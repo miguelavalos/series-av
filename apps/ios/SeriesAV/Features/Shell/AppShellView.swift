@@ -9,6 +9,8 @@ struct AppShellView: View {
     @State private var selectedTab: AppShellTab = .home
     @State private var navigationPath = NavigationPath()
     @State private var navigationRootID = UUID()
+    @State private var searchFocusRequest = 0
+    @StateObject private var searchState = SearchScreenState()
 
     init(
         startSignInFlow: @escaping (Bool) -> Void = { _ in },
@@ -27,6 +29,9 @@ struct AppShellView: View {
                     navigationRootID = UUID()
                 }
                 selectedTab = tab
+                if tab == .search {
+                    searchFocusRequest += 1
+                }
             },
             content: {
                 NavigationStack(path: $navigationPath) {
@@ -47,7 +52,9 @@ struct AppShellView: View {
             SearchScreen(
                 service: service,
                 cloudService: cloudService,
-                bottomContentPadding: AppShellMetrics.rootContentBottomPadding
+                bottomContentPadding: AppShellMetrics.rootContentBottomPadding,
+                focusRequest: searchFocusRequest,
+                state: searchState
             )
         case .library:
             LibraryScreen(bottomContentPadding: AppShellMetrics.rootContentBottomPadding)

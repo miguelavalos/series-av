@@ -6,6 +6,9 @@ coverage
 .DerivedData*/
 DerivedData/
 build/
+*.xcarchive
+*.xcresult
+*.ipa
 *.tsbuildinfo
 *.log
 npm-debug.log*

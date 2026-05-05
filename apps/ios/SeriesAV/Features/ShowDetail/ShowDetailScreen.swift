@@ -275,10 +275,14 @@ struct ShowDetailScreen: View {
     @ViewBuilder
     private func episodeNavigator(snapshot: ShowSnapshot) -> some View {
         if snapshot.episodesBySeason.isEmpty {
-            EmptyStateCard(
-                title: "Episode data unavailable",
-                detail: "This source did not return trackable season metadata yet."
-            )
+            if isLoading {
+                EpisodeLoadingCard()
+            } else {
+                EmptyStateCard(
+                    title: "Episode data unavailable",
+                    detail: "This source did not return trackable season metadata yet."
+                )
+            }
         } else {
             if libraryShow == nil {
                 Button {
@@ -656,10 +660,14 @@ struct ShowDetailScreen: View {
             }
 
             if snapshot.episodesBySeason.isEmpty {
-                EmptyStateCard(
-                    title: "Episode data unavailable",
-                    detail: "This source did not return trackable season metadata yet."
-                )
+                if isLoading {
+                    EpisodeLoadingCard()
+                } else {
+                    EmptyStateCard(
+                        title: "Episode data unavailable",
+                        detail: "This source did not return trackable season metadata yet."
+                    )
+                }
             } else {
                 ForEach(seasonNumbers(snapshot), id: \.self) { season in
                     seasonCard(snapshot: snapshot, season: season)
@@ -1085,24 +1093,70 @@ struct ShowDetailScreen: View {
 
         if let lookupRemoteSeriesID {
             if let remoteSnapshot = await socialStore.getSeriesSnapshot(seriesId: lookupRemoteSeriesID) {
-                snapshot = remoteSnapshot
-                isOverviewExpanded = false
-                expandedSeason = expandedSeason ?? preferredExpandedSeason(remoteSnapshot)
-                selectedSeason = selectedSeason ?? expandedSeason
-                errorMessage = nil
-                if let id = libraryShow?.id ?? libraryShowID {
-                    libraryStore.mergeSnapshot(id: id, snapshot: remoteSnapshot)
-                    libraryShow = libraryStore.show(id: id)
-                }
+                applyLoadedSnapshot(remoteSnapshot)
             } else if snapshot == nil {
                 errorMessage = "Unable to load this series right now."
             }
+        }
+
+        if loadedSnapshotHasNoEpisodes,
+           let enrichedSnapshot = await socialStore.enrichSeriesSnapshot(
+            seriesId: lookupRemoteSeriesID,
+            providerRefs: enrichmentProviderRefs()
+           ) {
+            applyLoadedSnapshot(enrichedSnapshot)
         }
     }
 
     private var remoteSourceKey: String? {
         guard let summary, summary.source != .tvmaze else { return nil }
         return buildSourceKey(source: summary.source, sourceId: summary.sourceId)
+    }
+
+    private var loadedSnapshotHasNoEpisodes: Bool {
+        guard let snapshot = resolvedSnapshot ?? fallbackSnapshot else { return true }
+        return snapshot.episodesBySeason.isEmpty
+    }
+
+    private func applyLoadedSnapshot(_ loadedSnapshot: ShowSnapshot) {
+        snapshot = loadedSnapshot
+        isOverviewExpanded = false
+        expandedSeason = expandedSeason ?? preferredExpandedSeason(loadedSnapshot)
+        selectedSeason = selectedSeason ?? expandedSeason
+        errorMessage = nil
+        if let id = libraryShow?.id ?? libraryShowID {
+            libraryStore.mergeSnapshot(id: id, snapshot: loadedSnapshot)
+            libraryShow = libraryStore.show(id: id)
+        }
+    }
+
+    private func enrichmentProviderRefs() -> [RemoteSeriesProviderRef] {
+        let source = summary?.source ?? libraryShow?.snapshot.source ?? snapshot?.source
+        let sourceId = summary?.sourceId ?? libraryShow?.snapshot.sourceId ?? snapshot?.sourceId
+
+        guard let source, let sourceId, !sourceId.isEmpty else { return [] }
+
+        let now = ISO8601DateFormatter().string(from: Date())
+        return [
+            RemoteSeriesProviderRef(
+                provider: source,
+                providerSeriesId: sourceId,
+                providerURL: providerURL(source: source, sourceId: sourceId),
+                matchConfidence: "strong",
+                isPrimary: true,
+                createdAt: now,
+                updatedAt: now
+            )
+        ]
+    }
+
+    private func providerURL(source: ShowSource, sourceId: String) -> String? {
+        switch source {
+        case .tvmaze:
+            return "https://www.tvmaze.com/shows/\(sourceId)"
+        case .thetvdb:
+            return "https://thetvdb.com/dereferrer/series/\(sourceId)"
+        }
     }
 
     private func firstTrackableSeason(snapshot: ShowSnapshot) -> Int? {
@@ -1183,6 +1237,58 @@ private struct EpisodeArtworkView: View {
     private var initials: String {
         let initials = episode.title.split(separator: " ").prefix(2).compactMap(\.first).map(String.init).joined()
         return initials.isEmpty ? "AV" : initials
+    }
+}
+
+private struct EpisodeLoadingCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(spacing: 12) {
+                ProgressView()
+                    .tint(SeriesTheme.highlight)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Loading episodes")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(SeriesTheme.textPrimary)
+
+                    Text("Fetching seasons and progress-ready metadata.")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(SeriesTheme.textSecondary)
+                }
+            }
+
+            VStack(spacing: 10) {
+                ForEach(0..<3, id: \.self) { index in
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(SeriesTheme.cardSurface)
+                        .frame(height: index == 0 ? 68 : 54)
+                        .overlay(alignment: .leading) {
+                            VStack(alignment: .leading, spacing: 8) {
+                                RoundedRectangle(cornerRadius: 4, style: .continuous)
+                                    .fill(SeriesTheme.mutedSurface)
+                                    .frame(width: index == 0 ? 170 : 130, height: 12)
+                                RoundedRectangle(cornerRadius: 4, style: .continuous)
+                                    .fill(SeriesTheme.mutedSurface)
+                                    .frame(width: index == 2 ? 96 : 140, height: 10)
+                            }
+                            .padding(.horizontal, 14)
+                        }
+                }
+            }
+            .redacted(reason: .placeholder)
+        }
+        .padding(18)
+        .background(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(SeriesTheme.cardSurface)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .stroke(SeriesTheme.borderSubtle, lineWidth: 1)
+                }
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Loading episodes")
     }
 }
 

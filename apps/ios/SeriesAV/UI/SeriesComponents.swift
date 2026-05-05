@@ -156,17 +156,22 @@ struct SearchField: View {
     let prompt: String
     let onSubmit: () -> Void
     let onClear: () -> Void
+    let focusTrigger: Int?
+
+    @FocusState private var isFocused: Bool
 
     init(
         query: Binding<String>,
         prompt: String = "Search",
         onSubmit: @escaping () -> Void = {},
-        onClear: @escaping () -> Void = {}
+        onClear: @escaping () -> Void = {},
+        focusTrigger: Int? = nil
     ) {
         _query = query
         self.prompt = prompt
         self.onSubmit = onSubmit
         self.onClear = onClear
+        self.focusTrigger = focusTrigger
     }
 
     var body: some View {
@@ -188,6 +193,7 @@ struct SearchField: View {
                 .font(.system(size: 16, weight: .medium))
                 .foregroundStyle(SeriesTheme.textPrimary)
                 .tint(SeriesTheme.highlight)
+                .focused($isFocused)
 
             if !query.isEmpty {
                 Button("Clear") {
@@ -208,11 +214,20 @@ struct SearchField: View {
                         .stroke(SeriesTheme.borderSubtle, lineWidth: 1)
                 }
         )
+        .onChange(of: focusTrigger) { _, _ in
+            isFocused = true
+        }
     }
 }
 
 struct ShowRowCard: View {
     let show: CatalogShowSummary
+    let libraryShow: LibraryShow?
+
+    init(show: CatalogShowSummary, libraryShow: LibraryShow? = nil) {
+        self.show = show
+        self.libraryShow = libraryShow
+    }
 
     var body: some View {
         HStack(spacing: 14) {
@@ -225,7 +240,9 @@ struct ShowRowCard: View {
                         .foregroundStyle(SeriesTheme.textPrimary)
                         .lineLimit(2)
                     Spacer(minLength: 8)
-                    if let year = show.year {
+                    if let libraryShow {
+                        followedBadge(status: libraryShow.status)
+                    } else if let year = show.year {
                         Text(String(year))
                             .font(.system(size: 12, weight: .bold))
                             .foregroundStyle(SeriesTheme.textSecondary)
@@ -247,6 +264,27 @@ struct ShowRowCard: View {
         }
         .padding(18)
         .background(seriesCardBackground)
+        .overlay {
+            if libraryShow != nil {
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .stroke(SeriesTheme.highlight.opacity(0.55), lineWidth: 1.2)
+            }
+        }
+        .accessibilityHint(libraryShow == nil ? "" : "Already in your library")
+    }
+
+    private func followedBadge(status: ShowStatus) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 12, weight: .bold))
+            Text(status.title.uppercased())
+                .font(.system(size: 10, weight: .black))
+                .lineLimit(1)
+        }
+        .foregroundStyle(SeriesTheme.brandBlack)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 6)
+        .background(SeriesTheme.highlight, in: Capsule())
     }
 }
 

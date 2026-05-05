@@ -1,109 +1,133 @@
 import SwiftUI
 
+@MainActor
+final class SearchScreenState: ObservableObject {
+    @Published var query = ""
+    @Published var submittedQuery = ""
+    @Published var activeCollection: SeriesBrowseCollection = .popular
+    @Published var shows: [CatalogShowSummary] = []
+    @Published var isLoading = false
+    @Published var errorMessage: String?
+    @Published var selectedDetail: SelectedShowDetail?
+
+    var hasLoadedContent: Bool {
+        !shows.isEmpty || errorMessage != nil || isLoading
+    }
+}
+
 struct SearchScreen: View {
     let service: TVMazeService
     let cloudService: SeriesAVCloudService?
     let bottomContentPadding: CGFloat
+    let focusRequest: Int
+    @ObservedObject var state: SearchScreenState
 
     @EnvironmentObject private var languageController: AppLanguageController
+    @EnvironmentObject private var libraryStore: SeriesLibraryStore
 
-    @State private var query = ""
-    @State private var submittedQuery = ""
-    @State private var activeCollection: SeriesBrowseCollection = .popular
-    @State private var shows: [CatalogShowSummary] = []
-    @State private var isLoading = false
-    @State private var errorMessage: String?
-    @State private var selectedDetail: SelectedShowDetail?
     @State private var loadTask: Task<Void, Never>?
+    @State private var searchFieldFocusTrigger = 0
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                ShellBrandHeader(statusTitle: isLoading ? L10n.string("search.status.searching") : L10n.string("tab.search"))
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    ShellBrandHeader(statusTitle: state.isLoading ? L10n.string("search.status.searching") : L10n.string("tab.search"))
 
-                VStack(alignment: .leading, spacing: 10) {
-                    Text(L10n.string("search.title"))
-                        .font(.system(size: 34, weight: .bold))
-                        .foregroundStyle(SeriesTheme.textPrimary)
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(L10n.string("search.title"))
+                            .font(.system(size: 34, weight: .bold))
+                            .foregroundStyle(SeriesTheme.textPrimary)
 
-                    Text(L10n.string("search.subtitle"))
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(SeriesTheme.textSecondary)
-                }
+                        Text(L10n.string("search.subtitle"))
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(SeriesTheme.textSecondary)
+                    }
 
-                SearchField(
-                    query: $query,
-                    prompt: L10n.string("tab.search"),
-                    onSubmit: submitSearch,
-                    onClear: clearSearch
-                )
-                VStack(alignment: .leading, spacing: 14) {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            ForEach(SeriesBrowseCollection.allCases) { collection in
-                                Button(collection.title) {
-                                    query = ""
-                                    submittedQuery = ""
-                                    activeCollection = collection
-                                    loadFeaturedCollection()
-                                }
-                                .font(.system(size: 13, weight: .bold))
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 10)
-                                .background(activeCollection == collection && submittedQuery.isEmpty ? SeriesTheme.highlight : SeriesTheme.cardSurface, in: Capsule())
-                                .foregroundStyle(activeCollection == collection && submittedQuery.isEmpty ? Color.white : SeriesTheme.textPrimary)
-                                .overlay {
-                                    Capsule()
-                                        .stroke(activeCollection == collection && submittedQuery.isEmpty ? SeriesTheme.highlight : SeriesTheme.borderSubtle, lineWidth: 1)
+                    SearchField(
+                        query: $state.query,
+                        prompt: L10n.string("tab.search"),
+                        onSubmit: submitSearch,
+                        onClear: clearSearch,
+                        focusTrigger: searchFieldFocusTrigger
+                    )
+                    .id("search.input")
+                    VStack(alignment: .leading, spacing: 14) {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 10) {
+                                ForEach(SeriesBrowseCollection.allCases) { collection in
+                                    Button(collection.title) {
+                                        state.query = ""
+                                        state.submittedQuery = ""
+                                        state.activeCollection = collection
+                                        loadFeaturedCollection()
+                                    }
+                                    .font(.system(size: 13, weight: .bold))
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 10)
+                                    .background(state.activeCollection == collection && state.submittedQuery.isEmpty ? SeriesTheme.highlight : SeriesTheme.cardSurface, in: Capsule())
+                                    .foregroundStyle(state.activeCollection == collection && state.submittedQuery.isEmpty ? Color.white : SeriesTheme.textPrimary)
+                                    .overlay {
+                                        Capsule()
+                                            .stroke(state.activeCollection == collection && state.submittedQuery.isEmpty ? SeriesTheme.highlight : SeriesTheme.borderSubtle, lineWidth: 1)
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                .padding(22)
-                .background(
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .fill(SeriesTheme.mutedSurface)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                                .stroke(SeriesTheme.borderSubtle, lineWidth: 1)
-                        }
-                )
-
-                ShellSection(
-                    title: !submittedQuery.isEmpty ? L10n.string("search.results.title", submittedQuery) : L10n.string("search.featured.title", activeCollection.title),
-                    subtitle: isLoading ? L10n.string("search.loading.inline") : L10n.string("search.results.subtitle")
-                ) {
-                    if let errorMessage {
-                        EmptyStateCard(title: L10n.string("search.error.title"), detail: errorMessage)
-                    } else if isLoading {
-                        SearchResultsSkeleton()
-                    } else if shows.isEmpty {
-                        EmptyStateCard(title: L10n.string("search.empty.title"), detail: L10n.string("search.empty.detail"))
-                    } else {
-                        ForEach(shows) { show in
-                            Button {
-                                selectedDetail = .summary(show)
-                            } label: {
-                                ShowRowCard(show: show)
+                    .padding(22)
+                    .background(
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .fill(SeriesTheme.mutedSurface)
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                                    .stroke(SeriesTheme.borderSubtle, lineWidth: 1)
                             }
-                            .buttonStyle(.plain)
+                    )
+
+                    ShellSection(
+                        title: !state.submittedQuery.isEmpty ? L10n.string("search.results.title", state.submittedQuery) : L10n.string("search.featured.title", state.activeCollection.title),
+                        subtitle: state.isLoading ? L10n.string("search.loading.inline") : L10n.string("search.results.subtitle")
+                    ) {
+                        if let errorMessage = state.errorMessage {
+                            EmptyStateCard(title: L10n.string("search.error.title"), detail: errorMessage)
+                        } else if state.isLoading {
+                            SearchResultsSkeleton()
+                        } else if state.shows.isEmpty {
+                            EmptyStateCard(title: L10n.string("search.empty.title"), detail: L10n.string("search.empty.detail"))
+                        } else {
+                            ForEach(state.shows) { show in
+                                Button {
+                                    state.selectedDetail = .summary(show)
+                                } label: {
+                                    ShowRowCard(show: show, libraryShow: followedShow(for: show))
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
                     }
+                }
+                .padding(24)
+                .padding(.bottom, bottomContentPadding)
+            }
+            .scrollIndicators(.hidden)
+            .onAppear {
+                if focusRequest > 0 {
+                    focusSearchInput(proxy: proxy)
                 }
             }
-            .padding(24)
-            .padding(.bottom, bottomContentPadding)
+            .onChange(of: focusRequest) { _, _ in
+                focusSearchInput(proxy: proxy)
+            }
         }
-        .scrollIndicators(.hidden)
         .background(SeriesTheme.shellBackground.ignoresSafeArea())
         .task {
-            loadFeaturedCollection()
+            loadInitialContentIfNeeded()
         }
         .onDisappear {
             loadTask?.cancel()
         }
-        .sheet(item: $selectedDetail) { detail in
+        .sheet(item: $state.selectedDetail) { detail in
             ShowDetailScreen(
                 libraryShowID: detail.libraryShowID,
                 summary: detail.summary,
@@ -116,32 +140,47 @@ struct SearchScreen: View {
     }
 
     private var trimmedQuery: String {
-        query.trimmingCharacters(in: .whitespacesAndNewlines)
+        state.query.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func focusSearchInput(proxy: ScrollViewProxy) {
+        withAnimation(.snappy) {
+            proxy.scrollTo("search.input", anchor: .center)
+        }
+        searchFieldFocusTrigger += 1
+    }
+
+    private func followedShow(for show: CatalogShowSummary) -> LibraryShow? {
+        libraryStore.findShow(
+            source: show.source,
+            sourceID: show.sourceId,
+            canonicalSeriesID: show.canonicalSeriesId
+        )
     }
 
     private func load(query searchQuery: String?) async {
-        isLoading = true
-        errorMessage = nil
+        state.isLoading = true
+        state.errorMessage = nil
         if searchQuery != nil {
-            shows = []
+            state.shows = []
         }
         defer {
             if !Task.isCancelled {
-                isLoading = false
+                state.isLoading = false
             }
         }
 
         do {
             if let searchQuery {
-                shows = try await search(query: searchQuery)
+                state.shows = try await search(query: searchQuery)
             } else {
-                shows = try await service.browse(collection: activeCollection)
+                state.shows = try await service.browse(collection: state.activeCollection)
             }
         } catch is CancellationError {
             return
         } catch {
-            shows = []
-            errorMessage = L10n.string("search.error.detail")
+            state.shows = []
+            state.errorMessage = L10n.string("search.error.detail")
         }
     }
 
@@ -152,7 +191,7 @@ struct SearchScreen: View {
             return
         }
 
-        submittedQuery = searchQuery
+        state.submittedQuery = searchQuery
         loadTask?.cancel()
         loadTask = Task {
             await load(query: searchQuery)
@@ -160,7 +199,12 @@ struct SearchScreen: View {
     }
 
     private func clearSearch() {
-        submittedQuery = ""
+        state.submittedQuery = ""
+        loadFeaturedCollection()
+    }
+
+    private func loadInitialContentIfNeeded() {
+        guard !state.hasLoadedContent else { return }
         loadFeaturedCollection()
     }
 

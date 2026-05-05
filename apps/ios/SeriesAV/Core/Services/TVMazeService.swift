@@ -16,14 +16,17 @@ struct TVMazeService {
         let genre = collection == .popular ? nil : collection.rawValue
         async let page0: [TVMazeShow] = fetch(URL(string: "https://api.tvmaze.com/shows?page=0")!)
         async let page1: [TVMazeShow] = fetch(URL(string: "https://api.tvmaze.com/shows?page=1")!)
-        let shows = try await (page0 + page1)
+        async let page2: [TVMazeShow] = fetch(URL(string: "https://api.tvmaze.com/shows?page=2")!)
+        async let page3: [TVMazeShow] = fetch(URL(string: "https://api.tvmaze.com/shows?page=3")!)
+        async let page4: [TVMazeShow] = fetch(URL(string: "https://api.tvmaze.com/shows?page=4")!)
+        let shows = try await (page0 + page1 + page2 + page3 + page4)
             .map(mapSummary(show:))
             .filter { summary in
                 guard let genre else { return true }
                 return summary.genres.contains(where: { $0.lowercased() == genre })
             }
             .sorted(by: { score($0) > score($1) })
-        return Array(shows.prefix(18))
+        return rotatingFeaturedShows(from: shows, collection: collection)
     }
 
     func snapshot(for sourceID: String) async throws -> ShowSnapshot {
@@ -129,6 +132,43 @@ struct TVMazeService {
             + Double(show.summary != nil ? 4 : 0)
             + Double(show.year.map { max(0, $0 - 1990) } ?? 0) / 10
             + Double(min(show.genres.count, 3))
+    }
+
+    private func rotatingFeaturedShows(
+        from shows: [CatalogShowSummary],
+        collection: SeriesBrowseCollection,
+        now: Date = Date()
+    ) -> [CatalogShowSummary] {
+        let candidatePool = Array(shows.prefix(90))
+        let rotationBucket = Int(now.timeIntervalSince1970 / (6 * 60 * 60))
+        let selected = candidatePool
+            .sorted {
+                rotationRank(for: $0, collection: collection, bucket: rotationBucket) <
+                    rotationRank(for: $1, collection: collection, bucket: rotationBucket)
+            }
+            .prefix(18)
+        return selected.sorted {
+            let leftScore = score($0)
+            let rightScore = score($1)
+            if leftScore == rightScore {
+                return $0.title < $1.title
+            }
+            return leftScore > rightScore
+        }
+    }
+
+    private func rotationRank(
+        for show: CatalogShowSummary,
+        collection: SeriesBrowseCollection,
+        bucket: Int
+    ) -> UInt64 {
+        stableHash("\(collection.rawValue)|\(bucket)|\(show.source.rawValue)|\(show.sourceId)")
+    }
+
+    private func stableHash(_ value: String) -> UInt64 {
+        value.utf8.reduce(14_695_981_039_346_656_037) { hash, byte in
+            (hash ^ UInt64(byte)).multipliedReportingOverflow(by: 1_099_511_628_211).partialValue
+        }
     }
 
     private func isEpisodeAired(_ episode: TVMazeEpisode, now: Date) -> Bool {

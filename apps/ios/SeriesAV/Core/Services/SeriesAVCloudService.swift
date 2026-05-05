@@ -73,6 +73,26 @@ final class SeriesAVCloudService {
         }
     }
 
+    func enrichCatalog(seriesId: String?, providerRefs: [RemoteSeriesProviderRef]) async throws -> RemoteCatalogRecord {
+        struct EnrichRequest: Encodable {
+            let seriesId: String?
+            let providerRefs: [RemoteSeriesProviderRef]
+        }
+
+        let body = try encoder.encode(
+            EnrichRequest(
+                seriesId: seriesId,
+                providerRefs: providerRefs
+            )
+        )
+        let response: RemoteCatalogEnrichResponse = try await apiClient.request(
+            "/v1/series/catalog/enrich",
+            method: "POST",
+            body: body
+        )
+        return response.record
+    }
+
     func resolveCatalog(query: String, preferredLanguage: String? = nil) async throws -> [RemoteSeriesRecord] {
         struct ResolveRequest: Encodable {
             let query: String

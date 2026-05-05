@@ -174,6 +174,16 @@ final class SeriesSocialStore: ObservableObject {
         }
     }
 
+    func enrichSeriesSnapshot(seriesId: String?, providerRefs: [RemoteSeriesProviderRef]) async -> ShowSnapshot? {
+        guard let cloudService, !providerRefs.isEmpty else { return nil }
+        do {
+            let record = try await cloudService.enrichCatalog(seriesId: seriesId, providerRefs: providerRefs)
+            return mapRemoteRecordToShowSnapshot(record)
+        } catch {
+            return nil
+        }
+    }
+
     private func hydrateMetadata(
         from cloudService: SeriesAVCloudService,
         recommendations: [RemoteRecommendation],

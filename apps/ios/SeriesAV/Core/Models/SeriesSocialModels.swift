@@ -77,6 +77,11 @@ struct RemoteCatalogResolveResponse: Decodable {
     let generatedAt: String
 }
 
+struct RemoteCatalogEnrichResponse: Decodable {
+    let record: RemoteCatalogRecord
+    let appliedAt: String
+}
+
 struct RemoteRecommendation: Decodable, Identifiable {
     let id: String
     let senderUserId: String
