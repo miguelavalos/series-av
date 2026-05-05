@@ -1,0 +1,35 @@
+{
+  "name": "seriesav",
+  "private": true,
+  "packageManager": "bun@1.3.13",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "start": "bun run dev",
+    "dev": "bun run ios:build",
+    "ios": "bun run ios:build",
+    "varlock:load": "zsh -lc 'eval \"$(./scripts/resolve-infisical-bootstrap-env.sh local)\" && ./node_modules/.bin/varlock load --path .'",
+    "varlock:load:production": "zsh -lc 'eval \"$(./scripts/resolve-infisical-bootstrap-env.sh production)\" && ./node_modules/.bin/varlock load --path .'",
+    "varlock:typegen": "echo 'No TypeScript env types are generated for the native iOS app.'",
+    "config:hygiene": "./scripts/check-public-config-hygiene.sh",
+    "ios:config": "./scripts/generate-local-xcconfig.sh local",
+    "ios:config:production": "./scripts/generate-local-xcconfig.sh production",
+    "ios:build": "xcodebuild -project apps/ios/SeriesAV.xcodeproj -scheme SeriesAV -destination 'generic/platform=iOS Simulator' -configuration Debug -derivedDataPath .DerivedData-ios build CODE_SIGNING_ALLOWED=NO",
+    "typecheck": "bun run ios:build",
+    "check": "bun run typecheck",
+    "deps:outdated": "ncu --workspaces --packageManager bun --cooldown 1",
+    "deps:audit": "bun audit",
+    "ncu": "ncu --workspaces --packageManager bun --target latest --cooldown 1 -u && bun run clean",
+    "ncu:minor": "ncu --workspaces --packageManager bun --target minor --cooldown 1 -u && bun run clean",
+    "update": "bun run ncu",
+    "update:minor": "bun run ncu:minor",
+    "clean": "bun run clean:files && bun install && bun run clean:cache",
+    "clean:files": "rm -rf node_modules dist coverage",
+    "clean:cache": "bun pm cache rm"
+  },
+  "devDependencies": {
+    "@varlock/infisical-plugin": "0.0.6",
+    "varlock": "^0.9.1"
+  }
+}
