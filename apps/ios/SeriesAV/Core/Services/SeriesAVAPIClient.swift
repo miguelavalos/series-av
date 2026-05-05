@@ -8,11 +8,11 @@ enum SeriesAVAPIClientError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingToken:
-            "Missing AV Account token."
+            "Missing Account AV token."
         case .missingBaseURL:
-            "Missing AV Account API base URL."
+            "Missing Account AV API base URL."
         case .requestFailed(let statusCode):
-            "AV Account API request failed with status \(statusCode)."
+            "Account AV API request failed with status \(statusCode)."
         }
     }
 }

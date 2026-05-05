@@ -53,7 +53,7 @@ struct SharedListsScreen: View {
                                         .font(.system(size: 22, weight: .bold))
                                         .foregroundStyle(SeriesTheme.textPrimary)
 
-                                    Text(listSummary.list.description ?? "Collaborative series curation for your AV Account circle.")
+                                    Text(listSummary.list.description ?? "Collaborative series curation for your Account AV circle.")
                                         .font(.system(size: 14, weight: .medium))
                                         .foregroundStyle(SeriesTheme.textSecondary)
                                         .fixedSize(horizontal: false, vertical: true)

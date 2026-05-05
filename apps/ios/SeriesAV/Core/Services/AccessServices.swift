@@ -256,17 +256,30 @@ final class AccessController: ObservableObject {
 
         guard let baseURL = AppConfig.avAppsAPIBaseURL else { return }
         do {
-            guard let token = try await accountService.getToken(), !token.isEmpty else { return }
+            authLogger.info("Refreshing Account AV access from \(baseURL.absoluteString, privacy: .public)")
+            guard let token = try await accountService.getToken(), !token.isEmpty else {
+                authLogger.error("Unable to refresh account access: missing Clerk session token")
+                return
+            }
             var request = URLRequest(url: baseURL.appending(path: "v1/me/access"))
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
             let (data, response) = try await URLSession.shared.data(for: request)
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else { return }
+            guard let httpResponse = response as? HTTPURLResponse else {
+                authLogger.error("Unable to refresh account access: non-HTTP response")
+                return
+            }
+            guard httpResponse.statusCode == 200 else {
+                authLogger.error("Unable to refresh account access: HTTP \(httpResponse.statusCode, privacy: .public)")
+                return
+            }
             let payload = try JSONDecoder().decode(MeAccessResponse.self, from: data)
             if let access = payload.apps.first(where: { $0.appId == "seriesav" }) {
+                authLogger.info("Resolved Series AV access mode \(access.accessMode.rawValue, privacy: .public)")
                 planTier = access.planTier
                 accessMode = access.accessMode
                 capabilities = access.capabilities
             } else {
+                authLogger.error("Unable to refresh account access: seriesav entry missing in response")
                 accessMode = .signedInFree
                 planTier = .free
                 capabilities = .forMode(.signedInFree)

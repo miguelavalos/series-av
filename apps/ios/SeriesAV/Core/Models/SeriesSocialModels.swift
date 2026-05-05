@@ -67,6 +67,16 @@ struct RemoteCatalogRecord: Decodable {
     let episodes: [RemoteEpisodeRecord]
 }
 
+struct RemoteCatalogResolveCandidate: Decodable {
+    let series: RemoteSeriesRecord
+    let matchConfidence: String
+}
+
+struct RemoteCatalogResolveResponse: Decodable {
+    let candidates: [RemoteCatalogResolveCandidate]
+    let generatedAt: String
+}
+
 struct RemoteRecommendation: Decodable, Identifiable {
     let id: String
     let senderUserId: String

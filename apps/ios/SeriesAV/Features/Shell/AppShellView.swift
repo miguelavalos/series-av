@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AppShellView: View {
     let startSignInFlow: (Bool) -> Void
+    let cloudService: SeriesAVCloudService?
 
     private let service = TVMazeService()
 
@@ -9,8 +10,12 @@ struct AppShellView: View {
     @State private var navigationPath = NavigationPath()
     @State private var navigationRootID = UUID()
 
-    init(startSignInFlow: @escaping (Bool) -> Void = { _ in }) {
+    init(
+        startSignInFlow: @escaping (Bool) -> Void = { _ in },
+        cloudService: SeriesAVCloudService? = nil
+    ) {
         self.startSignInFlow = startSignInFlow
+        self.cloudService = cloudService
     }
 
     var body: some View {
@@ -39,7 +44,11 @@ struct AppShellView: View {
         case .home:
             HomeScreen(service: service, bottomContentPadding: AppShellMetrics.rootContentBottomPadding)
         case .search:
-            SearchScreen(service: service, bottomContentPadding: AppShellMetrics.rootContentBottomPadding)
+            SearchScreen(
+                service: service,
+                cloudService: cloudService,
+                bottomContentPadding: AppShellMetrics.rootContentBottomPadding
+            )
         case .library:
             LibraryScreen(bottomContentPadding: AppShellMetrics.rootContentBottomPadding)
         case .discover:

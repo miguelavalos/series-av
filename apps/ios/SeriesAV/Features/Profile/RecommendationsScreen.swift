@@ -19,7 +19,7 @@ struct RecommendationsScreen: View {
                 SectionHeading(
                     eyebrow: "Social",
                     title: "Recommendations",
-                    subtitle: "Incoming picks from the AV Account layer, styled with the same shell used everywhere else in the app."
+                    subtitle: "Incoming picks from the Account AV layer, styled with the same shell used everywhere else in the app."
                 )
 
                 dashboardCard

@@ -44,7 +44,7 @@
 		145DE7E7B082B7D92C440A5B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		266318A1EDA805553FCB6D09 /* AppShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellView.swift; sourceTree = "<group>"; };
 		28289FA4BE6B01E917E68E89 /* SeriesSocialStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesSocialStore.swift; sourceTree = "<group>"; };
-		2A2E8FBF279E3A8C4EDC0B68 /* SeriesAV.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SeriesAV.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2A2E8FBF279E3A8C4EDC0B68 /* Series AV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Series AV.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F5BED36BE85DD07DEBB19A3 /* SeriesTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesTheme.swift; sourceTree = "<group>"; };
 		3C3510784E2A209F49C1295E /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		3DDD63C85E76FA77C1E40CCC /* SeriesSocialModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesSocialModels.swift; sourceTree = "<group>"; };
@@ -221,7 +221,7 @@
 		61ADF309C27D450FA7B67C86 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2A2E8FBF279E3A8C4EDC0B68 /* SeriesAV.app */,
+				2A2E8FBF279E3A8C4EDC0B68 /* Series AV.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -299,7 +299,7 @@
 				EB6F6B29A4A19D1806A544F7 /* ClerkKit */,
 			);
 			productName = SeriesAV;
-			productReference = 2A2E8FBF279E3A8C4EDC0B68 /* SeriesAV.app */;
+			productReference = 2A2E8FBF279E3A8C4EDC0B68 /* Series AV.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -312,7 +312,6 @@
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					5E6D90780F878770BBB2E021 = {
-						DevelopmentTeam = "$(AVALSYS_APPLE_DEVELOPMENT_TEAM)";
 						ProvisioningStyle = Automatic;
 					};
 				};

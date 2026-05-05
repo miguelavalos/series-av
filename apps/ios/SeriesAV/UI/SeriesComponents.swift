@@ -154,10 +154,19 @@ struct InlineBackButton: View {
 struct SearchField: View {
     @Binding var query: String
     let prompt: String
+    let onSubmit: () -> Void
+    let onClear: () -> Void
 
-    init(query: Binding<String>, prompt: String = "Search") {
+    init(
+        query: Binding<String>,
+        prompt: String = "Search",
+        onSubmit: @escaping () -> Void = {},
+        onClear: @escaping () -> Void = {}
+    ) {
         _query = query
         self.prompt = prompt
+        self.onSubmit = onSubmit
+        self.onClear = onClear
     }
 
     var body: some View {
@@ -174,6 +183,8 @@ struct SearchField: View {
             }
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
+                .submitLabel(.search)
+                .onSubmit(onSubmit)
                 .font(.system(size: 16, weight: .medium))
                 .foregroundStyle(SeriesTheme.textPrimary)
                 .tint(SeriesTheme.highlight)
@@ -181,6 +192,7 @@ struct SearchField: View {
             if !query.isEmpty {
                 Button("Clear") {
                     query = ""
+                    onClear()
                 }
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(SeriesTheme.highlight)

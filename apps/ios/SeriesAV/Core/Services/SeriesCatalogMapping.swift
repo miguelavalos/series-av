@@ -37,7 +37,7 @@ func mapRemoteRecordToShowSnapshot(_ record: RemoteCatalogRecord, sourceOverride
             season: episode.seasonNumber,
             episode: episode.episodeNumber,
             title: episode.title,
-            summary: episode.summary,
+            summary: stripHTML(episode.summary),
             imageURL: URL(string: episode.imageURL ?? ""),
             airdate: episode.airDate,
             isAired: episode.isAired ?? true
@@ -58,7 +58,7 @@ func mapRemoteRecordToShowSnapshot(_ record: RemoteCatalogRecord, sourceOverride
         title: record.series.title,
         year: record.series.year,
         imageURL: URL(string: record.series.posterURL ?? ""),
-        summary: record.series.summary,
+        summary: stripHTML(record.series.summary),
         genres: record.series.genres,
         episodeCountBySeason: episodeCountBySeason,
         totalEpisodeCountBySeason: totalEpisodeCountBySeason,
@@ -76,7 +76,23 @@ func mapRemoteRecordToSummary(_ record: RemoteCatalogRecord) -> CatalogShowSumma
         title: record.series.title,
         year: record.series.year,
         imageURL: URL(string: record.series.posterURL ?? ""),
-        summary: record.series.summary,
+        summary: stripHTML(record.series.summary),
         genres: record.series.genres
     )
+}
+
+func stripHTML(_ value: String?) -> String? {
+    guard let value, !value.isEmpty else { return nil }
+    let cleaned = value
+        .replacingOccurrences(of: "<[^>]+>", with: " ", options: .regularExpression)
+        .replacingOccurrences(of: "&nbsp;", with: " ")
+        .replacingOccurrences(of: "&amp;", with: "&")
+        .replacingOccurrences(of: "&quot;", with: "\"")
+        .replacingOccurrences(of: "&#39;", with: "'")
+        .replacingOccurrences(of: "&apos;", with: "'")
+        .replacingOccurrences(of: "&lt;", with: "<")
+        .replacingOccurrences(of: "&gt;", with: ">")
+        .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+        .trimmingCharacters(in: .whitespacesAndNewlines)
+    return cleaned.isEmpty ? nil : cleaned
 }

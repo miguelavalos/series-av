@@ -72,4 +72,26 @@ final class SeriesAVCloudService {
             return nil
         }
     }
+
+    func resolveCatalog(query: String, preferredLanguage: String? = nil) async throws -> [RemoteSeriesRecord] {
+        struct ResolveRequest: Encodable {
+            let query: String
+            let preferredProvider: ShowSource
+            let preferredLanguage: String?
+        }
+
+        let body = try encoder.encode(
+            ResolveRequest(
+                query: query.trimmingCharacters(in: .whitespacesAndNewlines),
+                preferredProvider: .thetvdb,
+                preferredLanguage: preferredLanguage
+            )
+        )
+        let response: RemoteCatalogResolveResponse = try await apiClient.request(
+            "/v1/series/catalog/resolve",
+            method: "POST",
+            body: body
+        )
+        return response.candidates.map(\.series)
+    }
 }

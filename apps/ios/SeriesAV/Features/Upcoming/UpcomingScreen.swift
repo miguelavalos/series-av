@@ -10,7 +10,7 @@ struct UpcomingScreen: View {
 
     private var watchingShows: [LibraryShow] {
         libraryStore.shows
-            .filter { $0.status == .watching }
+            .filter { $0.status == .watching && hasDatedNextEpisode($0) }
             .sorted { lhs, rhs in
                 let lhsEpisode = lhs.nextEpisode
                 let rhsEpisode = rhs.nextEpisode
@@ -187,6 +187,11 @@ struct UpcomingScreen: View {
     private func episodeSortKey(_ episode: UpcomingEpisode?, fallback: String) -> String {
         guard let episode else { return "9999-\(fallback)" }
         return "\(episode.airdate ?? "9999-99-99")-\(episode.season)-\(episode.episode)"
+    }
+
+    private func hasDatedNextEpisode(_ show: LibraryShow) -> Bool {
+        guard let airdate = show.nextEpisode?.airdate else { return false }
+        return !airdate.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }
 

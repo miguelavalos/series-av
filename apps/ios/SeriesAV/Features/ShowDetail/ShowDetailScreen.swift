@@ -516,7 +516,7 @@ struct ShowDetailScreen: View {
                     .font(.system(size: 22, weight: .bold))
                     .foregroundStyle(SeriesTheme.textPrimary)
 
-                Text("Use AV Account social features to recommend this show or place it in a shared watchlist.")
+                Text("Use Account AV social features to recommend this show or place it in a shared watchlist.")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(SeriesTheme.textSecondary)
             }
@@ -1040,12 +1040,25 @@ struct ShowDetailScreen: View {
                 expandedSeason = preferredExpandedSeason(snapshot)
                 selectedSeason = expandedSeason
             }
+        } else if let summary,
+                  let existingShow = libraryStore.findShow(
+                    source: summary.source,
+                    sourceID: summary.sourceId,
+                    canonicalSeriesID: summary.canonicalSeriesId
+                  ) {
+            libraryShow = existingShow
+            snapshot = existingShow.snapshot
+            isOverviewExpanded = false
+            expandedSeason = preferredExpandedSeason(existingShow.snapshot)
+            selectedSeason = expandedSeason
         }
 
         isLoading = true
         defer { isLoading = false }
 
-        if let sourceID = libraryShow?.snapshot.sourceId ?? summary?.sourceId {
+        if let source = libraryShow?.snapshot.source ?? summary?.source,
+           let sourceID = libraryShow?.snapshot.sourceId ?? summary?.sourceId,
+           source == .tvmaze {
             do {
                 let fresh = try await service.snapshot(for: sourceID)
                 snapshot = fresh
@@ -1065,21 +1078,31 @@ struct ShowDetailScreen: View {
             }
         }
 
-        if let remoteSeriesID {
-            if let remoteSnapshot = await socialStore.getSeriesSnapshot(seriesId: remoteSeriesID) {
+        let lookupRemoteSeriesID = remoteSeriesID
+            ?? libraryShow?.snapshot.canonicalSeriesId
+            ?? summary?.canonicalSeriesId
+            ?? remoteSourceKey
+
+        if let lookupRemoteSeriesID {
+            if let remoteSnapshot = await socialStore.getSeriesSnapshot(seriesId: lookupRemoteSeriesID) {
                 snapshot = remoteSnapshot
                 isOverviewExpanded = false
                 expandedSeason = expandedSeason ?? preferredExpandedSeason(remoteSnapshot)
                 selectedSeason = selectedSeason ?? expandedSeason
                 errorMessage = nil
-                if let libraryShowID {
-                    libraryStore.mergeSnapshot(id: libraryShowID, snapshot: remoteSnapshot)
-                    libraryShow = libraryStore.show(id: libraryShowID)
+                if let id = libraryShow?.id ?? libraryShowID {
+                    libraryStore.mergeSnapshot(id: id, snapshot: remoteSnapshot)
+                    libraryShow = libraryStore.show(id: id)
                 }
             } else if snapshot == nil {
                 errorMessage = "Unable to load this series right now."
             }
         }
+    }
+
+    private var remoteSourceKey: String? {
+        guard let summary, summary.source != .tvmaze else { return nil }
+        return buildSourceKey(source: summary.source, sourceId: summary.sourceId)
     }
 
     private func firstTrackableSeason(snapshot: ShowSnapshot) -> Int? {

@@ -11,9 +11,13 @@ struct RootView: View {
     @State private var isShowingOnboarding = false
     @State private var authOptionsArePresented = false
     @State private var shellID = UUID()
+    @State private var cloudService: SeriesAVCloudService?
 
     var body: some View {
-        AppShellView(startSignInFlow: startSignInFlow)
+        AppShellView(
+            startSignInFlow: startSignInFlow,
+            cloudService: cloudService
+        )
             .id(shellID)
             .preferredColorScheme(themeController.currentTheme.preferredColorScheme)
             .id(languageController.currentLanguage.hashValue ^ shellID.hashValue)
@@ -35,9 +39,12 @@ struct RootView: View {
                 .environmentObject(accessController)
             }
             .task {
+                async let initialExperience: Void = showInitialExperience()
                 await accessController.refresh()
-                await configureServices()
-                await showInitialExperience()
+                Task {
+                    await configureServices()
+                }
+                await initialExperience
             }
             .onChange(of: accessController.accessMode) { _, _ in
                 Task {
@@ -82,14 +89,12 @@ struct RootView: View {
 
     private func startAppleSignIn() async throws {
         try await accessController.signInWithApple()
-        await configureServices()
         shellID = UUID()
         isShowingOnboarding = false
     }
 
     private func startGoogleSignIn() async throws {
         try await accessController.signInWithGoogle()
-        await configureServices()
         shellID = UUID()
         isShowingOnboarding = false
     }
@@ -105,9 +110,11 @@ struct RootView: View {
 
         if accessController.capabilities.canUsePremiumFeatures {
             let cloudService = SeriesAVCloudService(getToken: { try await accessController.accountService.getToken() })
+            self.cloudService = cloudService.isConfigured() ? cloudService : nil
             socialStore.setCloudService(cloudService.isConfigured() ? cloudService : nil)
             await socialStore.refresh()
         } else {
+            cloudService = nil
             socialStore.setCloudService(nil)
         }
     }

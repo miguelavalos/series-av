@@ -2,7 +2,7 @@
 
 Open-source iOS app for Series AV.
 
-This repository contains the iOS client app, local watch-list and progress flows, AV Account UI, backend-aware access handling, and TV metadata integration used by the product.
+This repository contains the iOS client app, local watch-list and progress flows, Account AV UI, backend-aware access handling, and TV metadata integration used by the product.
 
 ## License
 
@@ -21,10 +21,10 @@ docs/
 
 - local-first series discovery and library flows
 - watch progress and on-device settings
-- AV Account UI surfaces
+- Account AV UI surfaces
 - native SwiftUI iOS app structure
 - public TV metadata integration via TVMaze
-- backend-backed access, app-data sync, and Series AV catalog/social integration through private AV Account infrastructure
+- backend-backed access, app-data sync, and Series AV catalog/social integration through private Account AV infrastructure
 
 ## Docs
 
@@ -34,19 +34,19 @@ docs/
 
 - TV metadata currently comes from `TVmaze`.
 - TVmaze's API licensing requires attribution. The app now exposes a visible attribution path in `Settings`, and the repo/docs should continue to keep that dependency explicit.
-- Signed-in account, entitlement, and deletion behavior are separate from TV catalog data and remain tied to the private AV Account backend.
+- Signed-in account, entitlement, and deletion behavior are separate from TV catalog data and remain tied to the private Account AV backend.
 
 ## Account Deletion Support
 
 - Public deletion support URL: `https://series-av.avalsys.com/delete-account`
 - Local-only users can remove on-device data from inside the app or by deleting the app.
-- If an AV Account was used, the public deletion page documents the out-of-app request path and the provider-subscription caveats.
+- If an Account AV was used, the public deletion page documents the out-of-app request path and the provider-subscription caveats.
 
 ## Current Structure Notes
 
 - All active app code lives under `apps/ios`.
 - There is no separate public backend in this repository.
-- Backend-backed features used by Series AV come from private AV Account infrastructure.
+- Backend-backed features used by Series AV come from private Account AV infrastructure.
 - When `ACCOUNTAV_API_BASE_URL` is configured, backend capabilities are authoritative for signed-in access.
 - Pro social surfaces and shared library sync are now wired in the public client.
 
@@ -60,9 +60,9 @@ docs/
 4. Build the iOS app:
    `bun run ios`
 
-Account sign-in uses the configured AV Account provider. `ACCOUNTAV_PUBLISHABLE_KEY` is required for generated native iOS config.
+Account sign-in uses the configured Account AV provider. `ACCOUNTAV_PUBLISHABLE_KEY` is required for generated native iOS config.
 
-If both the AV Account publishable key and `ACCOUNTAV_API_BASE_URL` are configured, the app can:
+If both the Account AV publishable key and `ACCOUNTAV_API_BASE_URL` are configured, the app can:
 
 - hydrate signed-in access from `GET /v1/me/access`
 - sync `library` through `/v1/apps/seriesav/data/library`
@@ -99,8 +99,8 @@ For simulator or physical iPhone installs, follow [docs/install-ios.md](docs/ins
 
 ## Open product work
 
-1. Run full end-to-end signed-in behavior checks against the real AV Account provider and AV Account backend environments.
-2. Run the private signed-in free/pro smoke prompt gates with a real AV Account session token in preview and production.
+1. Run full end-to-end signed-in behavior checks against the real Account AV provider and Account AV backend environments.
+2. Run the private signed-in free/pro smoke prompt gates with a real Account AV session token in preview and production.
 3. Collect real catalog mismatch examples that still fail after the current TheTVDB matching hardening.
 4. Validate the iOS signed-in simulator flow against preview before promoting future backend changes to production.
 
