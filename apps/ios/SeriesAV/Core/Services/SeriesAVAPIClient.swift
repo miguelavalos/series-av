@@ -77,6 +77,7 @@ final class SeriesAVAPIClient {
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("seriesav", forHTTPHeaderField: "x-appsav-app-id")
         for (header, value) in headers {
             request.setValue(value, forHTTPHeaderField: header)
         }

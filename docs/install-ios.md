@@ -40,6 +40,10 @@ bun run ios:preflight:production
 
 `apps/ios/Config/Local.xcconfig` is gitignored. Do not commit it or copy production values into versioned files.
 
+## Switching Dev And Production
+
+Always regenerate and preflight the native config after switching between dev and production. Do this before opening Xcode, running the simulator, archiving, or testing Clerk/Account AV sign-in.
+
 ## Dev Auth Smoke
 
 Use this sequence when testing native Account AV sign-in from the simulator:
