@@ -12,6 +12,7 @@ struct AccountSummary: Decodable, Equatable {
 
     enum CodingKeys: String, CodingKey {
         case id
+        case user
         case emailAddress
         case displayName
         case linkedApps
@@ -43,15 +44,22 @@ struct AccountSummary: Decodable, Equatable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decodeIfPresent(String.self, forKey: .id)
-        emailAddress = try container.decodeIfPresent(String.self, forKey: .emailAddress)
-        displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
+        let user = try container.decodeIfPresent(AccountSummaryUser.self, forKey: .user)
+        id = try container.decodeIfPresent(String.self, forKey: .id) ?? user?.id
+        emailAddress = try container.decodeIfPresent(String.self, forKey: .emailAddress) ?? user?.email
+        displayName = try container.decodeIfPresent(String.self, forKey: .displayName) ?? user?.displayName
         linkedApps = try container.decodeIfPresent([AccountLinkedApp].self, forKey: .linkedApps) ?? []
         access = try container.decodeIfPresent(AccountAccessSummary.self, forKey: .access)
         billing = try container.decodeIfPresent(AccountBillingSummary.self, forKey: .billing)
         currentDeletionJob = try container.decodeIfPresent(AccountDeletionJob.self, forKey: .currentDeletionJob)
         deleteAccountEligibility = try container.decodeIfPresent(AccountDeletionEligibility.self, forKey: .deleteAccountEligibility)
     }
+}
+
+private struct AccountSummaryUser: Decodable, Equatable {
+    let id: String?
+    let email: String?
+    let displayName: String?
 }
 
 struct AccountDeletionEligibility: Decodable, Equatable {
@@ -130,9 +138,45 @@ struct AccountDeletionJob: Decodable, Equatable {
     let message: String?
     let createdAt: String?
     let updatedAt: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case status
+        case message
+        case notes
+        case createdAt
+        case requestedAt
+        case updatedAt
+    }
+
+    init(
+        id: String? = nil,
+        status: AccountDeletionJobStatus,
+        message: String? = nil,
+        createdAt: String? = nil,
+        updatedAt: String? = nil
+    ) {
+        self.id = id
+        self.status = status
+        self.message = message
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+        status = try container.decodeIfPresent(AccountDeletionJobStatus.self, forKey: .status) ?? .unknown
+        message = try container.decodeIfPresent(String.self, forKey: .message)
+            ?? container.decodeIfPresent(String.self, forKey: .notes)
+        createdAt = try container.decodeIfPresent(String.self, forKey: .createdAt)
+            ?? container.decodeIfPresent(String.self, forKey: .requestedAt)
+        updatedAt = try container.decodeIfPresent(String.self, forKey: .updatedAt)
+    }
 }
 
 enum AccountDeletionJobStatus: String, Decodable, Equatable {
+    case queued
     case blocked
     case requested
     case processing
@@ -173,6 +217,28 @@ struct UnlinkAppResult: Decodable, Equatable {
 struct AccountLinkedApp: Decodable, Equatable {
     let appId: String
     let label: String?
+    let status: String?
+
+    enum CodingKeys: String, CodingKey {
+        case appId
+        case label
+        case name
+        case status
+    }
+
+    init(appId: String, label: String? = nil, status: String? = nil) {
+        self.appId = appId
+        self.label = label
+        self.status = status
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        appId = try container.decode(String.self, forKey: .appId)
+        label = try container.decodeIfPresent(String.self, forKey: .label)
+            ?? container.decodeIfPresent(String.self, forKey: .name)
+        status = try container.decodeIfPresent(String.self, forKey: .status)
+    }
 }
 
 struct AccountAccessSummary: Decodable, Equatable {
@@ -187,6 +253,15 @@ struct AccountAccessSummary: Decodable, Equatable {
     }
 
     init(from decoder: Decoder) throws {
+        if var unkeyedContainer = try? decoder.unkeyedContainer() {
+            var decodedApps: [AccountAppAccess] = []
+            while !unkeyedContainer.isAtEnd {
+                decodedApps.append(try unkeyedContainer.decode(AccountAppAccess.self))
+            }
+            apps = decodedApps
+            return
+        }
+
         let container = try decoder.container(keyedBy: CodingKeys.self)
         apps = try container.decodeIfPresent([AccountAppAccess].self, forKey: .apps) ?? []
     }
@@ -211,6 +286,15 @@ struct AccountBillingSummary: Decodable, Equatable {
     }
 
     init(from decoder: Decoder) throws {
+        if var unkeyedContainer = try? decoder.unkeyedContainer() {
+            var decodedSubscriptions: [AccountBillingSubscription] = []
+            while !unkeyedContainer.isAtEnd {
+                decodedSubscriptions.append(try unkeyedContainer.decode(AccountBillingSubscription.self))
+            }
+            subscriptions = decodedSubscriptions
+            return
+        }
+
         let container = try decoder.container(keyedBy: CodingKeys.self)
         subscriptions = try container.decodeIfPresent([AccountBillingSubscription].self, forKey: .subscriptions) ?? []
     }
@@ -220,4 +304,25 @@ struct AccountBillingSubscription: Decodable, Equatable {
     let status: String?
     let appId: String?
     let managementUrl: URL?
+
+    enum CodingKeys: String, CodingKey {
+        case status
+        case appId
+        case managementUrl
+        case manageUrl
+    }
+
+    init(status: String? = nil, appId: String? = nil, managementUrl: URL? = nil) {
+        self.status = status
+        self.appId = appId
+        self.managementUrl = managementUrl
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        status = try container.decodeIfPresent(String.self, forKey: .status)
+        appId = try container.decodeIfPresent(String.self, forKey: .appId)
+        managementUrl = try container.decodeIfPresent(URL.self, forKey: .managementUrl)
+            ?? container.decodeIfPresent(URL.self, forKey: .manageUrl)
+    }
 }

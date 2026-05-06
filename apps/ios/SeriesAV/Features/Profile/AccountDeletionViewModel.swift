@@ -179,7 +179,7 @@ final class AccountDeletionViewModel: ObservableObject {
                     managementUrl: nil
                 )
             ], canUnlinkCurrentApp: false)
-        case .requested, .processing, .awaitingIdentityDeletion:
+        case .queued, .requested, .processing, .awaitingIdentityDeletion:
             return .inProgress(job)
         case .failed, .unknown:
             return .blocked(
@@ -191,12 +191,12 @@ final class AccountDeletionViewModel: ObservableObject {
 
     private static func fallbackLinkedAppBlockers(from linkedApps: [AccountLinkedApp]) -> [AccountDeletionBlocker] {
         linkedApps
-            .filter { $0.appId != "seriesav" }
+            .filter { $0.appId != "seriesav" && $0.status != "available" }
             .map {
                 AccountDeletionBlocker(
                     type: .linkedApp,
                     appId: $0.appId,
-                    label: "Linked Apps AV app",
+                    label: $0.label ?? "Linked Apps AV app",
                     detail: "This shared Apps AV account is still linked to another app.",
                     managementUrl: nil
                 )
@@ -248,7 +248,7 @@ final class AccountDeletionViewModel: ObservableObject {
 
     private static func canUnlinkCurrentApp(from summary: AccountSummary) -> Bool {
         let currentAppId = "seriesav"
-        let linkedApps = summary.linkedApps.filter { $0.appId != "avapps" }
+        let linkedApps = summary.linkedApps.filter { $0.appId != "avapps" && $0.status != "available" }
         let isCurrentAppLinked = linkedApps.contains { $0.appId == currentAppId }
         let hasOtherLinkedApps = linkedApps.contains { $0.appId != currentAppId }
         let currentAppAccess = summary.access?.apps.first { $0.appId == currentAppId }
