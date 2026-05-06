@@ -28,9 +28,9 @@ private enum ShowDetailTab: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .episodes: "Episodes"
-        case .info: "Info"
-        case .social: "Social"
+        case .episodes: L10n.string("show.detail.tab.episodes")
+        case .info: L10n.string("show.detail.tab.info")
+        case .social: L10n.string("show.detail.tab.social")
         }
     }
 }
@@ -279,8 +279,8 @@ struct ShowDetailScreen: View {
                 EpisodeLoadingCard()
             } else {
                 EmptyStateCard(
-                    title: "Episode data unavailable",
-                    detail: "This source did not return trackable season metadata yet."
+                    title: L10n.string("show.detail.episodesUnavailable.title"),
+                    detail: L10n.string("show.detail.episodesUnavailable.detail")
                 )
             }
         } else {
@@ -288,7 +288,7 @@ struct ShowDetailScreen: View {
                 Button {
                     addSnapshotToLibrary(snapshot)
                 } label: {
-                    primaryButtonLabel("Add to My Series")
+                    primaryButtonLabel(L10n.string("show.detail.addToLibrary"))
                 }
                 .buttonStyle(.plain)
             }
@@ -340,10 +340,10 @@ struct ShowDetailScreen: View {
         return VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .bottom) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Season \(season)")
+                    Text(L10n.string("show.detail.season.title", season))
                         .font(.system(size: 24, weight: .black))
                         .foregroundStyle(SeriesTheme.textPrimary)
-                    Text(totalCount > airedCount ? "\(watchedCount) watched of \(airedCount) aired · \(totalCount) total" : "\(watchedCount) watched of \(airedCount) aired")
+                    Text(seasonProgressText(watchedCount: watchedCount, airedCount: airedCount, totalCount: totalCount))
                         .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(SeriesTheme.textSecondary)
                 }
@@ -488,7 +488,7 @@ struct ShowDetailScreen: View {
                     Button {
                         handleEpisodeProgressTap(episode)
                     } label: {
-                        primaryButtonLabel("Mark \(episodeCode(episode)) watched")
+                        primaryButtonLabel(L10n.string("show.detail.markWatched", episodeCode(episode)))
                     }
                     .buttonStyle(.plain)
                 }
@@ -497,14 +497,14 @@ struct ShowDetailScreen: View {
                     libraryStore.removeShow(id: libraryShow.id)
                     self.libraryShow = nil
                 } label: {
-                    destructiveButtonLabel("Remove from library")
+                    destructiveButtonLabel(L10n.string("show.detail.removeFromLibrary"))
                 }
                 .buttonStyle(.plain)
             } else {
                 Button {
                     addSnapshotToLibrary(snapshot)
                 } label: {
-                    primaryButtonLabel("Add to My Series")
+                    primaryButtonLabel(L10n.string("show.detail.addToLibrary"))
                 }
                 .buttonStyle(.plain)
             }
@@ -618,7 +618,7 @@ struct ShowDetailScreen: View {
                             .lineLimit(2)
 
                         HStack(spacing: 8) {
-                            metaChip(isEpisodeWatched(episode) ? "Watched" : episode.isAired ? "Up next" : "Coming soon", tone: episode.isAired ? .accent : .secondary)
+                            metaChip(episodeStatusChip(episode), tone: episode.isAired ? .accent : .secondary)
                             if let airdate = episode.airdate {
                                 metaChip(airdate, tone: .light)
                             }
@@ -650,11 +650,11 @@ struct ShowDetailScreen: View {
     private func episodes(snapshot: ShowSnapshot) -> some View {
         VStack(alignment: .leading, spacing: 18) {
             VStack(alignment: .leading, spacing: 6) {
-                Text("Episodes")
+                Text(L10n.string("show.detail.episodes.title"))
                     .font(.system(size: 22, weight: .bold))
                     .foregroundStyle(SeriesTheme.textPrimary)
 
-                Text("Season breakdown and progress-ready episode metadata.")
+                Text(L10n.string("show.detail.episodes.subtitle"))
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(SeriesTheme.textSecondary)
             }
@@ -663,10 +663,10 @@ struct ShowDetailScreen: View {
                 if isLoading {
                     EpisodeLoadingCard()
                 } else {
-                    EmptyStateCard(
-                        title: "Episode data unavailable",
-                        detail: "This source did not return trackable season metadata yet."
-                    )
+                EmptyStateCard(
+                    title: L10n.string("show.detail.episodesUnavailable.title"),
+                    detail: L10n.string("show.detail.episodesUnavailable.detail")
+                )
                 }
             } else {
                 ForEach(seasonNumbers(snapshot), id: \.self) { season in
@@ -694,10 +694,10 @@ struct ShowDetailScreen: View {
                 VStack(spacing: 14) {
                     HStack(spacing: 12) {
                         VStack(alignment: .leading, spacing: 5) {
-                            Text("Season \(season)")
+                            Text(L10n.string("show.detail.season.title", season))
                                 .font(.system(size: 24, weight: .black))
                                 .foregroundStyle(SeriesTheme.textPrimary)
-                            Text(totalCount > airedCount ? "\(watchedCount) watched of \(airedCount) aired · \(totalCount) total" : "\(watchedCount) watched of \(airedCount) aired")
+                            Text(seasonProgressText(watchedCount: watchedCount, airedCount: airedCount, totalCount: totalCount))
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundStyle(SeriesTheme.textSecondary)
                         }
@@ -748,11 +748,11 @@ struct ShowDetailScreen: View {
                 HStack(spacing: 8) {
                     metaChip(episodeCode(episode), tone: .light)
                     if watched {
-                        metaChip("Watched", tone: .accent)
+                        metaChip(L10n.string("show.detail.episode.watched"), tone: .accent)
                     } else if isNext {
-                        metaChip("Next", tone: .secondary)
+                        metaChip(L10n.string("show.detail.episode.next"), tone: .secondary)
                     } else if !episode.isAired {
-                        metaChip("Coming soon", tone: .secondary)
+                        metaChip(L10n.string("show.detail.episode.comingSoon"), tone: .secondary)
                     }
                 }
 
@@ -991,10 +991,10 @@ struct ShowDetailScreen: View {
     }
 
     private func featuredEpisodeEyebrow(_ episode: EpisodeSnapshot) -> String {
-        if libraryShow?.status == .completed { return "Completed" }
-        if !episode.isAired { return "Upcoming" }
-        if isEpisodeWatched(episode) { return "Latest watched" }
-        return libraryShow?.lastWatchedSeason == nil ? "Start watching" : "Continue watching"
+        if libraryShow?.status == .completed { return L10n.string("show.detail.featured.completed") }
+        if !episode.isAired { return L10n.string("show.detail.featured.upcoming") }
+        if isEpisodeWatched(episode) { return L10n.string("show.detail.featured.latestWatched") }
+        return libraryShow?.lastWatchedSeason == nil ? L10n.string("show.detail.featured.startWatching") : L10n.string("show.detail.featured.continueWatching")
     }
 
     private func episodeCode(_ episode: EpisodeSnapshot) -> String {
@@ -1003,9 +1003,22 @@ struct ShowDetailScreen: View {
 
     private func episodeFallbackSummary(_ episode: EpisodeSnapshot) -> String {
         if let airdate = episode.airdate {
-            return episode.isAired ? "Aired \(airdate)." : "Expected \(airdate)."
+            return episode.isAired ? L10n.string("show.detail.episode.airedSentence", airdate) : L10n.string("show.detail.episode.expectedSentence", airdate)
         }
-        return "No episode summary available yet."
+        return L10n.string("show.detail.episode.noSummary")
+    }
+
+    private func episodeStatusChip(_ episode: EpisodeSnapshot) -> String {
+        if isEpisodeWatched(episode) { return L10n.string("show.detail.episode.watched") }
+        if episode.isAired { return L10n.string("show.detail.episode.upNext") }
+        return L10n.string("show.detail.episode.comingSoon")
+    }
+
+    private func seasonProgressText(watchedCount: Int, airedCount: Int, totalCount: Int) -> String {
+        if totalCount > airedCount {
+            return L10n.string("show.detail.season.progressWithTotal", watchedCount, airedCount, totalCount)
+        }
+        return L10n.string("show.detail.season.progress", watchedCount, airedCount)
     }
 
     private enum ChipTone {
@@ -1312,7 +1325,7 @@ private struct EpisodeDetailSheet: View {
                         .foregroundStyle(SeriesTheme.textPrimary)
                         .fixedSize(horizontal: false, vertical: true)
                     if let airdate = episode.airdate {
-                        Text(episode.isAired ? "Aired \(airdate)" : "Expected \(airdate)")
+                        Text(episode.isAired ? L10n.string("show.detail.episode.aired", airdate) : L10n.string("show.detail.episode.expected", airdate))
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(SeriesTheme.textSecondary)
                     }
@@ -1343,15 +1356,16 @@ private struct EpisodeDetailSheet: View {
     }
 
     private var trackLabel: String {
-        if !episode.isAired { return "Episode not aired yet" }
-        return isWatched ? "Move progress to S\(episode.season)E\(episode.episode)" : "Mark S\(episode.season)E\(episode.episode) watched"
+        if !episode.isAired { return L10n.string("show.detail.episode.notAired") }
+        let code = "S\(episode.season)E\(episode.episode)"
+        return isWatched ? L10n.string("show.detail.episode.moveProgress", code) : L10n.string("show.detail.markWatched", code)
     }
 
     private var fallbackSummary: String {
         if let airdate = episode.airdate {
-            return episode.isAired ? "This episode aired on \(airdate)." : "This episode is expected on \(airdate)."
+            return episode.isAired ? L10n.string("show.detail.episode.airedSentence", airdate) : L10n.string("show.detail.episode.expectedSentence", airdate)
         }
-        return "No episode summary available yet."
+        return L10n.string("show.detail.episode.noSummary")
     }
 }
 

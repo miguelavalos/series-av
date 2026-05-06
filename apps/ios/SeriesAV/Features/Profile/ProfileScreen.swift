@@ -15,6 +15,7 @@ struct ProfileScreen: View {
     @State private var isSigningOut = false
     @State private var signOutErrorMessage = ""
     @State private var isShowingSignOutError = false
+    @State private var isShowingAccountDeletion = false
 
     var body: some View {
         ScrollView {
@@ -65,6 +66,16 @@ struct ProfileScreen: View {
             Button(L10n.string("profile.alert.close"), role: .cancel) {}
         } message: {
             Text(signOutErrorMessage)
+        }
+        .sheet(isPresented: $isShowingAccountDeletion) {
+            AccountDeletionScreen(
+                viewModel: AccountDeletionViewModel(
+                    api: SeriesAVAPIClient(getToken: { try await accessController.accountService.getToken() }),
+                    signOut: {
+                        await accessController.signOut()
+                    }
+                )
+            )
         }
     }
 
@@ -277,6 +288,11 @@ struct ProfileScreen: View {
                         open(supportURL)
                     }
                 }
+                if let tvMazeAttributionURL {
+                    ProfileActionRow(systemImage: "network", title: L10n.string("profile.help.dataSources.title"), detail: L10n.string("profile.help.dataSources.detail")) {
+                        open(tvMazeAttributionURL)
+                    }
+                }
                 if let termsURL = AppConfig.termsURL {
                     ProfileActionRow(systemImage: "doc.text", title: L10n.string("profile.help.terms.title"), detail: L10n.string("profile.help.terms.detail")) {
                         open(termsURL)
@@ -297,10 +313,8 @@ struct ProfileScreen: View {
         VStack(alignment: .leading, spacing: 12) {
             sectionHeader(title: L10n.string("profile.safety.title"), subtitle: L10n.string("profile.safety.subtitle"))
 
-            if let accountManagementURL = AppConfig.accountManagementURL {
-                ProfileActionRow(systemImage: "exclamationmark.shield", title: L10n.string("profile.safety.delete.title"), detail: L10n.string("profile.safety.delete.detail")) {
-                    open(accountManagementURL)
-                }
+            ProfileActionRow(systemImage: "exclamationmark.shield", title: L10n.string("profile.safety.delete.title"), detail: L10n.string("profile.safety.delete.detail")) {
+                isShowingAccountDeletion = true
             }
         }
         .padding(22)
@@ -453,6 +467,10 @@ struct ProfileScreen: View {
             count: libraryStore.shows.count,
             libraryStore.shows.count
         )
+    }
+
+    private var tvMazeAttributionURL: URL? {
+        URL(string: "https://www.tvmaze.com")
     }
 
     private var languageSelector: some View {

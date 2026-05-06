@@ -114,7 +114,7 @@ struct OnboardingView: View {
                 }
                 await MainActor.run {
                     activeProvider = nil
-                    errorMessage = error.localizedDescription
+                    errorMessage = error.appleSignInFailureMessage
                     isShowingError = true
                 }
             }
@@ -184,15 +184,24 @@ private enum AuthProvider {
 }
 
 private extension Error {
+    var appleSignInFailureMessage: String {
+        let nsError = self as NSError
+        if nsError.domain == ASAuthorizationError.errorDomain,
+           nsError.code == ASAuthorizationError.Code.unknown.rawValue {
+            return L10n.string("auth.alert.appleUnavailable.detail")
+        }
+
+        if let underlying = nsError.userInfo[NSUnderlyingErrorKey] as? Error {
+            return underlying.appleSignInFailureMessage
+        }
+
+        return localizedDescription
+    }
+
     var isAuthenticationCancellation: Bool {
         let nsError = self as NSError
         if nsError.domain == ASAuthorizationError.errorDomain,
            nsError.code == ASAuthorizationError.Code.canceled.rawValue {
-            return true
-        }
-
-        if nsError.domain.contains("AuthenticationServices"),
-           nsError.code == ASAuthorizationError.Code.unknown.rawValue {
             return true
         }
 

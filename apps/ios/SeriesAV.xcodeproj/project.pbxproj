@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		0C9D5C62B2630414209BC720 /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654BE2AAC38B9027EFC31ADA /* HomeScreen.swift */; };
+		1122AA33445566778899A001 /* AccountDeletionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1122AA33445566778899B001 /* AccountDeletionModels.swift */; };
+		1122AA33445566778899A002 /* AccountDeletionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1122AA33445566778899B002 /* AccountDeletionScreen.swift */; };
+		1122AA33445566778899A003 /* AccountDeletionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1122AA33445566778899B003 /* AccountDeletionViewModel.swift */; };
 		1673E9EEF56A505021C76A58 /* SeriesSocialModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DDD63C85E76FA77C1E40CCC /* SeriesSocialModels.swift */; };
 		30C2BF9A98DFB5D0DA8B3F6A /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5CAE803B2B1BF4D780369E0 /* L10n.swift */; };
 		3FD35C0E7A5E97803B4448DD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B96C17F9BEEC431492047F12 /* Assets.xcassets */; };
@@ -41,6 +44,9 @@
 /* Begin PBXFileReference section */
 		02D188112740F999A1615DF6 /* SeriesModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesModels.swift; sourceTree = "<group>"; };
 		071FBF3355D0BF54C06CE0F5 /* SeriesAVAppDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVAppDataService.swift; sourceTree = "<group>"; };
+		1122AA33445566778899B001 /* AccountDeletionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDeletionModels.swift; sourceTree = "<group>"; };
+		1122AA33445566778899B002 /* AccountDeletionScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDeletionScreen.swift; sourceTree = "<group>"; };
+		1122AA33445566778899B003 /* AccountDeletionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDeletionViewModel.swift; sourceTree = "<group>"; };
 		145DE7E7B082B7D92C440A5B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		266318A1EDA805553FCB6D09 /* AppShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellView.swift; sourceTree = "<group>"; };
 		28289FA4BE6B01E917E68E89 /* SeriesSocialStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesSocialStore.swift; sourceTree = "<group>"; };
@@ -192,6 +198,7 @@
 		4A220F02EAF1591F28DCCDCC /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				1122AA33445566778899B001 /* AccountDeletionModels.swift */,
 				02D188112740F999A1615DF6 /* SeriesModels.swift */,
 				3DDD63C85E76FA77C1E40CCC /* SeriesSocialModels.swift */,
 			);
@@ -254,6 +261,8 @@
 		F3A64473A350215E09C41F7C /* Profile */ = {
 			isa = PBXGroup;
 			children = (
+				1122AA33445566778899B002 /* AccountDeletionScreen.swift */,
+				1122AA33445566778899B003 /* AccountDeletionViewModel.swift */,
 				818B475C2F3BBEC901909750 /* ProfileScreen.swift */,
 				64D5A76CCA82C12A46B7FF29 /* RecommendationsScreen.swift */,
 				51378550A5B3CE338B9AB407 /* SharedListsScreen.swift */,
@@ -355,6 +364,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1122AA33445566778899A001 /* AccountDeletionModels.swift in Sources */,
+				1122AA33445566778899A002 /* AccountDeletionScreen.swift in Sources */,
+				1122AA33445566778899A003 /* AccountDeletionViewModel.swift in Sources */,
 				B733B28B0CBEE18DA395BEDA /* AccessServices.swift in Sources */,
 				4057AF5D7FF73D672E8E1A17 /* AppShellView.swift in Sources */,
 				0C9D5C62B2630414209BC720 /* HomeScreen.swift in Sources */,
@@ -516,7 +528,7 @@
 				CODE_SIGN_ENTITLEMENTS = SeriesAV/App/SeriesAV.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "$$(AVALSYS_APPLE_DEVELOPMENT_TEAM)";
+				DEVELOPMENT_TEAM = "$(AVALSYS_APPLE_DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SeriesAV/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -538,7 +550,7 @@
 				CODE_SIGN_ENTITLEMENTS = SeriesAV/App/SeriesAV.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "$$(AVALSYS_APPLE_DEVELOPMENT_TEAM)";
+				DEVELOPMENT_TEAM = "$(AVALSYS_APPLE_DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SeriesAV/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

@@ -8,11 +8,11 @@ enum SeriesAVAPIClientError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingToken:
-            "Missing Account AV token."
+            "Missing Apps AV account token."
         case .missingBaseURL:
-            "Missing Account AV API base URL."
+            "Missing Apps AV API base URL."
         case .requestFailed(let statusCode):
-            "Account AV API request failed with status \(statusCode)."
+            "Apps AV API request failed with status \(statusCode)."
         }
     }
 }
@@ -40,6 +40,22 @@ final class SeriesAVAPIClient {
     func request<T: Decodable>(_ path: String, method: String = "GET", body: Data? = nil) async throws -> T {
         let (data, _) = try await requestRaw(path, method: method, body: body)
         return try decoder.decode(T.self, from: data)
+    }
+
+    func fetchAccountSummary() async throws -> AccountSummary {
+        try await request("v1/me")
+    }
+
+    func requestAccountDeletion() async throws -> DeleteAccountRequestResponse {
+        try await request("v1/me/delete-account-request", method: "POST")
+    }
+
+    func finalizeAccountDeletion() async throws -> DeleteAccountFinalizeResponse {
+        try await request("v1/me/delete-account-finalize", method: "POST")
+    }
+
+    func unlinkCurrentApp() async throws -> UnlinkAppResponse {
+        try await request("v1/apps/seriesav/link", method: "DELETE")
     }
 
     func requestRaw(
