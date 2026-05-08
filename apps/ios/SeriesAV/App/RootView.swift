@@ -13,6 +13,10 @@ struct RootView: View {
     @State private var shellID = UUID()
     @State private var cloudService: SeriesAVCloudService?
 
+    private var isUITestMode: Bool {
+        ProcessInfo.processInfo.environment["SERIESAV_UI_TESTS"] == "1"
+    }
+
     var body: some View {
         AppShellView(
             startSignInFlow: startSignInFlow,
@@ -54,6 +58,13 @@ struct RootView: View {
     }
 
     private func showInitialExperience() async {
+        if isUITestMode {
+            isShowingSplash = false
+            isShowingOnboarding = false
+            accessController.markGuestPromptShown()
+            return
+        }
+
         try? await Task.sleep(for: .milliseconds(1100))
         withAnimation(.easeOut(duration: 0.35)) {
             isShowingSplash = false

@@ -109,6 +109,13 @@ struct HomeScreen: View {
     }
 
     private func load() async {
+        if ProcessInfo.processInfo.environment["SERIESAV_UI_TESTS"] == "1" {
+            shows = ScreenshotCatalogFixtures.shows
+            isLoading = false
+            errorMessage = nil
+            return
+        }
+
         isLoading = true
         errorMessage = nil
         do {
@@ -118,6 +125,28 @@ struct HomeScreen: View {
             errorMessage = L10n.string("home.error.detail")
         }
         isLoading = false
+    }
+}
+
+enum ScreenshotCatalogFixtures {
+    static let shows: [CatalogShowSummary] = [
+        show(id: "studio-journey", title: "Studio Journey", year: 2026, summary: "A compact production diary with clear seasons, episode progress, and a calm watch queue.", genres: ["Drama", "Documentary"]),
+        show(id: "city-signals", title: "City Signals", year: 2025, summary: "Short science-fiction episodes for keeping a current queue tidy across busy weeks.", genres: ["Sci-Fi", "Mystery"]),
+        show(id: "open-season", title: "Open Season", year: 2024, summary: "A rights-safe sample series used for local progress, completed status, and library filters.", genres: ["Comedy"]),
+        show(id: "night-archive", title: "Night Archive", year: 2023, summary: "A paused fixture title that keeps the profile and library counts realistic for screenshots.", genres: ["Drama"])
+    ]
+
+    private static func show(id: String, title: String, year: Int, summary: String, genres: [String]) -> CatalogShowSummary {
+        CatalogShowSummary(
+            source: .tvmaze,
+            sourceId: "screenshot-\(id)",
+            canonicalSeriesId: "screenshot-\(id)",
+            title: title,
+            year: year,
+            imageURL: nil,
+            summary: summary,
+            genres: genres
+        )
     }
 }
 

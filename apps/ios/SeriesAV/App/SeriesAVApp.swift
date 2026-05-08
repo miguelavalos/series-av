@@ -14,6 +14,9 @@ struct SeriesAVApp: App {
             diskCapacity: 250 * 1024 * 1024
         )
         AppConfig.configureClerkIfPossible()
+        if ProcessInfo.processInfo.environment["SERIESAV_UI_TESTS"] == "1" {
+            UserDefaults.standard.set(AppLanguage.english.rawValue, forKey: "seriesav.appLanguage")
+        }
         _accessController = StateObject(wrappedValue: AccessController())
         _libraryStore = StateObject(wrappedValue: SeriesLibraryStore())
         _languageController = StateObject(wrappedValue: AppLanguageController())

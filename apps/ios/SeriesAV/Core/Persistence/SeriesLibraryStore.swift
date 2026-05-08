@@ -29,6 +29,9 @@ final class SeriesLibraryStore: ObservableObject {
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         load()
+        if ProcessInfo.processInfo.environment["SERIESAV_UI_TESTS"] == "1" {
+            applyScreenshotFixtures()
+        }
     }
 
     func addShow(snapshot: ShowSnapshot) -> LibraryShow {
@@ -178,6 +181,11 @@ final class SeriesLibraryStore: ObservableObject {
         }
     }
 
+    private func applyScreenshotFixtures() {
+        shows = ScreenshotFixtures.libraryShows
+        settings = AppSettings(theme: .light)
+    }
+
     private func persistShows() {
         guard let data = try? encoder.encode(shows) else { return }
         defaults.set(data, forKey: showsKey)
@@ -263,5 +271,97 @@ final class SeriesLibraryStore: ObservableObject {
     private static func date(from value: String) -> Date {
         let formatter = ISO8601DateFormatter()
         return formatter.date(from: value) ?? .distantPast
+    }
+}
+
+private enum ScreenshotFixtures {
+    static var libraryShows: [LibraryShow] {
+        [
+            show(
+                id: "studio-journey",
+                title: "Studio Journey",
+                year: 2026,
+                summary: "A compact production diary with clear seasons, episode progress, and a calm watch queue.",
+                genres: ["Drama", "Documentary"],
+                status: .watching,
+                lastWatchedSeason: 1,
+                lastWatchedEpisode: 4,
+                nextEpisode: UpcomingEpisode(season: 1, episode: 5, airdate: "2026-05-15"),
+                updatedAt: "2026-05-08T09:00:00Z"
+            ),
+            show(
+                id: "city-signals",
+                title: "City Signals",
+                year: 2025,
+                summary: "Short science-fiction episodes for keeping a current queue tidy across busy weeks.",
+                genres: ["Sci-Fi", "Mystery"],
+                status: .watching,
+                lastWatchedSeason: 2,
+                lastWatchedEpisode: 3,
+                nextEpisode: UpcomingEpisode(season: 2, episode: 4, airdate: "2026-05-22"),
+                updatedAt: "2026-05-07T09:00:00Z"
+            ),
+            show(
+                id: "open-season",
+                title: "Open Season",
+                year: 2024,
+                summary: "A rights-safe sample series used for local progress, completed status, and library filters.",
+                genres: ["Comedy"],
+                status: .completed,
+                lastWatchedSeason: 1,
+                lastWatchedEpisode: 8,
+                nextEpisode: nil,
+                updatedAt: "2026-05-06T09:00:00Z"
+            ),
+            show(
+                id: "night-archive",
+                title: "Night Archive",
+                year: 2023,
+                summary: "A paused fixture title that keeps the profile and library counts realistic for screenshots.",
+                genres: ["Drama"],
+                status: .paused,
+                lastWatchedSeason: 1,
+                lastWatchedEpisode: 2,
+                nextEpisode: nil,
+                updatedAt: "2026-05-05T09:00:00Z"
+            )
+        ]
+    }
+
+    private static func show(
+        id: String,
+        title: String,
+        year: Int,
+        summary: String,
+        genres: [String],
+        status: ShowStatus,
+        lastWatchedSeason: Int?,
+        lastWatchedEpisode: Int?,
+        nextEpisode: UpcomingEpisode?,
+        updatedAt: String
+    ) -> LibraryShow {
+        LibraryShow(
+            id: "screenshot:\(id)",
+            snapshot: ShowSnapshot(
+                source: .tvmaze,
+                sourceId: "screenshot-\(id)",
+                canonicalSeriesId: "screenshot-\(id)",
+                title: title,
+                year: year,
+                imageURL: nil,
+                summary: summary,
+                genres: genres,
+                episodeCountBySeason: ["1": 8, "2": 6],
+                totalEpisodeCountBySeason: ["1": 8, "2": 6],
+                episodesBySeason: [:],
+                nextEpisode: nextEpisode
+            ),
+            status: status,
+            lastWatchedSeason: lastWatchedSeason,
+            lastWatchedEpisode: lastWatchedEpisode,
+            startedAt: "2026-05-01T09:00:00Z",
+            completedAt: status == .completed ? "2026-05-06T09:00:00Z" : nil,
+            lastUpdatedAt: updatedAt
+        )
     }
 }

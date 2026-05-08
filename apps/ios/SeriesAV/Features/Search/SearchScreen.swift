@@ -159,6 +159,13 @@ struct SearchScreen: View {
     }
 
     private func load(query searchQuery: String?) async {
+        if ProcessInfo.processInfo.environment["SERIESAV_UI_TESTS"] == "1" {
+            state.shows = ScreenshotCatalogFixtures.shows
+            state.isLoading = false
+            state.errorMessage = nil
+            return
+        }
+
         state.isLoading = true
         state.errorMessage = nil
         if searchQuery != nil {

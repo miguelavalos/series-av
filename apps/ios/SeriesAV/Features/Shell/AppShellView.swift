@@ -29,7 +29,7 @@ struct AppShellView: View {
                     navigationRootID = UUID()
                 }
                 selectedTab = tab
-                if tab == .search {
+                if tab == .search && ProcessInfo.processInfo.environment["SERIESAV_UI_TESTS"] != "1" {
                     searchFocusRequest += 1
                 }
             },
