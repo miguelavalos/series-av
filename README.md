@@ -14,6 +14,7 @@ This repository is released under the MIT license. See [LICENSE](LICENSE).
 apps/
   ios/      SwiftUI iOS app
 docs/
+  ios-animation-performance.md
   install-ios.md
 ```
 
@@ -29,6 +30,7 @@ docs/
 ## Docs
 
 - [iOS installation guide](docs/install-ios.md)
+- [iOS animation and media performance guide](docs/ios-animation-performance.md)
 
 ## Third-Party Data Sources
 
