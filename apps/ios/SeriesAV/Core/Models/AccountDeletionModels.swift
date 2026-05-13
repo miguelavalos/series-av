@@ -65,17 +65,25 @@ private struct AccountSummaryUser: Decodable, Equatable {
 struct AccountDeletionEligibility: Decodable, Equatable {
     let status: AccountDeletionEligibilityStatus
     let blockers: [AccountDeletionBlocker]
+    let warnings: [AccountDeletionBlocker]
     let currentJob: AccountDeletionJob?
 
     enum CodingKeys: String, CodingKey {
         case status
         case blockers
+        case warnings
         case currentJob
     }
 
-    init(status: AccountDeletionEligibilityStatus, blockers: [AccountDeletionBlocker] = [], currentJob: AccountDeletionJob? = nil) {
+    init(
+        status: AccountDeletionEligibilityStatus,
+        blockers: [AccountDeletionBlocker] = [],
+        warnings: [AccountDeletionBlocker] = [],
+        currentJob: AccountDeletionJob? = nil
+    ) {
         self.status = status
         self.blockers = blockers
+        self.warnings = warnings
         self.currentJob = currentJob
     }
 
@@ -83,6 +91,7 @@ struct AccountDeletionEligibility: Decodable, Equatable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         status = try container.decodeIfPresent(AccountDeletionEligibilityStatus.self, forKey: .status) ?? .unknown
         blockers = try container.decodeIfPresent([AccountDeletionBlocker].self, forKey: .blockers) ?? []
+        warnings = try container.decodeIfPresent([AccountDeletionBlocker].self, forKey: .warnings) ?? []
         currentJob = try container.decodeIfPresent(AccountDeletionJob.self, forKey: .currentJob)
     }
 }

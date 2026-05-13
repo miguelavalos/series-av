@@ -14,9 +14,9 @@ extension SeriesAVAPIClient: AccountDeletionAPI {}
 final class AccountDeletionViewModel: ObservableObject {
     enum State: Equatable {
         case loading
-        case blocked([AccountDeletionBlocker], canUnlinkCurrentApp: Bool)
-        case eligible
-        case inProgress(AccountDeletionJob?)
+        case blocked(blockers: [AccountDeletionBlocker], warnings: [AccountDeletionBlocker], canUnlinkCurrentApp: Bool)
+        case eligible(warnings: [AccountDeletionBlocker])
+        case inProgress(AccountDeletionJob?, warnings: [AccountDeletionBlocker])
         case completed
         case unlinked(String)
         case failed(String)
@@ -35,11 +35,14 @@ final class AccountDeletionViewModel: ObservableObject {
     }
 
     var canRequestDeletion: Bool {
-        state == .eligible && confirmationText == "DELETE" && !isSubmitting
+        if case .eligible = state {
+            return confirmationText == "DELETE" && !isSubmitting
+        }
+        return false
     }
 
     var canUnlinkCurrentApp: Bool {
-        if case .blocked(_, let canUnlinkCurrentApp) = state {
+        if case .blocked(_, _, let canUnlinkCurrentApp) = state {
             return canUnlinkCurrentApp && !isSubmitting
         }
         return false
@@ -55,7 +58,8 @@ final class AccountDeletionViewModel: ObservableObject {
             }
         } catch {
             state = .blocked(
-                [Self.unavailableBlocker(detail: error.localizedDescription)],
+                blockers: [Self.unavailableBlocker(detail: error.localizedDescription)],
+                warnings: [],
                 canUnlinkCurrentApp: false
             )
         }
@@ -84,7 +88,7 @@ final class AccountDeletionViewModel: ObservableObject {
     }
 
     func finalizeDeletion() async {
-        guard case .inProgress(let job) = state, job?.status == .awaitingIdentityDeletion else { return }
+        guard case .inProgress(let job, _) = state, job?.status == .awaitingIdentityDeletion else { return }
         isSubmitting = true
         defer { isSubmitting = false }
 
@@ -129,15 +133,10 @@ final class AccountDeletionViewModel: ObservableObject {
             return resolveState(from: job)
         }
 
-        var blockers: [AccountDeletionBlocker] = []
-        blockers.append(contentsOf: fallbackLinkedAppBlockers(from: summary.linkedApps))
-        blockers.append(contentsOf: fallbackProBlockers(from: summary.access))
-        blockers.append(contentsOf: fallbackBillingBlockers(from: summary.billing))
-
-        if blockers.isEmpty {
-            blockers.append(unavailableBlocker(detail: "Apps AV could not verify account-deletion eligibility yet. Try again or manage the account on the Apps AV account website."))
-        }
-        return .blocked(blockers, canUnlinkCurrentApp: canUnlinkCurrentApp(from: summary))
+        let warnings = fallbackLinkedAppWarnings(from: summary.linkedApps)
+            + fallbackProWarnings(from: summary.access)
+            + fallbackBillingWarnings(from: summary.billing)
+        return .eligible(warnings: warnings)
     }
 
     static func resolveState(from eligibility: AccountDeletionEligibility) -> State {
@@ -147,19 +146,21 @@ final class AccountDeletionViewModel: ObservableObject {
     static func resolveState(from eligibility: AccountDeletionEligibility, summary: AccountSummary?) -> State {
         switch eligibility.status {
         case .eligible:
-            return .eligible
+            return .eligible(warnings: eligibility.warnings)
         case .blocked:
             return .blocked(
-                eligibility.blockers,
+                blockers: eligibility.blockers,
+                warnings: eligibility.warnings,
                 canUnlinkCurrentApp: summary.map(canUnlinkCurrentApp(from:)) ?? false
             )
         case .inProgress:
-            return .inProgress(eligibility.currentJob)
+            return .inProgress(eligibility.currentJob, warnings: eligibility.warnings)
         case .completed:
             return .completed
         case .unknown:
             return .blocked(
-                [unavailableBlocker(detail: "Apps AV returned an unknown deletion status.")],
+                blockers: [unavailableBlocker(detail: "Apps AV returned an unknown deletion status.")],
+                warnings: eligibility.warnings,
                 canUnlinkCurrentApp: summary.map(canUnlinkCurrentApp(from:)) ?? false
             )
         }
@@ -170,26 +171,31 @@ final class AccountDeletionViewModel: ObservableObject {
         case .completed:
             return .completed
         case .blocked:
-            return .blocked([
-                AccountDeletionBlocker(
-                    type: .deletionInProgress,
-                    appId: nil,
-                    label: "Deletion is blocked",
-                    detail: job.message,
-                    managementUrl: nil
-                )
-            ], canUnlinkCurrentApp: false)
+            return .blocked(
+                blockers: [
+                    AccountDeletionBlocker(
+                        type: .deletionInProgress,
+                        appId: nil,
+                        label: "Deletion is blocked",
+                        detail: job.message,
+                        managementUrl: nil
+                    )
+                ],
+                warnings: [],
+                canUnlinkCurrentApp: false
+            )
         case .queued, .requested, .processing, .awaitingIdentityDeletion:
-            return .inProgress(job)
+            return .inProgress(job, warnings: [])
         case .failed, .unknown:
             return .blocked(
-                [unavailableBlocker(detail: job.message ?? "Apps AV could not safely confirm deletion status.")],
+                blockers: [unavailableBlocker(detail: job.message ?? "Apps AV could not safely confirm deletion status.")],
+                warnings: [],
                 canUnlinkCurrentApp: false
             )
         }
     }
 
-    private static func fallbackLinkedAppBlockers(from linkedApps: [AccountLinkedApp]) -> [AccountDeletionBlocker] {
+    private static func fallbackLinkedAppWarnings(from linkedApps: [AccountLinkedApp]) -> [AccountDeletionBlocker] {
         linkedApps
             .filter { $0.appId != "seriesav" && $0.status != "available" }
             .map {
@@ -197,13 +203,13 @@ final class AccountDeletionViewModel: ObservableObject {
                     type: .linkedApp,
                     appId: $0.appId,
                     label: $0.label ?? "Linked Apps AV app",
-                    detail: "This shared Apps AV account is still linked to another app.",
+                    detail: "Deleting this shared Apps AV account also removes this app link and its suite-owned data.",
                     managementUrl: nil
                 )
             }
     }
 
-    private static func fallbackProBlockers(from access: AccountAccessSummary?) -> [AccountDeletionBlocker] {
+    private static func fallbackProWarnings(from access: AccountAccessSummary?) -> [AccountDeletionBlocker] {
         guard let access else { return [] }
         return access.apps.compactMap { appAccess in
             let isPro = appAccess.isPro == true
@@ -214,23 +220,23 @@ final class AccountDeletionViewModel: ObservableObject {
                 type: .activeProAccess,
                 appId: appAccess.appId,
                 label: "Active Pro access",
-                detail: "Active Pro access must expire or be removed before deleting the shared account.",
+                detail: "This Pro access will be removed from Apps AV records. Billing may continue through the provider until cancelled or expired.",
                 managementUrl: nil
             )
         }
     }
 
-    private static func fallbackBillingBlockers(from billing: AccountBillingSummary?) -> [AccountDeletionBlocker] {
+    private static func fallbackBillingWarnings(from billing: AccountBillingSummary?) -> [AccountDeletionBlocker] {
         guard let billing else { return [] }
-        let blockedStatuses = Set(["active", "trialing", "pastdue", "past_due"])
+        let warningStatuses = Set(["active", "trialing", "pastdue", "past_due"])
         return billing.subscriptions.compactMap { subscription in
             let status = subscription.status?.lowercased()
-            guard let status, blockedStatuses.contains(status) else { return nil }
+            guard let status, warningStatuses.contains(status) else { return nil }
             return AccountDeletionBlocker(
                 type: .activeBillingSubscription,
                 appId: subscription.appId,
                 label: "Active subscription",
-                detail: "Cancel the provider-managed subscription and wait for access to end before deleting the shared account.",
+                detail: "Billing may continue through the provider until the subscription is cancelled or expires.",
                 managementUrl: subscription.managementUrl
             )
         }

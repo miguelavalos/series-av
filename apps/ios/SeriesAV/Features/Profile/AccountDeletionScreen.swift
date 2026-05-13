@@ -56,12 +56,12 @@ struct AccountDeletionScreen: View {
                 ProgressView()
                     .tint(SeriesTheme.textPrimary)
             }
-        case .blocked(let blockers, let canUnlinkCurrentApp):
-            blockedCard(blockers, canUnlinkCurrentApp: canUnlinkCurrentApp)
-        case .eligible:
-            eligibleCard
-        case .inProgress(let job):
-            inProgressCard(job)
+        case .blocked(let blockers, let warnings, let canUnlinkCurrentApp):
+            blockedCard(blockers, warnings: warnings, canUnlinkCurrentApp: canUnlinkCurrentApp)
+        case .eligible(let warnings):
+            eligibleCard(warnings: warnings)
+        case .inProgress(let job, let warnings):
+            inProgressCard(job, warnings: warnings)
         case .completed:
             statusCard(systemImage: "checkmark.circle", title: "Account deleted", detail: "Apps AV has deleted the shared account. This app is returning to guest mode.")
         case .unlinked(let message):
@@ -71,12 +71,16 @@ struct AccountDeletionScreen: View {
         }
     }
 
-    private func blockedCard(_ blockers: [AccountDeletionBlocker], canUnlinkCurrentApp: Bool) -> some View {
+    private func blockedCard(
+        _ blockers: [AccountDeletionBlocker],
+        warnings: [AccountDeletionBlocker],
+        canUnlinkCurrentApp: Bool
+    ) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             statusHeader(
                 systemImage: "exclamationmark.shield",
                 title: "Deletion is blocked",
-                detail: "Apps AV says this shared account cannot be deleted here yet. You can manage full deletion on the Apps AV account website."
+                detail: "Apps AV cannot complete deletion here because a required deletion dependency is unavailable. Provider billing and linked apps are normally warnings, not blockers."
             )
 
             VStack(spacing: 12) {
@@ -84,6 +88,8 @@ struct AccountDeletionScreen: View {
                     blockerRow(blocker)
                 }
             }
+
+            warningRows(warnings)
 
             Button {
                 Task { await viewModel.load() }
@@ -122,13 +128,15 @@ struct AccountDeletionScreen: View {
         .background(cardBackground)
     }
 
-    private var eligibleCard: some View {
+    private func eligibleCard(warnings: [AccountDeletionBlocker]) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             statusHeader(
                 systemImage: "trash",
                 title: "Ready to delete",
-                detail: "This account is eligible for deletion. Type DELETE to confirm this destructive action."
+                detail: "Review any warnings below, then type DELETE to request deletion of the shared Apps AV account."
             )
+
+            warningRows(warnings)
 
             TextField("DELETE", text: $viewModel.confirmationText)
                 .textInputAutocapitalization(.characters)
@@ -161,13 +169,15 @@ struct AccountDeletionScreen: View {
         .background(cardBackground)
     }
 
-    private func inProgressCard(_ job: AccountDeletionJob?) -> some View {
+    private func inProgressCard(_ job: AccountDeletionJob?, warnings: [AccountDeletionBlocker]) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             statusHeader(
                 systemImage: "hourglass",
                 title: "Deletion in progress",
                 detail: job?.message ?? "Apps AV is processing deletion for the shared account."
             )
+
+            warningRows(warnings)
 
             if job?.status == .awaitingIdentityDeletion {
                 Button {
@@ -270,6 +280,46 @@ struct AccountDeletionScreen: View {
             }
 
             if let managementUrl = blocker.managementUrl {
+                Link("Open management", destination: managementUrl)
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(SeriesTheme.highlight)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(SeriesTheme.mutedSurface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    @ViewBuilder
+    private func warningRows(_ warnings: [AccountDeletionBlocker]) -> some View {
+        if !warnings.isEmpty {
+            VStack(spacing: 12) {
+                ForEach(warnings) { warning in
+                    warningRow(warning)
+                }
+            }
+        }
+    }
+
+    private func warningRow(_ warning: AccountDeletionBlocker) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                Image(systemName: blockerIcon(for: warning.type))
+                    .foregroundStyle(SeriesTheme.highlight)
+                    .frame(width: 20)
+                Text(warning.label)
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(SeriesTheme.textPrimary)
+            }
+
+            if let detail = warning.detail, !detail.isEmpty {
+                Text(detail)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(SeriesTheme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if let managementUrl = warning.managementUrl {
                 Link("Open management", destination: managementUrl)
                     .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(SeriesTheme.highlight)
