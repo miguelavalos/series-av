@@ -4,6 +4,11 @@ Open-source iOS app for Series AV.
 
 This repository contains the iOS client app, local watch-list and progress flows, Account AV UI, backend-aware access handling, and TV metadata integration used by the product.
 
+Before validating signed account, backend access, library sync, social/catalog,
+or deletion workflows, read [AGENTS.md](AGENTS.md). Those workflows are governed
+by private AVALSYS runbooks and must not be replaced with an invented local
+backend flow.
+
 ## License
 
 This repository is released under the MIT license. See [LICENSE](LICENSE).
