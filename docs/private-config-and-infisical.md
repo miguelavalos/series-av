@@ -9,6 +9,7 @@ This repository is public and open source. Anything committed here can become pu
 3. Do not commit real account-provider keys, backend tokens, subscription sync tokens, or private service credentials.
 4. Do not add production backend URLs as fallback constants in source or scripts. Production values must come from Infisical.
 5. Keep public examples generic, for example `https://api.example.com` and `pk_test_your_publishable_key_here`.
+6. Keep RevenueCat public SDK keys in generated local config only. They must use the `appl_` prefix and must never be RevenueCat secret keys.
 
 ## Generate Config
 
@@ -26,6 +27,11 @@ bun run ios:config:production
 ```
 
 The production command must fail if Infisical does not provide required values.
+Required Series AV Pro values are:
+
+- `SERIESAV_REVENUECAT_PUBLIC_API_KEY`
+- `SERIESAV_REVENUECAT_OFFERING_ID`
+- `SERIESAV_REVENUECAT_MONTHLY_PACKAGE_ID`
 
 ## Before Pushing
 

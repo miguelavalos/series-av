@@ -19,6 +19,11 @@ bun run ios:config
 When `ACCOUNTAV_API_BASE_URL` is also configured, signed-in builds can refresh
 the account-backed access state used to show local, connected, or Pro status in
 the app.
+Series AV Pro also requires `SERIESAV_REVENUECAT_PUBLIC_API_KEY`,
+`SERIESAV_REVENUECAT_OFFERING_ID`, and
+`SERIESAV_REVENUECAT_MONTHLY_PACKAGE_ID` in Infisical before generating native
+config. The RevenueCat public key must use the Apple public SDK `appl_` prefix;
+never put a RevenueCat secret key in native config.
 V1 uses the same guest/free local-only and Pro paywall/subscription pattern as
 Tune AV. Cloud sync is Pro-only.
 
@@ -66,6 +71,8 @@ resolve:
 - Clerk key prefix: `pk_test_`
 - Account AV API: `http://127.0.0.1:8788`
 - Account AV management URL host: `account-av-preview.avalsys.com`
+- RevenueCat public SDK key prefix: `appl_`
+- non-empty RevenueCat offering and monthly package ids
 - a concrete Apple development team
 - `SeriesAV/App/SeriesAV.entitlements` with Keychain access groups
 
@@ -103,6 +110,8 @@ The production preflight must resolve:
 - Clerk key prefix: `pk_live_`
 - Account AV API: `https://api-account-av.avalsys.com`
 - Account AV management URL host: `account-av.avalsys.com`
+- RevenueCat public SDK key prefix: `appl_`
+- non-empty RevenueCat offering and monthly package ids
 
 If any value is different, regenerate config from the right profile before
 building. Do not hand-edit `Local.xcconfig`.

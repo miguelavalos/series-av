@@ -40,6 +40,9 @@ xcodebuild_url_value() {
 account_publishable_key="$(printenv_value ACCOUNTAV_PUBLISHABLE_KEY)"
 avaccount_api_base_url="$(printenv_value ACCOUNTAV_API_BASE_URL)"
 account_management_url="$(printenv_value ACCOUNTAV_MANAGEMENT_URL)"
+revenuecat_public_api_key="$(printenv_value SERIESAV_REVENUECAT_PUBLIC_API_KEY)"
+revenuecat_offering_id="$(printenv_value SERIESAV_REVENUECAT_OFFERING_ID)"
+revenuecat_monthly_package_id="$(printenv_value SERIESAV_REVENUECAT_MONTHLY_PACKAGE_ID)"
 terms_url="$(printenv_value SERIESAV_TERMS_URL)"
 privacy_url="$(printenv_value SERIESAV_PRIVACY_URL)"
 support_email="$(printenv_value SERIESAV_SUPPORT_EMAIL)"
@@ -52,6 +55,9 @@ required_values=(
   terms_url
   privacy_url
   account_management_url
+  revenuecat_public_api_key
+  revenuecat_offering_id
+  revenuecat_monthly_package_id
   support_email
 )
 
@@ -62,11 +68,29 @@ for value_name in "${required_values[@]}"; do
   fi
 done
 
+case "$revenuecat_public_api_key" in
+  appl_*) ;;
+  *)
+    echo "SERIESAV_REVENUECAT_PUBLIC_API_KEY must be a RevenueCat public app key with appl_ prefix." >&2
+    exit 1
+    ;;
+esac
+
+case "$revenuecat_public_api_key" in
+  sk_*)
+    echo "SERIESAV_REVENUECAT_PUBLIC_API_KEY must not be a RevenueCat secret key." >&2
+    exit 1
+    ;;
+esac
+
 rendered_config="$(cat <<EOF
 SERIESAV_BUNDLE_IDENTIFIER = $bundle_identifier
 AVALSYS_APPLE_DEVELOPMENT_TEAM = $development_team
 ACCOUNTAV_PUBLISHABLE_KEY = $account_publishable_key
 ACCOUNTAV_API_BASE_URL = $(xcodebuild_url_value "${avaccount_api_base_url:-}")
+SERIESAV_REVENUECAT_PUBLIC_API_KEY = $revenuecat_public_api_key
+SERIESAV_REVENUECAT_OFFERING_ID = $revenuecat_offering_id
+SERIESAV_REVENUECAT_MONTHLY_PACKAGE_ID = $revenuecat_monthly_package_id
 SERIESAV_TERMS_URL = $(xcodebuild_url_value "${terms_url:-}")
 SERIESAV_PRIVACY_URL = $(xcodebuild_url_value "${privacy_url:-}")
 ACCOUNTAV_MANAGEMENT_URL = $(xcodebuild_url_value "${account_management_url:-}")
