@@ -197,7 +197,11 @@ private struct SeriesWatchingHomeScreen: View {
                     SeriesUndoBar(
                         title: String(format: L10n.string(pendingUndo.messageKey), pendingUndo.title),
                         undo: {
-                            store.restore(pendingUndo.entryId)
+                            if pendingUndo.messageKey == "home.undo.added" {
+                                store.delete(pendingUndo.entryId)
+                            } else {
+                                store.restore(pendingUndo.entryId)
+                            }
                             self.pendingUndo = nil
                         },
                         dismiss: {
@@ -235,7 +239,11 @@ private struct SeriesWatchingHomeScreen: View {
             SeriesAddSheet(
                 store: store,
                 canAddSeries: canAddSeries,
-                remainingSeriesCount: remainingSeriesCount
+                remainingSeriesCount: remainingSeriesCount,
+                didAddSeries: { entry in
+                    pendingProgressUndo = nil
+                    pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.added")
+                }
             )
             .presentationDetents([.medium, .large])
         }
@@ -895,6 +903,7 @@ private struct SeriesAddSheet: View {
     @Bindable var store: SeriesLibraryStore
     let canAddSeries: Bool
     let remainingSeriesCount: Int?
+    let didAddSeries: (SeriesLibraryEntry) -> Void
 
     @State private var query = ""
 
@@ -972,9 +981,10 @@ private struct SeriesAddSheet: View {
     }
 
     private func addSeries() {
-        guard store.addLocalSeries(title: query) != nil else {
+        guard let entry = store.addLocalSeries(title: query) else {
             return
         }
+        didAddSeries(entry)
         dismiss()
     }
 }

@@ -42,6 +42,7 @@
 "home.archive" = "Archivar";
 "home.delete" = "Eliminar";
 "home.undo" = "Deshacer";
+"home.undo.added" = "\"%@\" anadida a Quiero ver";
 "home.undo.archived" = "\"%@\" archivada";
 "home.undo.deleted" = "\"%@\" eliminada";
 "home.undo.progress" = "Progreso de \"%@\" cambiado";

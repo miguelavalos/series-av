@@ -42,6 +42,7 @@
 "home.archive" = "Archiver";
 "home.delete" = "Supprimer";
 "home.undo" = "Annuler";
+"home.undo.added" = "\"%@\" ajoutee a A voir";
 "home.undo.archived" = "\"%@\" archivee";
 "home.undo.deleted" = "\"%@\" supprimee";
 "home.undo.progress" = "Progression de \"%@\" modifiee";

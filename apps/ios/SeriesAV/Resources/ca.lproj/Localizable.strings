@@ -42,6 +42,7 @@
 "home.archive" = "Arxivar";
 "home.delete" = "Eliminar";
 "home.undo" = "Desfer";
+"home.undo.added" = "\"%@\" afegida a Vull veure";
 "home.undo.archived" = "\"%@\" arxivada";
 "home.undo.deleted" = "\"%@\" eliminada";
 "home.undo.progress" = "Progres de \"%@\" canviat";
