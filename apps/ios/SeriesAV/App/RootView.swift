@@ -245,8 +245,6 @@ private struct SeriesWatchingHomeScreen: View {
                 initialFilter: initialLibraryFilter,
                 archive: { entry in
                     store.archive(entry.id)
-                    pendingProgressUndo = nil
-                    pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.archived")
                 },
                 setStatus: { entry, status in
                     store.setStatus(status, for: entry.id)
@@ -262,8 +260,6 @@ private struct SeriesWatchingHomeScreen: View {
                 },
                 delete: { entry in
                     store.delete(entry.id)
-                    pendingProgressUndo = nil
-                    pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.deleted")
                 }
             )
             .presentationDetents([.medium, .large])
@@ -457,6 +453,20 @@ private struct PendingLibraryUndo: Identifiable, Equatable {
     var id: String { "\(entryId)-\(messageKey)" }
 }
 
+private enum PendingLibraryMutationUndoAction: Equatable {
+    case restore
+    case archive
+}
+
+private struct PendingLibraryMutationUndo: Identifiable, Equatable {
+    var entryId: String
+    var title: String
+    var messageKey: String
+    var action: PendingLibraryMutationUndoAction
+
+    var id: String { "\(entryId)-\(messageKey)" }
+}
+
 private struct PendingProgressUndo: Identifiable, Equatable {
     var entryId: String
     var title: String
@@ -513,6 +523,7 @@ private struct SeriesLibrarySheet: View {
     @State private var query = ""
     @State private var selectedFilter: SeriesLibraryFilter
     @State private var editorEntry: SeriesLibraryEntry?
+    @State private var pendingLibraryUndo: PendingLibraryMutationUndo?
     @State private var pendingProgressUndo: PendingProgressUndo?
 
     init(
@@ -587,12 +598,26 @@ private struct SeriesLibrarySheet: View {
                                 }
 
                                 Button {
+                                    pendingLibraryUndo = PendingLibraryMutationUndo(
+                                        entryId: entry.id,
+                                        title: entry.title,
+                                        messageKey: "home.undo.archived",
+                                        action: .restore
+                                    )
+                                    pendingProgressUndo = nil
                                     archive(entry)
                                 } label: {
                                     Label(L10n.string("home.archive"), systemImage: "archivebox")
                                 }
 
                                 Button(role: .destructive) {
+                                    pendingLibraryUndo = PendingLibraryMutationUndo(
+                                        entryId: entry.id,
+                                        title: entry.title,
+                                        messageKey: "home.undo.deleted",
+                                        action: .restore
+                                    )
+                                    pendingProgressUndo = nil
                                     delete(entry)
                                 } label: {
                                     Label(L10n.string("home.delete"), systemImage: "trash")
@@ -611,12 +636,26 @@ private struct SeriesLibrarySheet: View {
                                 editProgress: nil
                             ) {
                                 Button {
+                                    pendingLibraryUndo = PendingLibraryMutationUndo(
+                                        entryId: entry.id,
+                                        title: entry.title,
+                                        messageKey: "home.undo.restored",
+                                        action: .archive
+                                    )
+                                    pendingProgressUndo = nil
                                     restore(entry)
                                 } label: {
                                     Label(L10n.string("library.restore"), systemImage: "arrow.uturn.backward")
                                 }
 
                                 Button(role: .destructive) {
+                                    pendingLibraryUndo = PendingLibraryMutationUndo(
+                                        entryId: entry.id,
+                                        title: entry.title,
+                                        messageKey: "home.undo.deleted",
+                                        action: .restore
+                                    )
+                                    pendingProgressUndo = nil
                                     delete(entry)
                                 } label: {
                                     Label(L10n.string("home.delete"), systemImage: "trash")
@@ -654,7 +693,21 @@ private struct SeriesLibrarySheet: View {
                 .presentationDetents([.medium])
             }
             .safeAreaInset(edge: .bottom) {
-                if let pendingProgressUndo {
+                if let pendingLibraryUndo {
+                    SeriesUndoBar(
+                        title: String(format: L10n.string(pendingLibraryUndo.messageKey), pendingLibraryUndo.title),
+                        undo: {
+                            applyLibraryUndo(pendingLibraryUndo)
+                            self.pendingLibraryUndo = nil
+                        },
+                        dismiss: {
+                            self.pendingLibraryUndo = nil
+                        }
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(.regularMaterial)
+                } else if let pendingProgressUndo {
                     SeriesUndoBar(
                         title: String(format: L10n.string(pendingProgressUndo.messageKey), pendingProgressUndo.title),
                         undo: {
@@ -674,6 +727,15 @@ private struct SeriesLibrarySheet: View {
                     .background(.regularMaterial)
                 }
             }
+        }
+    }
+
+    private func applyLibraryUndo(_ undo: PendingLibraryMutationUndo) {
+        switch undo.action {
+        case .restore:
+            store.restore(undo.entryId)
+        case .archive:
+            store.archive(undo.entryId)
         }
     }
 
