@@ -76,6 +76,7 @@ private struct SeriesWatchingHomeScreen: View {
     @State private var isShowingLibrarySheet = false
     @State private var initialLibraryFilter: SeriesLibraryFilter = .all
     @State private var pendingUndo: PendingLibraryUndo?
+    @State private var pendingProgressUndo: PendingProgressUndo?
 
     var body: some View {
         ScrollView {
@@ -104,9 +105,13 @@ private struct SeriesWatchingHomeScreen: View {
                     SeriesCurrentWatchingCard(
                         entry: currentEntry,
                         markPrevious: {
+                            pendingProgressUndo = progressUndo(for: currentEntry)
+                            pendingUndo = nil
                             store.markPreviousEpisodeWatched(for: currentEntry.id)
                         },
                         markNext: {
+                            pendingProgressUndo = progressUndo(for: currentEntry)
+                            pendingUndo = nil
                             store.markNextEpisodeWatched(for: currentEntry.id)
                         },
                         editProgress: {
@@ -120,10 +125,12 @@ private struct SeriesWatchingHomeScreen: View {
                         },
                         archive: {
                             store.archive(currentEntry.id)
+                            pendingProgressUndo = nil
                             pendingUndo = PendingLibraryUndo(entryId: currentEntry.id, title: currentEntry.title, messageKey: "home.undo.archived")
                         },
                         delete: {
                             store.delete(currentEntry.id)
+                            pendingProgressUndo = nil
                             pendingUndo = PendingLibraryUndo(entryId: currentEntry.id, title: currentEntry.title, messageKey: "home.undo.deleted")
                         }
                     )
@@ -135,6 +142,8 @@ private struct SeriesWatchingHomeScreen: View {
                     SeriesWatchingQueueSection(
                         entries: secondaryEntries,
                         markNext: { entry in
+                            pendingProgressUndo = progressUndo(for: entry)
+                            pendingUndo = nil
                             store.markNextEpisodeWatched(for: entry.id)
                         },
                         editProgress: { entry in
@@ -148,10 +157,12 @@ private struct SeriesWatchingHomeScreen: View {
                         },
                         archive: { entry in
                             store.archive(entry.id)
+                            pendingProgressUndo = nil
                             pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.archived")
                         },
                         delete: { entry in
                             store.delete(entry.id)
+                            pendingProgressUndo = nil
                             pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.deleted")
                         }
                     )
@@ -163,7 +174,22 @@ private struct SeriesWatchingHomeScreen: View {
         .background(Color(.systemGroupedBackground))
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 10) {
-                if let pendingUndo {
+                if let pendingProgressUndo {
+                    SeriesUndoBar(
+                        title: String(format: L10n.string(pendingProgressUndo.messageKey), pendingProgressUndo.title),
+                        undo: {
+                            store.restoreProgress(
+                                status: pendingProgressUndo.status,
+                                lastWatchedEpisodeCursor: pendingProgressUndo.lastWatchedEpisodeCursor,
+                                for: pendingProgressUndo.entryId
+                            )
+                            self.pendingProgressUndo = nil
+                        },
+                        dismiss: {
+                            self.pendingProgressUndo = nil
+                        }
+                    )
+                } else if let pendingUndo {
                     SeriesUndoBar(
                         title: String(format: L10n.string(pendingUndo.messageKey), pendingUndo.title),
                         undo: {
@@ -194,6 +220,8 @@ private struct SeriesWatchingHomeScreen: View {
             SeriesProgressEditorSheet(
                 entry: entry,
                 markWatchedThrough: { cursor in
+                    pendingProgressUndo = progressUndo(for: entry)
+                    pendingUndo = nil
                     store.markWatchedThrough(cursor, for: entry.id)
                 }
             )
@@ -213,6 +241,7 @@ private struct SeriesWatchingHomeScreen: View {
                 initialFilter: initialLibraryFilter,
                 archive: { entry in
                     store.archive(entry.id)
+                    pendingProgressUndo = nil
                     pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.archived")
                 },
                 setStatus: { entry, status in
@@ -229,6 +258,7 @@ private struct SeriesWatchingHomeScreen: View {
                 },
                 delete: { entry in
                     store.delete(entry.id)
+                    pendingProgressUndo = nil
                     pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.deleted")
                 }
             )
@@ -260,6 +290,16 @@ private struct SeriesWatchingHomeScreen: View {
 
     private func countActiveEntries(with status: SeriesLibraryEntryStatus) -> Int {
         store.activeEntries.filter { $0.status == status }.count
+    }
+
+    private func progressUndo(for entry: SeriesLibraryEntry) -> PendingProgressUndo {
+        PendingProgressUndo(
+            entryId: entry.id,
+            title: entry.title,
+            messageKey: "home.undo.progress",
+            status: entry.status,
+            lastWatchedEpisodeCursor: entry.lastWatchedEpisodeCursor
+        )
     }
 
     private func openLibrary(filter: SeriesLibraryFilter = .all) {
