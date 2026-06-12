@@ -218,6 +218,12 @@ private struct SeriesWatchingHomeScreen: View {
                 setStatus: { entry, status in
                     store.setStatus(status, for: entry.id)
                 },
+                markPrevious: { entry in
+                    store.markPreviousEpisodeWatched(for: entry.id)
+                },
+                markNext: { entry in
+                    store.markNextEpisodeWatched(for: entry.id)
+                },
                 restore: { entry in
                     store.restore(entry.id)
                 },
@@ -442,6 +448,8 @@ private struct SeriesLibrarySheet: View {
     let initialFilter: SeriesLibraryFilter
     let archive: (SeriesLibraryEntry) -> Void
     let setStatus: (SeriesLibraryEntry, SeriesLibraryEntryStatus) -> Void
+    let markPrevious: (SeriesLibraryEntry) -> Void
+    let markNext: (SeriesLibraryEntry) -> Void
     let restore: (SeriesLibraryEntry) -> Void
     let delete: (SeriesLibraryEntry) -> Void
 
@@ -454,6 +462,8 @@ private struct SeriesLibrarySheet: View {
         initialFilter: SeriesLibraryFilter,
         archive: @escaping (SeriesLibraryEntry) -> Void,
         setStatus: @escaping (SeriesLibraryEntry, SeriesLibraryEntryStatus) -> Void,
+        markPrevious: @escaping (SeriesLibraryEntry) -> Void,
+        markNext: @escaping (SeriesLibraryEntry) -> Void,
         restore: @escaping (SeriesLibraryEntry) -> Void,
         delete: @escaping (SeriesLibraryEntry) -> Void
     ) {
@@ -461,6 +471,8 @@ private struct SeriesLibrarySheet: View {
         self.initialFilter = initialFilter
         self.archive = archive
         self.setStatus = setStatus
+        self.markPrevious = markPrevious
+        self.markNext = markNext
         self.restore = restore
         self.delete = delete
         _selectedFilter = State(initialValue: initialFilter)
@@ -493,6 +505,22 @@ private struct SeriesLibrarySheet: View {
                                     editorEntry = entry
                                 }
                             ) {
+                                Button {
+                                    markNext(entry)
+                                } label: {
+                                    Label(
+                                        "\(L10n.string("home.next")) \(cursorLabel(entry.nextEpisodeCursor))",
+                                        systemImage: "checkmark.circle"
+                                    )
+                                }
+
+                                Button {
+                                    markPrevious(entry)
+                                } label: {
+                                    Label(L10n.string("home.previous"), systemImage: "arrow.uturn.backward.circle")
+                                }
+                                .disabled(entry.lastWatchedEpisodeCursor?.previousEpisode == nil)
+
                                 SeriesStatusButtons(entry: entry) { status in
                                     setStatus(entry, status)
                                 }
