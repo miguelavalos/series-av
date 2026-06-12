@@ -338,6 +338,10 @@ private struct SeriesLibrarySummaryItem: View {
     let systemImage: String
     let action: () -> Void
 
+    private var isEnabled: Bool {
+        count > 0
+    }
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: 7) {
@@ -363,6 +367,8 @@ private struct SeriesLibrarySummaryItem: View {
             .padding(.horizontal, 10)
         }
         .buttonStyle(.plain)
+        .disabled(!isEnabled)
+        .opacity(isEnabled ? 1 : 0.46)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
