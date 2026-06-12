@@ -16,6 +16,9 @@ packages:
     path: ../../../account-av
   AppsAV:
     path: ../../../apps-av/apple
+  RevenueCat:
+    url: https://github.com/RevenueCat/purchases-ios-spm.git
+    from: 5.0.0
 
 schemes:
   SeriesAV:
@@ -55,7 +58,11 @@ targets:
       - package: AppsAV
         product: AVSettingsFoundation
       - package: AppsAV
+        product: AVPaywallFoundation
+      - package: AppsAV
         product: AVProductAccountFoundation
+      - package: RevenueCat
+        product: RevenueCat
     settings:
       base:
         CODE_SIGN_ENTITLEMENTS: SeriesAV/App/SeriesAV.entitlements

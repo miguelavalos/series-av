@@ -20,6 +20,7 @@ struct SeriesProfileScreen: View {
     @State private var isSigningOut = false
     @State private var signOutErrorMessage = ""
     @State private var isShowingSignOutError = false
+    @State private var isShowingProPaywall = false
 
     var body: some View {
         NavigationStack {
@@ -50,6 +51,12 @@ struct SeriesProfileScreen: View {
                 Button(L10n.string("common.close"), role: .cancel) {}
             } message: {
                 Text(signOutErrorMessage)
+            }
+            .sheet(isPresented: $isShowingProPaywall) {
+                SeriesProPaywallView(
+                    accessController: accessController,
+                    startSignInFlow: startSignInFlow
+                )
             }
         }
     }
@@ -212,10 +219,36 @@ struct SeriesProfileScreen: View {
                 title: L10n.string("profile.pro.sync.title"),
                 detail: L10n.string("profile.pro.sync.detail")
             )
+            proActionButton
+        }
+    }
+
+    @ViewBuilder
+    private var proActionButton: some View {
+        switch accessController.accessMode {
+        case .guest:
+            AVSettingsButton(
+                title: L10n.string("profile.pro.signIn"),
+                style: .primary,
+                action: {
+                    dismiss()
+                    startSignInFlow()
+                }
+            )
+            .disabled(!accessController.accountIsAvailable)
+            .accessibilityIdentifier("profile.pro.signIn")
+        case .signedInFree:
+            AVSettingsButton(
+                title: L10n.string("profile.pro.upgrade"),
+                style: .primary,
+                action: { isShowingProPaywall = true }
+            )
+            .accessibilityIdentifier("profile.pro.upgrade")
+        case .signedInPro:
             AVSettingsInfoRow(
-                systemImage: "arrow.triangle.2.circlepath",
-                title: L10n.string("profile.pro.restore.title"),
-                detail: L10n.string("profile.pro.restore.detail")
+                systemImage: "checkmark.seal",
+                title: L10n.string("profile.pro.active.title"),
+                detail: L10n.string("profile.pro.active.detail")
             )
         }
     }

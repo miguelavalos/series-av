@@ -44,6 +44,18 @@ enum AppConfig {
         return accountManagementURL?.appending(path: "delete-account")
     }
 
+    static var revenueCatPublicAPIKey: String? {
+        BundleConfig.nonEmptyStringValue(for: "SERIESAV_REVENUECAT_PUBLIC_API_KEY")
+    }
+
+    static var revenueCatOfferingID: String? {
+        BundleConfig.nonEmptyStringValue(for: "SERIESAV_REVENUECAT_OFFERING_ID")
+    }
+
+    static var revenueCatMonthlyPackageID: String? {
+        BundleConfig.nonEmptyStringValue(for: "SERIESAV_REVENUECAT_MONTHLY_PACKAGE_ID")
+    }
+
     static var isDebugForceProModeEnabled: Bool {
         BundleConfig.boolValue(for: "SERIESAV_DEBUG_FORCE_PRO_MODE")
     }

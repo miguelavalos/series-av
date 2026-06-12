@@ -36,10 +36,18 @@ struct PlatformSeriesAccountProfileResolver: SeriesAccountProfileResolving {
 @MainActor
 @Observable
 final class SeriesAccessController {
+    enum SubscriptionReconciliationSource: Equatable {
+        case purchase
+        case restore
+    }
+
     private let accountService: SeriesAVAccountServicing
     private let profileResolver: SeriesAccountProfileResolving
     private let entitlementService: SeriesEntitlementServicing
+    private let subscriptionPurchasing: SeriesSubscriptionPurchasing
     private let userDefaults: UserDefaults
+    private let subscriptionReconciliationRetryDelaysNanoseconds: [UInt64]
+    private let sleepNanoseconds: (UInt64) async -> Void
     private let lastKnownAccountUserKey = "seriesav.account.lastKnownUser"
     private var accessRefreshGeneration = 0
 
@@ -51,12 +59,27 @@ final class SeriesAccessController {
     private(set) var limits: SeriesAccessLimits
     private(set) var platformUserId: String?
     private(set) var isAccountSessionTemporarilyUnavailable: Bool
+    private(set) var subscriptionOffer: SeriesSubscriptionOffer?
+    private(set) var subscriptionError: SeriesSubscriptionPurchaseError?
+    private(set) var isSubscriptionOperationInProgress: Bool
+    private(set) var isWaitingForSubscriptionReconciliation: Bool
+    private(set) var subscriptionReconciliationSource: SubscriptionReconciliationSource?
 
     init(
         accountService: SeriesAVAccountServicing = DefaultSeriesAVAccountService(),
         profileResolver: SeriesAccountProfileResolving? = nil,
         entitlementService: SeriesEntitlementServicing? = nil,
-        userDefaults: UserDefaults = .standard
+        subscriptionPurchasing: SeriesSubscriptionPurchasing = RevenueCatSeriesSubscriptionPurchasing(),
+        userDefaults: UserDefaults = .standard,
+        subscriptionReconciliationRetryDelaysNanoseconds: [UInt64] = [
+            1_000_000_000,
+            2_000_000_000,
+            3_000_000_000,
+            5_000_000_000
+        ],
+        sleepNanoseconds: @escaping (UInt64) async -> Void = { nanoseconds in
+            try? await Task.sleep(nanoseconds: nanoseconds)
+        }
     ) {
         let accessClient = SeriesAccountAccessClient(apiClient: SeriesAVAPIClient(
             baseURL: AppConfig.apiBaseURL,
@@ -68,7 +91,10 @@ final class SeriesAccessController {
         self.entitlementService = entitlementService ?? SeriesPlatformEntitlementService(
             accessClient: accessClient
         )
+        self.subscriptionPurchasing = subscriptionPurchasing
         self.userDefaults = userDefaults
+        self.subscriptionReconciliationRetryDelaysNanoseconds = subscriptionReconciliationRetryDelaysNanoseconds
+        self.sleepNanoseconds = sleepNanoseconds
         self.accountUser = nil
         self.accountSession = nil
         self.accessMode = .guest
@@ -77,6 +103,11 @@ final class SeriesAccessController {
         self.limits = .forMode(.guest)
         self.platformUserId = nil
         self.isAccountSessionTemporarilyUnavailable = false
+        self.subscriptionOffer = nil
+        self.subscriptionError = nil
+        self.isSubscriptionOperationInProgress = false
+        self.isWaitingForSubscriptionReconciliation = false
+        self.subscriptionReconciliationSource = nil
     }
 
     var isSignedIn: Bool {
@@ -129,6 +160,7 @@ final class SeriesAccessController {
         case .guest:
             accountUser = nil
             isAccountSessionTemporarilyUnavailable = false
+            clearSubscriptionState()
         }
 
         await refreshAccess()
@@ -150,10 +182,107 @@ final class SeriesAccessController {
     }
 
     func signOut() async throws {
+        accessRefreshGeneration += 1
         try await accountService.signOut()
+        accessRefreshGeneration += 1
         accountUser = nil
         isAccountSessionTemporarilyUnavailable = false
+        clearSubscriptionState()
         applyResolvedAccess(.guest)
+    }
+
+    func loadMonthlySubscriptionOffer() async {
+        guard accountUser != nil else {
+            subscriptionError = .missingAccountUser
+            return
+        }
+
+        do {
+            subscriptionOffer = try await subscriptionPurchasing.loadMonthlyOffer(for: accountUser)
+            subscriptionError = nil
+        } catch let error as SeriesSubscriptionPurchaseError {
+            subscriptionError = error
+        } catch {
+            subscriptionError = .underlying(error.localizedDescription)
+        }
+    }
+
+    func purchaseMonthlyPro() async {
+        await runSubscriptionOperation(source: .purchase) {
+            try await subscriptionPurchasing.purchaseMonthlyPro(for: accountUser)
+        }
+    }
+
+    func restorePurchases() async {
+        await runSubscriptionOperation(source: .restore) {
+            try await subscriptionPurchasing.restorePurchases(for: accountUser)
+        }
+    }
+
+    private func runSubscriptionOperation(
+        source: SubscriptionReconciliationSource,
+        _ operation: () async throws -> SeriesPurchaseOutcome
+    ) async {
+        guard accountUser != nil else {
+            subscriptionError = .missingAccountUser
+            return
+        }
+
+        isSubscriptionOperationInProgress = true
+        subscriptionError = nil
+        defer {
+            isSubscriptionOperationInProgress = false
+        }
+
+        do {
+            let outcome = try await operation()
+            guard outcome.shouldRefreshAccess else { return }
+            isWaitingForSubscriptionReconciliation = true
+            subscriptionReconciliationSource = source
+            await syncFromAccountProvider()
+            await retrySubscriptionReconciliationIfNeeded()
+        } catch let error as SeriesSubscriptionPurchaseError {
+            if error != .purchaseCancelled {
+                subscriptionError = error
+            }
+        } catch {
+            subscriptionError = .underlying(error.localizedDescription)
+        }
+    }
+
+    private func retrySubscriptionReconciliationIfNeeded() async {
+        guard accessMode != .signedInPro else {
+            clearSubscriptionReconciliationState()
+            return
+        }
+
+        let reconciliationAccountUser = accountUser
+        for delay in subscriptionReconciliationRetryDelaysNanoseconds {
+            guard isWaitingForSubscriptionReconciliation else { return }
+            guard accountUser == reconciliationAccountUser else { return }
+
+            await sleepNanoseconds(delay)
+            guard isWaitingForSubscriptionReconciliation else { return }
+            guard accountUser == reconciliationAccountUser else { return }
+
+            await refreshAccess()
+            if accessMode == .signedInPro {
+                clearSubscriptionReconciliationState()
+                return
+            }
+        }
+    }
+
+    private func clearSubscriptionReconciliationState() {
+        isWaitingForSubscriptionReconciliation = false
+        subscriptionReconciliationSource = nil
+    }
+
+    private func clearSubscriptionState() {
+        subscriptionOffer = nil
+        subscriptionError = nil
+        isSubscriptionOperationInProgress = false
+        clearSubscriptionReconciliationState()
     }
 
     private func applyResolvedAccess(_ resolvedAccess: SeriesResolvedAccess) {
@@ -167,6 +296,10 @@ final class SeriesAccessController {
             accountSession = SeriesAccountSession(user: accountUser, access: resolvedAccess)
         } else {
             accountSession = nil
+        }
+
+        if resolvedAccess.accessMode == .signedInPro {
+            clearSubscriptionReconciliationState()
         }
     }
 }

@@ -13,6 +13,7 @@
 		3BA53F4338BE907A4501FC94 /* SeriesAVAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE24F5B52463208C5E876228 /* SeriesAVAPIClient.swift */; };
 		3D36749576FEBB0BBB92401B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 72139F60FD554069885EE731 /* PrivacyInfo.xcprivacy */; };
 		3E6B8AE873E00FD5A55FDDEF /* SeriesLibraryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6E1160762AEF2A117BAE4A3 /* SeriesLibraryModels.swift */; };
+		40E46CA02D7EA0EEB7DCEE5B /* AVProductAccountFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 197D8D418F464FA352F78772 /* AVProductAccountFoundation */; };
 		4635329479183AA26672A051 /* SeriesAppDataSyncClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40364B2B84E6AC647B728FB /* SeriesAppDataSyncClient.swift */; };
 		4CA7CFF4D7974F4190454B09 /* SeriesAccessModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C97F5A3F29AAA0D7BB6E8D9 /* SeriesAccessModels.swift */; };
 		6A5D801612D51B6F370F6949 /* SeriesAVAccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E35FAF1A25D734B526F9350 /* SeriesAVAccountService.swift */; };
@@ -21,18 +22,21 @@
 		99C7AA7B52682CFDEA051A76 /* AVBrandFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 22C162D72D53D4477A9EC40E /* AVBrandFoundation */; };
 		9A9910A6DD514535A83D6C1C /* SeriesAppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = C64880B2D57EC391A9D4D766 /* SeriesAppPreferences.swift */; };
 		A058EA5097F7624496E4AEE8 /* AccountAV in Frameworks */ = {isa = PBXBuildFile; productRef = C2992247012F30B5FDE4706E /* AccountAV */; };
+		A14CE6F47C0607F670434388 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = DF538D2CBE6EEAF061AE84C4 /* RevenueCat */; };
 		AAFA14FB0414B5EDE57EBA93 /* SeriesAppExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1957FAE6E3298FDB2C8536F6 /* SeriesAppExperience.swift */; };
 		B5255448167E43828252DB71 /* SeriesAuthOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AF87B75A9721D260B4C3E1 /* SeriesAuthOnboardingView.swift */; };
 		BA243CAA0B49EFED0D7B6F21 /* SeriesProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39E85DD4C7D5EBBF8721E3A /* SeriesProfileScreen.swift */; };
 		BC9DA56281027A4AE6B394B0 /* SeriesAccessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEBE0C665DDB4A48FE198C52 /* SeriesAccessController.swift */; };
 		C2AA86A6CC3043D4021B9B09 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 86CE3F6EAA0958FB417BACCE /* Localizable.strings */; };
 		C6EB3E3CFAD3AF66C9C0471E /* SeriesEntitlementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A586B658AD9682B2BF8C0A92 /* SeriesEntitlementService.swift */; };
-		D93665C7D4D8E3AF2A66912E /* AVProductAccountFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 197D8D418F464FA352F78772 /* AVProductAccountFoundation */; };
+		D93665C7D4D8E3AF2A66912E /* AVPaywallFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = CA2084A4C124E233242FA2F9 /* AVPaywallFoundation */; };
+		DEE35176392FBAB1DB687472 /* SeriesProPaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 326ED2E28D2DC33ECDA6917C /* SeriesProPaywallView.swift */; };
 		E592D4F13BA7E38AFECB453C /* SeriesAVApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E930F20F64D72B22A232919B /* SeriesAVApp.swift */; };
 		E5B43EA5B85A739C5D7E6CE8 /* SeriesAppDataSyncClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F51872EA7F30BA6B1A1475 /* SeriesAppDataSyncClientTests.swift */; };
 		E647737E0691166B0AE5E9F9 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145DE7E7B082B7D92C440A5B /* RootView.swift */; };
 		F06A3D772FAA19F807378474 /* SeriesAccountAccessClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E3280C62806B5F89C4728A /* SeriesAccountAccessClient.swift */; };
 		F080E9F4FD5DFE9C674174EC /* SeriesAccessControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF565349F86597C1E4C0AC86 /* SeriesAccessControllerTests.swift */; };
+		F448C655EF1E1DD18F113A54 /* SeriesSubscriptionPurchasingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EF0BD8F6256FAEAD9C6EFA5 /* SeriesSubscriptionPurchasingService.swift */; };
 		F73DD51BA813EF38FE6083DE /* SeriesLibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB850E07D80A9A593EA3105 /* SeriesLibraryStore.swift */; };
 /* End PBXBuildFile section */
 
@@ -51,6 +55,8 @@
 		1957FAE6E3298FDB2C8536F6 /* SeriesAppExperience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppExperience.swift; sourceTree = "<group>"; };
 		2568399CFB4C7A1E14832801 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		2A2E8FBF279E3A8C4EDC0B68 /* SeriesAV.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SeriesAV.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2EF0BD8F6256FAEAD9C6EFA5 /* SeriesSubscriptionPurchasingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesSubscriptionPurchasingService.swift; sourceTree = "<group>"; };
+		326ED2E28D2DC33ECDA6917C /* SeriesProPaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesProPaywallView.swift; sourceTree = "<group>"; };
 		45AF87B75A9721D260B4C3E1 /* SeriesAuthOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAuthOnboardingView.swift; sourceTree = "<group>"; };
 		46116EC3820DEBFB599F0E49 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4C97F5A3F29AAA0D7BB6E8D9 /* SeriesAccessModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccessModels.swift; sourceTree = "<group>"; };
@@ -92,7 +98,9 @@
 				A058EA5097F7624496E4AEE8 /* AccountAV in Frameworks */,
 				99C7AA7B52682CFDEA051A76 /* AVBrandFoundation in Frameworks */,
 				39D3F2C4743954A3DD315B15 /* AVSettingsFoundation in Frameworks */,
-				D93665C7D4D8E3AF2A66912E /* AVProductAccountFoundation in Frameworks */,
+				D93665C7D4D8E3AF2A66912E /* AVPaywallFoundation in Frameworks */,
+				40E46CA02D7EA0EEB7DCEE5B /* AVProductAccountFoundation in Frameworks */,
+				A14CE6F47C0607F670434388 /* RevenueCat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,6 +141,7 @@
 				C64880B2D57EC391A9D4D766 /* SeriesAppPreferences.swift */,
 				5C2045BD1DAB63090578AC6B /* SeriesAV.entitlements */,
 				E930F20F64D72B22A232919B /* SeriesAVApp.swift */,
+				2EF0BD8F6256FAEAD9C6EFA5 /* SeriesSubscriptionPurchasingService.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -228,6 +237,7 @@
 			isa = PBXGroup;
 			children = (
 				B39E85DD4C7D5EBBF8721E3A /* SeriesProfileScreen.swift */,
+				326ED2E28D2DC33ECDA6917C /* SeriesProPaywallView.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -270,7 +280,9 @@
 				C2992247012F30B5FDE4706E /* AccountAV */,
 				22C162D72D53D4477A9EC40E /* AVBrandFoundation */,
 				138FB23720DA324B605EBCC9 /* AVSettingsFoundation */,
+				CA2084A4C124E233242FA2F9 /* AVPaywallFoundation */,
 				197D8D418F464FA352F78772 /* AVProductAccountFoundation */,
+				DF538D2CBE6EEAF061AE84C4 /* RevenueCat */,
 			);
 			productName = SeriesAV;
 			productReference = 2A2E8FBF279E3A8C4EDC0B68 /* SeriesAV.app */;
@@ -305,6 +317,7 @@
 			mainGroup = 5B9097F8C208FDC875876E1E;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				5A8A8131B9531312E076357F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
 				81586FB8C9B3D809BCFDEC71 /* XCLocalSwiftPackageReference "../../../account-av" */,
 				319B2400043A26E11E322D9F /* XCLocalSwiftPackageReference "../../../apps-av/apple" */,
 			);
@@ -363,7 +376,9 @@
 				C6EB3E3CFAD3AF66C9C0471E /* SeriesEntitlementService.swift in Sources */,
 				3E6B8AE873E00FD5A55FDDEF /* SeriesLibraryModels.swift in Sources */,
 				F73DD51BA813EF38FE6083DE /* SeriesLibraryStore.swift in Sources */,
+				DEE35176392FBAB1DB687472 /* SeriesProPaywallView.swift in Sources */,
 				BA243CAA0B49EFED0D7B6F21 /* SeriesProfileScreen.swift in Sources */,
+				F448C655EF1E1DD18F113A54 /* SeriesSubscriptionPurchasingService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -639,6 +654,17 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		5A8A8131B9531312E076357F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		138FB23720DA324B605EBCC9 /* AVSettingsFoundation */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -655,6 +681,15 @@
 		C2992247012F30B5FDE4706E /* AccountAV */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AccountAV;
+		};
+		CA2084A4C124E233242FA2F9 /* AVPaywallFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AVPaywallFoundation;
+		};
+		DF538D2CBE6EEAF061AE84C4 /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5A8A8131B9531312E076357F /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -30,14 +30,18 @@ Current scaffold:
   surfaces, with app language first, appearance second, local tracking context,
   help/legal links, session state, and account safety links.
 - Pro cloud-sync client contract for `/v1/apps/seriesav/data/seriesLibrary`.
+- RevenueCat-backed Series AV Pro purchase/restore boundary and custom paywall
+  shell, guarded by public xcconfig/Info.plist config and backend access
+  reconciliation.
 - Unit-test build coverage for library identity, cursor updates, app-data sync
-  envelopes, access entitlement resolution, and account session hydration.
+  envelopes, access entitlement resolution, account session hydration, and Pro
+  purchase reconciliation.
 
 Not implemented yet:
 
 - final Series AV UI redesign;
-- StoreKit/RevenueCat paywall surfaces;
-- purchase restore and advanced account-management flows beyond shared links;
+- private RevenueCat/App Store product configuration and signed purchase smoke;
+- advanced account-management flows beyond shared links;
 - Convex realtime projection;
 - catalog search/enrichment UI;
 - social features.
