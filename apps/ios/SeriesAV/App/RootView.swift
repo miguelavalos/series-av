@@ -615,9 +615,9 @@ private struct SeriesCurrentWatchingCard: View {
     let delete: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 18) {
             HStack(alignment: .top, spacing: 14) {
-                SeriesPosterMark(seed: entry.fallbackVisualSeed ?? entry.title, size: 82)
+                SeriesPosterMark(seed: entry.fallbackVisualSeed ?? entry.title, size: 94)
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text(L10n.string("home.current.title"))
@@ -635,6 +635,7 @@ private struct SeriesCurrentWatchingCard: View {
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.secondary)
                 }
+                .padding(.top, 3)
 
                 Spacer(minLength: 0)
 
@@ -647,6 +648,12 @@ private struct SeriesCurrentWatchingCard: View {
                 )
             }
 
+            SeriesPrimaryContinueButton(
+                title: L10n.string("home.next"),
+                episodeLabel: cursorLabel(entry.nextEpisodeCursor),
+                action: markNext
+            )
+
             HStack(spacing: 12) {
                 SeriesEpisodeChip(
                     title: L10n.string("home.previous"),
@@ -656,21 +663,13 @@ private struct SeriesCurrentWatchingCard: View {
                 )
                 .disabled(entry.lastWatchedEpisodeCursor == nil)
 
-                SeriesEpisodeChip(
-                    title: L10n.string("home.next"),
-                    value: cursorLabel(entry.nextEpisodeCursor),
-                    systemImage: "checkmark",
-                    action: markNext,
-                    isProminent: true
-                )
+                Button(action: editProgress) {
+                    Label(L10n.string("home.adjust"), systemImage: "slider.horizontal.3")
+                        .frame(maxWidth: .infinity, minHeight: 96)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
             }
-
-            Button(action: editProgress) {
-                Label(L10n.string("home.adjust"), systemImage: "slider.horizontal.3")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
         }
         .padding(20)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
@@ -685,6 +684,36 @@ private struct SeriesCurrentWatchingCard: View {
             return L10n.string("home.notStarted")
         }
         return cursorLabel(cursor)
+    }
+}
+
+private struct SeriesPrimaryContinueButton: View {
+    let title: String
+    let episodeLabel: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 14) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 26, weight: .bold))
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title)
+                        .font(.system(size: 13, weight: .bold))
+                    Text(episodeLabel)
+                        .font(.system(size: 28, weight: .black, design: .rounded))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
+                }
+
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, minHeight: 86)
+            .padding(.horizontal, 18)
+        }
+        .buttonStyle(.borderedProminent)
+        .controlSize(.large)
     }
 }
 
