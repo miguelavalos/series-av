@@ -28,6 +28,17 @@ struct SeriesEpisodeCursor: Codable, Equatable, Comparable, Sendable {
         }
         return lhs.episodeNumber < rhs.episodeNumber
     }
+
+    var nextEpisode: SeriesEpisodeCursor {
+        SeriesEpisodeCursor(seasonNumber: seasonNumber, episodeNumber: episodeNumber + 1)
+    }
+
+    var previousEpisode: SeriesEpisodeCursor? {
+        guard episodeNumber > 1 else {
+            return nil
+        }
+        return SeriesEpisodeCursor(seasonNumber: seasonNumber, episodeNumber: episodeNumber - 1)
+    }
 }
 
 struct SeriesLibraryEntry: Codable, Identifiable, Equatable, Sendable {
@@ -53,6 +64,10 @@ struct SeriesLibraryEntry: Codable, Identifiable, Equatable, Sendable {
             return status == .wantToWatch ? "Not started" : "No episode set"
         }
         return "S\(cursor.seasonNumber) E\(cursor.episodeNumber)"
+    }
+
+    var nextEpisodeCursor: SeriesEpisodeCursor {
+        lastWatchedEpisodeCursor?.nextEpisode ?? SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 1)
     }
 
     mutating func markWatchedThrough(_ cursor: SeriesEpisodeCursor, at date: Date = Date()) {

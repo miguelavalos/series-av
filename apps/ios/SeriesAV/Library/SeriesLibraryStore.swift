@@ -23,6 +23,15 @@ final class SeriesLibraryStore {
             }
     }
 
+    var watchingEntries: [SeriesLibraryEntry] {
+        activeEntries.filter { $0.status == .watching }
+    }
+
+    var homeEntries: [SeriesLibraryEntry] {
+        let watching = watchingEntries
+        return watching.isEmpty ? activeEntries : watching
+    }
+
     func upsert(_ entry: SeriesLibraryEntry) {
         if let index = entries.firstIndex(where: { SeriesLibraryIdentity.sameSeries($0, entry) }) {
             entries[index] = entry
@@ -43,14 +52,20 @@ final class SeriesLibraryStore {
             return
         }
 
-        let current = entries[index].lastWatchedEpisodeCursor ?? SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 0)
-        entries[index].markWatchedThrough(
-            SeriesEpisodeCursor(
-                seasonNumber: current.seasonNumber,
-                episodeNumber: current.episodeNumber + 1
-            ),
-            at: date
-        )
+        entries[index].markWatchedThrough(entries[index].nextEpisodeCursor, at: date)
+    }
+
+    func markPreviousEpisodeWatched(for entryId: String, at date: Date = Date()) {
+        guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
+            return
+        }
+
+        guard let previous = entries[index].lastWatchedEpisodeCursor?.previousEpisode else {
+            entries[index].clearProgress(at: date)
+            return
+        }
+
+        entries[index].markWatchedThrough(previous, at: date)
     }
 
     func replace(with incomingEntries: [SeriesLibraryEntry]) {
@@ -70,6 +85,25 @@ final class SeriesLibraryStore {
                 addedAt: now,
                 updatedAt: now,
                 lastInteractedAt: now
+            ),
+            SeriesLibraryEntry(
+                entryId: "sample-2",
+                seriesId: "sample-series-2",
+                title: "Slow Weekend Show",
+                status: .watching,
+                lastWatchedEpisodeCursor: SeriesEpisodeCursor(seasonNumber: 2, episodeNumber: 7),
+                addedAt: now.addingTimeInterval(-300),
+                updatedAt: now.addingTimeInterval(-300),
+                lastInteractedAt: now.addingTimeInterval(-300)
+            ),
+            SeriesLibraryEntry(
+                entryId: "sample-3",
+                seriesId: "sample-series-3",
+                title: "Later List",
+                status: .wantToWatch,
+                addedAt: now.addingTimeInterval(-600),
+                updatedAt: now.addingTimeInterval(-600),
+                lastInteractedAt: now.addingTimeInterval(-600)
             )
         ])
     }

@@ -77,6 +77,41 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertEqual(store.activeEntries.map(\.entryId), ["pinned", "recent"])
     }
 
+    func testHomeEntriesPrioritizeWatchingBeforeWantToWatch() {
+        let older = Date(timeIntervalSince1970: 1_800_000_000)
+        let newer = Date(timeIntervalSince1970: 1_800_000_100)
+        let store = SeriesLibraryStore(entries: [
+            SeriesLibraryEntry(
+                entryId: "later",
+                seriesId: "later",
+                title: "Later",
+                status: .wantToWatch,
+                addedAt: newer,
+                updatedAt: newer,
+                lastInteractedAt: newer
+            ),
+            entry(id: "watching", title: "Watching", pinned: false, interactedAt: older)
+        ])
+
+        XCTAssertEqual(store.homeEntries.map(\.entryId), ["watching"])
+    }
+
+    func testMarkPreviousEpisodeWatchedMovesBackOrClearsProgress() {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = SeriesLibraryStore(entries: [
+            entry(id: "entry", title: "Entry", pinned: false, interactedAt: date)
+        ])
+
+        store.markPreviousEpisodeWatched(for: "entry", at: date)
+        XCTAssertEqual(store.entries[0].lastWatchedEpisodeCursor, nil)
+        XCTAssertEqual(store.entries[0].status, .wantToWatch)
+
+        store.markWatchedThrough(SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 10), for: "entry", at: date)
+        store.markPreviousEpisodeWatched(for: "entry", at: date)
+        XCTAssertEqual(store.entries[0].lastWatchedEpisodeCursor, SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 9))
+        XCTAssertEqual(store.entries[0].status, .watching)
+    }
+
     private func entry(
         id: String,
         title: String,
