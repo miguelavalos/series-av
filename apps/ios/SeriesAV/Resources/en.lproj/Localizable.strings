@@ -60,6 +60,12 @@
 "library.search.placeholder" = "Search your library";
 "library.search.empty.title" = "No matches";
 "library.search.empty.subtitle" = "Try another title.";
+"library.filter.title" = "Filter";
+"library.filter.all" = "All";
+"library.filter.wantToWatch" = "Want";
+"library.filter.watching" = "Watching";
+"library.filter.watched" = "Watched";
+"library.filter.archived" = "Archived";
 "library.status.wantToWatch" = "Want to watch";
 "library.status.watching" = "Watching";
 "library.status.watched" = "Watched";

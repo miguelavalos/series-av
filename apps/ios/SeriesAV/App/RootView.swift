@@ -308,6 +308,14 @@ private struct SeriesUndoBar: View {
 }
 
 private struct SeriesLibrarySheet: View {
+    private enum LibraryFilter: String, CaseIterable {
+        case all
+        case watching
+        case wantToWatch
+        case watched
+        case archived
+    }
+
     @Environment(\.dismiss) private var dismiss
     @Bindable var store: SeriesLibraryStore
     let archive: (SeriesLibraryEntry) -> Void
@@ -316,6 +324,7 @@ private struct SeriesLibrarySheet: View {
     let delete: (SeriesLibraryEntry) -> Void
 
     @State private var query = ""
+    @State private var selectedFilter: LibraryFilter = .all
 
     var body: some View {
         NavigationStack {
@@ -324,6 +333,14 @@ private struct SeriesLibrarySheet: View {
                     TextField(L10n.string("library.search.placeholder"), text: $query)
                         .textInputAutocapitalization(.words)
                         .submitLabel(.search)
+
+                    Picker(L10n.string("library.filter.title"), selection: $selectedFilter) {
+                        ForEach(LibraryFilter.allCases, id: \.self) { filter in
+                            Text(filterTitle(filter))
+                                .tag(filter)
+                        }
+                    }
+                    .pickerStyle(.segmented)
                 }
 
                 if filteredActiveEntries.isEmpty == false {
@@ -391,11 +408,32 @@ private struct SeriesLibrarySheet: View {
     }
 
     private var filteredActiveEntries: [SeriesLibraryEntry] {
-        filter(store.activeEntries)
+        guard selectedFilter != .archived else {
+            return []
+        }
+
+        return filter(store.activeEntries).filter { entry in
+            switch selectedFilter {
+            case .all:
+                return true
+            case .watching:
+                return entry.status == .watching
+            case .wantToWatch:
+                return entry.status == .wantToWatch
+            case .watched:
+                return entry.status == .watched
+            case .archived:
+                return false
+            }
+        }
     }
 
     private var filteredArchivedEntries: [SeriesLibraryEntry] {
-        filter(store.archivedEntries)
+        guard selectedFilter == .all || selectedFilter == .archived else {
+            return []
+        }
+
+        return filter(store.archivedEntries)
     }
 
     private var normalizedQuery: String {
@@ -432,6 +470,21 @@ private struct SeriesLibrarySheet: View {
 
     private func libraryDetail(for entry: SeriesLibraryEntry) -> String {
         "\(statusTitle(entry.status)) · \(entry.progressLabel)"
+    }
+
+    private func filterTitle(_ filter: LibraryFilter) -> String {
+        switch filter {
+        case .all:
+            L10n.string("library.filter.all")
+        case .watching:
+            L10n.string("library.filter.watching")
+        case .wantToWatch:
+            L10n.string("library.filter.wantToWatch")
+        case .watched:
+            L10n.string("library.filter.watched")
+        case .archived:
+            L10n.string("library.filter.archived")
+        }
     }
 }
 

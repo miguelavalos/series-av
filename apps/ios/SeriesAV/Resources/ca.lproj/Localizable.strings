@@ -60,6 +60,12 @@
 "library.search.placeholder" = "Buscar a la biblioteca";
 "library.search.empty.title" = "Sense resultats";
 "library.search.empty.subtitle" = "Prova amb un altre titol.";
+"library.filter.title" = "Filtre";
+"library.filter.all" = "Tot";
+"library.filter.wantToWatch" = "Vull";
+"library.filter.watching" = "Veient";
+"library.filter.watched" = "Vista";
+"library.filter.archived" = "Arxivades";
 "library.status.wantToWatch" = "Vull veure";
 "library.status.watching" = "Veient";
 "library.status.watched" = "Vista";
