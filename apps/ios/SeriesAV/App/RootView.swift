@@ -55,6 +55,14 @@ struct RootView: View {
     RootView(accessController: SeriesAccessController(), startSignInFlow: {})
 }
 
+private enum SeriesLibraryFilter: String, CaseIterable {
+    case all
+    case watching
+    case wantToWatch
+    case watched
+    case archived
+}
+
 private struct SeriesWatchingHomeScreen: View {
     @Bindable var store: SeriesLibraryStore
     let accessTitle: String
@@ -66,6 +74,7 @@ private struct SeriesWatchingHomeScreen: View {
     @State private var editorEntry: SeriesLibraryEntry?
     @State private var isShowingAddSheet = false
     @State private var isShowingLibrarySheet = false
+    @State private var initialLibraryFilter: SeriesLibraryFilter = .all
     @State private var pendingUndo: PendingLibraryUndo?
 
     var body: some View {
@@ -75,7 +84,16 @@ private struct SeriesWatchingHomeScreen: View {
                 SeriesLibrarySummaryStrip(
                     watchingCount: countActiveEntries(with: .watching),
                     wantToWatchCount: countActiveEntries(with: .wantToWatch),
-                    watchedCount: countActiveEntries(with: .watched)
+                    watchedCount: countActiveEntries(with: .watched),
+                    openWatching: {
+                        openLibrary(filter: .watching)
+                    },
+                    openWantToWatch: {
+                        openLibrary(filter: .wantToWatch)
+                    },
+                    openWatched: {
+                        openLibrary(filter: .watched)
+                    }
                 )
 
                 if let currentEntry {
@@ -188,6 +206,7 @@ private struct SeriesWatchingHomeScreen: View {
         .sheet(isPresented: $isShowingLibrarySheet) {
             SeriesLibrarySheet(
                 store: store,
+                initialFilter: initialLibraryFilter,
                 archive: { entry in
                     store.archive(entry.id)
                     pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.archived")
@@ -233,6 +252,11 @@ private struct SeriesWatchingHomeScreen: View {
         store.activeEntries.filter { $0.status == status }.count
     }
 
+    private func openLibrary(filter: SeriesLibraryFilter = .all) {
+        initialLibraryFilter = filter
+        isShowingLibrarySheet = true
+    }
+
     private var accountBar: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
@@ -250,7 +274,7 @@ private struct SeriesWatchingHomeScreen: View {
             Spacer()
 
             Button {
-                isShowingLibrarySheet = true
+                openLibrary()
             } label: {
                 Image(systemName: "books.vertical")
                     .frame(width: 34, height: 34)
@@ -280,23 +304,29 @@ private struct SeriesLibrarySummaryStrip: View {
     let watchingCount: Int
     let wantToWatchCount: Int
     let watchedCount: Int
+    let openWatching: () -> Void
+    let openWantToWatch: () -> Void
+    let openWatched: () -> Void
 
     var body: some View {
         HStack(spacing: 8) {
             SeriesLibrarySummaryItem(
                 title: L10n.string("library.filter.watching"),
                 count: watchingCount,
-                systemImage: "play.circle.fill"
+                systemImage: "play.circle.fill",
+                action: openWatching
             )
             SeriesLibrarySummaryItem(
                 title: L10n.string("library.filter.wantToWatch"),
                 count: wantToWatchCount,
-                systemImage: "bookmark.fill"
+                systemImage: "bookmark.fill",
+                action: openWantToWatch
             )
             SeriesLibrarySummaryItem(
                 title: L10n.string("library.filter.watched"),
                 count: watchedCount,
-                systemImage: "checkmark.circle.fill"
+                systemImage: "checkmark.circle.fill",
+                action: openWatched
             )
         }
     }
@@ -306,34 +336,39 @@ private struct SeriesLibrarySummaryItem: View {
     let title: String
     let count: Int
     let systemImage: String
+    let action: () -> Void
 
     var body: some View {
-        HStack(spacing: 7) {
-            Image(systemName: systemImage)
-                .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(.secondary)
-
-            VStack(alignment: .leading, spacing: 1) {
-                Text("\(count)")
-                    .font(.system(size: 18, weight: .black, design: .rounded))
-                    .foregroundStyle(.primary)
-                    .monospacedDigit()
-                Text(title)
-                    .font(.system(size: 10, weight: .bold))
+        Button(action: action) {
+            HStack(spacing: 7) {
+                Image(systemName: systemImage)
+                    .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-            }
 
-            Spacer(minLength: 0)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("\(count)")
+                        .font(.system(size: 18, weight: .black, design: .rounded))
+                        .foregroundStyle(.primary)
+                        .monospacedDigit()
+                    Text(title)
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
+                }
+
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity, minHeight: 50)
+            .padding(.horizontal, 10)
         }
-        .frame(maxWidth: .infinity, minHeight: 50)
-        .padding(.horizontal, 10)
+        .buttonStyle(.plain)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .stroke(Color.primary.opacity(0.06), lineWidth: 1)
         }
+        .accessibilityLabel("\(title): \(count)")
     }
 }
 
@@ -378,23 +413,33 @@ private struct SeriesUndoBar: View {
 }
 
 private struct SeriesLibrarySheet: View {
-    private enum LibraryFilter: String, CaseIterable {
-        case all
-        case watching
-        case wantToWatch
-        case watched
-        case archived
-    }
-
     @Environment(\.dismiss) private var dismiss
     @Bindable var store: SeriesLibraryStore
+    let initialFilter: SeriesLibraryFilter
     let archive: (SeriesLibraryEntry) -> Void
     let setStatus: (SeriesLibraryEntry, SeriesLibraryEntryStatus) -> Void
     let restore: (SeriesLibraryEntry) -> Void
     let delete: (SeriesLibraryEntry) -> Void
 
     @State private var query = ""
-    @State private var selectedFilter: LibraryFilter = .all
+    @State private var selectedFilter: SeriesLibraryFilter
+
+    init(
+        store: SeriesLibraryStore,
+        initialFilter: SeriesLibraryFilter,
+        archive: @escaping (SeriesLibraryEntry) -> Void,
+        setStatus: @escaping (SeriesLibraryEntry, SeriesLibraryEntryStatus) -> Void,
+        restore: @escaping (SeriesLibraryEntry) -> Void,
+        delete: @escaping (SeriesLibraryEntry) -> Void
+    ) {
+        self.store = store
+        self.initialFilter = initialFilter
+        self.archive = archive
+        self.setStatus = setStatus
+        self.restore = restore
+        self.delete = delete
+        _selectedFilter = State(initialValue: initialFilter)
+    }
 
     var body: some View {
         NavigationStack {
@@ -405,7 +450,7 @@ private struct SeriesLibrarySheet: View {
                         .submitLabel(.search)
 
                     Picker(L10n.string("library.filter.title"), selection: $selectedFilter) {
-                        ForEach(LibraryFilter.allCases, id: \.self) { filter in
+                        ForEach(SeriesLibraryFilter.allCases, id: \.self) { filter in
                             Text(filterTitle(filter))
                                 .tag(filter)
                         }
@@ -542,7 +587,7 @@ private struct SeriesLibrarySheet: View {
         "\(statusTitle(entry.status)) · \(entry.progressLabel)"
     }
 
-    private func filterTitle(_ filter: LibraryFilter) -> String {
+    private func filterTitle(_ filter: SeriesLibraryFilter) -> String {
         switch filter {
         case .all:
             L10n.string("library.filter.all")
