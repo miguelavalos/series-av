@@ -1072,7 +1072,7 @@ private struct SeriesCurrentWatchingCard: View {
 
     private var currentProgress: String {
         guard entry.status != .wantToWatch else {
-            return L10n.string("home.current.wantToWatch.progress")
+            return String(format: L10n.string("home.queue.wantToWatch.progress"), cursorLabel(entry.nextEpisodeCursor))
         }
         return String(format: L10n.string("home.current.progress"), entry.progressLabel)
     }
