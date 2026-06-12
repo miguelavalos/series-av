@@ -315,12 +315,20 @@ private struct SeriesLibrarySheet: View {
     let restore: (SeriesLibraryEntry) -> Void
     let delete: (SeriesLibraryEntry) -> Void
 
+    @State private var query = ""
+
     var body: some View {
         NavigationStack {
             List {
-                if store.activeEntries.isEmpty == false {
+                Section {
+                    TextField(L10n.string("library.search.placeholder"), text: $query)
+                        .textInputAutocapitalization(.words)
+                        .submitLabel(.search)
+                }
+
+                if filteredActiveEntries.isEmpty == false {
                     Section(L10n.string("library.active.title")) {
-                        ForEach(store.activeEntries) { entry in
+                        ForEach(filteredActiveEntries) { entry in
                             SeriesLibraryRow(entry: entry, detail: libraryDetail(for: entry)) {
                                 SeriesStatusButtons(entry: entry) { status in
                                     setStatus(entry, status)
@@ -342,9 +350,9 @@ private struct SeriesLibrarySheet: View {
                     }
                 }
 
-                if store.archivedEntries.isEmpty == false {
+                if filteredArchivedEntries.isEmpty == false {
                     Section(L10n.string("library.archived.title")) {
-                        ForEach(store.archivedEntries) { entry in
+                        ForEach(filteredArchivedEntries) { entry in
                             SeriesLibraryRow(entry: entry, detail: L10n.string("library.archived.detail")) {
                                 Button {
                                     restore(entry)
@@ -362,11 +370,11 @@ private struct SeriesLibrarySheet: View {
                     }
                 }
 
-                if store.activeEntries.isEmpty && store.archivedEntries.isEmpty {
+                if isShowingEmptyState {
                     ContentUnavailableView(
-                        L10n.string("library.empty.title"),
+                        emptyTitle,
                         systemImage: "books.vertical",
-                        description: Text(L10n.string("library.empty.subtitle"))
+                        description: Text(emptySubtitle)
                     )
                 }
             }
@@ -379,6 +387,46 @@ private struct SeriesLibrarySheet: View {
                     }
                 }
             }
+        }
+    }
+
+    private var filteredActiveEntries: [SeriesLibraryEntry] {
+        filter(store.activeEntries)
+    }
+
+    private var filteredArchivedEntries: [SeriesLibraryEntry] {
+        filter(store.archivedEntries)
+    }
+
+    private var normalizedQuery: String {
+        SeriesLibraryIdentity.normalizedSearchText(query)
+    }
+
+    private var isShowingEmptyState: Bool {
+        filteredActiveEntries.isEmpty && filteredArchivedEntries.isEmpty
+    }
+
+    private var emptyTitle: String {
+        if store.activeEntries.isEmpty && store.archivedEntries.isEmpty {
+            return L10n.string("library.empty.title")
+        }
+        return L10n.string("library.search.empty.title")
+    }
+
+    private var emptySubtitle: String {
+        if store.activeEntries.isEmpty && store.archivedEntries.isEmpty {
+            return L10n.string("library.empty.subtitle")
+        }
+        return L10n.string("library.search.empty.subtitle")
+    }
+
+    private func filter(_ entries: [SeriesLibraryEntry]) -> [SeriesLibraryEntry] {
+        guard normalizedQuery.isEmpty == false else {
+            return entries
+        }
+
+        return entries.filter {
+            SeriesLibraryIdentity.normalizedSearchText($0.title).contains(normalizedQuery)
         }
     }
 

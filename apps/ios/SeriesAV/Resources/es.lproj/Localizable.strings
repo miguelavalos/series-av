@@ -57,6 +57,9 @@
 "library.restore" = "Restaurar";
 "library.empty.title" = "Sin series todavia";
 "library.empty.subtitle" = "Anade una serie y aparecera aqui.";
+"library.search.placeholder" = "Buscar en tu biblioteca";
+"library.search.empty.title" = "Sin resultados";
+"library.search.empty.subtitle" = "Prueba con otro titulo.";
 "library.status.wantToWatch" = "Quiero ver";
 "library.status.watching" = "Viendo";
 "library.status.watched" = "Vista";

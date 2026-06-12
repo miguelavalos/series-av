@@ -57,6 +57,9 @@
 "library.restore" = "Restaurar";
 "library.empty.title" = "Encara no hi ha series";
 "library.empty.subtitle" = "Afegeix una serie i apareixera aqui.";
+"library.search.placeholder" = "Buscar a la biblioteca";
+"library.search.empty.title" = "Sense resultats";
+"library.search.empty.subtitle" = "Prova amb un altre titol.";
 "library.status.wantToWatch" = "Vull veure";
 "library.status.watching" = "Veient";
 "library.status.watched" = "Vista";

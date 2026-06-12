@@ -57,6 +57,9 @@
 "library.restore" = "Restore";
 "library.empty.title" = "No series yet";
 "library.empty.subtitle" = "Add a series and it will appear here.";
+"library.search.placeholder" = "Search your library";
+"library.search.empty.title" = "No matches";
+"library.search.empty.subtitle" = "Try another title.";
 "library.status.wantToWatch" = "Want to watch";
 "library.status.watching" = "Watching";
 "library.status.watched" = "Watched";
