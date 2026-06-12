@@ -1,6 +1,10 @@
 import Foundation
 
 enum AppConfig {
+    static var avAccountKey: String {
+        BundleConfig.stringValue(for: "ACCOUNTAV_PUBLISHABLE_KEY")
+    }
+
     static var apiBaseURL: URL? {
         BundleConfig.urlValue(for: "ACCOUNTAV_API_BASE_URL")
     }

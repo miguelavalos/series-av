@@ -109,6 +109,10 @@ private struct StubSeriesAccountAccessClient: SeriesAccountAccessProviding {
         configured
     }
 
+    func fetchAccountSummary() async throws -> SeriesAccountSummary {
+        SeriesAccountSummary(id: "apps-av-user-1", emailAddress: "series@example.com", displayName: "Series User")
+    }
+
     func fetchMeAccess() async throws -> SeriesMeAccessResponse {
         response
     }

@@ -5,6 +5,66 @@ struct SeriesMeAccessResponse: Decodable, Equatable {
     let apps: [SeriesAppAccess]
 }
 
+struct SeriesAccountSummary: Decodable, Equatable {
+    let id: String?
+    let emailAddress: String?
+    let displayName: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case emailAddress
+        case email
+        case displayName
+        case name
+        case user
+    }
+
+    init(
+        id: String? = nil,
+        emailAddress: String? = nil,
+        displayName: String? = nil
+    ) {
+        self.id = id
+        self.emailAddress = emailAddress
+        self.displayName = displayName
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let user = try container.decodeIfPresent(SeriesAccountSummaryUser.self, forKey: .user)
+        id = try container.decodeIfPresent(String.self, forKey: .id) ?? user?.id
+        emailAddress = try container.decodeIfPresent(String.self, forKey: .emailAddress)
+            ?? container.decodeIfPresent(String.self, forKey: .email)
+            ?? user?.emailAddress
+        displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
+            ?? container.decodeIfPresent(String.self, forKey: .name)
+            ?? user?.displayName
+    }
+}
+
+private struct SeriesAccountSummaryUser: Decodable, Equatable {
+    let id: String?
+    let emailAddress: String?
+    let displayName: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case email
+        case emailAddress
+        case displayName
+        case name
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+        emailAddress = try container.decodeIfPresent(String.self, forKey: .emailAddress)
+            ?? container.decodeIfPresent(String.self, forKey: .email)
+        displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
+            ?? container.decodeIfPresent(String.self, forKey: .name)
+    }
+}
+
 struct SeriesMeAccessViewer: Decodable, Equatable {
     let isAuthenticated: Bool
     let userId: String?
@@ -55,6 +115,7 @@ struct SeriesAppAccess: Decodable, Equatable {
 @MainActor
 protocol SeriesAccountAccessProviding {
     func isConfigured() -> Bool
+    func fetchAccountSummary() async throws -> SeriesAccountSummary
     func fetchMeAccess() async throws -> SeriesMeAccessResponse
 }
 
@@ -73,6 +134,11 @@ struct SeriesAccountAccessClient: SeriesAccountAccessProviding, Sendable {
 
     func isConfigured() -> Bool {
         apiClient.baseURL != nil
+    }
+
+    func fetchAccountSummary() async throws -> SeriesAccountSummary {
+        let (data, _) = try await apiClient.requestData(path: "/v1/me")
+        return try decoder.decode(SeriesAccountSummary.self, from: data)
     }
 
     func fetchMeAccess() async throws -> SeriesMeAccessResponse {

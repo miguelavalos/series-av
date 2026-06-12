@@ -2,7 +2,7 @@ import Foundation
 import OSLog
 
 @MainActor
-protocol SeriesEntitlementServicing {
+protocol SeriesEntitlementServicing: Sendable {
     func resolveAccess(for user: SeriesAccountUser?) -> SeriesResolvedAccess
     func refreshAccess(for user: SeriesAccountUser?) async -> SeriesResolvedAccess
 }

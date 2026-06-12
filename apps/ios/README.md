@@ -21,14 +21,16 @@ Current scaffold:
 - Guest, signed-in Free, and Pro access models aligned with Account AV `/v1/me/access`.
 - Series AV entitlement service that selects the `seriesav` app entry and uses
   the Apps AV user id as the account authority.
+- Shared Account AV service/controller foundation for provider session restore,
+  Apps AV account identity resolution, access refresh, and sign-out.
 - Pro cloud-sync client contract for `/v1/apps/seriesav/data/seriesLibrary`.
 - Unit-test build coverage for library identity, cursor updates, app-data sync
-  envelopes, and access entitlement resolution.
+  envelopes, access entitlement resolution, and account session hydration.
 
 Not implemented yet:
 
 - final Series AV UI redesign;
-- shared Account AV sign-in/onboarding/account shell wiring;
+- final shared Account AV onboarding/sign-in/account UI surfaces;
 - StoreKit/RevenueCat paywall surfaces;
 - Convex realtime projection;
 - catalog search/enrichment UI;

@@ -11,6 +11,12 @@ settings:
     PRODUCT_NAME: SeriesAV
     SWIFT_VERSION: "6.0"
 
+packages:
+  AccountAV:
+    path: ../../../account-av
+  AppsAV:
+    path: ../../../apps-av/apple
+
 schemes:
   SeriesAV:
     build:
@@ -41,6 +47,11 @@ targets:
       Release: Config/Release.xcconfig
     sources:
       - path: SeriesAV
+    dependencies:
+      - package: AccountAV
+        product: AccountAV
+      - package: AppsAV
+        product: AVProductAccountFoundation
     settings:
       base:
         CODE_SIGN_ENTITLEMENTS: SeriesAV/App/SeriesAV.entitlements
