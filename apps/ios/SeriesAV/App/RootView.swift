@@ -85,6 +85,7 @@ private struct SeriesWatchingHomeScreen: View {
                     watchingCount: countActiveEntries(with: .watching),
                     wantToWatchCount: countActiveEntries(with: .wantToWatch),
                     watchedCount: countActiveEntries(with: .watched),
+                    archivedCount: store.archivedEntries.count,
                     openWatching: {
                         openLibrary(filter: .watching)
                     },
@@ -93,6 +94,9 @@ private struct SeriesWatchingHomeScreen: View {
                     },
                     openWatched: {
                         openLibrary(filter: .watched)
+                    },
+                    openArchived: {
+                        openLibrary(filter: .archived)
                     }
                 )
 
@@ -304,30 +308,44 @@ private struct SeriesLibrarySummaryStrip: View {
     let watchingCount: Int
     let wantToWatchCount: Int
     let watchedCount: Int
+    let archivedCount: Int
     let openWatching: () -> Void
     let openWantToWatch: () -> Void
     let openWatched: () -> Void
+    let openArchived: () -> Void
 
     var body: some View {
-        HStack(spacing: 8) {
-            SeriesLibrarySummaryItem(
-                title: L10n.string("library.filter.watching"),
-                count: watchingCount,
-                systemImage: "play.circle.fill",
-                action: openWatching
-            )
-            SeriesLibrarySummaryItem(
-                title: L10n.string("library.filter.wantToWatch"),
-                count: wantToWatchCount,
-                systemImage: "bookmark.fill",
-                action: openWantToWatch
-            )
-            SeriesLibrarySummaryItem(
-                title: L10n.string("library.filter.watched"),
-                count: watchedCount,
-                systemImage: "checkmark.circle.fill",
-                action: openWatched
-            )
+        VStack(alignment: .trailing, spacing: 8) {
+            HStack(spacing: 8) {
+                SeriesLibrarySummaryItem(
+                    title: L10n.string("library.filter.watching"),
+                    count: watchingCount,
+                    systemImage: "play.circle.fill",
+                    action: openWatching
+                )
+                SeriesLibrarySummaryItem(
+                    title: L10n.string("library.filter.wantToWatch"),
+                    count: wantToWatchCount,
+                    systemImage: "bookmark.fill",
+                    action: openWantToWatch
+                )
+                SeriesLibrarySummaryItem(
+                    title: L10n.string("library.filter.watched"),
+                    count: watchedCount,
+                    systemImage: "checkmark.circle.fill",
+                    action: openWatched
+                )
+            }
+
+            if archivedCount > 0 {
+                Button(action: openArchived) {
+                    Label("\(L10n.string("library.filter.archived")) · \(archivedCount)", systemImage: "archivebox")
+                        .font(.system(size: 12, weight: .semibold))
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .accessibilityLabel("\(L10n.string("library.filter.archived")): \(archivedCount)")
+            }
         }
     }
 }
