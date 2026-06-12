@@ -57,6 +57,7 @@
 "home.editor.episode" = "Episodio %d";
 "home.editor.footer" = "Al fijar este punto, los episodios anteriores quedan vistos y los posteriores pendientes.";
 "home.editor.confirm" = "Fijar punto visto";
+"home.editor.confirmStart" = "Empezar desde este punto";
 "home.empty.title" = "No hay series en progreso";
 "home.empty.subtitle" = "Anade una serie y sera el foco aqui.";
 "home.add" = "Anadir serie";

@@ -57,6 +57,7 @@
 "home.editor.episode" = "Episode %d";
 "home.editor.footer" = "Definir ce point marque les episodes precedents comme vus et les suivants en attente.";
 "home.editor.confirm" = "Definir le point vu";
+"home.editor.confirmStart" = "Demarrer depuis ce point";
 "home.empty.title" = "Aucune serie en cours";
 "home.empty.subtitle" = "Ajoutez une serie et elle deviendra le focus ici.";
 "home.add" = "Ajouter une serie";

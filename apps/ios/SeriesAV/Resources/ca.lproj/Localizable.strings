@@ -57,6 +57,7 @@
 "home.editor.episode" = "Episodi %d";
 "home.editor.footer" = "En fixar aquest punt, els episodis anteriors queden vistos i els posteriors pendents.";
 "home.editor.confirm" = "Fixar punt vist";
+"home.editor.confirmStart" = "Comencar des d'aquest punt";
 "home.empty.title" = "No hi ha series en progres";
 "home.empty.subtitle" = "Afegeix una serie i sera el focus aqui.";
 "home.add" = "Afegir serie";

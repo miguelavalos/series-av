@@ -1327,7 +1327,7 @@ private struct SeriesProgressEditorSheet: View {
                         markWatchedThrough(SeriesEpisodeCursor(seasonNumber: seasonNumber, episodeNumber: episodeNumber))
                         dismiss()
                     } label: {
-                        Text(L10n.string("home.editor.confirm"))
+                        Text(confirmTitle)
                             .frame(maxWidth: .infinity)
                     }
                 }
@@ -1342,6 +1342,10 @@ private struct SeriesProgressEditorSheet: View {
                 }
             }
         }
+    }
+
+    private var confirmTitle: String {
+        entry.lastWatchedEpisodeCursor == nil ? L10n.string("home.editor.confirmStart") : L10n.string("home.editor.confirm")
     }
 }
 
