@@ -33,6 +33,14 @@
 "home.next" = "Vist";
 "home.adjust" = "Ajustar episodi";
 "home.notStarted" = "Sense comencar";
+"home.actions" = "Accions de serie";
+"home.pin" = "Fixar a dalt";
+"home.unpin" = "Treure fixat";
+"home.archive" = "Arxivar";
+"home.delete" = "Eliminar";
+"home.undo" = "Desfer";
+"home.undo.archived" = "\"%@\" arxivada";
+"home.undo.deleted" = "\"%@\" eliminada";
 "home.queue.title" = "Tambe veient";
 "home.queue.progress" = "%@ vist, %@ seguent";
 "home.editor.season" = "Temporada %d";

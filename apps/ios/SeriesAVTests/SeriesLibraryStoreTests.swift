@@ -173,6 +173,43 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertEqual(reloadedStore.entries[0].lastWatchedEpisodeCursor, SeriesEpisodeCursor(seasonNumber: 2, episodeNumber: 8))
     }
 
+    func testArchiveRestoreAndDeleteKeepActionsReversibleInStore() {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = SeriesLibraryStore(entries: [
+            entry(id: "entry", title: "Entry", pinned: true, interactedAt: date)
+        ])
+
+        store.archive("entry", at: date)
+        XCTAssertEqual(store.activeEntries, [])
+        XCTAssertEqual(store.entries[0].archivedAt, date)
+        XCTAssertEqual(store.entries[0].isPinnedHomeSeries, false)
+
+        store.restore("entry", at: date)
+        XCTAssertEqual(store.activeEntries.map(\.entryId), ["entry"])
+        XCTAssertNil(store.entries[0].archivedAt)
+
+        store.delete("entry", at: date)
+        XCTAssertEqual(store.activeEntries, [])
+        XCTAssertEqual(store.entries[0].deletedAt, date)
+
+        store.restore("entry", at: date)
+        XCTAssertEqual(store.activeEntries.map(\.entryId), ["entry"])
+        XCTAssertNil(store.entries[0].deletedAt)
+    }
+
+    func testPinnedSeriesMovesToHomeFocus() {
+        let older = Date(timeIntervalSince1970: 1_800_000_000)
+        let newer = Date(timeIntervalSince1970: 1_800_000_100)
+        let store = SeriesLibraryStore(entries: [
+            entry(id: "recent", title: "Recent", pinned: false, interactedAt: newer),
+            entry(id: "older", title: "Older", pinned: false, interactedAt: older)
+        ])
+
+        store.setPinned(true, for: "older", at: newer)
+
+        XCTAssertEqual(store.homeEntries.map(\.entryId), ["older", "recent"])
+    }
+
     private func entry(
         id: String,
         title: String,

@@ -33,6 +33,14 @@
 "home.next" = "Gesehen";
 "home.adjust" = "Folge anpassen";
 "home.notStarted" = "Nicht begonnen";
+"home.actions" = "Serienaktionen";
+"home.pin" = "Oben anheften";
+"home.unpin" = "Nicht mehr anheften";
+"home.archive" = "Archivieren";
+"home.delete" = "Loeschen";
+"home.undo" = "Rueckgaengig";
+"home.undo.archived" = "\"%@\" archiviert";
+"home.undo.deleted" = "\"%@\" geloescht";
 "home.queue.title" = "Auch aktuell";
 "home.queue.progress" = "%@ gesehen, %@ als naechstes";
 "home.editor.season" = "Staffel %d";

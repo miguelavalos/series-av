@@ -33,6 +33,14 @@
 "home.next" = "Watched";
 "home.adjust" = "Adjust episode";
 "home.notStarted" = "Not started";
+"home.actions" = "Series actions";
+"home.pin" = "Pin to top";
+"home.unpin" = "Unpin";
+"home.archive" = "Archive";
+"home.delete" = "Delete";
+"home.undo" = "Undo";
+"home.undo.archived" = "\"%@\" archived";
+"home.undo.deleted" = "\"%@\" deleted";
 "home.queue.title" = "Also watching";
 "home.queue.progress" = "%@ watched, %@ next";
 "home.editor.season" = "Season %d";

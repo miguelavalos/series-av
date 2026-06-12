@@ -33,6 +33,14 @@
 "home.next" = "Visto";
 "home.adjust" = "Ajustar episodio";
 "home.notStarted" = "Sin empezar";
+"home.actions" = "Acciones de serie";
+"home.pin" = "Fijar arriba";
+"home.unpin" = "Quitar fijado";
+"home.archive" = "Archivar";
+"home.delete" = "Eliminar";
+"home.undo" = "Deshacer";
+"home.undo.archived" = "\"%@\" archivada";
+"home.undo.deleted" = "\"%@\" eliminada";
 "home.queue.title" = "Tambien viendo";
 "home.queue.progress" = "%@ visto, %@ siguiente";
 "home.editor.season" = "Temporada %d";

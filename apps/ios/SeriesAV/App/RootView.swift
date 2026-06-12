@@ -65,6 +65,7 @@ private struct SeriesWatchingHomeScreen: View {
 
     @State private var editorEntry: SeriesLibraryEntry?
     @State private var isShowingAddSheet = false
+    @State private var pendingUndo: PendingLibraryUndo?
 
     var body: some View {
         ScrollView {
@@ -82,6 +83,17 @@ private struct SeriesWatchingHomeScreen: View {
                         },
                         editProgress: {
                             editorEntry = currentEntry
+                        },
+                        togglePinned: {
+                            store.setPinned(currentEntry.isPinnedHomeSeries != true, for: currentEntry.id)
+                        },
+                        archive: {
+                            store.archive(currentEntry.id)
+                            pendingUndo = PendingLibraryUndo(entryId: currentEntry.id, title: currentEntry.title, messageKey: "home.undo.archived")
+                        },
+                        delete: {
+                            store.delete(currentEntry.id)
+                            pendingUndo = PendingLibraryUndo(entryId: currentEntry.id, title: currentEntry.title, messageKey: "home.undo.deleted")
                         }
                     )
                 } else {
@@ -96,6 +108,17 @@ private struct SeriesWatchingHomeScreen: View {
                         },
                         editProgress: { entry in
                             editorEntry = entry
+                        },
+                        togglePinned: { entry in
+                            store.setPinned(entry.isPinnedHomeSeries != true, for: entry.id)
+                        },
+                        archive: { entry in
+                            store.archive(entry.id)
+                            pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.archived")
+                        },
+                        delete: { entry in
+                            store.delete(entry.id)
+                            pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.deleted")
                         }
                     )
                 }
@@ -105,18 +128,33 @@ private struct SeriesWatchingHomeScreen: View {
         }
         .background(Color(.systemGroupedBackground))
         .safeAreaInset(edge: .bottom) {
-            Button {
-                isShowingAddSheet = true
-            } label: {
-                Label(L10n.string("home.add"), systemImage: "plus")
-                    .frame(maxWidth: .infinity)
+            VStack(spacing: 10) {
+                if let pendingUndo {
+                    SeriesUndoBar(
+                        title: String(format: L10n.string(pendingUndo.messageKey), pendingUndo.title),
+                        undo: {
+                            store.restore(pendingUndo.entryId)
+                            self.pendingUndo = nil
+                        },
+                        dismiss: {
+                            self.pendingUndo = nil
+                        }
+                    )
+                }
+
+                Button {
+                    isShowingAddSheet = true
+                } label: {
+                    Label(L10n.string("home.add"), systemImage: "plus")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(!canAddSeries)
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
             .background(.regularMaterial)
-            .disabled(!canAddSeries)
         }
         .sheet(item: $editorEntry) { entry in
             SeriesProgressEditorSheet(
@@ -190,6 +228,46 @@ private struct SeriesWatchingHomeScreen: View {
             .accessibilityLabel(L10n.string("shell.account"))
         }
         .padding(.horizontal, 2)
+    }
+}
+
+private struct PendingLibraryUndo: Identifiable, Equatable {
+    var entryId: String
+    var title: String
+    var messageKey: String
+
+    var id: String { "\(entryId)-\(messageKey)" }
+}
+
+private struct SeriesUndoBar: View {
+    let title: String
+    let undo: () -> Void
+    let dismiss: () -> Void
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Text(title)
+                .font(.system(size: 13, weight: .semibold))
+                .lineLimit(2)
+
+            Spacer()
+
+            Button(L10n.string("home.undo"), action: undo)
+                .font(.system(size: 13, weight: .bold))
+
+            Button(action: dismiss) {
+                Image(systemName: "xmark")
+                    .frame(width: 28, height: 28)
+            }
+            .accessibilityLabel(L10n.string("common.close"))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+        }
     }
 }
 
@@ -280,6 +358,9 @@ private struct SeriesCurrentWatchingCard: View {
     let markPrevious: () -> Void
     let markNext: () -> Void
     let editProgress: () -> Void
+    let togglePinned: () -> Void
+    let archive: () -> Void
+    let delete: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -302,6 +383,15 @@ private struct SeriesCurrentWatchingCard: View {
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.secondary)
                 }
+
+                Spacer(minLength: 0)
+
+                SeriesEntryActionsMenu(
+                    entry: entry,
+                    togglePinned: togglePinned,
+                    archive: archive,
+                    delete: delete
+                )
             }
 
             HStack(spacing: 12) {
@@ -349,6 +439,9 @@ private struct SeriesWatchingQueueSection: View {
     let entries: [SeriesLibraryEntry]
     let markNext: (SeriesLibraryEntry) -> Void
     let editProgress: (SeriesLibraryEntry) -> Void
+    let togglePinned: (SeriesLibraryEntry) -> Void
+    let archive: (SeriesLibraryEntry) -> Void
+    let delete: (SeriesLibraryEntry) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -389,12 +482,51 @@ private struct SeriesWatchingQueueSection: View {
                         }
                         .buttonStyle(.bordered)
                         .accessibilityLabel(L10n.string("home.adjust"))
+
+                        SeriesEntryActionsMenu(
+                            entry: entry,
+                            togglePinned: { togglePinned(entry) },
+                            archive: { archive(entry) },
+                            delete: { delete(entry) }
+                        )
                     }
                     .padding(12)
                     .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }
             }
         }
+    }
+}
+
+private struct SeriesEntryActionsMenu: View {
+    let entry: SeriesLibraryEntry
+    let togglePinned: () -> Void
+    let archive: () -> Void
+    let delete: () -> Void
+
+    var body: some View {
+        Menu {
+            Button(action: togglePinned) {
+                Label(pinTitle, systemImage: entry.isPinnedHomeSeries == true ? "pin.slash" : "pin")
+            }
+
+            Button(action: archive) {
+                Label(L10n.string("home.archive"), systemImage: "archivebox")
+            }
+
+            Button(role: .destructive, action: delete) {
+                Label(L10n.string("home.delete"), systemImage: "trash")
+            }
+        } label: {
+            Image(systemName: "ellipsis")
+                .frame(width: 34, height: 34)
+        }
+        .buttonStyle(.bordered)
+        .accessibilityLabel(L10n.string("home.actions"))
+    }
+
+    private var pinTitle: String {
+        entry.isPinnedHomeSeries == true ? L10n.string("home.unpin") : L10n.string("home.pin")
     }
 }
 

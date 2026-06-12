@@ -111,6 +111,54 @@ final class SeriesLibraryStore {
         persist()
     }
 
+    func setPinned(_ isPinned: Bool, for entryId: String, at date: Date = Date()) {
+        guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
+            return
+        }
+
+        entries[index].isPinnedHomeSeries = isPinned
+        entries[index].updatedAt = date
+        entries[index].lastInteractedAt = date
+        persist()
+    }
+
+    func archive(_ entryId: String, at date: Date = Date()) {
+        guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
+            return
+        }
+
+        entries[index].archivedAt = date
+        entries[index].isPinnedHomeSeries = false
+        entries[index].updatedAt = date
+        entries[index].lastInteractedAt = date
+        persist()
+    }
+
+    func restore(_ entryId: String, at date: Date = Date()) {
+        guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
+            return
+        }
+
+        entries[index].archivedAt = nil
+        entries[index].deletedAt = nil
+        entries[index].updatedAt = date
+        entries[index].lastInteractedAt = date
+        persist()
+    }
+
+    func delete(_ entryId: String, at date: Date = Date()) {
+        guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
+            return
+        }
+
+        entries[index].deletedAt = date
+        entries[index].archivedAt = nil
+        entries[index].isPinnedHomeSeries = false
+        entries[index].updatedAt = date
+        entries[index].lastInteractedAt = date
+        persist()
+    }
+
     func replace(with incomingEntries: [SeriesLibraryEntry]) {
         entries = incomingEntries
         persist()
