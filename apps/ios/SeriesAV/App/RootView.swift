@@ -447,6 +447,7 @@ private struct SeriesLibrarySheet: View {
 
     @State private var query = ""
     @State private var selectedFilter: SeriesLibraryFilter
+    @State private var editorEntry: SeriesLibraryEntry?
 
     init(
         store: SeriesLibraryStore,
@@ -485,7 +486,13 @@ private struct SeriesLibrarySheet: View {
                 if filteredActiveEntries.isEmpty == false {
                     Section(L10n.string("library.active.title")) {
                         ForEach(filteredActiveEntries) { entry in
-                            SeriesLibraryRow(entry: entry, detail: libraryDetail(for: entry)) {
+                            SeriesLibraryRow(
+                                entry: entry,
+                                detail: libraryDetail(for: entry),
+                                editProgress: {
+                                    editorEntry = entry
+                                }
+                            ) {
                                 SeriesStatusButtons(entry: entry) { status in
                                     setStatus(entry, status)
                                 }
@@ -509,7 +516,11 @@ private struct SeriesLibrarySheet: View {
                 if filteredArchivedEntries.isEmpty == false {
                     Section(L10n.string("library.archived.title")) {
                         ForEach(filteredArchivedEntries) { entry in
-                            SeriesLibraryRow(entry: entry, detail: L10n.string("library.archived.detail")) {
+                            SeriesLibraryRow(
+                                entry: entry,
+                                detail: L10n.string("library.archived.detail"),
+                                editProgress: nil
+                            ) {
                                 Button {
                                     restore(entry)
                                 } label: {
@@ -542,6 +553,15 @@ private struct SeriesLibrarySheet: View {
                         dismiss()
                     }
                 }
+            }
+            .sheet(item: $editorEntry) { entry in
+                SeriesProgressEditorSheet(
+                    entry: entry,
+                    markWatchedThrough: { cursor in
+                        store.markWatchedThrough(cursor, for: entry.id)
+                    }
+                )
+                .presentationDetents([.medium])
             }
         }
     }
@@ -630,20 +650,19 @@ private struct SeriesLibrarySheet: View {
 private struct SeriesLibraryRow<MenuContent: View>: View {
     let entry: SeriesLibraryEntry
     let detail: String
+    let editProgress: (() -> Void)?
     @ViewBuilder let menuContent: () -> MenuContent
 
     var body: some View {
         HStack(spacing: 12) {
-            SeriesPosterMark(seed: entry.fallbackVisualSeed ?? entry.title, size: 36)
-
-            VStack(alignment: .leading, spacing: 3) {
-                Text(entry.title)
-                    .font(.system(size: 15, weight: .semibold))
-                    .lineLimit(1)
-                Text(detail)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+            if let editProgress {
+                Button(action: editProgress) {
+                    rowContent
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint(L10n.string("home.adjust"))
+            } else {
+                rowContent
             }
 
             Spacer()
@@ -658,6 +677,22 @@ private struct SeriesLibraryRow<MenuContent: View>: View {
             .accessibilityLabel(L10n.string("home.actions"))
         }
         .padding(.vertical, 4)
+    }
+
+    private var rowContent: some View {
+        HStack(spacing: 12) {
+            SeriesPosterMark(seed: entry.fallbackVisualSeed ?? entry.title, size: 36)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(entry.title)
+                    .font(.system(size: 15, weight: .semibold))
+                    .lineLimit(1)
+                Text(detail)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+        }
     }
 }
 
