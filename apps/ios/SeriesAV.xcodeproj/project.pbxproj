@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		06222EBFC1E985565D6B452D /* SeriesAppBootstrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557E2299A00C28395D71C339 /* SeriesAppBootstrapView.swift */; };
 		159807956E30BB116384FADE /* SeriesEntitlementServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF356E2FD2CC3CC73B7B7490 /* SeriesEntitlementServiceTests.swift */; };
+		39D3F2C4743954A3DD315B15 /* AVSettingsFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 138FB23720DA324B605EBCC9 /* AVSettingsFoundation */; };
 		3BA53F4338BE907A4501FC94 /* SeriesAVAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE24F5B52463208C5E876228 /* SeriesAVAPIClient.swift */; };
 		3D36749576FEBB0BBB92401B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 72139F60FD554069885EE731 /* PrivacyInfo.xcprivacy */; };
 		3E6B8AE873E00FD5A55FDDEF /* SeriesLibraryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6E1160762AEF2A117BAE4A3 /* SeriesLibraryModels.swift */; };
@@ -16,10 +18,15 @@
 		6A5D801612D51B6F370F6949 /* SeriesAVAccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E35FAF1A25D734B526F9350 /* SeriesAVAccountService.swift */; };
 		93E1DFEF1203442F74B1D4BF /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2568399CFB4C7A1E14832801 /* AppConfig.swift */; };
 		96B90E763CC1A37D3DD098F1 /* SeriesLibraryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FAC949798DD909B4FF68C5 /* SeriesLibraryStoreTests.swift */; };
-		99C7AA7B52682CFDEA051A76 /* AVProductAccountFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 197D8D418F464FA352F78772 /* AVProductAccountFoundation */; };
+		99C7AA7B52682CFDEA051A76 /* AVBrandFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 22C162D72D53D4477A9EC40E /* AVBrandFoundation */; };
+		9A9910A6DD514535A83D6C1C /* SeriesAppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = C64880B2D57EC391A9D4D766 /* SeriesAppPreferences.swift */; };
 		A058EA5097F7624496E4AEE8 /* AccountAV in Frameworks */ = {isa = PBXBuildFile; productRef = C2992247012F30B5FDE4706E /* AccountAV */; };
+		AAFA14FB0414B5EDE57EBA93 /* SeriesAppExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1957FAE6E3298FDB2C8536F6 /* SeriesAppExperience.swift */; };
+		B5255448167E43828252DB71 /* SeriesAuthOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AF87B75A9721D260B4C3E1 /* SeriesAuthOnboardingView.swift */; };
 		BC9DA56281027A4AE6B394B0 /* SeriesAccessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEBE0C665DDB4A48FE198C52 /* SeriesAccessController.swift */; };
+		C2AA86A6CC3043D4021B9B09 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 86CE3F6EAA0958FB417BACCE /* Localizable.strings */; };
 		C6EB3E3CFAD3AF66C9C0471E /* SeriesEntitlementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A586B658AD9682B2BF8C0A92 /* SeriesEntitlementService.swift */; };
+		D93665C7D4D8E3AF2A66912E /* AVProductAccountFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 197D8D418F464FA352F78772 /* AVProductAccountFoundation */; };
 		E592D4F13BA7E38AFECB453C /* SeriesAVApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E930F20F64D72B22A232919B /* SeriesAVApp.swift */; };
 		E5B43EA5B85A739C5D7E6CE8 /* SeriesAppDataSyncClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F51872EA7F30BA6B1A1475 /* SeriesAppDataSyncClientTests.swift */; };
 		E647737E0691166B0AE5E9F9 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145DE7E7B082B7D92C440A5B /* RootView.swift */; };
@@ -40,12 +47,17 @@
 
 /* Begin PBXFileReference section */
 		145DE7E7B082B7D92C440A5B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		1957FAE6E3298FDB2C8536F6 /* SeriesAppExperience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppExperience.swift; sourceTree = "<group>"; };
 		2568399CFB4C7A1E14832801 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		2A2E8FBF279E3A8C4EDC0B68 /* SeriesAV.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SeriesAV.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		45AF87B75A9721D260B4C3E1 /* SeriesAuthOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAuthOnboardingView.swift; sourceTree = "<group>"; };
+		46116EC3820DEBFB599F0E49 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4C97F5A3F29AAA0D7BB6E8D9 /* SeriesAccessModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccessModels.swift; sourceTree = "<group>"; };
+		557E2299A00C28395D71C339 /* SeriesAppBootstrapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppBootstrapView.swift; sourceTree = "<group>"; };
 		5C2045BD1DAB63090578AC6B /* SeriesAV.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SeriesAV.entitlements; sourceTree = "<group>"; };
 		68FAC949798DD909B4FF68C5 /* SeriesLibraryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLibraryStoreTests.swift; sourceTree = "<group>"; };
 		72139F60FD554069885EE731 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		8B4FC08F67E3286D84ADC057 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		930B112F6F8AF2FEE47D085D /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		9E35FAF1A25D734B526F9350 /* SeriesAVAccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVAccountService.swift; sourceTree = "<group>"; };
 		A586B658AD9682B2BF8C0A92 /* SeriesEntitlementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesEntitlementService.swift; sourceTree = "<group>"; };
@@ -54,15 +66,19 @@
 		B608F239FAA9C18EE697CAC1 /* account-av */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "account-av"; path = "../../../account-av"; sourceTree = SOURCE_ROOT; };
 		C538F408F2AE4DD90050AD7A /* SeriesAVTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SeriesAVTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C57847956F08FF0FD0112E99 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		C64880B2D57EC391A9D4D766 /* SeriesAppPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppPreferences.swift; sourceTree = "<group>"; };
 		CE164B8C0FC2D8FA1427899D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D2F51872EA7F30BA6B1A1475 /* SeriesAppDataSyncClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppDataSyncClientTests.swift; sourceTree = "<group>"; };
 		D40364B2B84E6AC647B728FB /* SeriesAppDataSyncClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppDataSyncClient.swift; sourceTree = "<group>"; };
 		D9E3280C62806B5F89C4728A /* SeriesAccountAccessClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccountAccessClient.swift; sourceTree = "<group>"; };
 		DDE4812452BF8D624A9DED3B /* apple */ = {isa = PBXFileReference; lastKnownFileType = folder; name = apple; path = "../../../apps-av/apple"; sourceTree = SOURCE_ROOT; };
+		E646357FD1EDF6D21FE27826 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E930F20F64D72B22A232919B /* SeriesAVApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVApp.swift; sourceTree = "<group>"; };
+		E9BE2FCF29036CC49D6CFBEB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		EF565349F86597C1E4C0AC86 /* SeriesAccessControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccessControllerTests.swift; sourceTree = "<group>"; };
 		FAB850E07D80A9A593EA3105 /* SeriesLibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLibraryStore.swift; sourceTree = "<group>"; };
 		FEBE0C665DDB4A48FE198C52 /* SeriesAccessController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccessController.swift; sourceTree = "<group>"; };
+		FEDB57120F25EAF053887A9F /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FF356E2FD2CC3CC73B7B7490 /* SeriesEntitlementServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesEntitlementServiceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -72,7 +88,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A058EA5097F7624496E4AEE8 /* AccountAV in Frameworks */,
-				99C7AA7B52682CFDEA051A76 /* AVProductAccountFoundation in Frameworks */,
+				99C7AA7B52682CFDEA051A76 /* AVBrandFoundation in Frameworks */,
+				39D3F2C4743954A3DD315B15 /* AVSettingsFoundation in Frameworks */,
+				D93665C7D4D8E3AF2A66912E /* AVProductAccountFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,6 +103,7 @@
 				91AEC5E5F23DCCD2168A34A4 /* Access */,
 				39B82B664B9E3A72818F68F2 /* App */,
 				EF181474851C13F86990E6E4 /* Library */,
+				89BD05911C265EE1756328C7 /* Resources */,
 				5E6AF4D5A7DF69351C07AE56 /* Sync */,
 			);
 			path = SeriesAV;
@@ -106,6 +125,9 @@
 				CE164B8C0FC2D8FA1427899D /* Info.plist */,
 				72139F60FD554069885EE731 /* PrivacyInfo.xcprivacy */,
 				145DE7E7B082B7D92C440A5B /* RootView.swift */,
+				557E2299A00C28395D71C339 /* SeriesAppBootstrapView.swift */,
+				1957FAE6E3298FDB2C8536F6 /* SeriesAppExperience.swift */,
+				C64880B2D57EC391A9D4D766 /* SeriesAppPreferences.swift */,
 				5C2045BD1DAB63090578AC6B /* SeriesAV.entitlements */,
 				E930F20F64D72B22A232919B /* SeriesAVApp.swift */,
 			);
@@ -152,12 +174,21 @@
 			path = SeriesAVTests;
 			sourceTree = "<group>";
 		};
+		89BD05911C265EE1756328C7 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				86CE3F6EAA0958FB417BACCE /* Localizable.strings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		91AEC5E5F23DCCD2168A34A4 /* Access */ = {
 			isa = PBXGroup;
 			children = (
 				FEBE0C665DDB4A48FE198C52 /* SeriesAccessController.swift */,
 				4C97F5A3F29AAA0D7BB6E8D9 /* SeriesAccessModels.swift */,
 				D9E3280C62806B5F89C4728A /* SeriesAccountAccessClient.swift */,
+				45AF87B75A9721D260B4C3E1 /* SeriesAuthOnboardingView.swift */,
 				9E35FAF1A25D734B526F9350 /* SeriesAVAccountService.swift */,
 				A586B658AD9682B2BF8C0A92 /* SeriesEntitlementService.swift */,
 			);
@@ -218,6 +249,8 @@
 			name = SeriesAV;
 			packageProductDependencies = (
 				C2992247012F30B5FDE4706E /* AccountAV */,
+				22C162D72D53D4477A9EC40E /* AVBrandFoundation */,
+				138FB23720DA324B605EBCC9 /* AVSettingsFoundation */,
 				197D8D418F464FA352F78772 /* AVProductAccountFoundation */,
 			);
 			productName = SeriesAV;
@@ -244,7 +277,11 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
+				ca,
+				de,
 				en,
+				es,
+				fr,
 			);
 			mainGroup = 5B9097F8C208FDC875876E1E;
 			minimizedProjectReferenceProxies = 1;
@@ -268,6 +305,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C2AA86A6CC3043D4021B9B09 /* Localizable.strings in Resources */,
 				3D36749576FEBB0BBB92401B /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -298,7 +336,11 @@
 				BC9DA56281027A4AE6B394B0 /* SeriesAccessController.swift in Sources */,
 				4CA7CFF4D7974F4190454B09 /* SeriesAccessModels.swift in Sources */,
 				F06A3D772FAA19F807378474 /* SeriesAccountAccessClient.swift in Sources */,
+				06222EBFC1E985565D6B452D /* SeriesAppBootstrapView.swift in Sources */,
 				4635329479183AA26672A051 /* SeriesAppDataSyncClient.swift in Sources */,
+				AAFA14FB0414B5EDE57EBA93 /* SeriesAppExperience.swift in Sources */,
+				9A9910A6DD514535A83D6C1C /* SeriesAppPreferences.swift in Sources */,
+				B5255448167E43828252DB71 /* SeriesAuthOnboardingView.swift in Sources */,
 				C6EB3E3CFAD3AF66C9C0471E /* SeriesEntitlementService.swift in Sources */,
 				3E6B8AE873E00FD5A55FDDEF /* SeriesLibraryModels.swift in Sources */,
 				F73DD51BA813EF38FE6083DE /* SeriesLibraryStore.swift in Sources */,
@@ -314,6 +356,21 @@
 			targetProxy = 6687822496711E45690E3F17 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		86CE3F6EAA0958FB417BACCE /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FEDB57120F25EAF053887A9F /* ca */,
+				46116EC3820DEBFB599F0E49 /* de */,
+				E9BE2FCF29036CC49D6CFBEB /* en */,
+				E646357FD1EDF6D21FE27826 /* es */,
+				8B4FC08F67E3286D84ADC057 /* fr */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		21367C8B16D47FF8753F449B /* Debug */ = {
@@ -563,9 +620,17 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		138FB23720DA324B605EBCC9 /* AVSettingsFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AVSettingsFoundation;
+		};
 		197D8D418F464FA352F78772 /* AVProductAccountFoundation */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AVProductAccountFoundation;
+		};
+		22C162D72D53D4477A9EC40E /* AVBrandFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AVBrandFoundation;
 		};
 		C2992247012F30B5FDE4706E /* AccountAV */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -23,6 +23,9 @@ Current scaffold:
   the Apps AV user id as the account authority.
 - Shared Account AV service/controller foundation for provider session restore,
   Apps AV account identity resolution, access refresh, and sign-out.
+- Shared Account AV onboarding/sign-in shell wired through the Series AV app
+  bootstrap, with the current library screen behind the account gate.
+- Common language/theme controllers and the shared product-app localization set.
 - Pro cloud-sync client contract for `/v1/apps/seriesav/data/seriesLibrary`.
 - Unit-test build coverage for library identity, cursor updates, app-data sync
   envelopes, access entitlement resolution, and account session hydration.
@@ -30,7 +33,7 @@ Current scaffold:
 Not implemented yet:
 
 - final Series AV UI redesign;
-- final shared Account AV onboarding/sign-in/account UI surfaces;
+- final account/profile/settings surfaces;
 - StoreKit/RevenueCat paywall surfaces;
 - Convex realtime projection;
 - catalog search/enrichment UI;

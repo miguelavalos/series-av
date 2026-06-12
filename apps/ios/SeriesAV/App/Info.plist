@@ -40,6 +40,8 @@
 	<string>$(SERIESAV_PRIVACY_URL)</string>
 	<key>SERIESAV_SUPPORT_EMAIL</key>
 	<string>$(SERIESAV_SUPPORT_EMAIL)</string>
+	<key>SERIESAV_SUPPORT_URL</key>
+	<string>$(SERIESAV_SUPPORT_URL)</string>
 	<key>SERIESAV_TERMS_URL</key>
 	<string>$(SERIESAV_TERMS_URL)</string>
 	<key>UIApplicationSceneManifest</key>

@@ -51,6 +51,10 @@ targets:
       - package: AccountAV
         product: AccountAV
       - package: AppsAV
+        product: AVBrandFoundation
+      - package: AppsAV
+        product: AVSettingsFoundation
+      - package: AppsAV
         product: AVProductAccountFoundation
     settings:
       base:
