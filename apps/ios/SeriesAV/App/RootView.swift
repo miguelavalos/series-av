@@ -72,6 +72,11 @@ private struct SeriesWatchingHomeScreen: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 18) {
                 accountBar
+                SeriesLibrarySummaryStrip(
+                    watchingCount: countActiveEntries(with: .watching),
+                    wantToWatchCount: countActiveEntries(with: .wantToWatch),
+                    watchedCount: countActiveEntries(with: .watched)
+                )
 
                 if let currentEntry {
                     SeriesCurrentWatchingCard(
@@ -224,6 +229,10 @@ private struct SeriesWatchingHomeScreen: View {
         return max(0, activeSeriesLimit - store.activeEntries.count)
     }
 
+    private func countActiveEntries(with status: SeriesLibraryEntryStatus) -> Int {
+        store.activeEntries.filter { $0.status == status }.count
+    }
+
     private var accountBar: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
@@ -264,6 +273,67 @@ private struct SeriesWatchingHomeScreen: View {
             .accessibilityLabel(L10n.string("shell.account"))
         }
         .padding(.horizontal, 2)
+    }
+}
+
+private struct SeriesLibrarySummaryStrip: View {
+    let watchingCount: Int
+    let wantToWatchCount: Int
+    let watchedCount: Int
+
+    var body: some View {
+        HStack(spacing: 8) {
+            SeriesLibrarySummaryItem(
+                title: L10n.string("library.filter.watching"),
+                count: watchingCount,
+                systemImage: "play.circle.fill"
+            )
+            SeriesLibrarySummaryItem(
+                title: L10n.string("library.filter.wantToWatch"),
+                count: wantToWatchCount,
+                systemImage: "bookmark.fill"
+            )
+            SeriesLibrarySummaryItem(
+                title: L10n.string("library.filter.watched"),
+                count: watchedCount,
+                systemImage: "checkmark.circle.fill"
+            )
+        }
+    }
+}
+
+private struct SeriesLibrarySummaryItem: View {
+    let title: String
+    let count: Int
+    let systemImage: String
+
+    var body: some View {
+        HStack(spacing: 7) {
+            Image(systemName: systemImage)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(.secondary)
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text("\(count)")
+                    .font(.system(size: 18, weight: .black, design: .rounded))
+                    .foregroundStyle(.primary)
+                    .monospacedDigit()
+                Text(title)
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, minHeight: 50)
+        .padding(.horizontal, 10)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+        }
     }
 }
 
