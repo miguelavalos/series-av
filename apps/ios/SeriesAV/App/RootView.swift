@@ -121,6 +121,8 @@ private struct SeriesWatchingHomeScreen: View {
                             store.setPinned(currentEntry.isPinnedHomeSeries != true, for: currentEntry.id)
                         },
                         setStatus: { status in
+                            pendingProgressUndo = progressUndo(for: currentEntry, messageKey: "home.undo.status")
+                            pendingUndo = nil
                             store.setStatus(status, for: currentEntry.id)
                         },
                         archive: {
@@ -153,6 +155,8 @@ private struct SeriesWatchingHomeScreen: View {
                             store.setPinned(entry.isPinnedHomeSeries != true, for: entry.id)
                         },
                         setStatus: { entry, status in
+                            pendingProgressUndo = progressUndo(for: entry, messageKey: "home.undo.status")
+                            pendingUndo = nil
                             store.setStatus(status, for: entry.id)
                         },
                         archive: { entry in
@@ -292,11 +296,14 @@ private struct SeriesWatchingHomeScreen: View {
         store.activeEntries.filter { $0.status == status }.count
     }
 
-    private func progressUndo(for entry: SeriesLibraryEntry) -> PendingProgressUndo {
+    private func progressUndo(
+        for entry: SeriesLibraryEntry,
+        messageKey: String = "home.undo.progress"
+    ) -> PendingProgressUndo {
         PendingProgressUndo(
             entryId: entry.id,
             title: entry.title,
-            messageKey: "home.undo.progress",
+            messageKey: messageKey,
             status: entry.status,
             lastWatchedEpisodeCursor: entry.lastWatchedEpisodeCursor
         )
