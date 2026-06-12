@@ -99,6 +99,11 @@ Because the iOS project currently has no native test targets, complete and sign 
 4. Confirm the build exposes the native in-app route at Profile > Account safety > Delete Apps AV account.
 5. Confirm store metadata does not promise cloud sync, Pro social, or purchase flows that are not active in the submitted build.
 6. Confirm TVMaze attribution remains visible in-product.
+7. Confirm any visible TV/movie posters are supported by provider terms,
+   attribution, and release evidence.
+8. Confirm no company/platform/provider logos, availability badges, deep links,
+   trailers, or embedded provider pages are visible without separate
+   documented rights/terms evidence.
 
 ## Account AV And Backend
 

@@ -41,6 +41,11 @@ docs/
 
 - TV metadata currently comes from `TVmaze`.
 - TVmaze's API licensing requires attribution. The app now exposes a visible attribution path in `Settings`, and the repo/docs should continue to keep that dependency explicit.
+- TV/movie posters may be used as title-reference artwork when provider terms,
+  attribution, and release evidence support that use.
+- Company/platform/provider logos, availability badges, deep links, trailers,
+  and embedded provider pages are not covered by poster permission and require
+  separate documented rights/terms evidence.
 - Signed-in account, entitlement, and deletion behavior are separate from TV catalog data and remain tied to the private Account AV backend.
 
 ## Account Deletion Support

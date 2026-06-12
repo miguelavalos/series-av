@@ -30,6 +30,12 @@ Mandatory rules:
 - treat Account AV provider session identity as session metadata only; product
   ownership and backend-owned state must resolve through the internal Apps AV
   account user contract.
+- do not infer from Tune AV's station-logo rejection that Series AV must avoid
+  TV/movie posters. Posters can be title-reference artwork when provider terms
+  and release evidence allow them.
+- do not use Netflix, IMDb, TVmaze, TheTVDB, Apple, station, or other
+  company/platform/provider logos, availability badges, or deep links without
+  separate documented rights/terms evidence.
 
 If the private repo is unavailable, stop and say that the authoritative runbook
 cannot be checked. Do not substitute a guessed local workflow.
