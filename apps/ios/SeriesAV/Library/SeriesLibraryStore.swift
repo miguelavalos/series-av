@@ -3,10 +3,14 @@ import Observation
 
 @Observable
 final class SeriesLibraryStore {
-    private(set) var entries: [SeriesLibraryEntry]
+    private static let storageKey = "seriesav.library.v1"
 
-    init(entries: [SeriesLibraryEntry] = []) {
+    private(set) var entries: [SeriesLibraryEntry]
+    private let persistence: SeriesLibraryPersisting?
+
+    init(entries: [SeriesLibraryEntry] = [], persistence: SeriesLibraryPersisting? = nil) {
         self.entries = entries
+        self.persistence = persistence
     }
 
     var activeEntries: [SeriesLibraryEntry] {
@@ -49,6 +53,7 @@ final class SeriesLibraryStore {
         } else {
             entries.append(entry)
         }
+        persist()
     }
 
     @discardableResult
@@ -79,6 +84,7 @@ final class SeriesLibraryStore {
             return
         }
         entries[index].markWatchedThrough(cursor, at: date)
+        persist()
     }
 
     func markNextEpisodeWatched(for entryId: String, at date: Date = Date()) {
@@ -87,6 +93,7 @@ final class SeriesLibraryStore {
         }
 
         entries[index].markWatchedThrough(entries[index].nextEpisodeCursor, at: date)
+        persist()
     }
 
     func markPreviousEpisodeWatched(for entryId: String, at date: Date = Date()) {
@@ -96,14 +103,29 @@ final class SeriesLibraryStore {
 
         guard let previous = entries[index].lastWatchedEpisodeCursor?.previousEpisode else {
             entries[index].clearProgress(at: date)
+            persist()
             return
         }
 
         entries[index].markWatchedThrough(previous, at: date)
+        persist()
     }
 
     func replace(with incomingEntries: [SeriesLibraryEntry]) {
         entries = incomingEntries
+        persist()
+    }
+
+    private func persist() {
+        persistence?.save(entries)
+    }
+
+    static func persisted(userDefaults: UserDefaults = .standard) -> SeriesLibraryStore {
+        let persistence = SeriesLibraryUserDefaultsPersistence(
+            userDefaults: userDefaults,
+            key: storageKey
+        )
+        return SeriesLibraryStore(entries: persistence.load(), persistence: persistence)
     }
 
     static func sample() -> SeriesLibraryStore {
@@ -140,6 +162,53 @@ final class SeriesLibraryStore {
                 lastInteractedAt: now.addingTimeInterval(-600)
             )
         ])
+    }
+}
+
+protocol SeriesLibraryPersisting {
+    func load() -> [SeriesLibraryEntry]
+    func save(_ entries: [SeriesLibraryEntry])
+}
+
+struct SeriesLibraryUserDefaultsPersistence: SeriesLibraryPersisting {
+    let userDefaults: UserDefaults
+    let key: String
+    var encoder: JSONEncoder = SeriesLibraryCoding.makeEncoder()
+    var decoder: JSONDecoder = SeriesLibraryCoding.makeDecoder()
+
+    func load() -> [SeriesLibraryEntry] {
+        guard let data = userDefaults.data(forKey: key),
+              let document = try? decoder.decode(SeriesLibraryLocalDocument.self, from: data) else {
+            return []
+        }
+        return document.entries
+    }
+
+    func save(_ entries: [SeriesLibraryEntry]) {
+        let document = SeriesLibraryLocalDocument(version: 1, entries: entries)
+        guard let data = try? encoder.encode(document) else {
+            return
+        }
+        userDefaults.set(data, forKey: key)
+    }
+}
+
+private struct SeriesLibraryLocalDocument: Codable, Equatable {
+    var version: Int
+    var entries: [SeriesLibraryEntry]
+}
+
+private enum SeriesLibraryCoding {
+    static func makeEncoder() -> JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        return encoder
+    }
+
+    static func makeDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return decoder
     }
 }
 

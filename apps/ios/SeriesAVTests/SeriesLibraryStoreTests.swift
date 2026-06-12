@@ -151,6 +151,28 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertEqual(store.searchEntries(matching: "misterio").map(\.entryId), ["entry-1"])
     }
 
+    func testPersistedStoreLoadsSavedLocalSeries() {
+        let defaults = isolatedUserDefaults()
+        let store = SeriesLibraryStore.persisted(userDefaults: defaults)
+
+        store.addLocalSeries(title: "Persisted Show", at: Date(timeIntervalSince1970: 1_800_000_000))
+
+        let reloadedStore = SeriesLibraryStore.persisted(userDefaults: defaults)
+        XCTAssertEqual(reloadedStore.entries.map(\.title), ["Persisted Show"])
+        XCTAssertEqual(reloadedStore.entries[0].status, .watching)
+    }
+
+    func testPersistedStoreSavesProgressChanges() {
+        let defaults = isolatedUserDefaults()
+        let store = SeriesLibraryStore.persisted(userDefaults: defaults)
+        let entry = store.addLocalSeries(title: "Progress Show", at: Date(timeIntervalSince1970: 1_800_000_000))
+
+        store.markWatchedThrough(SeriesEpisodeCursor(seasonNumber: 2, episodeNumber: 8), for: entry?.id ?? "")
+
+        let reloadedStore = SeriesLibraryStore.persisted(userDefaults: defaults)
+        XCTAssertEqual(reloadedStore.entries[0].lastWatchedEpisodeCursor, SeriesEpisodeCursor(seasonNumber: 2, episodeNumber: 8))
+    }
+
     private func entry(
         id: String,
         title: String,
@@ -170,5 +192,12 @@ final class SeriesLibraryStoreTests: XCTestCase {
             updatedAt: interactedAt,
             lastInteractedAt: interactedAt
         )
+    }
+
+    private func isolatedUserDefaults() -> UserDefaults {
+        let suiteName = "series-av-library-tests-\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        return defaults
     }
 }

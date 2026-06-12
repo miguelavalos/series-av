@@ -8,7 +8,7 @@ struct RootView: View {
         var id: String { rawValue }
     }
 
-    @State private var store = SeriesLibraryStore.sample()
+    @State private var store = SeriesLibraryStore.persisted()
     @State private var profileMode: ProfileMode?
     let accessController: SeriesAccessController
     let startSignInFlow: () -> Void
