@@ -85,7 +85,7 @@ final class SeriesLibraryStore {
             entryId: seriesId,
             seriesId: seriesId,
             title: title,
-            status: .watching,
+            status: .wantToWatch,
             lastWatchedEpisodeCursor: nil,
             fallbackVisualSeed: title,
             addedAt: date,

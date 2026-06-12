@@ -170,7 +170,7 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertEqual(first?.title, "Example Show")
         XCTAssertEqual(second?.seriesId, "local-example-show")
         XCTAssertEqual(store.entries.count, 1)
-        XCTAssertEqual(store.entries[0].status, .watching)
+        XCTAssertEqual(store.entries[0].status, .wantToWatch)
     }
 
     func testSearchEntriesMatchesTitlesCaseInsensitively() {
@@ -207,7 +207,7 @@ final class SeriesLibraryStoreTests: XCTestCase {
 
         let reloadedStore = SeriesLibraryStore.persisted(userDefaults: defaults)
         XCTAssertEqual(reloadedStore.entries.map(\.title), ["Persisted Show"])
-        XCTAssertEqual(reloadedStore.entries[0].status, .watching)
+        XCTAssertEqual(reloadedStore.entries[0].status, .wantToWatch)
     }
 
     func testPersistedStoreSavesProgressChanges() {

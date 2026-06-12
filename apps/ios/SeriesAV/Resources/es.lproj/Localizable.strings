@@ -79,10 +79,11 @@
 "library.status.watched" = "Vista";
 "add.title" = "Anadir serie";
 "add.search.placeholder" = "Titulo de la serie";
-"add.action" = "Anadir a viendo";
+"add.action" = "Anadir a Quiero ver";
 "add.matches.title" = "Ya en tu biblioteca";
 "add.footer.pro" = "Las bibliotecas Pro pueden seguir anadiendo series.";
 "add.footer.remaining" = "Quedan %d espacios activos.";
+"add.footer.hint" = "Las series nuevas empiezan en Quiero ver, listas para empezar desde Home o Library.";
 "add.footer.limitReached" = "Tu limite de biblioteca activa esta lleno.";
 "profile.alert.signOutFailed.title" = "Problema al salir";
 "profile.settingsScreen.title" = "Ajustes";

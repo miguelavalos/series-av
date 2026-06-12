@@ -79,10 +79,11 @@
 "library.status.watched" = "Vue";
 "add.title" = "Ajouter une serie";
 "add.search.placeholder" = "Titre de la serie";
-"add.action" = "Ajouter en cours";
+"add.action" = "Ajouter a A voir";
 "add.matches.title" = "Deja dans votre bibliotheque";
 "add.footer.pro" = "Les bibliotheques Pro peuvent continuer a ajouter des series.";
 "add.footer.remaining" = "%d emplacements actifs restants.";
+"add.footer.hint" = "Les nouvelles series commencent dans A voir, pretes a demarrer depuis Home ou Library.";
 "add.footer.limitReached" = "Votre limite de bibliotheque active est atteinte.";
 "profile.alert.signOutFailed.title" = "Probleme de deconnexion";
 "profile.settingsScreen.title" = "Reglages";

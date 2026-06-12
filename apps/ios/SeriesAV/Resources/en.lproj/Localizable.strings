@@ -79,10 +79,11 @@
 "library.status.watched" = "Watched";
 "add.title" = "Add series";
 "add.search.placeholder" = "Series title";
-"add.action" = "Add to watching";
+"add.action" = "Add to Want";
 "add.matches.title" = "Already in your library";
 "add.footer.pro" = "Pro libraries can keep adding series.";
 "add.footer.remaining" = "%d active slots remaining.";
+"add.footer.hint" = "New series start in Want, ready to begin from Home or Library.";
 "add.footer.limitReached" = "Your active library limit is full.";
 "profile.alert.signOutFailed.title" = "Sign-out problem";
 "profile.settingsScreen.title" = "Settings";

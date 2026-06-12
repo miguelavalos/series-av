@@ -79,10 +79,11 @@
 "library.status.watched" = "Vista";
 "add.title" = "Afegir serie";
 "add.search.placeholder" = "Titol de la serie";
-"add.action" = "Afegir a veient";
+"add.action" = "Afegir a Vull veure";
 "add.matches.title" = "Ja a la teva biblioteca";
 "add.footer.pro" = "Les biblioteques Pro poden seguir afegint series.";
 "add.footer.remaining" = "Queden %d espais actius.";
+"add.footer.hint" = "Les series noves comencen a Vull veure, a punt per comencar des de Home o Library.";
 "add.footer.limitReached" = "El limit de biblioteca activa esta ple.";
 "profile.alert.signOutFailed.title" = "Problema en sortir";
 "profile.settingsScreen.title" = "Ajustos";

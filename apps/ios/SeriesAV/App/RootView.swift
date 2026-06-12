@@ -956,10 +956,10 @@ private struct SeriesAddSheet: View {
 
     private var limitText: String {
         guard let remainingSeriesCount else {
-            return L10n.string("add.footer.pro")
+            return "\(L10n.string("add.footer.pro"))\n\(L10n.string("add.footer.hint"))"
         }
         if canAddSeries {
-            return String(format: L10n.string("add.footer.remaining"), remainingSeriesCount)
+            return "\(String(format: L10n.string("add.footer.remaining"), remainingSeriesCount))\n\(L10n.string("add.footer.hint"))"
         }
         return L10n.string("add.footer.limitReached")
     }
