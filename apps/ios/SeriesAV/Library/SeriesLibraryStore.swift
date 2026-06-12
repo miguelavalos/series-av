@@ -32,12 +32,46 @@ final class SeriesLibraryStore {
         return watching.isEmpty ? activeEntries : watching
     }
 
+    func searchEntries(matching query: String) -> [SeriesLibraryEntry] {
+        let normalizedQuery = SeriesLibraryIdentity.normalizedSearchText(query)
+        guard normalizedQuery.isEmpty == false else {
+            return activeEntries
+        }
+
+        return activeEntries.filter {
+            SeriesLibraryIdentity.normalizedSearchText($0.title).contains(normalizedQuery)
+        }
+    }
+
     func upsert(_ entry: SeriesLibraryEntry) {
         if let index = entries.firstIndex(where: { SeriesLibraryIdentity.sameSeries($0, entry) }) {
             entries[index] = entry
         } else {
             entries.append(entry)
         }
+    }
+
+    @discardableResult
+    func addLocalSeries(title rawTitle: String, at date: Date = Date()) -> SeriesLibraryEntry? {
+        let title = rawTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard title.isEmpty == false else {
+            return nil
+        }
+
+        let seriesId = "local-\(SeriesLibraryIdentity.slug(for: title))"
+        let entry = SeriesLibraryEntry(
+            entryId: seriesId,
+            seriesId: seriesId,
+            title: title,
+            status: .watching,
+            lastWatchedEpisodeCursor: nil,
+            fallbackVisualSeed: title,
+            addedAt: date,
+            updatedAt: date,
+            lastInteractedAt: date
+        )
+        upsert(entry)
+        return entry
     }
 
     func markWatchedThrough(_ cursor: SeriesEpisodeCursor, for entryId: String, at date: Date = Date()) {
@@ -124,6 +158,25 @@ enum SeriesLibraryIdentity {
 
     static func sameSeries(_ lhs: SeriesLibraryEntry, _ rhs: SeriesLibraryEntry) -> Bool {
         key(for: lhs) == key(for: rhs)
+    }
+
+    static func normalizedSearchText(_ value: String) -> String {
+        value
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+    }
+
+    static func slug(for value: String) -> String {
+        let normalizedValue = normalizedSearchText(value)
+        let allowed = CharacterSet.alphanumerics
+        let scalars = normalizedValue.unicodeScalars.map { scalar in
+            allowed.contains(scalar) ? Character(scalar) : "-"
+        }
+        let slug = String(scalars)
+            .split(separator: "-")
+            .joined(separator: "-")
+        return slug.isEmpty ? UUID().uuidString.lowercased() : slug
     }
 
     private static func normalized(_ value: String?) -> String? {

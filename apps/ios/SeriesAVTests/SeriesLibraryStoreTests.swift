@@ -112,6 +112,45 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertEqual(store.entries[0].status, .watching)
     }
 
+    func testAddLocalSeriesTrimsTitleAndDeduplicatesByLocalSeriesId() {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = SeriesLibraryStore()
+
+        let first = store.addLocalSeries(title: "  Example Show  ", at: date)
+        let second = store.addLocalSeries(title: "Example Show", at: date.addingTimeInterval(10))
+
+        XCTAssertEqual(first?.title, "Example Show")
+        XCTAssertEqual(second?.seriesId, "local-example-show")
+        XCTAssertEqual(store.entries.count, 1)
+        XCTAssertEqual(store.entries[0].status, .watching)
+    }
+
+    func testSearchEntriesMatchesTitlesCaseInsensitively() {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = SeriesLibraryStore(entries: [
+            SeriesLibraryEntry(
+                entryId: "entry-1",
+                seriesId: "entry-1",
+                title: "Misterio",
+                status: .watching,
+                addedAt: date,
+                updatedAt: date,
+                lastInteractedAt: date
+            ),
+            SeriesLibraryEntry(
+                entryId: "entry-2",
+                seriesId: "entry-2",
+                title: "Comedy",
+                status: .watching,
+                addedAt: date,
+                updatedAt: date,
+                lastInteractedAt: date
+            )
+        ])
+
+        XCTAssertEqual(store.searchEntries(matching: "misterio").map(\.entryId), ["entry-1"])
+    }
+
     private func entry(
         id: String,
         title: String,

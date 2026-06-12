@@ -19,6 +19,7 @@ struct RootView: View {
                 store: store,
                 accessTitle: accessTitle,
                 accessSubtitle: accessSubtitle,
+                activeSeriesLimit: accessController.limits.activeLibrarySeries,
                 openSettings: { profileMode = .settings },
                 openAccount: { profileMode = .account }
             )
@@ -58,10 +59,12 @@ private struct SeriesWatchingHomeScreen: View {
     @Bindable var store: SeriesLibraryStore
     let accessTitle: String
     let accessSubtitle: String
+    let activeSeriesLimit: Int?
     let openSettings: () -> Void
     let openAccount: () -> Void
 
     @State private var editorEntry: SeriesLibraryEntry?
+    @State private var isShowingAddSheet = false
 
     var body: some View {
         ScrollView {
@@ -101,6 +104,20 @@ private struct SeriesWatchingHomeScreen: View {
             .padding(.vertical, 18)
         }
         .background(Color(.systemGroupedBackground))
+        .safeAreaInset(edge: .bottom) {
+            Button {
+                isShowingAddSheet = true
+            } label: {
+                Label(L10n.string("home.add"), systemImage: "plus")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .background(.regularMaterial)
+            .disabled(!canAddSeries)
+        }
         .sheet(item: $editorEntry) { entry in
             SeriesProgressEditorSheet(
                 entry: entry,
@@ -110,6 +127,14 @@ private struct SeriesWatchingHomeScreen: View {
             )
             .presentationDetents([.medium])
         }
+        .sheet(isPresented: $isShowingAddSheet) {
+            SeriesAddSheet(
+                store: store,
+                canAddSeries: canAddSeries,
+                remainingSeriesCount: remainingSeriesCount
+            )
+            .presentationDetents([.medium, .large])
+        }
     }
 
     private var currentEntry: SeriesLibraryEntry? {
@@ -118,6 +143,20 @@ private struct SeriesWatchingHomeScreen: View {
 
     private var secondaryEntries: [SeriesLibraryEntry] {
         Array(store.homeEntries.dropFirst())
+    }
+
+    private var canAddSeries: Bool {
+        guard let activeSeriesLimit else {
+            return true
+        }
+        return store.activeEntries.count < activeSeriesLimit
+    }
+
+    private var remainingSeriesCount: Int? {
+        guard let activeSeriesLimit else {
+            return nil
+        }
+        return max(0, activeSeriesLimit - store.activeEntries.count)
     }
 
     private var accountBar: some View {
@@ -151,6 +190,88 @@ private struct SeriesWatchingHomeScreen: View {
             .accessibilityLabel(L10n.string("shell.account"))
         }
         .padding(.horizontal, 2)
+    }
+}
+
+private struct SeriesAddSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @Bindable var store: SeriesLibraryStore
+    let canAddSeries: Bool
+    let remainingSeriesCount: Int?
+
+    @State private var query = ""
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    TextField(L10n.string("add.search.placeholder"), text: $query)
+                        .textInputAutocapitalization(.words)
+                        .submitLabel(.done)
+
+                    Button {
+                        addSeries()
+                    } label: {
+                        Label(L10n.string("add.action"), systemImage: "plus")
+                    }
+                    .disabled(!canSubmit)
+                } footer: {
+                    Text(limitText)
+                }
+
+                if matchingEntries.isEmpty == false {
+                    Section(L10n.string("add.matches.title")) {
+                        ForEach(matchingEntries) { entry in
+                            HStack(spacing: 12) {
+                                SeriesPosterMark(seed: entry.fallbackVisualSeed ?? entry.title, size: 34)
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(entry.title)
+                                        .font(.system(size: 15, weight: .semibold))
+                                    Text(entry.progressLabel)
+                                        .font(.system(size: 12, weight: .medium))
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                }
+            }
+            .navigationTitle(L10n.string("add.title"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(L10n.string("common.cancel")) {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+
+    private var matchingEntries: [SeriesLibraryEntry] {
+        store.searchEntries(matching: query)
+    }
+
+    private var canSubmit: Bool {
+        canAddSeries && query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+    }
+
+    private var limitText: String {
+        guard let remainingSeriesCount else {
+            return L10n.string("add.footer.pro")
+        }
+        if canAddSeries {
+            return String(format: L10n.string("add.footer.remaining"), remainingSeriesCount)
+        }
+        return L10n.string("add.footer.limitReached")
+    }
+
+    private func addSeries() {
+        guard store.addLocalSeries(title: query) != nil else {
+            return
+        }
+        dismiss()
     }
 }
 

@@ -41,6 +41,14 @@
 "home.editor.confirm" = "Gesehenen Punkt setzen";
 "home.empty.title" = "Keine Serie in Arbeit";
 "home.empty.subtitle" = "Fuege eine Serie hinzu, dann wird sie hier zum Fokus.";
+"home.add" = "Serie hinzufuegen";
+"add.title" = "Serie hinzufuegen";
+"add.search.placeholder" = "Serientitel";
+"add.action" = "Zu aktuell hinzufuegen";
+"add.matches.title" = "Schon in deiner Bibliothek";
+"add.footer.pro" = "Pro-Bibliotheken koennen weiter Serien hinzufuegen.";
+"add.footer.remaining" = "%d aktive Plaetze uebrig.";
+"add.footer.limitReached" = "Dein aktives Bibliothekslimit ist voll.";
 "profile.alert.signOutFailed.title" = "Abmeldeproblem";
 "profile.settingsScreen.title" = "Einstellungen";
 "profile.accountScreen.title" = "Konto";

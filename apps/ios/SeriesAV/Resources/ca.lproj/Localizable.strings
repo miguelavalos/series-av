@@ -41,6 +41,14 @@
 "home.editor.confirm" = "Fixar punt vist";
 "home.empty.title" = "No hi ha series en progres";
 "home.empty.subtitle" = "Afegeix una serie i sera el focus aqui.";
+"home.add" = "Afegir serie";
+"add.title" = "Afegir serie";
+"add.search.placeholder" = "Titol de la serie";
+"add.action" = "Afegir a veient";
+"add.matches.title" = "Ja a la teva biblioteca";
+"add.footer.pro" = "Les biblioteques Pro poden seguir afegint series.";
+"add.footer.remaining" = "Queden %d espais actius.";
+"add.footer.limitReached" = "El limit de biblioteca activa esta ple.";
 "profile.alert.signOutFailed.title" = "Problema en sortir";
 "profile.settingsScreen.title" = "Ajustos";
 "profile.accountScreen.title" = "Compte";
