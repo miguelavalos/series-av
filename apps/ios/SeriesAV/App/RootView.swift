@@ -1040,13 +1040,14 @@ private struct SeriesCurrentWatchingCard: View {
             )
 
             HStack(spacing: 12) {
-                SeriesEpisodeChip(
-                    title: L10n.string("home.previous"),
-                    value: previousLabel,
-                    systemImage: "arrow.counterclockwise",
-                    action: markPrevious
-                )
-                .disabled(entry.lastWatchedEpisodeCursor == nil)
+                if entry.lastWatchedEpisodeCursor != nil {
+                    SeriesEpisodeChip(
+                        title: L10n.string("home.previous"),
+                        value: previousLabel,
+                        systemImage: "arrow.counterclockwise",
+                        action: markPrevious
+                    )
+                }
 
                 Button(action: editProgress) {
                     Label(L10n.string("home.adjust"), systemImage: "slider.horizontal.3")
