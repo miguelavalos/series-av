@@ -1,0 +1,74 @@
+name: SeriesAV
+options:
+  bundleIdPrefix: com.avalsys
+  deploymentTarget:
+    iOS: "18.0"
+  xcodeVersion: "16.0"
+
+settings:
+  base:
+    DEVELOPMENT_LANGUAGE: en
+    PRODUCT_NAME: SeriesAV
+    SWIFT_VERSION: "6.0"
+
+schemes:
+  SeriesAV:
+    build:
+      targets:
+        SeriesAV: all
+    run:
+      config: Debug
+      executable: SeriesAV
+    test:
+      config: Debug
+      targets:
+        - SeriesAVTests
+    analyze:
+      config: Debug
+    profile:
+      config: Release
+    archive:
+      config: Release
+    management:
+      shared: true
+
+targets:
+  SeriesAV:
+    type: application
+    platform: iOS
+    configFiles:
+      Debug: Config/Debug.xcconfig
+      Release: Config/Release.xcconfig
+    sources:
+      - path: SeriesAV
+    settings:
+      base:
+        CODE_SIGN_ENTITLEMENTS: SeriesAV/App/SeriesAV.entitlements
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: "$(AVALSYS_APPLE_DEVELOPMENT_TEAM)"
+        INFOPLIST_FILE: SeriesAV/App/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        PRODUCT_BUNDLE_IDENTIFIER: "$(PRODUCT_BUNDLE_IDENTIFIER)"
+        SKIP_INSTALL: NO
+        TARGETED_DEVICE_FAMILY: "1"
+        SUPPORTS_MACCATALYST: NO
+      configs:
+        Debug:
+          CODE_SIGN_IDENTITY: Apple Development
+        Release:
+          CODE_SIGN_IDENTITY: Apple Development
+
+  SeriesAVTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: SeriesAVTests
+    dependencies:
+      - target: SeriesAV
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_MODULE_NAME: SeriesAVTests
+        PRODUCT_BUNDLE_IDENTIFIER: "$(SERIESAV_BUNDLE_IDENTIFIER).tests"
+        TARGETED_DEVICE_FAMILY: "1"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/SeriesAV.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SeriesAV"

@@ -30,7 +30,7 @@ docs/
 - Account AV UI surfaces
 - native SwiftUI iOS app structure
 - public TV metadata integration via TVMaze
-- backend-backed access, app-data sync, and Series AV catalog/social integration through private Account AV infrastructure
+- backend-backed access and app-data sync through private Account AV infrastructure
 
 ## Docs
 
@@ -60,7 +60,8 @@ docs/
 - There is no separate public backend in this repository.
 - Backend-backed features used by Series AV come from private Account AV infrastructure.
 - When `ACCOUNTAV_API_BASE_URL` is configured, backend capabilities are authoritative for signed-in access.
-- Pro social surfaces and shared library sync are now wired in the public client.
+- The V1 rebuild sync resource is `seriesLibrary` at `/v1/apps/seriesav/data/seriesLibrary`.
+- Social features are intentionally not part of the V1 public client.
 
 ## Local Setup
 
@@ -77,8 +78,8 @@ Account sign-in uses the configured Account AV provider. `ACCOUNTAV_PUBLISHABLE_
 If both the Account AV publishable key and `ACCOUNTAV_API_BASE_URL` are configured, the app can:
 
 - hydrate signed-in access from `GET /v1/me/access`
-- sync `library` through `/v1/apps/seriesav/data/library`
-- use backend-backed Series AV catalog and Pro social routes
+- sync `seriesLibrary` through `/v1/apps/seriesav/data/seriesLibrary`
+- use backend-backed Series AV catalog routes when those V1 routes are wired
 - reflect `local`, `connected`, and `pro` account states in the iOS profile without selling or managing subscriptions inside the app
 
 ## Local Secrets
@@ -111,10 +112,10 @@ For simulator or physical iPhone installs, follow [docs/install-ios.md](docs/ins
 
 ## Open product work
 
-1. Run full end-to-end signed-in behavior checks against the real Account AV provider and Account AV backend environments.
-2. Run the private signed-in free/pro smoke prompt gates with a real Account AV session token in preview and production.
-3. Collect real catalog mismatch examples that still fail after the current TheTVDB matching hardening.
-4. Validate the iOS signed-in simulator flow against preview before promoting future backend changes to production.
+1. Wire the shared Account AV onboarding/sign-in/account shell.
+2. Add the Tune AV-style paywall/subscription surfaces for Pro cloud sync.
+3. Build the Series AV Home/Search/Library UI on top of the V1 local store.
+4. Validate signed-in free/pro smoke flows against preview.
 
 ## Contributing And Security
 

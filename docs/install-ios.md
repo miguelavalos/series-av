@@ -19,8 +19,8 @@ bun run ios:config
 When `ACCOUNTAV_API_BASE_URL` is also configured, signed-in builds can refresh
 the account-backed access state used to show local, connected, or Pro status in
 the app.
-This first iOS release does not sell subscriptions, restore purchases, or manage
-subscription state from inside the app.
+V1 uses the same guest/free local-only and Pro paywall/subscription pattern as
+Tune AV. Cloud sync is Pro-only.
 
 ## Native iOS Build
 
