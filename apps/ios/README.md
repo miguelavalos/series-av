@@ -18,13 +18,17 @@ Current scaffold:
 - XcodeGen project and compile-only iOS app target.
 - V1 local library models with a single progress cursor per series.
 - Local store behavior for reversible progress updates and Home priority.
+- Guest, signed-in Free, and Pro access models aligned with Account AV `/v1/me/access`.
+- Series AV entitlement service that selects the `seriesav` app entry and uses
+  the Apps AV user id as the account authority.
 - Pro cloud-sync client contract for `/v1/apps/seriesav/data/seriesLibrary`.
-- Unit tests for library identity, cursor updates, and app-data sync envelopes.
+- Unit-test build coverage for library identity, cursor updates, app-data sync
+  envelopes, and access entitlement resolution.
 
 Not implemented yet:
 
 - final Series AV UI redesign;
-- Account AV sign-in/onboarding/account shell;
+- shared Account AV sign-in/onboarding/account shell wiring;
 - StoreKit/RevenueCat paywall surfaces;
 - Convex realtime projection;
 - catalog search/enrichment UI;

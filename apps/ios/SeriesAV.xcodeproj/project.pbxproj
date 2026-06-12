@@ -7,15 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		159807956E30BB116384FADE /* SeriesEntitlementServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF356E2FD2CC3CC73B7B7490 /* SeriesEntitlementServiceTests.swift */; };
 		3BA53F4338BE907A4501FC94 /* SeriesAVAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE24F5B52463208C5E876228 /* SeriesAVAPIClient.swift */; };
 		3D36749576FEBB0BBB92401B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 72139F60FD554069885EE731 /* PrivacyInfo.xcprivacy */; };
 		3E6B8AE873E00FD5A55FDDEF /* SeriesLibraryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6E1160762AEF2A117BAE4A3 /* SeriesLibraryModels.swift */; };
 		4635329479183AA26672A051 /* SeriesAppDataSyncClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40364B2B84E6AC647B728FB /* SeriesAppDataSyncClient.swift */; };
+		4CA7CFF4D7974F4190454B09 /* SeriesAccessModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C97F5A3F29AAA0D7BB6E8D9 /* SeriesAccessModels.swift */; };
 		93E1DFEF1203442F74B1D4BF /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2568399CFB4C7A1E14832801 /* AppConfig.swift */; };
 		96B90E763CC1A37D3DD098F1 /* SeriesLibraryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FAC949798DD909B4FF68C5 /* SeriesLibraryStoreTests.swift */; };
+		C6EB3E3CFAD3AF66C9C0471E /* SeriesEntitlementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A586B658AD9682B2BF8C0A92 /* SeriesEntitlementService.swift */; };
 		E592D4F13BA7E38AFECB453C /* SeriesAVApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E930F20F64D72B22A232919B /* SeriesAVApp.swift */; };
 		E5B43EA5B85A739C5D7E6CE8 /* SeriesAppDataSyncClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F51872EA7F30BA6B1A1475 /* SeriesAppDataSyncClientTests.swift */; };
 		E647737E0691166B0AE5E9F9 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145DE7E7B082B7D92C440A5B /* RootView.swift */; };
+		F06A3D772FAA19F807378474 /* SeriesAccountAccessClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E3280C62806B5F89C4728A /* SeriesAccountAccessClient.swift */; };
 		F73DD51BA813EF38FE6083DE /* SeriesLibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB850E07D80A9A593EA3105 /* SeriesLibraryStore.swift */; };
 /* End PBXBuildFile section */
 
@@ -33,10 +37,12 @@
 		145DE7E7B082B7D92C440A5B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		2568399CFB4C7A1E14832801 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		2A2E8FBF279E3A8C4EDC0B68 /* SeriesAV.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SeriesAV.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C97F5A3F29AAA0D7BB6E8D9 /* SeriesAccessModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccessModels.swift; sourceTree = "<group>"; };
 		5C2045BD1DAB63090578AC6B /* SeriesAV.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SeriesAV.entitlements; sourceTree = "<group>"; };
 		68FAC949798DD909B4FF68C5 /* SeriesLibraryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLibraryStoreTests.swift; sourceTree = "<group>"; };
 		72139F60FD554069885EE731 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		930B112F6F8AF2FEE47D085D /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		A586B658AD9682B2BF8C0A92 /* SeriesEntitlementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesEntitlementService.swift; sourceTree = "<group>"; };
 		A6E1160762AEF2A117BAE4A3 /* SeriesLibraryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLibraryModels.swift; sourceTree = "<group>"; };
 		AE24F5B52463208C5E876228 /* SeriesAVAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVAPIClient.swift; sourceTree = "<group>"; };
 		C538F408F2AE4DD90050AD7A /* SeriesAVTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SeriesAVTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -44,14 +50,17 @@
 		CE164B8C0FC2D8FA1427899D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D2F51872EA7F30BA6B1A1475 /* SeriesAppDataSyncClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppDataSyncClientTests.swift; sourceTree = "<group>"; };
 		D40364B2B84E6AC647B728FB /* SeriesAppDataSyncClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppDataSyncClient.swift; sourceTree = "<group>"; };
+		D9E3280C62806B5F89C4728A /* SeriesAccountAccessClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccountAccessClient.swift; sourceTree = "<group>"; };
 		E930F20F64D72B22A232919B /* SeriesAVApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVApp.swift; sourceTree = "<group>"; };
 		FAB850E07D80A9A593EA3105 /* SeriesLibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLibraryStore.swift; sourceTree = "<group>"; };
+		FF356E2FD2CC3CC73B7B7490 /* SeriesEntitlementServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesEntitlementServiceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		0D239A4F9BC368710EAABA77 /* SeriesAV */ = {
 			isa = PBXGroup;
 			children = (
+				91AEC5E5F23DCCD2168A34A4 /* Access */,
 				39B82B664B9E3A72818F68F2 /* App */,
 				EF181474851C13F86990E6E4 /* Library */,
 				5E6AF4D5A7DF69351C07AE56 /* Sync */,
@@ -104,9 +113,20 @@
 			isa = PBXGroup;
 			children = (
 				D2F51872EA7F30BA6B1A1475 /* SeriesAppDataSyncClientTests.swift */,
+				FF356E2FD2CC3CC73B7B7490 /* SeriesEntitlementServiceTests.swift */,
 				68FAC949798DD909B4FF68C5 /* SeriesLibraryStoreTests.swift */,
 			);
 			path = SeriesAVTests;
+			sourceTree = "<group>";
+		};
+		91AEC5E5F23DCCD2168A34A4 /* Access */ = {
+			isa = PBXGroup;
+			children = (
+				4C97F5A3F29AAA0D7BB6E8D9 /* SeriesAccessModels.swift */,
+				D9E3280C62806B5F89C4728A /* SeriesAccountAccessClient.swift */,
+				A586B658AD9682B2BF8C0A92 /* SeriesEntitlementService.swift */,
+			);
+			path = Access;
 			sourceTree = "<group>";
 		};
 		E056649875893E20FD1E77A8 /* Config */ = {
@@ -218,6 +238,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E5B43EA5B85A739C5D7E6CE8 /* SeriesAppDataSyncClientTests.swift in Sources */,
+				159807956E30BB116384FADE /* SeriesEntitlementServiceTests.swift in Sources */,
 				96B90E763CC1A37D3DD098F1 /* SeriesLibraryStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -230,7 +251,10 @@
 				E647737E0691166B0AE5E9F9 /* RootView.swift in Sources */,
 				3BA53F4338BE907A4501FC94 /* SeriesAVAPIClient.swift in Sources */,
 				E592D4F13BA7E38AFECB453C /* SeriesAVApp.swift in Sources */,
+				4CA7CFF4D7974F4190454B09 /* SeriesAccessModels.swift in Sources */,
+				F06A3D772FAA19F807378474 /* SeriesAccountAccessClient.swift in Sources */,
 				4635329479183AA26672A051 /* SeriesAppDataSyncClient.swift in Sources */,
+				C6EB3E3CFAD3AF66C9C0471E /* SeriesEntitlementService.swift in Sources */,
 				3E6B8AE873E00FD5A55FDDEF /* SeriesLibraryModels.swift in Sources */,
 				F73DD51BA813EF38FE6083DE /* SeriesLibraryStore.swift in Sources */,
 			);

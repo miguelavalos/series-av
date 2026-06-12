@@ -22,6 +22,12 @@ the app.
 V1 uses the same guest/free local-only and Pro paywall/subscription pattern as
 Tune AV. Cloud sync is Pro-only.
 
+Accepted V1 access limits are compiled into the iOS access layer:
+
+- Guest: 25 active library series and 5 Avi actions/day.
+- Signed-in Free: 75 active library series and 15 Avi actions/day.
+- Pro: 1000 active library series and practical fair-use Avi.
+
 ## Native iOS Build
 
 Generate the Swift iOS local config from Infisical before building:

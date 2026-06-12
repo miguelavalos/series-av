@@ -80,7 +80,8 @@ If both the Account AV publishable key and `ACCOUNTAV_API_BASE_URL` are configur
 - hydrate signed-in access from `GET /v1/me/access`
 - sync `seriesLibrary` through `/v1/apps/seriesav/data/seriesLibrary`
 - use backend-backed Series AV catalog routes when those V1 routes are wired
-- reflect `local`, `connected`, and `pro` account states in the iOS profile without selling or managing subscriptions inside the app
+- reflect guest, signed-in Free, and Pro account states in the iOS profile
+- sell, restore, and manage the Pro entitlement through the Tune AV-style paywall and Account AV access refresh flow once the shared UI is wired
 
 ## Local Secrets
 
@@ -112,7 +113,7 @@ For simulator or physical iPhone installs, follow [docs/install-ios.md](docs/ins
 
 ## Open product work
 
-1. Wire the shared Account AV onboarding/sign-in/account shell.
+1. Wire the shared Account AV onboarding/sign-in/account shell to the Series AV access layer.
 2. Add the Tune AV-style paywall/subscription surfaces for Pro cloud sync.
 3. Build the Series AV Home/Search/Library UI on top of the V1 local store.
 4. Validate signed-in free/pro smoke flows against preview.
