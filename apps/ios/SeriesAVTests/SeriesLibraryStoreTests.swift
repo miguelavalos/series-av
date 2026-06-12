@@ -96,6 +96,34 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertEqual(store.homeEntries.map(\.entryId), ["watching"])
     }
 
+    func testHomeEntriesFallBackToWantToWatchBeforeWatched() {
+        let older = Date(timeIntervalSince1970: 1_800_000_000)
+        let newer = Date(timeIntervalSince1970: 1_800_000_100)
+        let store = SeriesLibraryStore(entries: [
+            SeriesLibraryEntry(
+                entryId: "watched",
+                seriesId: "watched",
+                title: "Watched",
+                status: .watched,
+                lastWatchedEpisodeCursor: SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 6),
+                addedAt: newer,
+                updatedAt: newer,
+                lastInteractedAt: newer
+            ),
+            SeriesLibraryEntry(
+                entryId: "later",
+                seriesId: "later",
+                title: "Later",
+                status: .wantToWatch,
+                addedAt: older,
+                updatedAt: older,
+                lastInteractedAt: older
+            )
+        ])
+
+        XCTAssertEqual(store.homeEntries.map(\.entryId), ["later"])
+    }
+
     func testMarkPreviousEpisodeWatchedMovesBackOrClearsProgress() {
         let date = Date(timeIntervalSince1970: 1_800_000_000)
         let store = SeriesLibraryStore(entries: [

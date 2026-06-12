@@ -45,7 +45,12 @@ final class SeriesLibraryStore {
 
     var homeEntries: [SeriesLibraryEntry] {
         let watching = watchingEntries
-        return watching.isEmpty ? activeEntries : watching
+        if watching.isEmpty == false {
+            return watching
+        }
+
+        let wantToWatch = activeEntries.filter { $0.status == .wantToWatch }
+        return wantToWatch.isEmpty ? activeEntries : wantToWatch
     }
 
     func searchEntries(matching query: String) -> [SeriesLibraryEntry] {
