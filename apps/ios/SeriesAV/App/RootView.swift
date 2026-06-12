@@ -579,7 +579,7 @@ private struct SeriesLibrarySheet: View {
                                     markNext(entry)
                                 } label: {
                                     Label(
-                                        "\(L10n.string("home.next")) \(cursorLabel(entry.nextEpisodeCursor))",
+                                        quickProgressTitle(for: entry),
                                         systemImage: "checkmark.circle"
                                     )
                                 }
@@ -802,6 +802,11 @@ private struct SeriesLibrarySheet: View {
 
     private func libraryDetail(for entry: SeriesLibraryEntry) -> String {
         "\(statusTitle(entry.status)) · \(entry.progressLabel)"
+    }
+
+    private func quickProgressTitle(for entry: SeriesLibraryEntry) -> String {
+        let actionTitle = entry.status == .wantToWatch ? L10n.string("home.start") : L10n.string("home.next")
+        return "\(actionTitle) \(cursorLabel(entry.nextEpisodeCursor))"
     }
 
     private func progressUndo(
