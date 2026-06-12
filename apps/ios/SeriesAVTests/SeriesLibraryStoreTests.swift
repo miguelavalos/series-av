@@ -33,6 +33,26 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertEqual(store.entries[0].lastWatchedEpisodeCursor, SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 5))
     }
 
+    func testMarkNextStartsWantToWatchAtFirstEpisode() {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = SeriesLibraryStore(entries: [
+            SeriesLibraryEntry(
+                entryId: "entry",
+                seriesId: "entry",
+                title: "Ready",
+                status: .wantToWatch,
+                addedAt: date,
+                updatedAt: date,
+                lastInteractedAt: date
+            )
+        ])
+
+        store.markNextEpisodeWatched(for: "entry", at: date.addingTimeInterval(10))
+
+        XCTAssertEqual(store.entries[0].status, .watching)
+        XCTAssertEqual(store.entries[0].lastWatchedEpisodeCursor, SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 1))
+    }
+
     func testUpsertDeduplicatesByProviderRefBeforeLocalEntryId() {
         let date = Date(timeIntervalSince1970: 1_800_000_000)
         let store = SeriesLibraryStore(entries: [
