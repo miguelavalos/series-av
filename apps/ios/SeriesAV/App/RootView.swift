@@ -924,7 +924,7 @@ private struct SeriesAddSheet: View {
                                 VStack(alignment: .leading, spacing: 3) {
                                     Text(entry.title)
                                         .font(.system(size: 15, weight: .semibold))
-                                    Text(entry.progressLabel)
+                                    Text(matchDetail(for: entry))
                                         .font(.system(size: 12, weight: .medium))
                                         .foregroundStyle(.secondary)
                                 }
@@ -962,6 +962,13 @@ private struct SeriesAddSheet: View {
             return "\(String(format: L10n.string("add.footer.remaining"), remainingSeriesCount))\n\(L10n.string("add.footer.hint"))"
         }
         return L10n.string("add.footer.limitReached")
+    }
+
+    private func matchDetail(for entry: SeriesLibraryEntry) -> String {
+        if entry.status == .wantToWatch {
+            return "\(statusTitle(entry.status)) · \(String(format: L10n.string("home.queue.wantToWatch.progress"), cursorLabel(entry.nextEpisodeCursor)))"
+        }
+        return "\(statusTitle(entry.status)) · \(entry.progressLabel)"
     }
 
     private func addSeries() {
