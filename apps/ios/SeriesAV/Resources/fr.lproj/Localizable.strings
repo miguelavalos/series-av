@@ -50,6 +50,13 @@
 "home.empty.title" = "Aucune serie en cours";
 "home.empty.subtitle" = "Ajoutez une serie et elle deviendra le focus ici.";
 "home.add" = "Ajouter une serie";
+"library.title" = "Bibliotheque";
+"library.active.title" = "Actives";
+"library.archived.title" = "Archivees";
+"library.archived.detail" = "Archivee";
+"library.restore" = "Restaurer";
+"library.empty.title" = "Aucune serie pour l'instant";
+"library.empty.subtitle" = "Ajoutez une serie et elle apparaitra ici.";
 "add.title" = "Ajouter une serie";
 "add.search.placeholder" = "Titre de la serie";
 "add.action" = "Ajouter en cours";

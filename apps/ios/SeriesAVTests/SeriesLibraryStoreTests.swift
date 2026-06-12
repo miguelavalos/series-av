@@ -181,19 +181,24 @@ final class SeriesLibraryStoreTests: XCTestCase {
 
         store.archive("entry", at: date)
         XCTAssertEqual(store.activeEntries, [])
+        XCTAssertEqual(store.archivedEntries.map(\.entryId), ["entry"])
         XCTAssertEqual(store.entries[0].archivedAt, date)
         XCTAssertEqual(store.entries[0].isPinnedHomeSeries, false)
 
         store.restore("entry", at: date)
         XCTAssertEqual(store.activeEntries.map(\.entryId), ["entry"])
+        XCTAssertEqual(store.archivedEntries, [])
         XCTAssertNil(store.entries[0].archivedAt)
 
         store.delete("entry", at: date)
         XCTAssertEqual(store.activeEntries, [])
+        XCTAssertEqual(store.archivedEntries, [])
+        XCTAssertEqual(store.deletedEntries.map(\.entryId), ["entry"])
         XCTAssertEqual(store.entries[0].deletedAt, date)
 
         store.restore("entry", at: date)
         XCTAssertEqual(store.activeEntries.map(\.entryId), ["entry"])
+        XCTAssertEqual(store.deletedEntries, [])
         XCTAssertNil(store.entries[0].deletedAt)
     }
 

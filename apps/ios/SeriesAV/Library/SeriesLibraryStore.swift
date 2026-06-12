@@ -27,6 +27,18 @@ final class SeriesLibraryStore {
             }
     }
 
+    var archivedEntries: [SeriesLibraryEntry] {
+        entries
+            .filter { $0.deletedAt == nil && $0.archivedAt != nil }
+            .sorted { $0.lastInteractedAt > $1.lastInteractedAt }
+    }
+
+    var deletedEntries: [SeriesLibraryEntry] {
+        entries
+            .filter { $0.deletedAt != nil }
+            .sorted { $0.lastInteractedAt > $1.lastInteractedAt }
+    }
+
     var watchingEntries: [SeriesLibraryEntry] {
         activeEntries.filter { $0.status == .watching }
     }

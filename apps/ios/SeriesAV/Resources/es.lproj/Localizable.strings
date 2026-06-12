@@ -50,6 +50,13 @@
 "home.empty.title" = "No hay series en progreso";
 "home.empty.subtitle" = "Anade una serie y sera el foco aqui.";
 "home.add" = "Anadir serie";
+"library.title" = "Biblioteca";
+"library.active.title" = "Activas";
+"library.archived.title" = "Archivadas";
+"library.archived.detail" = "Archivada";
+"library.restore" = "Restaurar";
+"library.empty.title" = "Sin series todavia";
+"library.empty.subtitle" = "Anade una serie y aparecera aqui.";
 "add.title" = "Anadir serie";
 "add.search.placeholder" = "Titulo de la serie";
 "add.action" = "Anadir a viendo";

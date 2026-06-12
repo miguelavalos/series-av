@@ -65,6 +65,7 @@ private struct SeriesWatchingHomeScreen: View {
 
     @State private var editorEntry: SeriesLibraryEntry?
     @State private var isShowingAddSheet = false
+    @State private var isShowingLibrarySheet = false
     @State private var pendingUndo: PendingLibraryUndo?
 
     var body: some View {
@@ -173,6 +174,23 @@ private struct SeriesWatchingHomeScreen: View {
             )
             .presentationDetents([.medium, .large])
         }
+        .sheet(isPresented: $isShowingLibrarySheet) {
+            SeriesLibrarySheet(
+                store: store,
+                archive: { entry in
+                    store.archive(entry.id)
+                    pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.archived")
+                },
+                restore: { entry in
+                    store.restore(entry.id)
+                },
+                delete: { entry in
+                    store.delete(entry.id)
+                    pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.deleted")
+                }
+            )
+            .presentationDetents([.medium, .large])
+        }
     }
 
     private var currentEntry: SeriesLibraryEntry? {
@@ -212,6 +230,15 @@ private struct SeriesWatchingHomeScreen: View {
             }
 
             Spacer()
+
+            Button {
+                isShowingLibrarySheet = true
+            } label: {
+                Image(systemName: "books.vertical")
+                    .frame(width: 34, height: 34)
+            }
+            .buttonStyle(.bordered)
+            .accessibilityLabel(L10n.string("library.title"))
 
             Button(action: openSettings) {
                 Image(systemName: "gearshape")
@@ -268,6 +295,111 @@ private struct SeriesUndoBar: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .stroke(Color.primary.opacity(0.08), lineWidth: 1)
         }
+    }
+}
+
+private struct SeriesLibrarySheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @Bindable var store: SeriesLibraryStore
+    let archive: (SeriesLibraryEntry) -> Void
+    let restore: (SeriesLibraryEntry) -> Void
+    let delete: (SeriesLibraryEntry) -> Void
+
+    var body: some View {
+        NavigationStack {
+            List {
+                if store.activeEntries.isEmpty == false {
+                    Section(L10n.string("library.active.title")) {
+                        ForEach(store.activeEntries) { entry in
+                            SeriesLibraryRow(entry: entry, detail: entry.progressLabel) {
+                                Button {
+                                    archive(entry)
+                                } label: {
+                                    Label(L10n.string("home.archive"), systemImage: "archivebox")
+                                }
+
+                                Button(role: .destructive) {
+                                    delete(entry)
+                                } label: {
+                                    Label(L10n.string("home.delete"), systemImage: "trash")
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if store.archivedEntries.isEmpty == false {
+                    Section(L10n.string("library.archived.title")) {
+                        ForEach(store.archivedEntries) { entry in
+                            SeriesLibraryRow(entry: entry, detail: L10n.string("library.archived.detail")) {
+                                Button {
+                                    restore(entry)
+                                } label: {
+                                    Label(L10n.string("library.restore"), systemImage: "arrow.uturn.backward")
+                                }
+
+                                Button(role: .destructive) {
+                                    delete(entry)
+                                } label: {
+                                    Label(L10n.string("home.delete"), systemImage: "trash")
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if store.activeEntries.isEmpty && store.archivedEntries.isEmpty {
+                    ContentUnavailableView(
+                        L10n.string("library.empty.title"),
+                        systemImage: "books.vertical",
+                        description: Text(L10n.string("library.empty.subtitle"))
+                    )
+                }
+            }
+            .navigationTitle(L10n.string("library.title"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(L10n.string("common.close")) {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+private struct SeriesLibraryRow<MenuContent: View>: View {
+    let entry: SeriesLibraryEntry
+    let detail: String
+    @ViewBuilder let menuContent: () -> MenuContent
+
+    var body: some View {
+        HStack(spacing: 12) {
+            SeriesPosterMark(seed: entry.fallbackVisualSeed ?? entry.title, size: 36)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(entry.title)
+                    .font(.system(size: 15, weight: .semibold))
+                    .lineLimit(1)
+                Text(detail)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+
+            Spacer()
+
+            Menu {
+                menuContent()
+            } label: {
+                Image(systemName: "ellipsis")
+                    .frame(width: 34, height: 34)
+            }
+            .buttonStyle(.bordered)
+            .accessibilityLabel(L10n.string("home.actions"))
+        }
+        .padding(.vertical, 4)
     }
 }
 

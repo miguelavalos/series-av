@@ -50,6 +50,13 @@
 "home.empty.title" = "No hi ha series en progres";
 "home.empty.subtitle" = "Afegeix una serie i sera el focus aqui.";
 "home.add" = "Afegir serie";
+"library.title" = "Biblioteca";
+"library.active.title" = "Actives";
+"library.archived.title" = "Arxivades";
+"library.archived.detail" = "Arxivada";
+"library.restore" = "Restaurar";
+"library.empty.title" = "Encara no hi ha series";
+"library.empty.subtitle" = "Afegeix una serie i apareixera aqui.";
 "add.title" = "Afegir serie";
 "add.search.placeholder" = "Titol de la serie";
 "add.action" = "Afegir a veient";
