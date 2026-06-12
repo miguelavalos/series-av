@@ -57,6 +57,9 @@
 "library.restore" = "Restaurar";
 "library.empty.title" = "Sin series todavia";
 "library.empty.subtitle" = "Anade una serie y aparecera aqui.";
+"library.status.wantToWatch" = "Quiero ver";
+"library.status.watching" = "Viendo";
+"library.status.watched" = "Vista";
 "add.title" = "Anadir serie";
 "add.search.placeholder" = "Titulo de la serie";
 "add.action" = "Anadir a viendo";

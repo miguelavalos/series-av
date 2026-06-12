@@ -215,6 +215,22 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertEqual(store.homeEntries.map(\.entryId), ["older", "recent"])
     }
 
+    func testSetStatusKeepsHomeFocusedOnWatchingAndClearsProgressForWantToWatch() {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = SeriesLibraryStore(entries: [
+            entry(id: "entry", title: "Entry", pinned: true, interactedAt: date)
+        ])
+
+        store.setStatus(.watched, for: "entry", at: date)
+        XCTAssertEqual(store.entries[0].status, .watched)
+        XCTAssertEqual(store.entries[0].isPinnedHomeSeries, false)
+        XCTAssertEqual(store.homeEntries.map(\.entryId), ["entry"])
+
+        store.setStatus(.wantToWatch, for: "entry", at: date)
+        XCTAssertEqual(store.entries[0].status, .wantToWatch)
+        XCTAssertNil(store.entries[0].lastWatchedEpisodeCursor)
+    }
+
     private func entry(
         id: String,
         title: String,

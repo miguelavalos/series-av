@@ -57,6 +57,9 @@
 "library.restore" = "Restaurer";
 "library.empty.title" = "Aucune serie pour l'instant";
 "library.empty.subtitle" = "Ajoutez une serie et elle apparaitra ici.";
+"library.status.wantToWatch" = "A voir";
+"library.status.watching" = "En cours";
+"library.status.watched" = "Vue";
 "add.title" = "Ajouter une serie";
 "add.search.placeholder" = "Titre de la serie";
 "add.action" = "Ajouter en cours";

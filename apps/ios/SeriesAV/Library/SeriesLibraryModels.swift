@@ -1,6 +1,6 @@
 import Foundation
 
-enum SeriesLibraryEntryStatus: String, Codable, Equatable, Sendable {
+enum SeriesLibraryEntryStatus: String, CaseIterable, Codable, Equatable, Sendable {
     case wantToWatch
     case watching
     case watched

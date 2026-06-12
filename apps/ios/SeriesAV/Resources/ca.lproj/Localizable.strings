@@ -57,6 +57,9 @@
 "library.restore" = "Restaurar";
 "library.empty.title" = "Encara no hi ha series";
 "library.empty.subtitle" = "Afegeix una serie i apareixera aqui.";
+"library.status.wantToWatch" = "Vull veure";
+"library.status.watching" = "Veient";
+"library.status.watched" = "Vista";
 "add.title" = "Afegir serie";
 "add.search.placeholder" = "Titol de la serie";
 "add.action" = "Afegir a veient";

@@ -134,6 +134,23 @@ final class SeriesLibraryStore {
         persist()
     }
 
+    func setStatus(_ status: SeriesLibraryEntryStatus, for entryId: String, at date: Date = Date()) {
+        guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
+            return
+        }
+
+        entries[index].status = status
+        if status == .wantToWatch {
+            entries[index].lastWatchedEpisodeCursor = nil
+        }
+        if status == .watched {
+            entries[index].isPinnedHomeSeries = false
+        }
+        entries[index].updatedAt = date
+        entries[index].lastInteractedAt = date
+        persist()
+    }
+
     func archive(_ entryId: String, at date: Date = Date()) {
         guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
             return

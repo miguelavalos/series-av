@@ -57,6 +57,9 @@
 "library.restore" = "Restore";
 "library.empty.title" = "No series yet";
 "library.empty.subtitle" = "Add a series and it will appear here.";
+"library.status.wantToWatch" = "Want to watch";
+"library.status.watching" = "Watching";
+"library.status.watched" = "Watched";
 "add.title" = "Add series";
 "add.search.placeholder" = "Series title";
 "add.action" = "Add to watching";

@@ -88,6 +88,9 @@ private struct SeriesWatchingHomeScreen: View {
                         togglePinned: {
                             store.setPinned(currentEntry.isPinnedHomeSeries != true, for: currentEntry.id)
                         },
+                        setStatus: { status in
+                            store.setStatus(status, for: currentEntry.id)
+                        },
                         archive: {
                             store.archive(currentEntry.id)
                             pendingUndo = PendingLibraryUndo(entryId: currentEntry.id, title: currentEntry.title, messageKey: "home.undo.archived")
@@ -112,6 +115,9 @@ private struct SeriesWatchingHomeScreen: View {
                         },
                         togglePinned: { entry in
                             store.setPinned(entry.isPinnedHomeSeries != true, for: entry.id)
+                        },
+                        setStatus: { entry, status in
+                            store.setStatus(status, for: entry.id)
                         },
                         archive: { entry in
                             store.archive(entry.id)
@@ -180,6 +186,9 @@ private struct SeriesWatchingHomeScreen: View {
                 archive: { entry in
                     store.archive(entry.id)
                     pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.archived")
+                },
+                setStatus: { entry, status in
+                    store.setStatus(status, for: entry.id)
                 },
                 restore: { entry in
                     store.restore(entry.id)
@@ -302,6 +311,7 @@ private struct SeriesLibrarySheet: View {
     @Environment(\.dismiss) private var dismiss
     @Bindable var store: SeriesLibraryStore
     let archive: (SeriesLibraryEntry) -> Void
+    let setStatus: (SeriesLibraryEntry, SeriesLibraryEntryStatus) -> Void
     let restore: (SeriesLibraryEntry) -> Void
     let delete: (SeriesLibraryEntry) -> Void
 
@@ -311,7 +321,11 @@ private struct SeriesLibrarySheet: View {
                 if store.activeEntries.isEmpty == false {
                     Section(L10n.string("library.active.title")) {
                         ForEach(store.activeEntries) { entry in
-                            SeriesLibraryRow(entry: entry, detail: entry.progressLabel) {
+                            SeriesLibraryRow(entry: entry, detail: libraryDetail(for: entry)) {
+                                SeriesStatusButtons(entry: entry) { status in
+                                    setStatus(entry, status)
+                                }
+
                                 Button {
                                     archive(entry)
                                 } label: {
@@ -366,6 +380,10 @@ private struct SeriesLibrarySheet: View {
                 }
             }
         }
+    }
+
+    private func libraryDetail(for entry: SeriesLibraryEntry) -> String {
+        "\(statusTitle(entry.status)) · \(entry.progressLabel)"
     }
 }
 
@@ -491,6 +509,7 @@ private struct SeriesCurrentWatchingCard: View {
     let markNext: () -> Void
     let editProgress: () -> Void
     let togglePinned: () -> Void
+    let setStatus: (SeriesLibraryEntryStatus) -> Void
     let archive: () -> Void
     let delete: () -> Void
 
@@ -521,6 +540,7 @@ private struct SeriesCurrentWatchingCard: View {
                 SeriesEntryActionsMenu(
                     entry: entry,
                     togglePinned: togglePinned,
+                    setStatus: setStatus,
                     archive: archive,
                     delete: delete
                 )
@@ -572,6 +592,7 @@ private struct SeriesWatchingQueueSection: View {
     let markNext: (SeriesLibraryEntry) -> Void
     let editProgress: (SeriesLibraryEntry) -> Void
     let togglePinned: (SeriesLibraryEntry) -> Void
+    let setStatus: (SeriesLibraryEntry, SeriesLibraryEntryStatus) -> Void
     let archive: (SeriesLibraryEntry) -> Void
     let delete: (SeriesLibraryEntry) -> Void
 
@@ -618,6 +639,7 @@ private struct SeriesWatchingQueueSection: View {
                         SeriesEntryActionsMenu(
                             entry: entry,
                             togglePinned: { togglePinned(entry) },
+                            setStatus: { setStatus(entry, $0) },
                             archive: { archive(entry) },
                             delete: { delete(entry) }
                         )
@@ -633,11 +655,14 @@ private struct SeriesWatchingQueueSection: View {
 private struct SeriesEntryActionsMenu: View {
     let entry: SeriesLibraryEntry
     let togglePinned: () -> Void
+    let setStatus: (SeriesLibraryEntryStatus) -> Void
     let archive: () -> Void
     let delete: () -> Void
 
     var body: some View {
         Menu {
+            SeriesStatusButtons(entry: entry, setStatus: setStatus)
+
             Button(action: togglePinned) {
                 Label(pinTitle, systemImage: entry.isPinnedHomeSeries == true ? "pin.slash" : "pin")
             }
@@ -659,6 +684,48 @@ private struct SeriesEntryActionsMenu: View {
 
     private var pinTitle: String {
         entry.isPinnedHomeSeries == true ? L10n.string("home.unpin") : L10n.string("home.pin")
+    }
+}
+
+private struct SeriesStatusButtons: View {
+    let entry: SeriesLibraryEntry
+    let setStatus: (SeriesLibraryEntryStatus) -> Void
+
+    var body: some View {
+        ForEach(SeriesLibraryEntryStatus.allCases, id: \.self) { status in
+            Button {
+                setStatus(status)
+            } label: {
+                Label(statusTitle(status), systemImage: statusIcon(status, isSelected: entry.status == status))
+            }
+            .disabled(entry.status == status)
+        }
+    }
+}
+
+private func statusTitle(_ status: SeriesLibraryEntryStatus) -> String {
+    switch status {
+    case .wantToWatch:
+        L10n.string("library.status.wantToWatch")
+    case .watching:
+        L10n.string("library.status.watching")
+    case .watched:
+        L10n.string("library.status.watched")
+    }
+}
+
+private func statusIcon(_ status: SeriesLibraryEntryStatus, isSelected: Bool) -> String {
+    if isSelected {
+        return "checkmark.circle.fill"
+    }
+
+    switch status {
+    case .wantToWatch:
+        return "bookmark"
+    case .watching:
+        return "play.circle"
+    case .watched:
+        return "checkmark.circle"
     }
 }
 
