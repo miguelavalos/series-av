@@ -19,6 +19,7 @@ package-lock.json
 .infisical/*
 !apps/ios/
 !apps/ios/**
+apps/ios_old/
 apps/ios/Config/Local.xcconfig
 apps/ios/**/*.xcuserdatad
 apps/ios/**/xcuserdata/
