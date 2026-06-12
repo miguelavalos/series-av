@@ -801,7 +801,10 @@ private struct SeriesLibrarySheet: View {
     }
 
     private func libraryDetail(for entry: SeriesLibraryEntry) -> String {
-        "\(statusTitle(entry.status)) · \(entry.progressLabel)"
+        if entry.status == .wantToWatch {
+            return "\(statusTitle(entry.status)) · \(String(format: L10n.string("home.queue.wantToWatch.progress"), cursorLabel(entry.nextEpisodeCursor)))"
+        }
+        return "\(statusTitle(entry.status)) · \(entry.progressLabel)"
     }
 
     private func quickProgressTitle(for entry: SeriesLibraryEntry) -> String {
