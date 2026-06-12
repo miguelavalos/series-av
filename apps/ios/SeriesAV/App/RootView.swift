@@ -749,6 +749,15 @@ private struct SeriesWatchingQueueSection: View {
                         Spacer()
 
                         Button {
+                            togglePinned(entry)
+                        } label: {
+                            Image(systemName: "pin")
+                                .frame(width: 34, height: 34)
+                        }
+                        .buttonStyle(.bordered)
+                        .accessibilityLabel(L10n.string("home.pin"))
+
+                        Button {
                             markNext(entry)
                         } label: {
                             Image(systemName: "checkmark")
@@ -757,18 +766,10 @@ private struct SeriesWatchingQueueSection: View {
                         .buttonStyle(.borderedProminent)
                         .accessibilityLabel(L10n.string("shell.watch.next"))
 
-                        Button {
-                            editProgress(entry)
-                        } label: {
-                            Image(systemName: "slider.horizontal.3")
-                                .frame(width: 34, height: 34)
-                        }
-                        .buttonStyle(.bordered)
-                        .accessibilityLabel(L10n.string("home.adjust"))
-
                         SeriesEntryActionsMenu(
                             entry: entry,
                             togglePinned: { togglePinned(entry) },
+                            editProgress: { editProgress(entry) },
                             setStatus: { setStatus(entry, $0) },
                             archive: { archive(entry) },
                             delete: { delete(entry) }
@@ -785,6 +786,7 @@ private struct SeriesWatchingQueueSection: View {
 private struct SeriesEntryActionsMenu: View {
     let entry: SeriesLibraryEntry
     let togglePinned: () -> Void
+    var editProgress: (() -> Void)? = nil
     let setStatus: (SeriesLibraryEntryStatus) -> Void
     let archive: () -> Void
     let delete: () -> Void
@@ -792,6 +794,12 @@ private struct SeriesEntryActionsMenu: View {
     var body: some View {
         Menu {
             SeriesStatusButtons(entry: entry, setStatus: setStatus)
+
+            if let editProgress {
+                Button(action: editProgress) {
+                    Label(L10n.string("home.adjust"), systemImage: "slider.horizontal.3")
+                }
+            }
 
             Button(action: togglePinned) {
                 Label(pinTitle, systemImage: entry.isPinnedHomeSeries == true ? "pin.slash" : "pin")
