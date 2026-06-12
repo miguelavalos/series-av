@@ -29,8 +29,11 @@
 "shell.watching" = "Viendo";
 "home.current.title" = "Viendo ahora";
 "home.current.progress" = "Visto hasta %@";
+"home.current.wantToWatch.title" = "Lista para empezar";
+"home.current.wantToWatch.progress" = "Sin episodios vistos";
 "home.previous" = "Atras";
 "home.next" = "Visto";
+"home.start" = "Empezar";
 "home.adjust" = "Ajustar episodio";
 "home.notStarted" = "Sin empezar";
 "home.actions" = "Acciones de serie";

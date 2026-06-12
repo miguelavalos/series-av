@@ -980,7 +980,7 @@ private struct SeriesCurrentWatchingCard: View {
                 SeriesPosterMark(seed: entry.fallbackVisualSeed ?? entry.title, size: 94)
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(L10n.string("home.current.title"))
+                    Text(currentTitle)
                         .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(.secondary)
                         .textCase(.uppercase)
@@ -991,7 +991,7 @@ private struct SeriesCurrentWatchingCard: View {
                         .lineLimit(3)
                         .fixedSize(horizontal: false, vertical: true)
 
-                    Text(String(format: L10n.string("home.current.progress"), entry.progressLabel))
+                    Text(currentProgress)
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.secondary)
                 }
@@ -1009,7 +1009,7 @@ private struct SeriesCurrentWatchingCard: View {
             }
 
             SeriesPrimaryContinueButton(
-                title: L10n.string("home.next"),
+                title: primaryActionTitle,
                 episodeLabel: cursorLabel(entry.nextEpisodeCursor),
                 action: markNext
             )
@@ -1037,6 +1037,23 @@ private struct SeriesCurrentWatchingCard: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .stroke(Color.primary.opacity(0.08), lineWidth: 1)
         }
+    }
+
+    private var currentTitle: String {
+        entry.status == .wantToWatch
+            ? L10n.string("home.current.wantToWatch.title")
+            : L10n.string("home.current.title")
+    }
+
+    private var currentProgress: String {
+        guard entry.status != .wantToWatch else {
+            return L10n.string("home.current.wantToWatch.progress")
+        }
+        return String(format: L10n.string("home.current.progress"), entry.progressLabel)
+    }
+
+    private var primaryActionTitle: String {
+        entry.status == .wantToWatch ? L10n.string("home.start") : L10n.string("home.next")
     }
 
     private var previousLabel: String {

@@ -29,8 +29,11 @@
 "shell.watching" = "Mirant";
 "home.current.title" = "Veient ara";
 "home.current.progress" = "Vist fins a %@";
+"home.current.wantToWatch.title" = "A punt per comencar";
+"home.current.wantToWatch.progress" = "Cap episodi vist";
 "home.previous" = "Enrere";
 "home.next" = "Vist";
+"home.start" = "Comencar";
 "home.adjust" = "Ajustar episodi";
 "home.notStarted" = "Sense comencar";
 "home.actions" = "Accions de serie";

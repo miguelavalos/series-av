@@ -29,8 +29,11 @@
 "shell.watching" = "Watching";
 "home.current.title" = "Watching now";
 "home.current.progress" = "Watched through %@";
+"home.current.wantToWatch.title" = "Ready to start";
+"home.current.wantToWatch.progress" = "No episodes watched yet";
 "home.previous" = "Back";
 "home.next" = "Watched";
+"home.start" = "Start";
 "home.adjust" = "Adjust episode";
 "home.notStarted" = "Not started";
 "home.actions" = "Series actions";
