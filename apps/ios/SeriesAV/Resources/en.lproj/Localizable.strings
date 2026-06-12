@@ -42,6 +42,7 @@
 "home.undo.archived" = "\"%@\" archived";
 "home.undo.deleted" = "\"%@\" deleted";
 "home.undo.progress" = "\"%@\" progress changed";
+"home.undo.status" = "\"%@\" status changed";
 "home.queue.title" = "Also watching";
 "home.queue.progress" = "%@ watched, %@ next";
 "home.editor.season" = "Season %d";

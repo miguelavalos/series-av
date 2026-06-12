@@ -413,10 +413,11 @@ private struct PendingLibraryUndo: Identifiable, Equatable {
 private struct PendingProgressUndo: Identifiable, Equatable {
     var entryId: String
     var title: String
+    var messageKey: String
     var status: SeriesLibraryEntryStatus
     var lastWatchedEpisodeCursor: SeriesEpisodeCursor?
 
-    var id: String { entryId }
+    var id: String { "\(entryId)-\(messageKey)" }
 }
 
 private struct SeriesUndoBar: View {
@@ -534,6 +535,7 @@ private struct SeriesLibrarySheet: View {
                                 .disabled(entry.lastWatchedEpisodeCursor?.previousEpisode == nil)
 
                                 SeriesStatusButtons(entry: entry) { status in
+                                    pendingProgressUndo = progressUndo(for: entry, messageKey: "home.undo.status")
                                     setStatus(entry, status)
                                 }
 
@@ -607,7 +609,7 @@ private struct SeriesLibrarySheet: View {
             .safeAreaInset(edge: .bottom) {
                 if let pendingProgressUndo {
                     SeriesUndoBar(
-                        title: String(format: L10n.string("home.undo.progress"), pendingProgressUndo.title),
+                        title: String(format: L10n.string(pendingProgressUndo.messageKey), pendingProgressUndo.title),
                         undo: {
                             store.restoreProgress(
                                 status: pendingProgressUndo.status,
@@ -693,10 +695,14 @@ private struct SeriesLibrarySheet: View {
         "\(statusTitle(entry.status)) · \(entry.progressLabel)"
     }
 
-    private func progressUndo(for entry: SeriesLibraryEntry) -> PendingProgressUndo {
+    private func progressUndo(
+        for entry: SeriesLibraryEntry,
+        messageKey: String = "home.undo.progress"
+    ) -> PendingProgressUndo {
         PendingProgressUndo(
             entryId: entry.id,
             title: entry.title,
+            messageKey: messageKey,
             status: entry.status,
             lastWatchedEpisodeCursor: entry.lastWatchedEpisodeCursor
         )
