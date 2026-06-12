@@ -35,6 +35,7 @@
 "home.next" = "Watched";
 "home.start" = "Start";
 "home.adjust" = "Adjust episode";
+"home.chooseEpisode" = "Choose episode";
 "home.notStarted" = "Not started";
 "home.actions" = "Series actions";
 "home.pin" = "Pin to top";

@@ -35,6 +35,7 @@
 "home.next" = "Vist";
 "home.start" = "Comencar";
 "home.adjust" = "Ajustar episodi";
+"home.chooseEpisode" = "Triar episodi";
 "home.notStarted" = "Sense comencar";
 "home.actions" = "Accions de serie";
 "home.pin" = "Fixar a dalt";

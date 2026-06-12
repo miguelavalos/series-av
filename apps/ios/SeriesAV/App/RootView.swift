@@ -1050,7 +1050,7 @@ private struct SeriesCurrentWatchingCard: View {
                 }
 
                 Button(action: editProgress) {
-                    Label(L10n.string("home.adjust"), systemImage: "slider.horizontal.3")
+                    Label(progressEditTitle, systemImage: "slider.horizontal.3")
                         .frame(maxWidth: .infinity, minHeight: 96)
                 }
                 .buttonStyle(.bordered)
@@ -1080,6 +1080,10 @@ private struct SeriesCurrentWatchingCard: View {
 
     private var primaryActionTitle: String {
         entry.status == .wantToWatch ? L10n.string("home.start") : L10n.string("home.next")
+    }
+
+    private var progressEditTitle: String {
+        entry.lastWatchedEpisodeCursor == nil ? L10n.string("home.chooseEpisode") : L10n.string("home.adjust")
     }
 
     private var previousLabel: String {

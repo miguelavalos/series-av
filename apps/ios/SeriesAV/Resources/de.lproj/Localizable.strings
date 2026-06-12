@@ -35,6 +35,7 @@
 "home.next" = "Gesehen";
 "home.start" = "Starten";
 "home.adjust" = "Folge anpassen";
+"home.chooseEpisode" = "Folge waehlen";
 "home.notStarted" = "Nicht begonnen";
 "home.actions" = "Serienaktionen";
 "home.pin" = "Oben anheften";

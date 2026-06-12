@@ -35,6 +35,7 @@
 "home.next" = "Visto";
 "home.start" = "Empezar";
 "home.adjust" = "Ajustar episodio";
+"home.chooseEpisode" = "Elegir episodio";
 "home.notStarted" = "Sin empezar";
 "home.actions" = "Acciones de serie";
 "home.pin" = "Fijar arriba";

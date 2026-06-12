@@ -35,6 +35,7 @@
 "home.next" = "Vu";
 "home.start" = "Demarrer";
 "home.adjust" = "Ajuster l'episode";
+"home.chooseEpisode" = "Choisir l'episode";
 "home.notStarted" = "Pas commence";
 "home.actions" = "Actions de serie";
 "home.pin" = "Epingler en haut";
