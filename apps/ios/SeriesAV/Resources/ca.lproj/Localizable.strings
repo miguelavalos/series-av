@@ -49,6 +49,8 @@
 "home.undo.status" = "Estat de \"%@\" canviat";
 "home.queue.title" = "Tambe veient";
 "home.queue.progress" = "%@ vist, %@ seguent";
+"home.queue.wantToWatch.title" = "A punt per comencar";
+"home.queue.wantToWatch.progress" = "Comencar per %@";
 "home.editor.season" = "Temporada %d";
 "home.editor.episode" = "Episodi %d";
 "home.editor.footer" = "En fixar aquest punt, els episodis anteriors queden vistos i els posteriors pendents.";

@@ -1105,7 +1105,7 @@ private struct SeriesWatchingQueueSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(L10n.string("home.queue.title"))
+            Text(queueTitle)
                 .font(.system(size: 16, weight: .bold))
 
             VStack(spacing: 8) {
@@ -1117,7 +1117,7 @@ private struct SeriesWatchingQueueSection: View {
                             Text(entry.title)
                                 .font(.system(size: 15, weight: .semibold))
                                 .lineLimit(1)
-                            Text(String(format: L10n.string("home.queue.progress"), entry.progressLabel, cursorLabel(entry.nextEpisodeCursor)))
+                            Text(queueProgress(for: entry))
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundStyle(.secondary)
                                 .lineLimit(1)
@@ -1141,7 +1141,7 @@ private struct SeriesWatchingQueueSection: View {
                                 .frame(width: 34, height: 34)
                         }
                         .buttonStyle(.borderedProminent)
-                        .accessibilityLabel(L10n.string("shell.watch.next"))
+                        .accessibilityLabel(primaryActionTitle(for: entry))
 
                         SeriesEntryActionsMenu(
                             entry: entry,
@@ -1157,6 +1157,23 @@ private struct SeriesWatchingQueueSection: View {
                 }
             }
         }
+    }
+
+    private var queueTitle: String {
+        entries.allSatisfy { $0.status == .wantToWatch }
+            ? L10n.string("home.queue.wantToWatch.title")
+            : L10n.string("home.queue.title")
+    }
+
+    private func queueProgress(for entry: SeriesLibraryEntry) -> String {
+        guard entry.status != .wantToWatch else {
+            return String(format: L10n.string("home.queue.wantToWatch.progress"), cursorLabel(entry.nextEpisodeCursor))
+        }
+        return String(format: L10n.string("home.queue.progress"), entry.progressLabel, cursorLabel(entry.nextEpisodeCursor))
+    }
+
+    private func primaryActionTitle(for entry: SeriesLibraryEntry) -> String {
+        entry.status == .wantToWatch ? L10n.string("home.start") : L10n.string("shell.watch.next")
     }
 }
 

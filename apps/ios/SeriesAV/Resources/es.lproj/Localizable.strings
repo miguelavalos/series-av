@@ -49,6 +49,8 @@
 "home.undo.status" = "Estado de \"%@\" cambiado";
 "home.queue.title" = "Tambien viendo";
 "home.queue.progress" = "%@ visto, %@ siguiente";
+"home.queue.wantToWatch.title" = "Listas para empezar";
+"home.queue.wantToWatch.progress" = "Empezar por %@";
 "home.editor.season" = "Temporada %d";
 "home.editor.episode" = "Episodio %d";
 "home.editor.footer" = "Al fijar este punto, los episodios anteriores quedan vistos y los posteriores pendientes.";

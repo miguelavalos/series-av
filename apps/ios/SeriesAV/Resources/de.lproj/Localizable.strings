@@ -49,6 +49,8 @@
 "home.undo.status" = "Status von \"%@\" geaendert";
 "home.queue.title" = "Auch aktuell";
 "home.queue.progress" = "%@ gesehen, %@ als naechstes";
+"home.queue.wantToWatch.title" = "Bereit zum Start";
+"home.queue.wantToWatch.progress" = "Mit %@ starten";
 "home.editor.season" = "Staffel %d";
 "home.editor.episode" = "Folge %d";
 "home.editor.footer" = "Wenn du diesen Punkt setzt, gelten fruehere Folgen als gesehen und spaetere als offen.";
