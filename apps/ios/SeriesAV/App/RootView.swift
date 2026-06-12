@@ -1,7 +1,15 @@
 import SwiftUI
 
 struct RootView: View {
+    private enum ProfileMode: String, Identifiable {
+        case settings
+        case account
+
+        var id: String { rawValue }
+    }
+
     @State private var store = SeriesLibraryStore.sample()
+    @State private var profileMode: ProfileMode?
     let accessController: SeriesAccessController
     let startSignInFlow: () -> Void
 
@@ -18,8 +26,18 @@ struct RootView: View {
                                 .foregroundStyle(.secondary)
                         }
                         Spacer()
-                        Button(L10n.string("shell.account"), action: startSignInFlow)
-                            .buttonStyle(.bordered)
+                        Menu {
+                            Button(L10n.string("shell.settings")) {
+                                profileMode = .settings
+                            }
+                            Button(L10n.string("shell.account")) {
+                                profileMode = .account
+                            }
+                        } label: {
+                            Image(systemName: "person.crop.circle")
+                                .font(.system(size: 18, weight: .semibold))
+                        }
+                        .buttonStyle(.bordered)
                     }
                 }
 
@@ -42,6 +60,13 @@ struct RootView: View {
                 }
             }
             .navigationTitle("Series AV")
+        }
+        .sheet(item: $profileMode) { mode in
+            SeriesProfileScreen(
+                mode: mode == .settings ? .settings : .account,
+                accessController: accessController,
+                startSignInFlow: startSignInFlow
+            )
         }
     }
 

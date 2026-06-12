@@ -26,6 +26,9 @@ Current scaffold:
 - Shared Account AV onboarding/sign-in shell wired through the Series AV app
   bootstrap, with the current library screen behind the account gate.
 - Common language/theme controllers and the shared product-app localization set.
+- Visible Account/Profile/Settings shell using the shared Apps AV settings
+  surfaces, with app language first, appearance second, local tracking context,
+  help/legal links, session state, and account safety links.
 - Pro cloud-sync client contract for `/v1/apps/seriesav/data/seriesLibrary`.
 - Unit-test build coverage for library identity, cursor updates, app-data sync
   envelopes, access entitlement resolution, and account session hydration.
@@ -33,8 +36,8 @@ Current scaffold:
 Not implemented yet:
 
 - final Series AV UI redesign;
-- final account/profile/settings surfaces;
 - StoreKit/RevenueCat paywall surfaces;
+- purchase restore and advanced account-management flows beyond shared links;
 - Convex realtime projection;
 - catalog search/enrichment UI;
 - social features.

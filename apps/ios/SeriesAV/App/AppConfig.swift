@@ -32,6 +32,10 @@ enum AppConfig {
         BundleConfig.urlValue(for: "SERIESAV_PRIVACY_URL")
     }
 
+    static var openSourceURL: URL? {
+        BundleConfig.urlValue(for: "SERIESAV_OPEN_SOURCE_URL")
+    }
+
     static var accountDeletionURL: URL? {
         if let url = BundleConfig.urlValue(for: "SERIESAV_DELETE_ACCOUNT_URL") {
             return url

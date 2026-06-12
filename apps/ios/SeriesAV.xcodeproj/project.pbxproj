@@ -23,6 +23,7 @@
 		A058EA5097F7624496E4AEE8 /* AccountAV in Frameworks */ = {isa = PBXBuildFile; productRef = C2992247012F30B5FDE4706E /* AccountAV */; };
 		AAFA14FB0414B5EDE57EBA93 /* SeriesAppExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1957FAE6E3298FDB2C8536F6 /* SeriesAppExperience.swift */; };
 		B5255448167E43828252DB71 /* SeriesAuthOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AF87B75A9721D260B4C3E1 /* SeriesAuthOnboardingView.swift */; };
+		BA243CAA0B49EFED0D7B6F21 /* SeriesProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39E85DD4C7D5EBBF8721E3A /* SeriesProfileScreen.swift */; };
 		BC9DA56281027A4AE6B394B0 /* SeriesAccessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEBE0C665DDB4A48FE198C52 /* SeriesAccessController.swift */; };
 		C2AA86A6CC3043D4021B9B09 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 86CE3F6EAA0958FB417BACCE /* Localizable.strings */; };
 		C6EB3E3CFAD3AF66C9C0471E /* SeriesEntitlementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A586B658AD9682B2BF8C0A92 /* SeriesEntitlementService.swift */; };
@@ -63,6 +64,7 @@
 		A586B658AD9682B2BF8C0A92 /* SeriesEntitlementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesEntitlementService.swift; sourceTree = "<group>"; };
 		A6E1160762AEF2A117BAE4A3 /* SeriesLibraryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLibraryModels.swift; sourceTree = "<group>"; };
 		AE24F5B52463208C5E876228 /* SeriesAVAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVAPIClient.swift; sourceTree = "<group>"; };
+		B39E85DD4C7D5EBBF8721E3A /* SeriesProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesProfileScreen.swift; sourceTree = "<group>"; };
 		B608F239FAA9C18EE697CAC1 /* account-av */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "account-av"; path = "../../../account-av"; sourceTree = SOURCE_ROOT; };
 		C538F408F2AE4DD90050AD7A /* SeriesAVTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SeriesAVTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C57847956F08FF0FD0112E99 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
@@ -102,6 +104,7 @@
 			children = (
 				91AEC5E5F23DCCD2168A34A4 /* Access */,
 				39B82B664B9E3A72818F68F2 /* App */,
+				3C3C51AD32C89EE9A289595D /* Features */,
 				EF181474851C13F86990E6E4 /* Library */,
 				89BD05911C265EE1756328C7 /* Resources */,
 				5E6AF4D5A7DF69351C07AE56 /* Sync */,
@@ -132,6 +135,14 @@
 				E930F20F64D72B22A232919B /* SeriesAVApp.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		3C3C51AD32C89EE9A289595D /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				F3A64473A350215E09C41F7C /* Profile */,
+			);
+			path = Features;
 			sourceTree = "<group>";
 		};
 		5B9097F8C208FDC875876E1E = {
@@ -211,6 +222,14 @@
 				FAB850E07D80A9A593EA3105 /* SeriesLibraryStore.swift */,
 			);
 			path = Library;
+			sourceTree = "<group>";
+		};
+		F3A64473A350215E09C41F7C /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				B39E85DD4C7D5EBBF8721E3A /* SeriesProfileScreen.swift */,
+			);
+			path = Profile;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -344,6 +363,7 @@
 				C6EB3E3CFAD3AF66C9C0471E /* SeriesEntitlementService.swift in Sources */,
 				3E6B8AE873E00FD5A55FDDEF /* SeriesLibraryModels.swift in Sources */,
 				F73DD51BA813EF38FE6083DE /* SeriesLibraryStore.swift in Sources */,
+				BA243CAA0B49EFED0D7B6F21 /* SeriesProfileScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
