@@ -41,6 +41,7 @@
 "home.undo" = "Annuler";
 "home.undo.archived" = "\"%@\" archivee";
 "home.undo.deleted" = "\"%@\" supprimee";
+"home.undo.progress" = "Progression de \"%@\" modifiee";
 "home.queue.title" = "Aussi en cours";
 "home.queue.progress" = "%@ vu, %@ suivant";
 "home.editor.season" = "Saison %d";

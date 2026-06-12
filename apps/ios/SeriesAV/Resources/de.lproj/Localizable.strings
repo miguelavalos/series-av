@@ -41,6 +41,7 @@
 "home.undo" = "Rueckgaengig";
 "home.undo.archived" = "\"%@\" archiviert";
 "home.undo.deleted" = "\"%@\" geloescht";
+"home.undo.progress" = "Fortschritt von \"%@\" geaendert";
 "home.queue.title" = "Auch aktuell";
 "home.queue.progress" = "%@ gesehen, %@ als naechstes";
 "home.editor.season" = "Staffel %d";

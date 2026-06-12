@@ -410,6 +410,15 @@ private struct PendingLibraryUndo: Identifiable, Equatable {
     var id: String { "\(entryId)-\(messageKey)" }
 }
 
+private struct PendingProgressUndo: Identifiable, Equatable {
+    var entryId: String
+    var title: String
+    var status: SeriesLibraryEntryStatus
+    var lastWatchedEpisodeCursor: SeriesEpisodeCursor?
+
+    var id: String { entryId }
+}
+
 private struct SeriesUndoBar: View {
     let title: String
     let undo: () -> Void
@@ -456,6 +465,7 @@ private struct SeriesLibrarySheet: View {
     @State private var query = ""
     @State private var selectedFilter: SeriesLibraryFilter
     @State private var editorEntry: SeriesLibraryEntry?
+    @State private var pendingProgressUndo: PendingProgressUndo?
 
     init(
         store: SeriesLibraryStore,
@@ -506,6 +516,7 @@ private struct SeriesLibrarySheet: View {
                                 }
                             ) {
                                 Button {
+                                    pendingProgressUndo = progressUndo(for: entry)
                                     markNext(entry)
                                 } label: {
                                     Label(
@@ -515,6 +526,7 @@ private struct SeriesLibrarySheet: View {
                                 }
 
                                 Button {
+                                    pendingProgressUndo = progressUndo(for: entry)
                                     markPrevious(entry)
                                 } label: {
                                     Label(L10n.string("home.previous"), systemImage: "arrow.uturn.backward.circle")
@@ -586,10 +598,32 @@ private struct SeriesLibrarySheet: View {
                 SeriesProgressEditorSheet(
                     entry: entry,
                     markWatchedThrough: { cursor in
+                        pendingProgressUndo = progressUndo(for: entry)
                         store.markWatchedThrough(cursor, for: entry.id)
                     }
                 )
                 .presentationDetents([.medium])
+            }
+            .safeAreaInset(edge: .bottom) {
+                if let pendingProgressUndo {
+                    SeriesUndoBar(
+                        title: String(format: L10n.string("home.undo.progress"), pendingProgressUndo.title),
+                        undo: {
+                            store.restoreProgress(
+                                status: pendingProgressUndo.status,
+                                lastWatchedEpisodeCursor: pendingProgressUndo.lastWatchedEpisodeCursor,
+                                for: pendingProgressUndo.entryId
+                            )
+                            self.pendingProgressUndo = nil
+                        },
+                        dismiss: {
+                            self.pendingProgressUndo = nil
+                        }
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(.regularMaterial)
+                }
             }
         }
     }
@@ -657,6 +691,15 @@ private struct SeriesLibrarySheet: View {
 
     private func libraryDetail(for entry: SeriesLibraryEntry) -> String {
         "\(statusTitle(entry.status)) · \(entry.progressLabel)"
+    }
+
+    private func progressUndo(for entry: SeriesLibraryEntry) -> PendingProgressUndo {
+        PendingProgressUndo(
+            entryId: entry.id,
+            title: entry.title,
+            status: entry.status,
+            lastWatchedEpisodeCursor: entry.lastWatchedEpisodeCursor
+        )
     }
 
     private func filterTitle(_ filter: SeriesLibraryFilter) -> String {

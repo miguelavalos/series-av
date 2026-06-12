@@ -41,6 +41,7 @@
 "home.undo" = "Desfer";
 "home.undo.archived" = "\"%@\" arxivada";
 "home.undo.deleted" = "\"%@\" eliminada";
+"home.undo.progress" = "Progres de \"%@\" canviat";
 "home.queue.title" = "Tambe veient";
 "home.queue.progress" = "%@ vist, %@ seguent";
 "home.editor.season" = "Temporada %d";

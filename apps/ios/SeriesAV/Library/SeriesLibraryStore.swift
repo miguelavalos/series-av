@@ -123,6 +123,23 @@ final class SeriesLibraryStore {
         persist()
     }
 
+    func restoreProgress(
+        status: SeriesLibraryEntryStatus,
+        lastWatchedEpisodeCursor: SeriesEpisodeCursor?,
+        for entryId: String,
+        at date: Date = Date()
+    ) {
+        guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
+            return
+        }
+
+        entries[index].status = status
+        entries[index].lastWatchedEpisodeCursor = lastWatchedEpisodeCursor
+        entries[index].updatedAt = date
+        entries[index].lastInteractedAt = date
+        persist()
+    }
+
     func setPinned(_ isPinned: Bool, for entryId: String, at date: Date = Date()) {
         guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
             return

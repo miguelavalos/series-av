@@ -41,6 +41,7 @@
 "home.undo" = "Deshacer";
 "home.undo.archived" = "\"%@\" archivada";
 "home.undo.deleted" = "\"%@\" eliminada";
+"home.undo.progress" = "Progreso de \"%@\" cambiado";
 "home.queue.title" = "Tambien viendo";
 "home.queue.progress" = "%@ visto, %@ siguiente";
 "home.editor.season" = "Temporada %d";
