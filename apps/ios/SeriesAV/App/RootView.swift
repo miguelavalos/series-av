@@ -651,7 +651,7 @@ private struct SeriesLibrarySheet: View {
                                     )
                                 }
 
-                                if entry.lastWatchedEpisodeCursor != nil {
+                                if entry.lastWatchedEpisodeCursor?.canStepBackQuickly == true {
                                     Button {
                                         pendingProgressUndo = progressUndo(for: entry)
                                         pendingLibraryUndo = nil
@@ -1168,7 +1168,7 @@ private struct SeriesCurrentWatchingCard: View {
             )
 
             HStack(spacing: 12) {
-                if entry.lastWatchedEpisodeCursor != nil {
+                if entry.lastWatchedEpisodeCursor?.canStepBackQuickly == true {
                     SeriesEpisodeChip(
                         title: L10n.string("home.previous"),
                         value: previousLabel,

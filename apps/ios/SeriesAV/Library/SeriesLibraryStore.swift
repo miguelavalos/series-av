@@ -126,14 +126,24 @@ final class SeriesLibraryStore {
             return
         }
 
-        guard let previous = entries[index].lastWatchedEpisodeCursor?.previousEpisode else {
-            entries[index].clearProgress(at: date)
+        guard let cursor = entries[index].lastWatchedEpisodeCursor else {
+            return
+        }
+
+        if let previous = cursor.previousEpisode {
+            entries[index].markWatchedThrough(previous, at: date)
             persist()
             return
         }
 
-        entries[index].markWatchedThrough(previous, at: date)
-        persist()
+        guard cursor.canStepBackQuickly else {
+            return
+        }
+
+        if cursor.seasonNumber == 1 && cursor.episodeNumber == 1 {
+            entries[index].clearProgress(at: date)
+            persist()
+        }
     }
 
     func restoreProgress(

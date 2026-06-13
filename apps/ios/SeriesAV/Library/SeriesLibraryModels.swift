@@ -39,6 +39,10 @@ struct SeriesEpisodeCursor: Codable, Equatable, Comparable, Sendable {
         }
         return SeriesEpisodeCursor(seasonNumber: seasonNumber, episodeNumber: episodeNumber - 1)
     }
+
+    var canStepBackQuickly: Bool {
+        episodeNumber > 1 || (seasonNumber == 1 && episodeNumber == 1)
+    }
 }
 
 struct SeriesLibraryEntry: Codable, Identifiable, Equatable, Sendable {
