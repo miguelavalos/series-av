@@ -625,7 +625,7 @@ private struct SeriesLibrarySheet: View {
                                         pendingLibraryUndo = nil
                                         markPrevious(entry)
                                     } label: {
-                                        Label(L10n.string("home.previous"), systemImage: "arrow.uturn.backward.circle")
+                                        Label(previousProgressTitle(for: entry), systemImage: "arrow.uturn.backward.circle")
                                     }
                                 }
 
@@ -849,6 +849,12 @@ private struct SeriesLibrarySheet: View {
     private func quickProgressTitle(for entry: SeriesLibraryEntry) -> String {
         let actionTitle = entry.status == .wantToWatch ? L10n.string("home.start") : L10n.string("home.next")
         return "\(actionTitle) \(cursorLabel(entry.nextEpisodeCursor))"
+    }
+
+    private func previousProgressTitle(for entry: SeriesLibraryEntry) -> String {
+        entry.lastWatchedEpisodeCursor?.previousEpisode == nil
+            ? L10n.string("home.notStarted")
+            : L10n.string("home.previous")
     }
 
     private func progressUndo(
