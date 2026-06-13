@@ -1516,20 +1516,14 @@ private struct SeriesProgressEditorSheet: View {
 
                         SeriesProgressNumberControl(
                             title: L10n.string("home.editor.season.short"),
-                            value: seasonNumber,
-                            decrement: { seasonNumber = max(1, seasonNumber - 1) },
-                            increment: { seasonNumber = min(99, seasonNumber + 1) },
-                            canDecrement: seasonNumber > 1,
-                            canIncrement: seasonNumber < 99
+                            value: $seasonNumber,
+                            range: 1...99
                         )
 
                         SeriesProgressNumberControl(
                             title: L10n.string("home.editor.episode.short"),
-                            value: episodeNumber,
-                            decrement: { episodeNumber = max(1, episodeNumber - 1) },
-                            increment: { episodeNumber = min(999, episodeNumber + 1) },
-                            canDecrement: episodeNumber > 1,
-                            canIncrement: episodeNumber < 999
+                            value: $episodeNumber,
+                            range: 1...999
                         )
                     }
                 } footer: {
@@ -1587,11 +1581,8 @@ private struct SeriesProgressEditorSheet: View {
 
 private struct SeriesProgressNumberControl: View {
     let title: String
-    let value: Int
-    let decrement: () -> Void
-    let increment: () -> Void
-    let canDecrement: Bool
-    let canIncrement: Bool
+    @Binding var value: Int
+    let range: ClosedRange<Int>
 
     var body: some View {
         HStack(spacing: 12) {
@@ -1601,25 +1592,35 @@ private struct SeriesProgressNumberControl: View {
 
             Spacer()
 
-            Button(action: decrement) {
+            Button {
+                value = max(range.lowerBound, value - 1)
+            } label: {
                 Image(systemName: "minus")
                     .frame(width: 30, height: 30)
             }
             .buttonStyle(.bordered)
-            .disabled(!canDecrement)
+            .disabled(value <= range.lowerBound)
             .accessibilityLabel("\(title) -1")
 
-            Text("\(value)")
+            TextField(title, value: $value, format: .number)
                 .font(.headline)
                 .monospacedDigit()
-                .frame(minWidth: 34)
+                .multilineTextAlignment(.center)
+                .keyboardType(.numberPad)
+                .textFieldStyle(.roundedBorder)
+                .frame(width: 72)
+                .onChange(of: value) { _, newValue in
+                    value = min(max(range.lowerBound, newValue), range.upperBound)
+                }
 
-            Button(action: increment) {
+            Button {
+                value = min(range.upperBound, value + 1)
+            } label: {
                 Image(systemName: "plus")
                     .frame(width: 30, height: 30)
             }
             .buttonStyle(.borderedProminent)
-            .disabled(!canIncrement)
+            .disabled(value >= range.upperBound)
             .accessibilityLabel("\(title) +1")
         }
         .padding(12)
