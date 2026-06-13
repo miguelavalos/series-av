@@ -54,7 +54,9 @@
 "home.queue.wantToWatch.title" = "A punt per comencar";
 "home.queue.wantToWatch.progress" = "Comencar per %@";
 "home.editor.season" = "Temporada %d";
+"home.editor.season.short" = "Temporada";
 "home.editor.episode" = "Episodi %d";
+"home.editor.episode.short" = "Episodi";
 "home.editor.footer" = "En fixar aquest punt, els episodis anteriors queden vistos i els posteriors pendents.";
 "home.editor.confirm" = "Fixar punt vist";
 "home.editor.confirmStart" = "Comencar des d'aquest punt";

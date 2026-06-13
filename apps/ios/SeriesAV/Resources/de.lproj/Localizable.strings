@@ -54,7 +54,9 @@
 "home.queue.wantToWatch.title" = "Bereit zum Start";
 "home.queue.wantToWatch.progress" = "Mit %@ starten";
 "home.editor.season" = "Staffel %d";
+"home.editor.season.short" = "Staffel";
 "home.editor.episode" = "Folge %d";
+"home.editor.episode.short" = "Folge";
 "home.editor.footer" = "Wenn du diesen Punkt setzt, gelten fruehere Folgen als gesehen und spaetere als offen.";
 "home.editor.confirm" = "Gesehenen Punkt setzen";
 "home.editor.confirmStart" = "Ab diesem Punkt starten";

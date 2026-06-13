@@ -54,7 +54,9 @@
 "home.queue.wantToWatch.title" = "Pretes a demarrer";
 "home.queue.wantToWatch.progress" = "Demarrer avec %@";
 "home.editor.season" = "Saison %d";
+"home.editor.season.short" = "Saison";
 "home.editor.episode" = "Episode %d";
+"home.editor.episode.short" = "Episode";
 "home.editor.footer" = "Definir ce point marque les episodes precedents comme vus et les suivants en attente.";
 "home.editor.confirm" = "Definir le point vu";
 "home.editor.confirmStart" = "Demarrer depuis ce point";

@@ -1386,12 +1386,42 @@ private struct SeriesProgressEditorSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    Stepper(value: $seasonNumber, in: 1...99) {
-                        Text(String(format: L10n.string("home.editor.season"), seasonNumber))
-                    }
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack(alignment: .lastTextBaseline) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(entry.lastWatchedEpisodeCursor == nil ? L10n.string("home.chooseEpisode") : L10n.string("home.adjust"))
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
 
-                    Stepper(value: $episodeNumber, in: 1...999) {
-                        Text(String(format: L10n.string("home.editor.episode"), episodeNumber))
+                                Text(selectedCursorLabel)
+                                    .font(.system(size: 40, weight: .bold, design: .rounded))
+                                    .monospacedDigit()
+                            }
+
+                            Spacer()
+
+                            Image(systemName: "play.rectangle.on.rectangle")
+                                .font(.title2)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        SeriesProgressNumberControl(
+                            title: L10n.string("home.editor.season.short"),
+                            value: seasonNumber,
+                            decrement: { seasonNumber = max(1, seasonNumber - 1) },
+                            increment: { seasonNumber = min(99, seasonNumber + 1) },
+                            canDecrement: seasonNumber > 1,
+                            canIncrement: seasonNumber < 99
+                        )
+
+                        SeriesProgressNumberControl(
+                            title: L10n.string("home.editor.episode.short"),
+                            value: episodeNumber,
+                            decrement: { episodeNumber = max(1, episodeNumber - 1) },
+                            increment: { episodeNumber = min(999, episodeNumber + 1) },
+                            canDecrement: episodeNumber > 1,
+                            canIncrement: episodeNumber < 999
+                        )
                     }
                 } footer: {
                     Text(L10n.string("home.editor.footer"))
@@ -1431,6 +1461,56 @@ private struct SeriesProgressEditorSheet: View {
 
     private var confirmTitle: String {
         entry.lastWatchedEpisodeCursor == nil ? L10n.string("home.editor.confirmStart") : L10n.string("home.editor.confirm")
+    }
+
+    private var selectedCursorLabel: String {
+        cursorLabel(SeriesEpisodeCursor(seasonNumber: seasonNumber, episodeNumber: episodeNumber))
+    }
+}
+
+private struct SeriesProgressNumberControl: View {
+    let title: String
+    let value: Int
+    let decrement: () -> Void
+    let increment: () -> Void
+    let canDecrement: Bool
+    let canIncrement: Bool
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Text(title)
+                .font(.headline)
+                .monospacedDigit()
+
+            Spacer()
+
+            Button(action: decrement) {
+                Image(systemName: "minus")
+                    .frame(width: 30, height: 30)
+            }
+            .buttonStyle(.bordered)
+            .disabled(!canDecrement)
+            .accessibilityLabel("\(title) -1")
+
+            Text("\(value)")
+                .font(.headline)
+                .monospacedDigit()
+                .frame(minWidth: 34)
+
+            Button(action: increment) {
+                Image(systemName: "plus")
+                    .frame(width: 30, height: 30)
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(!canIncrement)
+            .accessibilityLabel("\(title) +1")
+        }
+        .padding(12)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+        }
     }
 }
 
