@@ -272,6 +272,9 @@ private struct SeriesWatchingHomeScreen: View {
                 markNext: { entry in
                     store.markNextEpisodeWatched(for: entry.id)
                 },
+                markWatchedThrough: { entry, cursor in
+                    store.markWatchedThrough(cursor, for: entry.id)
+                },
                 restore: { entry in
                     store.restore(entry.id)
                 },
@@ -545,6 +548,7 @@ private struct SeriesLibrarySheet: View {
     let setStatus: (SeriesLibraryEntry, SeriesLibraryEntryStatus) -> Void
     let markPrevious: (SeriesLibraryEntry) -> Void
     let markNext: (SeriesLibraryEntry) -> Void
+    let markWatchedThrough: (SeriesLibraryEntry, SeriesEpisodeCursor) -> Void
     let restore: (SeriesLibraryEntry) -> Void
     let delete: (SeriesLibraryEntry) -> Void
 
@@ -561,6 +565,7 @@ private struct SeriesLibrarySheet: View {
         setStatus: @escaping (SeriesLibraryEntry, SeriesLibraryEntryStatus) -> Void,
         markPrevious: @escaping (SeriesLibraryEntry) -> Void,
         markNext: @escaping (SeriesLibraryEntry) -> Void,
+        markWatchedThrough: @escaping (SeriesLibraryEntry, SeriesEpisodeCursor) -> Void,
         restore: @escaping (SeriesLibraryEntry) -> Void,
         delete: @escaping (SeriesLibraryEntry) -> Void
     ) {
@@ -570,6 +575,7 @@ private struct SeriesLibrarySheet: View {
         self.setStatus = setStatus
         self.markPrevious = markPrevious
         self.markNext = markNext
+        self.markWatchedThrough = markWatchedThrough
         self.restore = restore
         self.delete = delete
         _selectedFilter = State(initialValue: initialFilter)
@@ -604,6 +610,7 @@ private struct SeriesLibrarySheet: View {
                             ) {
                                 Button {
                                     pendingProgressUndo = progressUndo(for: entry)
+                                    pendingLibraryUndo = nil
                                     markNext(entry)
                                 } label: {
                                     Label(
@@ -614,6 +621,7 @@ private struct SeriesLibrarySheet: View {
 
                                 Button {
                                     pendingProgressUndo = progressUndo(for: entry)
+                                    pendingLibraryUndo = nil
                                     markPrevious(entry)
                                 } label: {
                                     Label(L10n.string("home.previous"), systemImage: "arrow.uturn.backward.circle")
@@ -622,6 +630,7 @@ private struct SeriesLibrarySheet: View {
 
                                 SeriesStatusButtons(entry: entry) { status in
                                     pendingProgressUndo = progressUndo(for: entry, messageKey: "home.undo.status")
+                                    pendingLibraryUndo = nil
                                     setStatus(entry, status)
                                 }
 
@@ -715,7 +724,8 @@ private struct SeriesLibrarySheet: View {
                     entry: entry,
                     markWatchedThrough: { cursor in
                         pendingProgressUndo = progressUndo(for: entry)
-                        store.markWatchedThrough(cursor, for: entry.id)
+                        pendingLibraryUndo = nil
+                        markWatchedThrough(entry, cursor)
                     }
                 )
                 .presentationDetents([.medium])
