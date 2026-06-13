@@ -90,7 +90,7 @@
 "add.matches.title" = "Ya en tu biblioteca";
 "add.footer.pro" = "Las bibliotecas Pro pueden seguir anadiendo series.";
 "add.footer.remaining" = "Quedan %d espacios activos.";
-"add.footer.hint" = "Las series nuevas empiezan en Quiero ver, listas para empezar desde Home o Library.";
+"add.footer.hint" = "Las series nuevas empiezan en Quiero ver, listas para empezar desde Home.";
 "add.footer.limitReached" = "Tu limite de biblioteca activa esta lleno.";
 "add.footer.upgrade" = "Mejorar a Pro";
 "profile.alert.signOutFailed.title" = "Problema al salir";

@@ -90,7 +90,7 @@
 "add.matches.title" = "Ja a la teva biblioteca";
 "add.footer.pro" = "Les biblioteques Pro poden seguir afegint series.";
 "add.footer.remaining" = "Queden %d espais actius.";
-"add.footer.hint" = "Les series noves comencen a Vull veure, a punt per comencar des de Home o Library.";
+"add.footer.hint" = "Les series noves comencen a Vull veure, a punt per comencar des de Home.";
 "add.footer.limitReached" = "El limit de biblioteca activa esta ple.";
 "add.footer.upgrade" = "Millorar a Pro";
 "profile.alert.signOutFailed.title" = "Problema en sortir";
