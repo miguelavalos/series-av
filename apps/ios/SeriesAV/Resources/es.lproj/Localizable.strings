@@ -87,6 +87,7 @@
 "add.title" = "Anadir serie";
 "add.search.placeholder" = "Titulo de la serie";
 "add.action" = "Anadir a lista";
+"add.action.alreadyAdded" = "Ya anadida";
 "add.matches.title" = "Ya en tu biblioteca";
 "add.footer.pro" = "Las bibliotecas Pro pueden seguir anadiendo series.";
 "add.footer.remaining" = "Quedan %d espacios activos.";

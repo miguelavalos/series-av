@@ -87,6 +87,7 @@
 "add.title" = "Serie hinzufuegen";
 "add.search.placeholder" = "Serientitel";
 "add.action" = "Zur Merkliste hinzufuegen";
+"add.action.alreadyAdded" = "Schon hinzugefuegt";
 "add.matches.title" = "Schon in deiner Bibliothek";
 "add.footer.pro" = "Pro-Bibliotheken koennen weiter Serien hinzufuegen.";
 "add.footer.remaining" = "%d aktive Plaetze uebrig.";

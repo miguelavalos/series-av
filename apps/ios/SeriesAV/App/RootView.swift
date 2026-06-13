@@ -1009,7 +1009,7 @@ private struct SeriesAddSheet: View {
                     Button {
                         addSeries()
                     } label: {
-                        Label(L10n.string("add.action"), systemImage: "plus")
+                        Label(addActionTitle, systemImage: exactMatchingEntry == nil ? "plus" : "checkmark")
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
@@ -1088,8 +1088,24 @@ private struct SeriesAddSheet: View {
         remainingSeriesCount != nil && !canAddSeries
     }
 
+    private var exactMatchingEntry: SeriesLibraryEntry? {
+        let normalizedQuery = SeriesLibraryIdentity.normalizedSearchText(query)
+        guard normalizedQuery.isEmpty == false else {
+            return nil
+        }
+        return store.activeEntries.first {
+            SeriesLibraryIdentity.normalizedSearchText($0.title) == normalizedQuery
+        }
+    }
+
+    private var addActionTitle: String {
+        exactMatchingEntry == nil ? L10n.string("add.action") : L10n.string("add.action.alreadyAdded")
+    }
+
     private var canSubmit: Bool {
-        canAddSeries && query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+        canAddSeries
+            && query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+            && exactMatchingEntry == nil
     }
 
     private var limitText: String {

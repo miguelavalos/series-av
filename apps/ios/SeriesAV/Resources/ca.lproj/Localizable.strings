@@ -87,6 +87,7 @@
 "add.title" = "Afegir serie";
 "add.search.placeholder" = "Titol de la serie";
 "add.action" = "Afegir a la llista";
+"add.action.alreadyAdded" = "Ja afegida";
 "add.matches.title" = "Ja a la teva biblioteca";
 "add.footer.pro" = "Les biblioteques Pro poden seguir afegint series.";
 "add.footer.remaining" = "Queden %d espais actius.";

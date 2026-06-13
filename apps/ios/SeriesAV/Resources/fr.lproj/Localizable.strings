@@ -87,6 +87,7 @@
 "add.title" = "Ajouter une serie";
 "add.search.placeholder" = "Titre de la serie";
 "add.action" = "Ajouter a la liste";
+"add.action.alreadyAdded" = "Deja ajoutee";
 "add.matches.title" = "Deja dans votre bibliotheque";
 "add.footer.pro" = "Les bibliotheques Pro peuvent continuer a ajouter des series.";
 "add.footer.remaining" = "%d emplacements actifs restants.";

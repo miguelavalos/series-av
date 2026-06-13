@@ -87,6 +87,7 @@
 "add.title" = "Add series";
 "add.search.placeholder" = "Series title";
 "add.action" = "Add to watch list";
+"add.action.alreadyAdded" = "Already added";
 "add.matches.title" = "Already in your library";
 "add.footer.pro" = "Pro libraries can keep adding series.";
 "add.footer.remaining" = "%d active slots remaining.";
