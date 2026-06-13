@@ -60,7 +60,7 @@
 "home.editor.footer" = "En fixar aquest punt, els episodis anteriors queden vistos i els posteriors pendents.";
 "home.editor.confirm" = "Fixar punt vist";
 "home.editor.startPrompt" = "Ultim episodi vist";
-"home.editor.confirmFirstPoint" = "Fixar ultim vist";
+"home.editor.confirmFirstPoint" = "Marcar aquest episodi vist";
 "home.editor.confirmStart" = "Comencar des d'aquest punt";
 "home.empty.title" = "Afegeix la primera serie";
 "home.empty.subtitle" = "Tria la serie, fixa l'ultim episodi vist i continua des de Home.";

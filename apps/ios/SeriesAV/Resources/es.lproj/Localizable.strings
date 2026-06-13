@@ -60,7 +60,7 @@
 "home.editor.footer" = "Al fijar este punto, los episodios anteriores quedan vistos y los posteriores pendientes.";
 "home.editor.confirm" = "Fijar punto visto";
 "home.editor.startPrompt" = "Ultimo episodio visto";
-"home.editor.confirmFirstPoint" = "Fijar ultimo visto";
+"home.editor.confirmFirstPoint" = "Marcar este episodio visto";
 "home.editor.confirmStart" = "Empezar desde este punto";
 "home.empty.title" = "Anade tu primera serie";
 "home.empty.subtitle" = "Elige la serie, fija el ultimo episodio visto y sigue desde Home.";

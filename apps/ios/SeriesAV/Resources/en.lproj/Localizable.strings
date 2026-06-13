@@ -60,7 +60,7 @@
 "home.editor.footer" = "Setting this point marks earlier episodes watched and later episodes pending.";
 "home.editor.confirm" = "Set watched point";
 "home.editor.startPrompt" = "Last episode watched";
-"home.editor.confirmFirstPoint" = "Set last watched";
+"home.editor.confirmFirstPoint" = "Mark this episode watched";
 "home.editor.confirmStart" = "Start from this point";
 "home.empty.title" = "Add your first series";
 "home.empty.subtitle" = "Choose the show, set your last watched episode, and keep going from Home.";

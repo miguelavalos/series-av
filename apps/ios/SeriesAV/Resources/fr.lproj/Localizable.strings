@@ -60,7 +60,7 @@
 "home.editor.footer" = "Definir ce point marque les episodes precedents comme vus et les suivants en attente.";
 "home.editor.confirm" = "Definir le point vu";
 "home.editor.startPrompt" = "Dernier episode vu";
-"home.editor.confirmFirstPoint" = "Definir comme dernier vu";
+"home.editor.confirmFirstPoint" = "Marquer cet episode comme vu";
 "home.editor.confirmStart" = "Demarrer depuis ce point";
 "home.empty.title" = "Ajoutez votre premiere serie";
 "home.empty.subtitle" = "Choisissez la serie, fixez le dernier episode vu, puis continuez depuis Home.";

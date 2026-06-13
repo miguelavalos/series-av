@@ -1553,6 +1553,14 @@ private struct SeriesProgressEditorSheet: View {
                             Text(L10n.string("home.notStarted"))
                                 .frame(maxWidth: .infinity)
                         }
+                    } else {
+                        Button {
+                            clearProgress()
+                            dismiss()
+                        } label: {
+                            Text(L10n.string("home.notStarted"))
+                                .frame(maxWidth: .infinity)
+                        }
                     }
                 }
             }
