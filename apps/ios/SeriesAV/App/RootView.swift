@@ -404,7 +404,7 @@ private struct SeriesLibrarySummaryStrip: View {
     let openArchived: () -> Void
 
     var body: some View {
-        VStack(alignment: .trailing, spacing: 8) {
+        ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 SeriesLibrarySummaryItem(
                     title: L10n.string("library.filter.watching"),
@@ -424,16 +424,15 @@ private struct SeriesLibrarySummaryStrip: View {
                     systemImage: "checkmark.circle.fill",
                     action: openWatched
                 )
-            }
 
-            if archivedCount > 0 {
-                Button(action: openArchived) {
-                    Label("\(L10n.string("library.filter.archived")) · \(archivedCount)", systemImage: "archivebox")
-                        .font(.system(size: 12, weight: .semibold))
+                if archivedCount > 0 {
+                    SeriesLibrarySummaryItem(
+                        title: L10n.string("library.filter.archived"),
+                        count: archivedCount,
+                        systemImage: "archivebox",
+                        action: openArchived
+                    )
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-                .accessibilityLabel("\(L10n.string("library.filter.archived")): \(archivedCount)")
             }
         }
     }
@@ -451,34 +450,31 @@ private struct SeriesLibrarySummaryItem: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 7) {
+            HStack(spacing: 5) {
                 Image(systemName: systemImage)
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.system(size: 11, weight: .bold))
                     .foregroundStyle(.secondary)
 
-                VStack(alignment: .leading, spacing: 1) {
-                    Text("\(count)")
-                        .font(.system(size: 18, weight: .black, design: .rounded))
-                        .foregroundStyle(.primary)
-                        .monospacedDigit()
-                    Text(title)
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.72)
-                }
+                Text("\(count)")
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .foregroundStyle(.primary)
+                    .monospacedDigit()
 
-                Spacer(minLength: 0)
+                Text(title)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+
             }
-            .frame(maxWidth: .infinity, minHeight: 50)
-            .padding(.horizontal, 10)
+            .frame(minHeight: 30)
+            .padding(.horizontal, 9)
         }
         .buttonStyle(.plain)
         .disabled(!isEnabled)
         .opacity(isEnabled ? 1 : 0.46)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .background(Color(.secondarySystemGroupedBackground).opacity(0.72), in: Capsule())
         .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
+            Capsule()
                 .stroke(Color.primary.opacity(0.06), lineWidth: 1)
         }
         .accessibilityLabel("\(title): \(count)")
