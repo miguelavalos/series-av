@@ -62,8 +62,8 @@
 "home.editor.startPrompt" = "Last episode watched";
 "home.editor.confirmFirstPoint" = "Set last watched";
 "home.editor.confirmStart" = "Start from this point";
-"home.empty.title" = "No series in progress";
-"home.empty.subtitle" = "Add a series and it will become the focus here.";
+"home.empty.title" = "Add your first series";
+"home.empty.subtitle" = "Choose the show, set your last watched episode, and keep going from Home.";
 "home.add" = "Add series";
 "library.title" = "Library";
 "library.active.title" = "Active";

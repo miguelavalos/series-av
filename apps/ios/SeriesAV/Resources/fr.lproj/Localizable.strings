@@ -62,8 +62,8 @@
 "home.editor.startPrompt" = "Dernier episode vu";
 "home.editor.confirmFirstPoint" = "Definir comme dernier vu";
 "home.editor.confirmStart" = "Demarrer depuis ce point";
-"home.empty.title" = "Aucune serie en cours";
-"home.empty.subtitle" = "Ajoutez une serie et elle deviendra le focus ici.";
+"home.empty.title" = "Ajoutez votre premiere serie";
+"home.empty.subtitle" = "Choisissez la serie, fixez le dernier episode vu, puis continuez depuis Home.";
 "home.add" = "Ajouter une serie";
 "library.title" = "Bibliotheque";
 "library.active.title" = "Actives";

@@ -62,8 +62,8 @@
 "home.editor.startPrompt" = "Ultim episodi vist";
 "home.editor.confirmFirstPoint" = "Fixar ultim vist";
 "home.editor.confirmStart" = "Comencar des d'aquest punt";
-"home.empty.title" = "No hi ha series en progres";
-"home.empty.subtitle" = "Afegeix una serie i sera el focus aqui.";
+"home.empty.title" = "Afegeix la primera serie";
+"home.empty.subtitle" = "Tria la serie, fixa l'ultim episodi vist i continua des de Home.";
 "home.add" = "Afegir serie";
 "library.title" = "Biblioteca";
 "library.active.title" = "Actives";

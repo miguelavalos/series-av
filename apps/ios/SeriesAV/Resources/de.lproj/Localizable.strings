@@ -62,8 +62,8 @@
 "home.editor.startPrompt" = "Zuletzt gesehene Folge";
 "home.editor.confirmFirstPoint" = "Als zuletzt gesehen setzen";
 "home.editor.confirmStart" = "Ab diesem Punkt starten";
-"home.empty.title" = "Keine Serie in Arbeit";
-"home.empty.subtitle" = "Fuege eine Serie hinzu, dann wird sie hier zum Fokus.";
+"home.empty.title" = "Erste Serie hinzufuegen";
+"home.empty.subtitle" = "Waehle die Serie, setze die zuletzt gesehene Folge und mache von Home aus weiter.";
 "home.add" = "Serie hinzufuegen";
 "library.title" = "Bibliothek";
 "library.active.title" = "Aktiv";
