@@ -93,6 +93,7 @@
 "add.footer.remaining" = "%d active slots remaining.";
 "add.footer.hint" = "New series start in To watch, ready to begin from Home.";
 "add.footer.limitReached" = "Your active library limit is full.";
+"add.footer.connectAccount" = "Connect account";
 "add.footer.upgrade" = "Upgrade to Pro";
 "profile.alert.signOutFailed.title" = "Sign-out problem";
 "profile.settingsScreen.title" = "Settings";

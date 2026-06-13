@@ -78,6 +78,7 @@ private struct SeriesWatchingHomeScreen: View {
     @State private var isShowingLibrarySheet = false
     @State private var isShowingProPaywall = false
     @State private var pendingProPaywallAfterAddDismiss = false
+    @State private var pendingSignInAfterAddDismiss = false
     @State private var pendingProgressEditorAfterAddEntryId: String?
     @State private var initialLibraryFilter: SeriesLibraryFilter = .all
     @State private var pendingUndo: PendingLibraryUndo?
@@ -251,10 +252,15 @@ private struct SeriesWatchingHomeScreen: View {
             SeriesAddSheet(
                 store: store,
                 canAddSeries: canAddSeries,
-                isProAccess: accessController.accessMode == .signedInPro,
+                accessMode: accessController.accessMode,
+                accountIsAvailable: accessController.accountIsAvailable,
                 remainingSeriesCount: remainingSeriesCount,
                 openProPaywall: {
                     pendingProPaywallAfterAddDismiss = true
+                    isShowingAddSheet = false
+                },
+                startSignInFlow: {
+                    pendingSignInAfterAddDismiss = true
                     isShowingAddSheet = false
                 },
                 didAddSeries: { entry in
@@ -308,6 +314,12 @@ private struct SeriesWatchingHomeScreen: View {
             if pendingProPaywallAfterAddDismiss {
                 pendingProPaywallAfterAddDismiss = false
                 isShowingProPaywall = true
+                return
+            }
+
+            if pendingSignInAfterAddDismiss {
+                pendingSignInAfterAddDismiss = false
+                startSignInFlow()
                 return
             }
 
@@ -987,9 +999,11 @@ private struct SeriesAddSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Bindable var store: SeriesLibraryStore
     let canAddSeries: Bool
-    let isProAccess: Bool
+    let accessMode: SeriesAccessMode
+    let accountIsAvailable: Bool
     let remainingSeriesCount: Int?
     let openProPaywall: () -> Void
+    let startSignInFlow: () -> Void
     let didAddSeries: (SeriesLibraryEntry) -> Void
 
     @State private var query = ""
@@ -1037,12 +1051,13 @@ private struct SeriesAddSheet: View {
 
                         if shouldShowUpgradeAction {
                             Button {
-                                openProPaywall()
+                                runLimitAction()
                             } label: {
-                                Label(L10n.string("add.footer.upgrade"), systemImage: "sparkles")
+                                Label(limitActionTitle, systemImage: limitActionSystemImage)
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
+                            .disabled(accessMode == .guest && !accountIsAvailable)
                         }
                     }
 
@@ -1098,7 +1113,22 @@ private struct SeriesAddSheet: View {
     }
 
     private var shouldShowUpgradeAction: Bool {
-        remainingSeriesCount != nil && !canAddSeries && !isProAccess
+        remainingSeriesCount != nil && !canAddSeries && accessMode != .signedInPro
+    }
+
+    private var limitActionTitle: String {
+        switch accessMode {
+        case .guest:
+            accountIsAvailable ? L10n.string("add.footer.connectAccount") : L10n.string("profile.account.connectUnavailable")
+        case .signedInFree:
+            L10n.string("add.footer.upgrade")
+        case .signedInPro:
+            L10n.string("add.footer.upgrade")
+        }
+    }
+
+    private var limitActionSystemImage: String {
+        accessMode == .guest ? "person.crop.circle.badge.plus" : "sparkles"
     }
 
     private var exactMatchingEntry: SeriesLibraryEntry? {
@@ -1122,7 +1152,7 @@ private struct SeriesAddSheet: View {
     }
 
     private var limitText: String {
-        if isProAccess && canAddSeries {
+        if accessMode == .signedInPro && canAddSeries {
             return "\(L10n.string("add.footer.pro"))\n\(L10n.string("add.footer.hint"))"
         }
         guard let remainingSeriesCount else {
@@ -1150,6 +1180,17 @@ private struct SeriesAddSheet: View {
         }
         didAddSeries(entry)
         dismiss()
+    }
+
+    private func runLimitAction() {
+        switch accessMode {
+        case .guest:
+            startSignInFlow()
+        case .signedInFree:
+            openProPaywall()
+        case .signedInPro:
+            break
+        }
     }
 }
 

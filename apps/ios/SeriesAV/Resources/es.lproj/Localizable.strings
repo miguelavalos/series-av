@@ -93,6 +93,7 @@
 "add.footer.remaining" = "Quedan %d espacios activos.";
 "add.footer.hint" = "Las series nuevas empiezan en Por ver, listas para empezar desde Home.";
 "add.footer.limitReached" = "Tu limite de biblioteca activa esta lleno.";
+"add.footer.connectAccount" = "Conectar cuenta";
 "add.footer.upgrade" = "Mejorar a Pro";
 "profile.alert.signOutFailed.title" = "Problema al salir";
 "profile.settingsScreen.title" = "Ajustes";

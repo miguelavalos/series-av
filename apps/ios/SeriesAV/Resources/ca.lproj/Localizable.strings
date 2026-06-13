@@ -93,6 +93,7 @@
 "add.footer.remaining" = "Queden %d espais actius.";
 "add.footer.hint" = "Les series noves comencen a Per veure, a punt per comencar des de Home.";
 "add.footer.limitReached" = "El limit de biblioteca activa esta ple.";
+"add.footer.connectAccount" = "Connectar compte";
 "add.footer.upgrade" = "Millorar a Pro";
 "profile.alert.signOutFailed.title" = "Problema en sortir";
 "profile.settingsScreen.title" = "Ajustos";
