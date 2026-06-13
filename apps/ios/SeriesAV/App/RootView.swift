@@ -619,7 +619,7 @@ private struct SeriesLibrarySheet: View {
                                     )
                                 }
 
-                                if entry.lastWatchedEpisodeCursor?.previousEpisode != nil {
+                                if entry.lastWatchedEpisodeCursor != nil {
                                     Button {
                                         pendingProgressUndo = progressUndo(for: entry)
                                         pendingLibraryUndo = nil
