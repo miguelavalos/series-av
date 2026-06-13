@@ -88,24 +88,6 @@ private struct SeriesWatchingHomeScreen: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 18) {
                 accountBar
-                SeriesLibrarySummaryStrip(
-                    watchingCount: countActiveEntries(with: .watching),
-                    wantToWatchCount: countActiveEntries(with: .wantToWatch),
-                    watchedCount: countActiveEntries(with: .watched),
-                    archivedCount: store.archivedEntries.count,
-                    openWatching: {
-                        openLibrary(filter: .watching)
-                    },
-                    openWantToWatch: {
-                        openLibrary(filter: .wantToWatch)
-                    },
-                    openWatched: {
-                        openLibrary(filter: .watched)
-                    },
-                    openArchived: {
-                        openLibrary(filter: .archived)
-                    }
-                )
 
                 if let currentEntry {
                     SeriesCurrentWatchingCard(
@@ -145,6 +127,25 @@ private struct SeriesWatchingHomeScreen: View {
                 } else {
                     SeriesEmptyWatchingView()
                 }
+
+                SeriesLibrarySummaryStrip(
+                    watchingCount: countActiveEntries(with: .watching),
+                    wantToWatchCount: countActiveEntries(with: .wantToWatch),
+                    watchedCount: countActiveEntries(with: .watched),
+                    archivedCount: store.archivedEntries.count,
+                    openWatching: {
+                        openLibrary(filter: .watching)
+                    },
+                    openWantToWatch: {
+                        openLibrary(filter: .wantToWatch)
+                    },
+                    openWatched: {
+                        openLibrary(filter: .watched)
+                    },
+                    openArchived: {
+                        openLibrary(filter: .archived)
+                    }
+                )
 
                 if secondaryEntries.isEmpty == false {
                     SeriesWatchingQueueSection(
@@ -1068,37 +1069,10 @@ private struct SeriesCurrentWatchingCard: View {
     let delete: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            HStack(alignment: .top, spacing: 14) {
-                SeriesPosterMark(seed: entry.fallbackVisualSeed ?? entry.title, size: 94)
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(currentTitle)
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(.secondary)
-                        .textCase(.uppercase)
-
-                    Text(entry.title)
-                        .font(.system(size: 30, weight: .bold, design: .rounded))
-                        .foregroundStyle(.primary)
-                        .lineLimit(3)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Text(currentProgress)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.top, 3)
-
-                Spacer(minLength: 0)
-
-                SeriesEntryActionsMenu(
-                    entry: entry,
-                    togglePinned: togglePinned,
-                    setStatus: setStatus,
-                    archive: archive,
-                    delete: delete
-                )
+        VStack(alignment: .leading, spacing: 22) {
+            ViewThatFits(in: .horizontal) {
+                horizontalHeader
+                verticalHeader
             }
 
             SeriesPrimaryContinueButton(
@@ -1125,12 +1099,64 @@ private struct SeriesCurrentWatchingCard: View {
                 .controlSize(.large)
             }
         }
-        .padding(20)
+        .padding(22)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .stroke(Color.primary.opacity(0.08), lineWidth: 1)
         }
+    }
+
+    private var horizontalHeader: some View {
+        HStack(alignment: .top, spacing: 16) {
+            SeriesPosterMark(seed: entry.fallbackVisualSeed ?? entry.title, size: 118)
+            titleBlock
+                .padding(.top, 3)
+            Spacer(minLength: 0)
+            actionsMenu
+        }
+    }
+
+    private var verticalHeader: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top) {
+                SeriesPosterMark(seed: entry.fallbackVisualSeed ?? entry.title, size: 96)
+                Spacer(minLength: 0)
+                actionsMenu
+            }
+
+            titleBlock
+        }
+    }
+
+    private var titleBlock: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(currentTitle)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+
+            Text(entry.title)
+                .font(.system(size: 36, weight: .bold, design: .rounded))
+                .foregroundStyle(.primary)
+                .lineLimit(3)
+                .minimumScaleFactor(0.78)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(currentProgress)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var actionsMenu: some View {
+        SeriesEntryActionsMenu(
+            entry: entry,
+            togglePinned: togglePinned,
+            setStatus: setStatus,
+            archive: archive,
+            delete: delete
+        )
     }
 
     private var currentTitle: String {
@@ -1184,8 +1210,8 @@ private struct SeriesPrimaryContinueButton: View {
 
                 Spacer()
             }
-            .frame(maxWidth: .infinity, minHeight: 86)
-            .padding(.horizontal, 18)
+            .frame(maxWidth: .infinity, minHeight: 104)
+            .padding(.horizontal, 20)
         }
         .buttonStyle(.borderedProminent)
         .controlSize(.large)
