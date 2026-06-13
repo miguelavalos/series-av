@@ -43,7 +43,7 @@
 "home.archive" = "Archivieren";
 "home.delete" = "Loeschen";
 "home.undo" = "Rueckgaengig";
-"home.undo.added" = "\"%@\" zu Ansehen hinzugefuegt";
+"home.undo.added" = "\"%@\" hinzugefuegt";
 "home.undo.archived" = "\"%@\" archiviert";
 "home.undo.deleted" = "\"%@\" geloescht";
 "home.undo.progress" = "Fortschritt von \"%@\" geaendert";

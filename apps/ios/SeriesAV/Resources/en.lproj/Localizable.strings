@@ -43,7 +43,7 @@
 "home.archive" = "Archive";
 "home.delete" = "Delete";
 "home.undo" = "Undo";
-"home.undo.added" = "\"%@\" added to Want";
+"home.undo.added" = "\"%@\" added";
 "home.undo.archived" = "\"%@\" archived";
 "home.undo.deleted" = "\"%@\" deleted";
 "home.undo.progress" = "\"%@\" progress changed";
