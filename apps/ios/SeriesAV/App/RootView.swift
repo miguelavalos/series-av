@@ -1228,14 +1228,15 @@ private struct SeriesWatchingQueueSection: View {
     let delete: (SeriesLibraryEntry) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             Text(queueTitle)
                 .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(.secondary)
 
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
                 ForEach(entries) { entry in
                     HStack(spacing: 12) {
-                        SeriesPosterMark(seed: entry.fallbackVisualSeed ?? entry.title, size: 46)
+                        SeriesPosterMark(seed: entry.fallbackVisualSeed ?? entry.title, size: 40)
 
                         VStack(alignment: .leading, spacing: 3) {
                             Text(entry.title)
@@ -1250,21 +1251,12 @@ private struct SeriesWatchingQueueSection: View {
                         Spacer()
 
                         Button {
-                            togglePinned(entry)
-                        } label: {
-                            Image(systemName: "pin")
-                                .frame(width: 34, height: 34)
-                        }
-                        .buttonStyle(.bordered)
-                        .accessibilityLabel(L10n.string("home.pin"))
-
-                        Button {
                             markNext(entry)
                         } label: {
                             Image(systemName: "checkmark")
-                                .frame(width: 34, height: 34)
+                                .frame(width: 32, height: 32)
                         }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(.bordered)
                         .accessibilityLabel(primaryActionTitle(for: entry))
 
                         SeriesEntryActionsMenu(
@@ -1276,8 +1268,9 @@ private struct SeriesWatchingQueueSection: View {
                             delete: { delete(entry) }
                         )
                     }
-                    .padding(12)
+                    .padding(10)
                     .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .opacity(0.92)
                 }
             }
         }
