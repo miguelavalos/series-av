@@ -78,6 +78,7 @@ private struct SeriesWatchingHomeScreen: View {
     @State private var isShowingLibrarySheet = false
     @State private var isShowingProPaywall = false
     @State private var pendingProPaywallAfterAddDismiss = false
+    @State private var pendingProgressEditorAfterAddEntryId: String?
     @State private var initialLibraryFilter: SeriesLibraryFilter = .all
     @State private var pendingUndo: PendingLibraryUndo?
     @State private var pendingProgressUndo: PendingProgressUndo?
@@ -257,6 +258,7 @@ private struct SeriesWatchingHomeScreen: View {
                 },
                 didAddSeries: { entry in
                     pendingProgressUndo = nil
+                    pendingProgressEditorAfterAddEntryId = entry.id
                     pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.added")
                 }
             )
@@ -300,9 +302,19 @@ private struct SeriesWatchingHomeScreen: View {
             )
         }
         .onChange(of: isShowingAddSheet) { _, isShowing in
-            guard !isShowing, pendingProPaywallAfterAddDismiss else { return }
-            pendingProPaywallAfterAddDismiss = false
-            isShowingProPaywall = true
+            guard !isShowing else { return }
+
+            if pendingProPaywallAfterAddDismiss {
+                pendingProPaywallAfterAddDismiss = false
+                isShowingProPaywall = true
+                return
+            }
+
+            if let entryId = pendingProgressEditorAfterAddEntryId {
+                pendingProgressEditorAfterAddEntryId = nil
+                guard let entry = store.entries.first(where: { $0.id == entryId }) else { return }
+                editorEntry = entry
+            }
         }
     }
 
