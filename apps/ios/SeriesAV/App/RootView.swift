@@ -1468,7 +1468,7 @@ private struct SeriesProgressEditorSheet: View {
                     VStack(alignment: .leading, spacing: 16) {
                         HStack(alignment: .lastTextBaseline) {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text(entry.lastWatchedEpisodeCursor == nil ? L10n.string("home.chooseEpisode") : L10n.string("home.adjust"))
+                                Text(entry.lastWatchedEpisodeCursor == nil ? L10n.string("home.editor.startPrompt") : L10n.string("home.adjust"))
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
 
@@ -1539,7 +1539,7 @@ private struct SeriesProgressEditorSheet: View {
     }
 
     private var confirmTitle: String {
-        entry.lastWatchedEpisodeCursor == nil ? L10n.string("home.editor.confirmStart") : L10n.string("home.editor.confirm")
+        entry.lastWatchedEpisodeCursor == nil ? L10n.string("home.editor.confirmFirstPoint") : L10n.string("home.editor.confirm")
     }
 
     private var selectedCursorLabel: String {

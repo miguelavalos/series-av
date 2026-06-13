@@ -59,6 +59,8 @@
 "home.editor.episode.short" = "Folge";
 "home.editor.footer" = "Wenn du diesen Punkt setzt, gelten fruehere Folgen als gesehen und spaetere als offen.";
 "home.editor.confirm" = "Gesehenen Punkt setzen";
+"home.editor.startPrompt" = "Zuletzt gesehene Folge";
+"home.editor.confirmFirstPoint" = "Als zuletzt gesehen setzen";
 "home.editor.confirmStart" = "Ab diesem Punkt starten";
 "home.empty.title" = "Keine Serie in Arbeit";
 "home.empty.subtitle" = "Fuege eine Serie hinzu, dann wird sie hier zum Fokus.";

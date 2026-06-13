@@ -59,6 +59,8 @@
 "home.editor.episode.short" = "Episodi";
 "home.editor.footer" = "En fixar aquest punt, els episodis anteriors queden vistos i els posteriors pendents.";
 "home.editor.confirm" = "Fixar punt vist";
+"home.editor.startPrompt" = "Ultim episodi vist";
+"home.editor.confirmFirstPoint" = "Fixar ultim vist";
 "home.editor.confirmStart" = "Comencar des d'aquest punt";
 "home.empty.title" = "No hi ha series en progres";
 "home.empty.subtitle" = "Afegeix una serie i sera el focus aqui.";
