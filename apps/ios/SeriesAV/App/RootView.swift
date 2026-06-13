@@ -971,21 +971,44 @@ private struct SeriesAddSheet: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    TextField(L10n.string("add.search.placeholder"), text: $query)
-                        .textInputAutocapitalization(.words)
-                        .submitLabel(.done)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        TextField(L10n.string("add.search.placeholder"), text: $query)
+                            .font(.system(size: 24, weight: .bold))
+                            .textFieldStyle(.plain)
+                            .textInputAutocapitalization(.words)
+                            .submitLabel(.done)
+                            .onSubmit {
+                                addSeries()
+                            }
+
+                        Rectangle()
+                            .fill(Color.primary.opacity(0.12))
+                            .frame(height: 1)
+                    }
+                    .padding(18)
+                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+                    }
 
                     Button {
                         addSeries()
                     } label: {
                         Label(L10n.string("add.action"), systemImage: "plus")
+                            .frame(maxWidth: .infinity)
                     }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
                     .disabled(!canSubmit)
-                } footer: {
-                    VStack(alignment: .leading, spacing: 8) {
+
+                    VStack(alignment: .leading, spacing: 10) {
                         Text(limitText)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
 
                         if shouldShowUpgradeAction {
                             Button {
@@ -993,28 +1016,46 @@ private struct SeriesAddSheet: View {
                             } label: {
                                 Label(L10n.string("add.footer.upgrade"), systemImage: "sparkles")
                             }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
                         }
                     }
-                }
 
-                if matchingEntries.isEmpty == false {
-                    Section(L10n.string("add.matches.title")) {
-                        ForEach(matchingEntries) { entry in
-                            HStack(spacing: 12) {
-                                SeriesPosterMark(seed: entry.fallbackVisualSeed ?? entry.title, size: 34)
-                                VStack(alignment: .leading, spacing: 3) {
-                                    Text(entry.title)
-                                        .font(.system(size: 15, weight: .semibold))
-                                    Text(matchDetail(for: entry))
-                                        .font(.system(size: 12, weight: .medium))
-                                        .foregroundStyle(.secondary)
+                    if matchingEntries.isEmpty == false {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text(L10n.string("add.matches.title"))
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundStyle(.secondary)
+
+                            VStack(spacing: 0) {
+                                ForEach(matchingEntries) { entry in
+                                    HStack(spacing: 12) {
+                                        SeriesPosterMark(seed: entry.fallbackVisualSeed ?? entry.title, size: 34)
+                                        VStack(alignment: .leading, spacing: 3) {
+                                            Text(entry.title)
+                                                .font(.system(size: 15, weight: .semibold))
+                                            Text(matchDetail(for: entry))
+                                                .font(.system(size: 12, weight: .medium))
+                                                .foregroundStyle(.secondary)
+                                        }
+                                        Spacer(minLength: 0)
+                                    }
+                                    .padding(.vertical, 8)
+
+                                    if entry.id != matchingEntries.last?.id {
+                                        Divider()
+                                    }
                                 }
                             }
-                            .padding(.vertical, 4)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 6)
+                            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                         }
                     }
                 }
+                .padding(20)
             }
+            .background(Color(.systemGroupedBackground))
             .navigationTitle(L10n.string("add.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
