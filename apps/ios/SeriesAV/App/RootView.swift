@@ -513,7 +513,8 @@ private struct PendingLibraryUndo: Identifiable, Equatable {
 }
 
 private enum PendingLibraryMutationUndoAction: Equatable {
-    case restore
+    case restoreActive
+    case restoreArchived
     case archive
 }
 
@@ -671,7 +672,7 @@ private struct SeriesLibrarySheet: View {
                                         entryId: entry.id,
                                         title: entry.title,
                                         messageKey: "home.undo.archived",
-                                        action: .restore
+                                        action: .restoreActive
                                     )
                                     pendingProgressUndo = nil
                                     archive(entry)
@@ -684,7 +685,7 @@ private struct SeriesLibrarySheet: View {
                                         entryId: entry.id,
                                         title: entry.title,
                                         messageKey: "home.undo.deleted",
-                                        action: .restore
+                                        action: .restoreActive
                                     )
                                     pendingProgressUndo = nil
                                     delete(entry)
@@ -722,7 +723,7 @@ private struct SeriesLibrarySheet: View {
                                         entryId: entry.id,
                                         title: entry.title,
                                         messageKey: "home.undo.deleted",
-                                        action: .restore
+                                        action: .restoreArchived
                                     )
                                     pendingProgressUndo = nil
                                     delete(entry)
@@ -807,8 +808,11 @@ private struct SeriesLibrarySheet: View {
 
     private func applyLibraryUndo(_ undo: PendingLibraryMutationUndo) {
         switch undo.action {
-        case .restore:
+        case .restoreActive:
             store.restore(undo.entryId)
+        case .restoreArchived:
+            store.restore(undo.entryId)
+            store.archive(undo.entryId)
         case .archive:
             store.archive(undo.entryId)
         }
