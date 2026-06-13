@@ -21,7 +21,6 @@ struct RootView: View {
                 accessSubtitle: accessSubtitle,
                 activeSeriesLimit: accessController.limits.activeLibrarySeries,
                 accessController: accessController,
-                openSettings: { profileMode = .settings },
                 openAccount: { profileMode = .account },
                 startSignInFlow: startSignInFlow
             )
@@ -71,7 +70,6 @@ private struct SeriesWatchingHomeScreen: View {
     let accessSubtitle: String
     let activeSeriesLimit: Int?
     let accessController: SeriesAccessController
-    let openSettings: () -> Void
     let openAccount: () -> Void
     let startSignInFlow: () -> Void
 
@@ -354,17 +352,24 @@ private struct SeriesWatchingHomeScreen: View {
 
     private var accountBar: some View {
         HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 7) {
+                Image(systemName: accountStatusImage)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(.secondary)
+
                 Text(accessTitle)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.primary)
-                if accessSubtitle.isEmpty == false {
-                    Text(accessSubtitle)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
             }
+            .frame(minHeight: 30)
+            .padding(.horizontal, 10)
+            .background(Color(.secondarySystemGroupedBackground).opacity(0.72), in: Capsule())
+            .overlay {
+                Capsule()
+                    .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(accountAccessibilityLabel)
 
             Spacer()
 
@@ -377,13 +382,6 @@ private struct SeriesWatchingHomeScreen: View {
             .buttonStyle(.bordered)
             .accessibilityLabel(L10n.string("library.title"))
 
-            Button(action: openSettings) {
-                Image(systemName: "gearshape")
-                    .frame(width: 34, height: 34)
-            }
-            .buttonStyle(.bordered)
-            .accessibilityLabel(L10n.string("shell.settings"))
-
             Button(action: openAccount) {
                 Image(systemName: "person.crop.circle")
                     .frame(width: 34, height: 34)
@@ -392,6 +390,17 @@ private struct SeriesWatchingHomeScreen: View {
             .accessibilityLabel(L10n.string("shell.account"))
         }
         .padding(.horizontal, 2)
+    }
+
+    private var accountStatusImage: String {
+        accessController.accessMode == .signedInPro ? "sparkles" : "person.crop.circle"
+    }
+
+    private var accountAccessibilityLabel: String {
+        if accessSubtitle.isEmpty {
+            return accessTitle
+        }
+        return "\(accessTitle), \(accessSubtitle)"
     }
 }
 

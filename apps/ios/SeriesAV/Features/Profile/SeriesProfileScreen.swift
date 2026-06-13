@@ -94,6 +94,10 @@ struct SeriesProfileScreen: View {
         if accessController.isSignedIn {
             accountSafetyCard
         }
+        appPreferencesCard
+        seriesPreferencesCard
+        onThisDeviceCard
+        helpAndLegalCard
     }
 
     private var appPreferencesCard: some View {
