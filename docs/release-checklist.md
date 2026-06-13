@@ -119,6 +119,20 @@ Because the iOS project currently has no native test targets, complete and sign 
 The first iOS release ships with the Tune AV-style Pro paywall, RevenueCat
 purchase/restore handling, and App Store subscription management.
 
+Current external setup snapshot, 2026-06-13:
+
+- App Store Connect app `6766831320` has subscription group `Series AV Pro`
+  (`22155014`) and monthly product `seriesav_pro_monthly`
+  (`6779974260`) configured at USD 2.99 base price, all current countries and
+  regions, and future country/region availability enabled.
+- App Store Connect still reports the subscription as missing metadata until the
+  required review screenshot is uploaded and the first subscription is submitted
+  with the app version.
+- RevenueCat app `app0468cf478e` has product `seriesav_pro_monthly` attached to
+  entitlement `pro` and included in offering `default`, package `$rc_monthly`.
+- Production `ios:preflight`, iOS simulator build, and private production
+  subscription-readiness checks passed after the setup.
+
 1. Confirm the private Series AV subscription readiness checker passes for both
    preview and production before any App Store/TestFlight submission:
 
