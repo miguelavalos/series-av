@@ -619,14 +619,15 @@ private struct SeriesLibrarySheet: View {
                                     )
                                 }
 
-                                Button {
-                                    pendingProgressUndo = progressUndo(for: entry)
-                                    pendingLibraryUndo = nil
-                                    markPrevious(entry)
-                                } label: {
-                                    Label(L10n.string("home.previous"), systemImage: "arrow.uturn.backward.circle")
+                                if entry.lastWatchedEpisodeCursor?.previousEpisode != nil {
+                                    Button {
+                                        pendingProgressUndo = progressUndo(for: entry)
+                                        pendingLibraryUndo = nil
+                                        markPrevious(entry)
+                                    } label: {
+                                        Label(L10n.string("home.previous"), systemImage: "arrow.uturn.backward.circle")
+                                    }
                                 }
-                                .disabled(entry.lastWatchedEpisodeCursor?.previousEpisode == nil)
 
                                 SeriesStatusButtons(entry: entry) { status in
                                     pendingProgressUndo = progressUndo(for: entry, messageKey: "home.undo.status")
@@ -1300,12 +1301,13 @@ private struct SeriesStatusButtons: View {
 
     var body: some View {
         ForEach(SeriesLibraryEntryStatus.allCases, id: \.self) { status in
-            Button {
-                setStatus(status)
-            } label: {
-                Label(statusTitle(status), systemImage: statusIcon(status, isSelected: entry.status == status))
+            if status != entry.status {
+                Button {
+                    setStatus(status)
+                } label: {
+                    Label(statusTitle(status), systemImage: statusIcon(status, isSelected: false))
+                }
             }
-            .disabled(entry.status == status)
         }
     }
 }
