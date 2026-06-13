@@ -196,7 +196,7 @@ final class SeriesAccessController {
         }
 
         do {
-            subscriptionOffer = try await subscriptionPurchasing.loadMonthlyOffer(for: accountUser)
+            subscriptionOffer = try await subscriptionPurchasing.loadMonthlyOffer(for: subscriptionAccountUser)
             subscriptionError = nil
         } catch let error as SeriesSubscriptionPurchaseError {
             subscriptionError = error
@@ -207,13 +207,13 @@ final class SeriesAccessController {
 
     func purchaseMonthlyPro() async {
         await runSubscriptionOperation(source: .purchase) {
-            try await subscriptionPurchasing.purchaseMonthlyPro(for: accountUser)
+            try await subscriptionPurchasing.purchaseMonthlyPro(for: subscriptionAccountUser)
         }
     }
 
     func restorePurchases() async {
         await runSubscriptionOperation(source: .restore) {
-            try await subscriptionPurchasing.restorePurchases(for: accountUser)
+            try await subscriptionPurchasing.restorePurchases(for: subscriptionAccountUser)
         }
     }
 
@@ -333,6 +333,16 @@ final class SeriesAccessController {
 
     private func clearLastKnownAccountUser() {
         userDefaults.removeObject(forKey: lastKnownAccountUserKey)
+    }
+
+    private var subscriptionAccountUser: SeriesAccountUser? {
+        guard let accountUser else { return nil }
+        guard let platformUserId, !platformUserId.isEmpty else { return accountUser }
+        return SeriesAccountUser(
+            id: platformUserId,
+            displayName: accountUser.displayName,
+            emailAddress: accountUser.emailAddress
+        )
     }
 }
 

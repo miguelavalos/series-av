@@ -156,11 +156,52 @@ final class SeriesAccessControllerTests: XCTestCase {
         await controller.purchaseMonthlyPro()
 
         XCTAssertEqual(subscriptionPurchasing.purchaseCount, 1)
+        XCTAssertEqual(subscriptionPurchasing.lastPurchasedUser?.id, "apps-av-user-1")
         XCTAssertEqual(controller.accessMode, .signedInPro)
         XCTAssertEqual(controller.planTier, .pro)
         XCTAssertEqual(controller.isWaitingForSubscriptionReconciliation, false)
         XCTAssertNil(controller.subscriptionReconciliationSource)
         XCTAssertNil(controller.subscriptionError)
+    }
+
+    func testSubscriptionOperationsUsePlatformUserIdWhenAvailable() async {
+        let subscriptionPurchasing = StubSeriesSubscriptionPurchasing()
+        let controller = SeriesAccessController(
+            accountService: StubSeriesAVAccountService(
+                restoreResult: .active(SeriesAccountUser(
+                    id: "provider-user-1",
+                    displayName: "Provider User",
+                    emailAddress: "provider@example.com"
+                )),
+                token: "provider-token"
+            ),
+            profileResolver: StubSeriesAccountProfileResolver(user: SeriesAccountUser(
+                id: "profile-user-1",
+                displayName: "Profile User",
+                emailAddress: "profile@example.com"
+            )),
+            entitlementService: StubSeriesEntitlementService(access: SeriesResolvedAccess(
+                platformUserId: "apps-av-user-1",
+                planTier: .free,
+                accessMode: .signedInFree,
+                capabilities: .forMode(.signedInFree),
+                limits: .forMode(.signedInFree)
+            )),
+            subscriptionPurchasing: subscriptionPurchasing,
+            userDefaults: isolatedUserDefaults(),
+            subscriptionReconciliationRetryDelaysNanoseconds: [],
+            sleepNanoseconds: { _ in }
+        )
+
+        await controller.syncFromAccountProvider()
+        await controller.loadMonthlySubscriptionOffer()
+        await controller.purchaseMonthlyPro()
+        await controller.restorePurchases()
+
+        XCTAssertEqual(subscriptionPurchasing.lastLoadedOfferUser?.id, "apps-av-user-1")
+        XCTAssertEqual(subscriptionPurchasing.lastPurchasedUser?.id, "apps-av-user-1")
+        XCTAssertEqual(subscriptionPurchasing.lastRestoredUser?.id, "apps-av-user-1")
+        XCTAssertEqual(subscriptionPurchasing.lastPurchasedUser?.displayName, "Profile User")
     }
 
     func testLoadMonthlySubscriptionOfferRequiresSignedInUser() async {
@@ -283,6 +324,9 @@ private final class SequenceSeriesEntitlementService: SeriesEntitlementServicing
 private final class StubSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasing {
     private(set) var purchaseCount = 0
     private(set) var restoreCount = 0
+    private(set) var lastLoadedOfferUser: SeriesAccountUser?
+    private(set) var lastPurchasedUser: SeriesAccountUser?
+    private(set) var lastRestoredUser: SeriesAccountUser?
     var offer = SeriesSubscriptionOffer(
         identifier: "$rc_monthly",
         productIdentifier: "com.avalsys.seriesav.pro.monthly",
@@ -298,18 +342,21 @@ private final class StubSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasi
 
     func loadMonthlyOffer(for user: SeriesAccountUser?) async throws -> SeriesSubscriptionOffer {
         try await prepare(for: user)
+        lastLoadedOfferUser = user
         return offer
     }
 
     func purchaseMonthlyPro(for user: SeriesAccountUser?) async throws -> SeriesPurchaseOutcome {
         try await prepare(for: user)
         purchaseCount += 1
+        lastPurchasedUser = user
         return SeriesPurchaseOutcome(shouldRefreshAccess: true, customerUserID: user?.id ?? "")
     }
 
     func restorePurchases(for user: SeriesAccountUser?) async throws -> SeriesPurchaseOutcome {
         try await prepare(for: user)
         restoreCount += 1
+        lastRestoredUser = user
         return SeriesPurchaseOutcome(shouldRefreshAccess: true, customerUserID: user?.id ?? "")
     }
 }
