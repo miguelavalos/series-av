@@ -97,6 +97,25 @@ struct SeriesLimitState: Codable, Equatable, Sendable {
     var reasonCode: String?
 }
 
+struct SeriesActiveLibraryLimitPolicy: Equatable, Sendable {
+    var activeCount: Int
+    var activeLimit: Int?
+
+    var canAddSeries: Bool {
+        guard let activeLimit else {
+            return true
+        }
+        return activeCount < activeLimit
+    }
+
+    var remainingSeriesCount: Int? {
+        guard let activeLimit else {
+            return nil
+        }
+        return max(0, activeLimit - activeCount)
+    }
+}
+
 struct SeriesLibraryEnvelope: Codable, Equatable, Sendable {
     var appId: String
     var resource: String

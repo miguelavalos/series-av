@@ -251,6 +251,7 @@ private struct SeriesWatchingHomeScreen: View {
             SeriesAddSheet(
                 store: store,
                 canAddSeries: canAddSeries,
+                isProAccess: accessController.accessMode == .signedInPro,
                 remainingSeriesCount: remainingSeriesCount,
                 openProPaywall: {
                     pendingProPaywallAfterAddDismiss = true
@@ -326,18 +327,19 @@ private struct SeriesWatchingHomeScreen: View {
         Array(store.homeEntries.dropFirst())
     }
 
+    private var activeLibraryLimitPolicy: SeriesActiveLibraryLimitPolicy {
+        SeriesActiveLibraryLimitPolicy(
+            activeCount: store.activeEntries.count,
+            activeLimit: activeSeriesLimit
+        )
+    }
+
     private var canAddSeries: Bool {
-        guard let activeSeriesLimit else {
-            return true
-        }
-        return store.activeEntries.count < activeSeriesLimit
+        activeLibraryLimitPolicy.canAddSeries
     }
 
     private var remainingSeriesCount: Int? {
-        guard let activeSeriesLimit else {
-            return nil
-        }
-        return max(0, activeSeriesLimit - store.activeEntries.count)
+        activeLibraryLimitPolicy.remainingSeriesCount
     }
 
     private func countActiveEntries(with status: SeriesLibraryEntryStatus) -> Int {
@@ -985,6 +987,7 @@ private struct SeriesAddSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Bindable var store: SeriesLibraryStore
     let canAddSeries: Bool
+    let isProAccess: Bool
     let remainingSeriesCount: Int?
     let openProPaywall: () -> Void
     let didAddSeries: (SeriesLibraryEntry) -> Void
@@ -1095,7 +1098,7 @@ private struct SeriesAddSheet: View {
     }
 
     private var shouldShowUpgradeAction: Bool {
-        remainingSeriesCount != nil && !canAddSeries
+        remainingSeriesCount != nil && !canAddSeries && !isProAccess
     }
 
     private var exactMatchingEntry: SeriesLibraryEntry? {
@@ -1119,6 +1122,9 @@ private struct SeriesAddSheet: View {
     }
 
     private var limitText: String {
+        if isProAccess && canAddSeries {
+            return "\(L10n.string("add.footer.pro"))\n\(L10n.string("add.footer.hint"))"
+        }
         guard let remainingSeriesCount else {
             return "\(L10n.string("add.footer.pro"))\n\(L10n.string("add.footer.hint"))"
         }
@@ -1136,6 +1142,9 @@ private struct SeriesAddSheet: View {
     }
 
     private func addSeries() {
+        guard canSubmit else {
+            return
+        }
         guard let entry = store.addLocalSeries(title: query) else {
             return
         }

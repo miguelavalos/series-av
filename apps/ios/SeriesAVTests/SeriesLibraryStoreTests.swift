@@ -241,6 +241,27 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertEqual(store.entries[0].status, .wantToWatch)
     }
 
+    func testActiveLibraryLimitPolicyAllowsAddingBelowLimit() {
+        let policy = SeriesActiveLibraryLimitPolicy(activeCount: 24, activeLimit: 25)
+
+        XCTAssertTrue(policy.canAddSeries)
+        XCTAssertEqual(policy.remainingSeriesCount, 1)
+    }
+
+    func testActiveLibraryLimitPolicyBlocksAddingAtLimit() {
+        let policy = SeriesActiveLibraryLimitPolicy(activeCount: 25, activeLimit: 25)
+
+        XCTAssertFalse(policy.canAddSeries)
+        XCTAssertEqual(policy.remainingSeriesCount, 0)
+    }
+
+    func testActiveLibraryLimitPolicyTreatsNilLimitAsUnlimited() {
+        let policy = SeriesActiveLibraryLimitPolicy(activeCount: 1_000, activeLimit: nil)
+
+        XCTAssertTrue(policy.canAddSeries)
+        XCTAssertNil(policy.remainingSeriesCount)
+    }
+
     func testSearchEntriesMatchesTitlesCaseInsensitively() {
         let date = Date(timeIntervalSince1970: 1_800_000_000)
         let store = SeriesLibraryStore(entries: [
