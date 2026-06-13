@@ -157,7 +157,7 @@
 "profile.summary.plan.detail.pro" = "Pro account";
 "profile.pro.subtitle.guest" = "Sign in and upgrade when you want Pro sync.";
 "profile.pro.subtitle.free" = "Upgrade to unlock Pro account capabilities.";
-"profile.pro.subtitle.pro" = "Your account has Pro capabilities.";
+"profile.pro.subtitle.pro" = "Your Pro access is active. Manage billing in your App Store account.";
 "profile.pro.signIn" = "Sign in for Pro";
 "profile.pro.upgrade" = "Upgrade to Pro";
 "profile.pro.manage" = "Manage subscription";
@@ -170,14 +170,14 @@
 "paywall.subtitle" = "Upgrade when you want account-backed tracking, higher limits, and the Pro base for future social features.";
 "paywall.scene.title" = "Monthly Pro";
 "paywall.scene.detail" = "Sync-ready tracking for serious series watching.";
-"paywall.subscriptionTerms" = "%@ per month. Auto-renews until cancelled.";
+"paywall.subscriptionTerms" = "Series AV Pro is a monthly auto-renewable subscription. You will be charged %@ for each 1-month period until you cancel in App Store settings.";
 "paywall.purchase.loading" = "Working";
 "paywall.purchase.loadingOffer" = "Loading offer";
 "paywall.purchase.price" = "Start Pro for %@";
 "paywall.restore" = "Restore purchases";
 "paywall.restore.loading" = "Restoring";
-"paywall.status.purchasePending" = "Purchase complete. Checking your Series AV Pro access.";
-"paywall.status.restorePending" = "Restore complete. Checking your Series AV Pro access.";
+"paywall.status.purchasePending" = "Purchase received. Series AV will unlock Pro after Apps AV confirms your account access.";
+"paywall.status.restorePending" = "Restore completed. If your App Store account has an active subscription, Series AV will unlock Pro after Apps AV confirms access.";
 "paywall.benefit.sync.title" = "Account sync";
 "paywall.benefit.sync" = "Prepare your progress to follow your account across devices.";
 "paywall.benefit.library.title" = "Larger library";

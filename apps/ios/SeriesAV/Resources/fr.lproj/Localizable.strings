@@ -157,7 +157,7 @@
 "profile.summary.plan.detail.pro" = "Compte Pro";
 "profile.pro.subtitle.guest" = "Connectez-vous et passez a Pro quand vous voulez Sync Pro.";
 "profile.pro.subtitle.free" = "Passez a Pro pour debloquer les capacites Pro.";
-"profile.pro.subtitle.pro" = "Votre compte a les capacites Pro.";
+"profile.pro.subtitle.pro" = "Votre acces Pro est actif. Gerez la facturation dans votre compte App Store.";
 "profile.pro.signIn" = "Se connecter pour Pro";
 "profile.pro.upgrade" = "Passer a Pro";
 "profile.pro.manage" = "Gerer l'abonnement";
@@ -170,14 +170,14 @@
 "paywall.subtitle" = "Passez a Pro pour le suivi avec compte, des limites plus hautes et la base Pro pour de futures fonctions sociales.";
 "paywall.scene.title" = "Pro mensuel";
 "paywall.scene.detail" = "Suivi pret pour la sync si vous regardez beaucoup de series.";
-"paywall.subscriptionTerms" = "%@ par mois. Renouvellement automatique jusqu'a annulation.";
+"paywall.subscriptionTerms" = "Series AV Pro est un abonnement mensuel auto-renouvelable. Vous serez facture %@ pour chaque periode d'un mois jusqu'a annulation dans les reglages de l'App Store.";
 "paywall.purchase.loading" = "En cours";
 "paywall.purchase.loadingOffer" = "Chargement de l'offre";
 "paywall.purchase.price" = "Demarrer Pro pour %@";
 "paywall.restore" = "Restaurer les achats";
 "paywall.restore.loading" = "Restauration";
-"paywall.status.purchasePending" = "Achat termine. Verification de votre acces Series AV Pro.";
-"paywall.status.restorePending" = "Restauration terminee. Verification de votre acces Series AV Pro.";
+"paywall.status.purchasePending" = "Achat recu. Series AV debloquera Pro apres confirmation de votre acces par Apps AV.";
+"paywall.status.restorePending" = "Restauration terminee. Si votre compte App Store a un abonnement actif, Series AV debloquera Pro apres confirmation de l'acces par Apps AV.";
 "paywall.benefit.sync.title" = "Sync de compte";
 "paywall.benefit.sync" = "Preparez votre progression pour suivre votre compte entre appareils.";
 "paywall.benefit.library.title" = "Bibliotheque plus grande";

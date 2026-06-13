@@ -157,7 +157,7 @@
 "profile.summary.plan.detail.pro" = "Compte Pro";
 "profile.pro.subtitle.guest" = "Inicia sessio i millora quan vulguis Sync Pro.";
 "profile.pro.subtitle.free" = "Millora per desbloquejar capacitats Pro.";
-"profile.pro.subtitle.pro" = "El teu compte te capacitats Pro.";
+"profile.pro.subtitle.pro" = "El teu acces Pro esta actiu. Gestiona la facturacio al teu compte de l'App Store.";
 "profile.pro.signIn" = "Iniciar sessio per Pro";
 "profile.pro.upgrade" = "Millorar a Pro";
 "profile.pro.manage" = "Gestionar subscripcio";
@@ -170,14 +170,14 @@
 "paywall.subtitle" = "Millora quan vulguis seguiment amb compte, limits mes alts i la base Pro per futures funcions socials.";
 "paywall.scene.title" = "Pro mensual";
 "paywall.scene.detail" = "Seguiment preparat per sync si mires moltes series.";
-"paywall.subscriptionTerms" = "%@ al mes. Es renova automaticament fins que cancel.lis.";
+"paywall.subscriptionTerms" = "Series AV Pro es una subscripcio mensual amb renovacio automatica. Se't cobrara %@ per cada periode d'1 mes fins que cancel.lis als ajustos de l'App Store.";
 "paywall.purchase.loading" = "Treballant";
 "paywall.purchase.loadingOffer" = "Carregant oferta";
 "paywall.purchase.price" = "Comencar Pro per %@";
 "paywall.restore" = "Restaurar compres";
 "paywall.restore.loading" = "Restaurant";
-"paywall.status.purchasePending" = "Compra completada. Comprovant l'acces Series AV Pro.";
-"paywall.status.restorePending" = "Restauracio completada. Comprovant l'acces Series AV Pro.";
+"paywall.status.purchasePending" = "Compra rebuda. Series AV desbloquejara Pro quan Apps AV confirmi l'acces del compte.";
+"paywall.status.restorePending" = "Restauracio completada. Si l'App Store te una subscripcio activa, Series AV desbloquejara Pro quan Apps AV confirmi l'acces.";
 "paywall.benefit.sync.title" = "Sync de compte";
 "paywall.benefit.sync" = "Prepara el progres per seguir el compte entre dispositius.";
 "paywall.benefit.library.title" = "Biblioteca mes gran";

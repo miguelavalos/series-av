@@ -157,7 +157,7 @@
 "profile.summary.plan.detail.pro" = "Pro-Konto";
 "profile.pro.subtitle.guest" = "Melde dich an und upgrade, wenn du Pro-Sync moechtest.";
 "profile.pro.subtitle.free" = "Upgrade, um Pro-Funktionen freizuschalten.";
-"profile.pro.subtitle.pro" = "Dein Konto hat Pro-Funktionen.";
+"profile.pro.subtitle.pro" = "Dein Pro-Zugriff ist aktiv. Verwalte die Abrechnung in deinem App Store Konto.";
 "profile.pro.signIn" = "Fuer Pro anmelden";
 "profile.pro.upgrade" = "Auf Pro upgraden";
 "profile.pro.manage" = "Abo verwalten";
@@ -170,14 +170,14 @@
 "paywall.subtitle" = "Upgrade fuer konto-basiertes Tracking, hoehere Limits und die Pro-Basis fuer spaetere soziale Funktionen.";
 "paywall.scene.title" = "Monatlich Pro";
 "paywall.scene.detail" = "Sync-bereites Tracking fuer intensives Seriensehen.";
-"paywall.subscriptionTerms" = "%@ pro Monat. Verlaengert sich automatisch bis zur Kuendigung.";
+"paywall.subscriptionTerms" = "Series AV Pro ist ein monatliches, automatisch verlaengerbares Abonnement. Dir werden %@ fuer jeden 1-Monats-Zeitraum berechnet, bis du in den App Store Einstellungen kuendigst.";
 "paywall.purchase.loading" = "Arbeitet";
 "paywall.purchase.loadingOffer" = "Angebot wird geladen";
 "paywall.purchase.price" = "Pro fuer %@ starten";
 "paywall.restore" = "Kaeufe wiederherstellen";
 "paywall.restore.loading" = "Wiederherstellen";
-"paywall.status.purchasePending" = "Kauf abgeschlossen. Series AV Pro Zugriff wird geprueft.";
-"paywall.status.restorePending" = "Wiederherstellung abgeschlossen. Series AV Pro Zugriff wird geprueft.";
+"paywall.status.purchasePending" = "Kauf erhalten. Series AV entsperrt Pro, sobald Apps AV deinen Kontozugriff bestaetigt.";
+"paywall.status.restorePending" = "Wiederherstellung abgeschlossen. Wenn dein App Store Konto ein aktives Abo hat, entsperrt Series AV Pro, sobald Apps AV den Zugriff bestaetigt.";
 "paywall.benefit.sync.title" = "Konto-Sync";
 "paywall.benefit.sync" = "Bereite deinen Fortschritt vor, damit er deinem Konto ueber Geraete folgt.";
 "paywall.benefit.library.title" = "Groessere Bibliothek";
