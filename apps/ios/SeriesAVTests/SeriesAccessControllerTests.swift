@@ -113,6 +113,63 @@ final class SeriesAccessControllerTests: XCTestCase {
         XCTAssertEqual(controller.accessMode, .guest)
     }
 
+    func testGuestOnboardingShowsWhenNoPromptRecorded() {
+        let controller = SeriesAccessController(
+            accountService: StubSeriesAVAccountService(restoreResult: .signedOut),
+            profileResolver: StubSeriesAccountProfileResolver(user: nil),
+            entitlementService: StubSeriesEntitlementService(access: .guest),
+            userDefaults: isolatedUserDefaults(),
+            guestOnboardingPolicy: SeriesGuestOnboardingPolicy(cooldown: 10),
+            now: { Date(timeIntervalSince1970: 100) }
+        )
+
+        XCTAssertTrue(controller.shouldAutoShowGuestOnboarding)
+    }
+
+    func testSkipForNowSuppressesGuestOnboardingDuringCooldown() {
+        let defaults = isolatedUserDefaults()
+        var currentDate = Date(timeIntervalSince1970: 100)
+        let controller = SeriesAccessController(
+            accountService: StubSeriesAVAccountService(restoreResult: .signedOut),
+            profileResolver: StubSeriesAccountProfileResolver(user: nil),
+            entitlementService: StubSeriesEntitlementService(access: .guest),
+            userDefaults: defaults,
+            guestOnboardingPolicy: SeriesGuestOnboardingPolicy(cooldown: 10),
+            now: { currentDate }
+        )
+
+        controller.skipForNow()
+
+        XCTAssertFalse(controller.shouldAutoShowGuestOnboarding)
+
+        currentDate = Date(timeIntervalSince1970: 111)
+
+        XCTAssertTrue(controller.shouldAutoShowGuestOnboarding)
+    }
+
+    func testGuestOnboardingDoesNotAutoShowForSignedInAccess() {
+        let controller = SeriesAccessController(
+            accountService: StubSeriesAVAccountService(restoreResult: .active(SeriesAccountUser(
+                id: "apps-av-user-1",
+                displayName: "Apps AV User",
+                emailAddress: "apps@example.com"
+            ))),
+            profileResolver: StubSeriesAccountProfileResolver(user: nil),
+            entitlementService: StubSeriesEntitlementService(access: SeriesResolvedAccess(
+                platformUserId: "apps-av-user-1",
+                planTier: .free,
+                accessMode: .signedInFree,
+                capabilities: .forMode(.signedInFree),
+                limits: .forMode(.signedInFree)
+            )),
+            userDefaults: isolatedUserDefaults(),
+            guestOnboardingPolicy: SeriesGuestOnboardingPolicy(cooldown: 10),
+            now: { Date(timeIntervalSince1970: 100) }
+        )
+
+        XCTAssertFalse(controller.shouldAutoShowGuestOnboarding)
+    }
+
     func testPurchaseRefreshesAccessAndClearsReconciliationWhenProArrives() async {
         let entitlementService = SequenceSeriesEntitlementService(accesses: [
             SeriesResolvedAccess(

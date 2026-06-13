@@ -11,6 +11,21 @@ enum SeriesAccountProfileResolverError: Error, Equatable {
     case missingInternalUserId
 }
 
+struct SeriesGuestOnboardingPolicy {
+    static let defaultCooldown: TimeInterval = 10 * 24 * 60 * 60
+
+    let cooldown: TimeInterval
+
+    init(cooldown: TimeInterval = Self.defaultCooldown) {
+        self.cooldown = cooldown
+    }
+
+    func shouldShowAutomatically(lastPromptAt: Date?, now: Date) -> Bool {
+        guard let lastPromptAt else { return true }
+        return now >= lastPromptAt.addingTimeInterval(cooldown)
+    }
+}
+
 @MainActor
 struct PlatformSeriesAccountProfileResolver: SeriesAccountProfileResolving {
     let accessClient: SeriesAccountAccessProviding
@@ -46,8 +61,11 @@ final class SeriesAccessController {
     private let entitlementService: SeriesEntitlementServicing
     private let subscriptionPurchasing: SeriesSubscriptionPurchasing
     private let userDefaults: UserDefaults
+    private let guestOnboardingPolicy: SeriesGuestOnboardingPolicy
+    private let now: () -> Date
     private let subscriptionReconciliationRetryDelaysNanoseconds: [UInt64]
     private let sleepNanoseconds: (UInt64) async -> Void
+    private let guestOnboardingLastPromptAtKey = "seriesav.guestOnboarding.lastPromptAt"
     private let lastKnownAccountUserKey = "seriesav.account.lastKnownUser"
     private var accessRefreshGeneration = 0
 
@@ -71,6 +89,8 @@ final class SeriesAccessController {
         entitlementService: SeriesEntitlementServicing? = nil,
         subscriptionPurchasing: SeriesSubscriptionPurchasing = RevenueCatSeriesSubscriptionPurchasing(),
         userDefaults: UserDefaults = .standard,
+        guestOnboardingPolicy: SeriesGuestOnboardingPolicy = SeriesGuestOnboardingPolicy(),
+        now: @escaping () -> Date = Date.init,
         subscriptionReconciliationRetryDelaysNanoseconds: [UInt64] = [
             1_000_000_000,
             2_000_000_000,
@@ -94,6 +114,8 @@ final class SeriesAccessController {
         )
         self.subscriptionPurchasing = subscriptionPurchasing
         self.userDefaults = userDefaults
+        self.guestOnboardingPolicy = guestOnboardingPolicy
+        self.now = now
         self.subscriptionReconciliationRetryDelaysNanoseconds = subscriptionReconciliationRetryDelaysNanoseconds
         self.sleepNanoseconds = sleepNanoseconds
         self.accountUser = currentUser
@@ -118,6 +140,14 @@ final class SeriesAccessController {
 
     var accountIsAvailable: Bool {
         accountService.isAvailable
+    }
+
+    var shouldAutoShowGuestOnboarding: Bool {
+        guard accessMode == .guest else { return false }
+        return guestOnboardingPolicy.shouldShowAutomatically(
+            lastPromptAt: userDefaults.object(forKey: guestOnboardingLastPromptAtKey) as? Date,
+            now: now()
+        )
     }
 
     var productAccountState: AVProductAccountState {
@@ -187,6 +217,14 @@ final class SeriesAccessController {
         accessRefreshGeneration += 1
         clearSignedOutAccountState()
         resolveAccessState()
+    }
+
+    func skipForNow() {
+        markGuestOnboardingPromptShown()
+    }
+
+    func markGuestOnboardingPromptShown() {
+        userDefaults.set(now(), forKey: guestOnboardingLastPromptAtKey)
     }
 
     func loadMonthlySubscriptionOffer() async {
