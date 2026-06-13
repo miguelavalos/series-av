@@ -90,7 +90,7 @@
 "add.matches.title" = "Already in your library";
 "add.footer.pro" = "Pro libraries can keep adding series.";
 "add.footer.remaining" = "%d active slots remaining.";
-"add.footer.hint" = "New series start in Want, ready to begin from Home.";
+"add.footer.hint" = "New series start in To watch, ready to begin from Home.";
 "add.footer.limitReached" = "Your active library limit is full.";
 "add.footer.upgrade" = "Upgrade to Pro";
 "profile.alert.signOutFailed.title" = "Sign-out problem";

@@ -90,7 +90,7 @@
 "add.matches.title" = "Schon in deiner Bibliothek";
 "add.footer.pro" = "Pro-Bibliotheken koennen weiter Serien hinzufuegen.";
 "add.footer.remaining" = "%d aktive Plaetze uebrig.";
-"add.footer.hint" = "Neue Serien starten in Ansehen, bereit zum Start von Home.";
+"add.footer.hint" = "Neue Serien starten in der Merkliste, bereit zum Start von Home.";
 "add.footer.limitReached" = "Dein aktives Bibliothekslimit ist voll.";
 "add.footer.upgrade" = "Auf Pro upgraden";
 "profile.alert.signOutFailed.title" = "Abmeldeproblem";

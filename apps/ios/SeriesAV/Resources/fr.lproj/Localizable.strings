@@ -90,7 +90,7 @@
 "add.matches.title" = "Deja dans votre bibliotheque";
 "add.footer.pro" = "Les bibliotheques Pro peuvent continuer a ajouter des series.";
 "add.footer.remaining" = "%d emplacements actifs restants.";
-"add.footer.hint" = "Les nouvelles series commencent dans A voir, pretes a demarrer depuis Home.";
+"add.footer.hint" = "Les nouvelles series commencent dans A regarder, pretes a demarrer depuis Home.";
 "add.footer.limitReached" = "Votre limite de bibliotheque active est atteinte.";
 "add.footer.upgrade" = "Passer a Pro";
 "profile.alert.signOutFailed.title" = "Probleme de deconnexion";
