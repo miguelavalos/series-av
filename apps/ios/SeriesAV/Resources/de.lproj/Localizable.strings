@@ -88,6 +88,7 @@
 "add.footer.remaining" = "%d aktive Plaetze uebrig.";
 "add.footer.hint" = "Neue Serien starten in Ansehen, bereit zum Start von Home oder Library.";
 "add.footer.limitReached" = "Dein aktives Bibliothekslimit ist voll.";
+"add.footer.upgrade" = "Auf Pro upgraden";
 "profile.alert.signOutFailed.title" = "Abmeldeproblem";
 "profile.settingsScreen.title" = "Einstellungen";
 "profile.accountScreen.title" = "Konto";

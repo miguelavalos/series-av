@@ -20,8 +20,10 @@ struct RootView: View {
                 accessTitle: accessTitle,
                 accessSubtitle: accessSubtitle,
                 activeSeriesLimit: accessController.limits.activeLibrarySeries,
+                accessController: accessController,
                 openSettings: { profileMode = .settings },
-                openAccount: { profileMode = .account }
+                openAccount: { profileMode = .account },
+                startSignInFlow: startSignInFlow
             )
             .navigationTitle("Series AV")
             .navigationBarTitleDisplayMode(.inline)
@@ -68,12 +70,15 @@ private struct SeriesWatchingHomeScreen: View {
     let accessTitle: String
     let accessSubtitle: String
     let activeSeriesLimit: Int?
+    let accessController: SeriesAccessController
     let openSettings: () -> Void
     let openAccount: () -> Void
+    let startSignInFlow: () -> Void
 
     @State private var editorEntry: SeriesLibraryEntry?
     @State private var isShowingAddSheet = false
     @State private var isShowingLibrarySheet = false
+    @State private var isShowingProPaywall = false
     @State private var initialLibraryFilter: SeriesLibraryFilter = .all
     @State private var pendingUndo: PendingLibraryUndo?
     @State private var pendingProgressUndo: PendingProgressUndo?
@@ -240,6 +245,11 @@ private struct SeriesWatchingHomeScreen: View {
                 store: store,
                 canAddSeries: canAddSeries,
                 remainingSeriesCount: remainingSeriesCount,
+                openProPaywall: {
+                    DispatchQueue.main.async {
+                        isShowingProPaywall = true
+                    }
+                },
                 didAddSeries: { entry in
                     pendingProgressUndo = nil
                     pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.added")
@@ -271,6 +281,12 @@ private struct SeriesWatchingHomeScreen: View {
                 }
             )
             .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $isShowingProPaywall) {
+            SeriesProPaywallView(
+                accessController: accessController,
+                startSignInFlow: startSignInFlow
+            )
         }
     }
 
@@ -903,6 +919,7 @@ private struct SeriesAddSheet: View {
     @Bindable var store: SeriesLibraryStore
     let canAddSeries: Bool
     let remainingSeriesCount: Int?
+    let openProPaywall: () -> Void
     let didAddSeries: (SeriesLibraryEntry) -> Void
 
     @State private var query = ""
@@ -922,7 +939,18 @@ private struct SeriesAddSheet: View {
                     }
                     .disabled(!canSubmit)
                 } footer: {
-                    Text(limitText)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(limitText)
+
+                        if shouldShowUpgradeAction {
+                            Button {
+                                dismiss()
+                                openProPaywall()
+                            } label: {
+                                Label(L10n.string("add.footer.upgrade"), systemImage: "sparkles")
+                            }
+                        }
+                    }
                 }
 
                 if matchingEntries.isEmpty == false {
@@ -957,6 +985,10 @@ private struct SeriesAddSheet: View {
 
     private var matchingEntries: [SeriesLibraryEntry] {
         store.searchEntries(matching: query)
+    }
+
+    private var shouldShowUpgradeAction: Bool {
+        remainingSeriesCount != nil && !canAddSeries
     }
 
     private var canSubmit: Bool {
