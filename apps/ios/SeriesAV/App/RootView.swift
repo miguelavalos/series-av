@@ -223,7 +223,6 @@ private struct SeriesWatchingHomeScreen: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
-                .disabled(!canAddSeries)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
