@@ -3,6 +3,26 @@ import XCTest
 
 @MainActor
 final class SeriesEntitlementServiceTests: XCTestCase {
+    func testAccessPolicyMatchesSharedContract() throws {
+        let contract = try loadAccessPolicyContract()
+        let expectedModes: [(mode: SeriesAccessMode, planTier: String)] = [
+            (.guest, "free"),
+            (.signedInFree, "free"),
+            (.signedInPro, "pro")
+        ]
+
+        XCTAssertEqual(contract.appId, "seriesav")
+        XCTAssertEqual(contract.schemaVersion, 1)
+        XCTAssertEqual(Set(contract.accessModes.keys), Set(expectedModes.map { $0.mode.rawValue }))
+
+        for expectedMode in expectedModes {
+            let contractMode = try XCTUnwrap(contract.accessModes[expectedMode.mode.rawValue])
+            XCTAssertEqual(contractMode.planTier, expectedMode.planTier)
+            XCTAssertEqual(SeriesAccessCapabilities.forMode(expectedMode.mode), contractMode.capabilities.seriesValue)
+            XCTAssertEqual(SeriesAccessLimits.forMode(expectedMode.mode), contractMode.limits.seriesValue)
+        }
+    }
+
     func testGuestIsLocalOnlyAndUsesAcceptedLimits() {
         let access = SeriesLocalEntitlementService().resolveAccess(for: nil)
 
@@ -97,6 +117,60 @@ final class SeriesEntitlementServiceTests: XCTestCase {
             id: "provider-user-1",
             displayName: "Series User",
             emailAddress: "series@example.com"
+        )
+    }
+
+    private func loadAccessPolicyContract() throws -> AccessPolicyContract {
+        let testFileURL = URL(fileURLWithPath: #filePath)
+        let contractURL = testFileURL
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("shared/contracts/access-policy.json")
+        let data = try Data(contentsOf: contractURL)
+        return try JSONDecoder().decode(AccessPolicyContract.self, from: data)
+    }
+}
+
+private struct AccessPolicyContract: Decodable {
+    let appId: String
+    let schemaVersion: Int
+    let accessModes: [String: AccessPolicyModeContract]
+}
+
+private struct AccessPolicyModeContract: Decodable {
+    let planTier: String
+    let capabilities: AccessCapabilitiesContract
+    let limits: AccessLimitsContract
+}
+
+private struct AccessCapabilitiesContract: Decodable {
+    let isSignedIn: Bool
+    let canUseBackend: Bool
+    let canUsePremiumFeatures: Bool
+    let canUseCloudSync: Bool
+    let canManagePlan: Bool
+
+    var seriesValue: SeriesAccessCapabilities {
+        SeriesAccessCapabilities(
+            isSignedIn: isSignedIn,
+            canUseBackend: canUseBackend,
+            canUsePremiumFeatures: canUsePremiumFeatures,
+            canUseCloudSync: canUseCloudSync,
+            canManagePlan: canManagePlan
+        )
+    }
+}
+
+private struct AccessLimitsContract: Decodable {
+    let activeLibrarySeries: Int?
+    let aviActionsPerDay: Int?
+
+    var seriesValue: SeriesAccessLimits {
+        SeriesAccessLimits(
+            activeLibrarySeries: activeLibrarySeries,
+            aviActionsPerDay: aviActionsPerDay
         )
     }
 }

@@ -1,0 +1,48 @@
+{
+  "appId": "seriesav",
+  "schemaVersion": 1,
+  "accessModes": {
+    "guest": {
+      "planTier": "free",
+      "capabilities": {
+        "isSignedIn": false,
+        "canUseBackend": true,
+        "canUsePremiumFeatures": false,
+        "canUseCloudSync": false,
+        "canManagePlan": false
+      },
+      "limits": {
+        "activeLibrarySeries": 25,
+        "aviActionsPerDay": 5
+      }
+    },
+    "signedInFree": {
+      "planTier": "free",
+      "capabilities": {
+        "isSignedIn": true,
+        "canUseBackend": true,
+        "canUsePremiumFeatures": false,
+        "canUseCloudSync": false,
+        "canManagePlan": true
+      },
+      "limits": {
+        "activeLibrarySeries": 75,
+        "aviActionsPerDay": 15
+      }
+    },
+    "signedInPro": {
+      "planTier": "pro",
+      "capabilities": {
+        "isSignedIn": true,
+        "canUseBackend": true,
+        "canUsePremiumFeatures": true,
+        "canUseCloudSync": true,
+        "canManagePlan": true
+      },
+      "limits": {
+        "activeLibrarySeries": 1000,
+        "aviActionsPerDay": null
+      }
+    }
+  }
+}
