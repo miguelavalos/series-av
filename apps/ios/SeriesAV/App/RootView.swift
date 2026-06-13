@@ -667,6 +667,8 @@ private struct SeriesLibrarySheet: View {
                                     setStatus(entry, status)
                                 }
 
+                                Divider()
+
                                 Button {
                                     pendingLibraryUndo = PendingLibraryMutationUndo(
                                         entryId: entry.id,
@@ -679,6 +681,8 @@ private struct SeriesLibrarySheet: View {
                                 } label: {
                                     Label(L10n.string("home.archive"), systemImage: "archivebox")
                                 }
+
+                                Divider()
 
                                 Button(role: .destructive) {
                                     pendingLibraryUndo = PendingLibraryMutationUndo(
@@ -717,6 +721,8 @@ private struct SeriesLibrarySheet: View {
                                 } label: {
                                     Label(L10n.string("library.restore"), systemImage: "arrow.uturn.backward")
                                 }
+
+                                Divider()
 
                                 Button(role: .destructive) {
                                     pendingLibraryUndo = PendingLibraryMutationUndo(
@@ -1392,6 +1398,8 @@ private struct SeriesEntryActionsMenu: View {
                 }
             }
 
+            Divider()
+
             Button(action: togglePinned) {
                 Label(pinTitle, systemImage: entry.isPinnedHomeSeries == true ? "pin.slash" : "pin")
             }
@@ -1399,6 +1407,8 @@ private struct SeriesEntryActionsMenu: View {
             Button(action: archive) {
                 Label(L10n.string("home.archive"), systemImage: "archivebox")
             }
+
+            Divider()
 
             Button(role: .destructive, action: delete) {
                 Label(L10n.string("home.delete"), systemImage: "trash")
