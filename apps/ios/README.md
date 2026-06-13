@@ -40,7 +40,8 @@ Current scaffold:
 Not implemented yet:
 
 - final Series AV UI redesign;
-- private RevenueCat/App Store product configuration and signed purchase smoke;
+- private RevenueCat/App Store product configuration, Apps AV product-map
+  readiness, and signed purchase/restore smoke;
 - advanced account-management flows beyond shared links;
 - Convex realtime projection;
 - catalog search/enrichment UI;

@@ -51,6 +51,19 @@ bun run ios:config:production
 bun run ios:preflight:production
 ```
 
+Series AV Pro is a paid/subscription V1. Before TestFlight or App Store
+submission, the private suite readiness checks must also pass for preview and
+production:
+
+```bash
+bun run series-av:subscription:readiness:preview
+bun run series-av:subscription:readiness:production
+```
+
+Those checks validate the Infisical-backed RevenueCat client values and the
+Apps AV product map entry for `seriesav_pro_monthly -> seriesav` without
+printing secrets.
+
 `apps/ios/Config/Local.xcconfig` is gitignored. Do not commit it or copy production values into versioned files.
 
 ## Switching Dev And Production

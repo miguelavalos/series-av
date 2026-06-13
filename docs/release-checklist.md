@@ -119,16 +119,29 @@ Because the iOS project currently has no native test targets, complete and sign 
 The first iOS release ships with the Tune AV-style Pro paywall, RevenueCat
 purchase/restore handling, and App Store subscription management.
 
-1. Confirm visible purchase, restore, and manage-subscription actions match the
+1. Confirm the private Series AV subscription readiness checker passes for both
+   preview and production before any App Store/TestFlight submission:
+
+   ```bash
+   bun run series-av:subscription:readiness:preview
+   bun run series-av:subscription:readiness:production
+   ```
+
+2. Confirm Infisical provides `SERIESAV_REVENUECAT_PUBLIC_API_KEY`,
+   `SERIESAV_REVENUECAT_OFFERING_ID`, and
+   `SERIESAV_REVENUECAT_MONTHLY_PACKAGE_ID` for the submitted environment.
+3. Confirm `APPSAV_REVENUECAT_PRODUCT_APP_MAP_JSON` maps
+   `seriesav_pro_monthly` to `seriesav`.
+4. Confirm visible purchase, restore, and manage-subscription actions match the
    submitted RevenueCat/App Store product configuration.
-2. Confirm Pro is framed as account-backed access for higher limits, Pro sync
+5. Confirm Pro is framed as account-backed access for higher limits, Pro sync
    readiness, and the future social base only where those features are active or
    explicitly future-facing.
-3. Confirm App Store metadata advertises only the active Pro benefits in this
+6. Confirm App Store metadata advertises only the active Pro benefits in this
    submitted build.
-4. Confirm App Store review notes explain RevenueCat purchase/restore,
+7. Confirm App Store review notes explain RevenueCat purchase/restore,
    Account AV access refresh, and the App Store subscription management route.
-5. Confirm App Store product mapping, server notifications, and purchase
+8. Confirm App Store product mapping, server notifications, and purchase
    reconciliation are ready for the shipping environment before release.
 
 ## Release Sign-Off
