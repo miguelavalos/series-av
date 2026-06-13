@@ -81,6 +81,7 @@ final class SeriesAccessController {
             try? await Task.sleep(nanoseconds: nanoseconds)
         }
     ) {
+        let currentUser = Self.lastKnownAccountUser(from: userDefaults, key: lastKnownAccountUserKey)
         let accessClient = SeriesAccountAccessClient(apiClient: SeriesAVAPIClient(
             baseURL: AppConfig.apiBaseURL,
             tokenProvider: { try await accountService.getToken() }
@@ -95,7 +96,7 @@ final class SeriesAccessController {
         self.userDefaults = userDefaults
         self.subscriptionReconciliationRetryDelaysNanoseconds = subscriptionReconciliationRetryDelaysNanoseconds
         self.sleepNanoseconds = sleepNanoseconds
-        self.accountUser = nil
+        self.accountUser = currentUser
         self.accountSession = nil
         self.accessMode = .guest
         self.planTier = .free
@@ -108,6 +109,7 @@ final class SeriesAccessController {
         self.isSubscriptionOperationInProgress = false
         self.isWaitingForSubscriptionReconciliation = false
         self.subscriptionReconciliationSource = nil
+        resolveAccessState()
     }
 
     var isSignedIn: Bool {
@@ -158,9 +160,7 @@ final class SeriesAccessController {
             accountUser = lastKnownUser.map(SeriesAccountUser.init(productAccountUser:))
             isAccountSessionTemporarilyUnavailable = lastKnownUser != nil
         case .guest:
-            accountUser = nil
-            isAccountSessionTemporarilyUnavailable = false
-            clearSubscriptionState()
+            clearSignedOutAccountState()
         }
 
         await refreshAccess()
@@ -185,10 +185,8 @@ final class SeriesAccessController {
         accessRefreshGeneration += 1
         try await accountService.signOut()
         accessRefreshGeneration += 1
-        accountUser = nil
-        isAccountSessionTemporarilyUnavailable = false
-        clearSubscriptionState()
-        applyResolvedAccess(.guest)
+        clearSignedOutAccountState()
+        resolveAccessState()
     }
 
     func loadMonthlySubscriptionOffer() async {
@@ -285,22 +283,56 @@ final class SeriesAccessController {
         clearSubscriptionReconciliationState()
     }
 
+    private func resolveAccessState() {
+        applyResolvedAccess(entitlementService.resolveAccess(for: accountUser))
+    }
+
+    private func clearSignedOutAccountState() {
+        accountUser = nil
+        platformUserId = nil
+        accountSession = nil
+        isAccountSessionTemporarilyUnavailable = false
+        clearSubscriptionState()
+        clearLastKnownAccountUser()
+    }
+
     private func applyResolvedAccess(_ resolvedAccess: SeriesResolvedAccess) {
+        guard let accountUser, resolvedAccess.accessMode != .guest else {
+            planTier = .free
+            accessMode = .guest
+            capabilities = .forMode(.guest)
+            limits = .forMode(.guest)
+            platformUserId = nil
+            accountSession = nil
+            return
+        }
+
         platformUserId = resolvedAccess.platformUserId
         accessMode = resolvedAccess.accessMode
         planTier = resolvedAccess.planTier
         capabilities = resolvedAccess.capabilities
         limits = resolvedAccess.limits
 
-        if let accountUser {
-            accountSession = SeriesAccountSession(user: accountUser, access: resolvedAccess)
-        } else {
-            accountSession = nil
-        }
+        accountSession = SeriesAccountSession(user: accountUser, access: resolvedAccess)
+        persistLastKnownAccountUser(accountUser)
 
         if resolvedAccess.accessMode == .signedInPro {
             clearSubscriptionReconciliationState()
         }
+    }
+
+    private static func lastKnownAccountUser(from userDefaults: UserDefaults, key: String) -> SeriesAccountUser? {
+        guard let data = userDefaults.data(forKey: key) else { return nil }
+        return try? JSONDecoder().decode(SeriesAccountUser.self, from: data)
+    }
+
+    private func persistLastKnownAccountUser(_ user: SeriesAccountUser) {
+        guard let data = try? JSONEncoder().encode(user) else { return }
+        userDefaults.set(data, forKey: lastKnownAccountUserKey)
+    }
+
+    private func clearLastKnownAccountUser() {
+        userDefaults.removeObject(forKey: lastKnownAccountUserKey)
     }
 }
 

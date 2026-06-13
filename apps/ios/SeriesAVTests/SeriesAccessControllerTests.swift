@@ -1,3 +1,4 @@
+import AVProductAccountFoundation
 import XCTest
 @testable import SeriesAV
 
@@ -51,6 +52,65 @@ final class SeriesAccessControllerTests: XCTestCase {
         XCTAssertEqual(controller.productAccountState, .guest)
         XCTAssertEqual(controller.accessMode, .guest)
         XCTAssertEqual(controller.capabilities.canUseCloudSync, false)
+    }
+
+    func testInitializesWithLastKnownAccountUser() {
+        let defaults = isolatedUserDefaults()
+        persistLastKnownAccountUser(
+            SeriesAccountUser(
+                id: "apps-av-user-1",
+                displayName: "Apps AV User",
+                emailAddress: "apps@example.com"
+            ),
+            in: defaults
+        )
+
+        let controller = SeriesAccessController(
+            accountService: StubSeriesAVAccountService(restoreResult: .temporarilyUnavailable(nil)),
+            profileResolver: StubSeriesAccountProfileResolver(user: nil),
+            entitlementService: StubSeriesEntitlementService(access: SeriesResolvedAccess(
+                platformUserId: "apps-av-user-1",
+                planTier: .free,
+                accessMode: .signedInFree,
+                capabilities: .forMode(.signedInFree),
+                limits: .forMode(.signedInFree)
+            )),
+            userDefaults: defaults
+        )
+
+        XCTAssertEqual(controller.accountUser?.id, "apps-av-user-1")
+        XCTAssertEqual(controller.accessMode, .signedInFree)
+        XCTAssertEqual(controller.productAccountState, .signedIn(AVProductAccountSession(
+            user: AVProductAccountUser(
+                id: "apps-av-user-1",
+                displayName: "Apps AV User",
+                emailAddress: "apps@example.com"
+            )
+        )))
+    }
+
+    func testSignOutClearsLastKnownAccountUser() async throws {
+        let defaults = isolatedUserDefaults()
+        persistLastKnownAccountUser(
+            SeriesAccountUser(
+                id: "apps-av-user-1",
+                displayName: "Apps AV User",
+                emailAddress: "apps@example.com"
+            ),
+            in: defaults
+        )
+        let controller = SeriesAccessController(
+            accountService: StubSeriesAVAccountService(restoreResult: .signedOut),
+            profileResolver: StubSeriesAccountProfileResolver(user: nil),
+            entitlementService: StubSeriesEntitlementService(access: .guest),
+            userDefaults: defaults
+        )
+
+        try await controller.signOut()
+
+        XCTAssertNil(defaults.data(forKey: lastKnownAccountUserKey))
+        XCTAssertNil(controller.accountUser)
+        XCTAssertEqual(controller.accessMode, .guest)
     }
 
     func testPurchaseRefreshesAccessAndClearsReconciliationWhenProArrives() async {
@@ -122,6 +182,15 @@ final class SeriesAccessControllerTests: XCTestCase {
         let defaults = UserDefaults(suiteName: suiteName)!
         defaults.removePersistentDomain(forName: suiteName)
         return defaults
+    }
+
+    private var lastKnownAccountUserKey: String {
+        "seriesav.account.lastKnownUser"
+    }
+
+    private func persistLastKnownAccountUser(_ user: SeriesAccountUser, in defaults: UserDefaults) {
+        let data = try! JSONEncoder().encode(user)
+        defaults.set(data, forKey: lastKnownAccountUserKey)
     }
 }
 
