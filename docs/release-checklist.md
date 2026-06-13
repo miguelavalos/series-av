@@ -97,7 +97,8 @@ Because the iOS project currently has no native test targets, complete and sign 
 2. Confirm the delete-account support URL is `https://series-av.avalsys.com/delete-account`.
 3. Confirm review notes explain the shared Apps AV account-deletion flow, linked-app blockers, and provider-managed subscription caveat.
 4. Confirm the build exposes the native in-app route at Profile > Account safety > Delete Apps AV account.
-5. Confirm store metadata does not promise cloud sync, Pro social, or purchase flows that are not active in the submitted build.
+5. Confirm store metadata does not promise cloud sync, Pro social, Avi actions,
+   or purchase flows that are not active in the submitted build.
 6. Confirm TVMaze attribution remains visible in-product.
 7. Confirm any visible TV/movie posters are supported by provider terms,
    attribution, and release evidence.
@@ -115,13 +116,20 @@ Because the iOS project currently has no native test targets, complete and sign 
 
 ## Pro And Entitlements
 
-The first iOS release ships without iOS purchases.
+The first iOS release ships with the Tune AV-style Pro paywall, RevenueCat
+purchase/restore handling, and App Store subscription management.
 
-1. Confirm no visible purchase, restore, or manage-subscription actions are exposed in the shipping build.
-2. Confirm Pro is framed only as backend-resolved access state.
-3. Confirm App Store metadata does not advertise in-app subscription purchase or restore support.
-4. Confirm App Store review notes explain that subscription purchase and management are not available inside this first iOS build.
-5. Keep App Store product mapping, server notifications, and purchase reconciliation out of the release gate until a future paid iOS build.
+1. Confirm visible purchase, restore, and manage-subscription actions match the
+   submitted RevenueCat/App Store product configuration.
+2. Confirm Pro is framed as account-backed access for higher limits, Pro sync
+   readiness, and the future social base only where those features are active or
+   explicitly future-facing.
+3. Confirm App Store metadata advertises only the active Pro benefits in this
+   submitted build.
+4. Confirm App Store review notes explain RevenueCat purchase/restore,
+   Account AV access refresh, and the App Store subscription management route.
+5. Confirm App Store product mapping, server notifications, and purchase
+   reconciliation are ready for the shipping environment before release.
 
 ## Release Sign-Off
 

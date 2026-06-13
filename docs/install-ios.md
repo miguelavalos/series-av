@@ -27,7 +27,9 @@ never put a RevenueCat secret key in native config.
 V1 uses the same guest/free local-only and Pro paywall/subscription pattern as
 Tune AV. Cloud sync is Pro-only.
 
-Accepted V1 access limits are compiled into the iOS access layer:
+Accepted V1 access limits are compiled into the iOS access layer. The Avi daily
+limits are a reserved entitlement contract for later Avi-assisted Series AV
+flows; the current V1 iOS surface does not expose standalone Avi actions yet.
 
 - Guest: 25 active library series and 5 Avi actions/day.
 - Signed-in Free: 75 active library series and 15 Avi actions/day.
