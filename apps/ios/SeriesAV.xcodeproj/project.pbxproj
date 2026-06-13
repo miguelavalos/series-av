@@ -15,6 +15,7 @@
 		3E6B8AE873E00FD5A55FDDEF /* SeriesLibraryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6E1160762AEF2A117BAE4A3 /* SeriesLibraryModels.swift */; };
 		40E46CA02D7EA0EEB7DCEE5B /* AVProductAccountFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 197D8D418F464FA352F78772 /* AVProductAccountFoundation */; };
 		4635329479183AA26672A051 /* SeriesAppDataSyncClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40364B2B84E6AC647B728FB /* SeriesAppDataSyncClient.swift */; };
+		48F5DA44C9E47D08A707B9D1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C6F54EEDDB4D7438D5A4B50 /* Assets.xcassets */; };
 		4CA7CFF4D7974F4190454B09 /* SeriesAccessModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C97F5A3F29AAA0D7BB6E8D9 /* SeriesAccessModels.swift */; };
 		6A5D801612D51B6F370F6949 /* SeriesAVAccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E35FAF1A25D734B526F9350 /* SeriesAVAccountService.swift */; };
 		93E1DFEF1203442F74B1D4BF /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2568399CFB4C7A1E14832801 /* AppConfig.swift */; };
@@ -59,6 +60,7 @@
 		326ED2E28D2DC33ECDA6917C /* SeriesProPaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesProPaywallView.swift; sourceTree = "<group>"; };
 		45AF87B75A9721D260B4C3E1 /* SeriesAuthOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAuthOnboardingView.swift; sourceTree = "<group>"; };
 		46116EC3820DEBFB599F0E49 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		4C6F54EEDDB4D7438D5A4B50 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4C97F5A3F29AAA0D7BB6E8D9 /* SeriesAccessModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccessModels.swift; sourceTree = "<group>"; };
 		557E2299A00C28395D71C339 /* SeriesAppBootstrapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppBootstrapView.swift; sourceTree = "<group>"; };
 		5C2045BD1DAB63090578AC6B /* SeriesAV.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SeriesAV.entitlements; sourceTree = "<group>"; };
@@ -133,6 +135,7 @@
 			isa = PBXGroup;
 			children = (
 				2568399CFB4C7A1E14832801 /* AppConfig.swift */,
+				4C6F54EEDDB4D7438D5A4B50 /* Assets.xcassets */,
 				CE164B8C0FC2D8FA1427899D /* Info.plist */,
 				72139F60FD554069885EE731 /* PrivacyInfo.xcprivacy */,
 				145DE7E7B082B7D92C440A5B /* RootView.swift */,
@@ -338,6 +341,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C2AA86A6CC3043D4021B9B09 /* Localizable.strings in Resources */,
+				48F5DA44C9E47D08A707B9D1 /* Assets.xcassets in Resources */,
 				3D36749576FEBB0BBB92401B /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
