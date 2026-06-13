@@ -249,11 +249,20 @@ struct SeriesProfileScreen: View {
             )
             .accessibilityIdentifier("profile.pro.upgrade")
         case .signedInPro:
-            AVSettingsInfoRow(
-                systemImage: "checkmark.seal",
-                title: L10n.string("profile.pro.active.title"),
-                detail: L10n.string("profile.pro.active.detail")
-            )
+            VStack(alignment: .leading, spacing: 12) {
+                AVSettingsInfoRow(
+                    systemImage: "checkmark.seal",
+                    title: L10n.string("profile.pro.active.title"),
+                    detail: L10n.string("profile.pro.active.detail")
+                )
+
+                AVSettingsButton(
+                    title: L10n.string("profile.pro.manage"),
+                    style: .secondary,
+                    action: openAppleSubscriptionManagement
+                )
+                .accessibilityIdentifier("profile.pro.manage")
+            }
         }
     }
 
@@ -437,6 +446,11 @@ struct SeriesProfileScreen: View {
 
     private func openAccountDeletion() {
         guard let url = appExperience.legalLinks.accountDeletionURL ?? AppConfig.accountDeletionURL else { return }
+        openURL(url)
+    }
+
+    private func openAppleSubscriptionManagement() {
+        guard let url = URL(string: "https://apps.apple.com/account/subscriptions") else { return }
         openURL(url)
     }
 }

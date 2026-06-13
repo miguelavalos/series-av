@@ -139,8 +139,6 @@
 "profile.pro.title" = "Series AV Pro";
 "profile.pro.sync.title" = "Sync de compte";
 "profile.pro.sync.detail" = "Preparez votre suivi pour qu'il puisse suivre votre compte entre appareils.";
-"profile.pro.restore.title" = "Restaurer les achats";
-"profile.pro.restore.detail" = "La restauration vivra ici quand le paywall sera connecte.";
 "profile.safety.title" = "Securite du compte";
 "profile.safety.subtitle" = "Les actions de compte ouvrent le flux partage Account AV.";
 "profile.safety.delete.title" = "Supprimer le compte";
@@ -161,6 +159,7 @@
 "profile.pro.subtitle.pro" = "Votre compte a les capacites Pro.";
 "profile.pro.signIn" = "Se connecter pour Pro";
 "profile.pro.upgrade" = "Passer a Pro";
+"profile.pro.manage" = "Gerer l'abonnement";
 "profile.pro.active.title" = "Pro actif";
 "profile.pro.active.detail" = "Votre compte est pret pour Sync Pro et les limites premium.";
 "paywall.navigationTitle" = "Series AV Pro";

@@ -139,8 +139,6 @@
 "profile.pro.title" = "Series AV Pro";
 "profile.pro.sync.title" = "Sync de compte";
 "profile.pro.sync.detail" = "Prepara el seguiment per poder seguir el compte entre dispositius.";
-"profile.pro.restore.title" = "Restaurar compres";
-"profile.pro.restore.detail" = "La restauracio viura aqui quan connectem el paywall.";
 "profile.safety.title" = "Seguretat de compte";
 "profile.safety.subtitle" = "Les accions de compte obren el flux compartit d'Account AV.";
 "profile.safety.delete.title" = "Eliminar compte";
@@ -161,6 +159,7 @@
 "profile.pro.subtitle.pro" = "El teu compte te capacitats Pro.";
 "profile.pro.signIn" = "Iniciar sessio per Pro";
 "profile.pro.upgrade" = "Millorar a Pro";
+"profile.pro.manage" = "Gestionar subscripcio";
 "profile.pro.active.title" = "Pro actiu";
 "profile.pro.active.detail" = "El teu compte esta llest per Sync Pro i limits premium.";
 "paywall.navigationTitle" = "Series AV Pro";
