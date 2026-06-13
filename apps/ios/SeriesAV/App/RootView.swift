@@ -79,6 +79,7 @@ private struct SeriesWatchingHomeScreen: View {
     @State private var isShowingAddSheet = false
     @State private var isShowingLibrarySheet = false
     @State private var isShowingProPaywall = false
+    @State private var pendingProPaywallAfterAddDismiss = false
     @State private var initialLibraryFilter: SeriesLibraryFilter = .all
     @State private var pendingUndo: PendingLibraryUndo?
     @State private var pendingProgressUndo: PendingProgressUndo?
@@ -245,9 +246,8 @@ private struct SeriesWatchingHomeScreen: View {
                 canAddSeries: canAddSeries,
                 remainingSeriesCount: remainingSeriesCount,
                 openProPaywall: {
-                    DispatchQueue.main.async {
-                        isShowingProPaywall = true
-                    }
+                    pendingProPaywallAfterAddDismiss = true
+                    isShowingAddSheet = false
                 },
                 didAddSeries: { entry in
                     pendingProgressUndo = nil
@@ -286,6 +286,11 @@ private struct SeriesWatchingHomeScreen: View {
                 accessController: accessController,
                 startSignInFlow: startSignInFlow
             )
+        }
+        .onChange(of: isShowingAddSheet) { _, isShowing in
+            guard !isShowing, pendingProPaywallAfterAddDismiss else { return }
+            pendingProPaywallAfterAddDismiss = false
+            isShowingProPaywall = true
         }
     }
 
@@ -943,7 +948,6 @@ private struct SeriesAddSheet: View {
 
                         if shouldShowUpgradeAction {
                             Button {
-                                dismiss()
                                 openProPaywall()
                             } label: {
                                 Label(L10n.string("add.footer.upgrade"), systemImage: "sparkles")
