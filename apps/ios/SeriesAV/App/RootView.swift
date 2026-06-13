@@ -125,7 +125,9 @@ private struct SeriesWatchingHomeScreen: View {
                         }
                     )
                 } else {
-                    SeriesEmptyWatchingView()
+                    SeriesEmptyWatchingView {
+                        isShowingAddSheet = true
+                    }
                 }
 
                 SeriesLibrarySummaryStrip(
@@ -1616,16 +1618,36 @@ private struct SeriesPosterMark: View {
 }
 
 private struct SeriesEmptyWatchingView: View {
+    let addSeries: () -> Void
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Image(systemName: "play.rectangle")
-                .font(.system(size: 28, weight: .semibold))
-                .foregroundStyle(.secondary)
-            Text(L10n.string("home.empty.title"))
-                .font(.system(size: 22, weight: .bold))
-            Text(L10n.string("home.empty.subtitle"))
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(.secondary)
+        HStack(alignment: .center, spacing: 16) {
+            ZStack {
+                SeriesPosterMark(seed: "Series AV", size: 74)
+
+                Image(systemName: "plus")
+                    .font(.system(size: 18, weight: .black))
+                    .foregroundStyle(.white)
+                    .frame(width: 34, height: 34)
+                    .background(.ultraThinMaterial, in: Circle())
+            }
+
+            VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(L10n.string("home.empty.title"))
+                        .font(.system(size: 22, weight: .bold))
+                    Text(L10n.string("home.empty.subtitle"))
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Button(action: addSeries) {
+                    Label(L10n.string("home.add"), systemImage: "plus")
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.regular)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
