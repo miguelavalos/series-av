@@ -104,6 +104,14 @@ final class SeriesLibraryStore {
         persist()
     }
 
+    func clearProgress(for entryId: String, at date: Date = Date()) {
+        guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
+            return
+        }
+        entries[index].clearProgress(at: date)
+        persist()
+    }
+
     func markNextEpisodeWatched(for entryId: String, at date: Date = Date()) {
         guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
             return

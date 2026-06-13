@@ -236,6 +236,11 @@ private struct SeriesWatchingHomeScreen: View {
                     pendingProgressUndo = progressUndo(for: entry)
                     pendingUndo = nil
                     store.markWatchedThrough(cursor, for: entry.id)
+                },
+                clearProgress: {
+                    pendingProgressUndo = progressUndo(for: entry)
+                    pendingUndo = nil
+                    store.clearProgress(for: entry.id)
                 }
             )
             .presentationDetents([.medium])
@@ -274,6 +279,9 @@ private struct SeriesWatchingHomeScreen: View {
                 },
                 markWatchedThrough: { entry, cursor in
                     store.markWatchedThrough(cursor, for: entry.id)
+                },
+                clearProgress: { entry in
+                    store.clearProgress(for: entry.id)
                 },
                 restore: { entry in
                     store.restore(entry.id)
@@ -549,6 +557,7 @@ private struct SeriesLibrarySheet: View {
     let markPrevious: (SeriesLibraryEntry) -> Void
     let markNext: (SeriesLibraryEntry) -> Void
     let markWatchedThrough: (SeriesLibraryEntry, SeriesEpisodeCursor) -> Void
+    let clearProgress: (SeriesLibraryEntry) -> Void
     let restore: (SeriesLibraryEntry) -> Void
     let delete: (SeriesLibraryEntry) -> Void
 
@@ -566,6 +575,7 @@ private struct SeriesLibrarySheet: View {
         markPrevious: @escaping (SeriesLibraryEntry) -> Void,
         markNext: @escaping (SeriesLibraryEntry) -> Void,
         markWatchedThrough: @escaping (SeriesLibraryEntry, SeriesEpisodeCursor) -> Void,
+        clearProgress: @escaping (SeriesLibraryEntry) -> Void,
         restore: @escaping (SeriesLibraryEntry) -> Void,
         delete: @escaping (SeriesLibraryEntry) -> Void
     ) {
@@ -576,6 +586,7 @@ private struct SeriesLibrarySheet: View {
         self.markPrevious = markPrevious
         self.markNext = markNext
         self.markWatchedThrough = markWatchedThrough
+        self.clearProgress = clearProgress
         self.restore = restore
         self.delete = delete
         _selectedFilter = State(initialValue: initialFilter)
@@ -727,6 +738,11 @@ private struct SeriesLibrarySheet: View {
                         pendingProgressUndo = progressUndo(for: entry)
                         pendingLibraryUndo = nil
                         markWatchedThrough(entry, cursor)
+                    },
+                    clearProgress: {
+                        pendingProgressUndo = progressUndo(for: entry)
+                        pendingLibraryUndo = nil
+                        clearProgress(entry)
                     }
                 )
                 .presentationDetents([.medium])
@@ -1348,13 +1364,19 @@ private struct SeriesProgressEditorSheet: View {
     @Environment(\.dismiss) private var dismiss
     let entry: SeriesLibraryEntry
     let markWatchedThrough: (SeriesEpisodeCursor) -> Void
+    let clearProgress: () -> Void
 
     @State private var seasonNumber: Int
     @State private var episodeNumber: Int
 
-    init(entry: SeriesLibraryEntry, markWatchedThrough: @escaping (SeriesEpisodeCursor) -> Void) {
+    init(
+        entry: SeriesLibraryEntry,
+        markWatchedThrough: @escaping (SeriesEpisodeCursor) -> Void,
+        clearProgress: @escaping () -> Void
+    ) {
         self.entry = entry
         self.markWatchedThrough = markWatchedThrough
+        self.clearProgress = clearProgress
         let cursor = entry.lastWatchedEpisodeCursor ?? SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 1)
         _seasonNumber = State(initialValue: cursor.seasonNumber)
         _episodeNumber = State(initialValue: cursor.episodeNumber)
@@ -1382,6 +1404,16 @@ private struct SeriesProgressEditorSheet: View {
                     } label: {
                         Text(confirmTitle)
                             .frame(maxWidth: .infinity)
+                    }
+
+                    if entry.lastWatchedEpisodeCursor != nil {
+                        Button(role: .destructive) {
+                            clearProgress()
+                            dismiss()
+                        } label: {
+                            Text(L10n.string("home.notStarted"))
+                                .frame(maxWidth: .infinity)
+                        }
                     }
                 }
             }

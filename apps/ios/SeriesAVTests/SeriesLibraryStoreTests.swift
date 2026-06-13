@@ -174,6 +174,19 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertEqual(store.entries[0].status, .wantToWatch)
     }
 
+    func testClearProgressResetsEntryToWantToWatch() {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = SeriesLibraryStore(entries: [
+            entry(id: "entry", title: "Entry", pinned: false, interactedAt: date)
+        ])
+
+        store.markWatchedThrough(SeriesEpisodeCursor(seasonNumber: 2, episodeNumber: 4), for: "entry", at: date)
+        store.clearProgress(for: "entry", at: date.addingTimeInterval(10))
+
+        XCTAssertNil(store.entries[0].lastWatchedEpisodeCursor)
+        XCTAssertEqual(store.entries[0].status, .wantToWatch)
+    }
+
     func testRestoreProgressRestoresExactStatusAndCursor() {
         let date = Date(timeIntervalSince1970: 1_800_000_000)
         let store = SeriesLibraryStore(entries: [
