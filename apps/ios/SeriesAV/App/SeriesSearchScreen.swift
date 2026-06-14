@@ -22,7 +22,7 @@ struct SeriesSearchScreen: View {
         AVAppShellScrollableScreenScaffold(
             alignment: .leading,
             spacing: 16,
-            bottomPadding: 176
+            bottomPadding: 236
         ) {
             AVBrandSurface.shellBackground
         } content: {
@@ -290,15 +290,6 @@ struct SeriesSearchScreen: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.vertical, 14)
-            } else if isSearchingCatalog && trimmedQuery.isEmpty {
-                HStack(spacing: 10) {
-                    ProgressView()
-                    Text(L10n.string("search.collection.updating"))
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.vertical, 4)
             } else if localMatches.isEmpty && visibleCatalogResults.isEmpty {
                 ContentUnavailableView(
                     L10n.string("library.search.empty.title"),
