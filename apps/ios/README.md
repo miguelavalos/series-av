@@ -19,6 +19,8 @@ Current scaffold:
 - V1 local library models with a single progress cursor per series.
 - Local store behavior for reversible progress updates and Home priority.
 - Guest, signed-in Free, and Pro access models aligned with Account AV `/v1/me/access`.
+- Series access limits mirror `shared/contracts/access-policy.json`, including
+  `activeLibrarySeries` and `aviActionsPerDay`.
 - Series AV entitlement service that selects the `seriesav` app entry and uses
   the Apps AV user id as the account authority.
 - Shared Account AV service/controller foundation for provider session restore,
@@ -56,6 +58,16 @@ Current scaffold:
 - Unit-test build coverage for library identity, cursor updates, app-data sync
   envelopes, access entitlement resolution, account session hydration, and Pro
   purchase reconciliation.
+
+Release/prod runtime config check:
+
+```bash
+scripts/verify-ios-runtime-config.sh production
+```
+
+Account-gated onboarding tests should model the real restore contract: active
+provider session, non-empty provider token, and internal Apps AV user resolution
+before asserting signed-in UI state.
 
 Still pending before App Store submission:
 

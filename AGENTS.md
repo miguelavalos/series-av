@@ -42,6 +42,8 @@ Mandatory rules:
   `ACCOUNTAV_PUBLISHABLE_KEY`, `ACCOUNTAV_KEYCHAIN_SERVICE`, and
   `ACCOUNTAV_KEYCHAIN_ACCESS_GROUP` must be exposed through Info.plist,
   passed to Account AV, and validated by the runtime config check;
+- Series AV's Release/prod runtime config check is
+  `scripts/verify-ios-runtime-config.sh production`;
 - keep private URLs, service identifiers, approval status, and operations
   evidence out of this public repo;
 - treat Account AV provider session identity as session metadata only; product
