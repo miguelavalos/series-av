@@ -421,7 +421,7 @@ private struct SeriesHomeAviBrief: View {
             Image("AviOnboardingCTA")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 58, height: 58)
+                .frame(width: 50, height: 50)
         }
     }
 
@@ -795,12 +795,12 @@ private struct SeriesCurrentWatchingCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 14) {
             heroTopBar
             heroMain
             heroControls
         }
-        .padding(18)
+        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(heroBackground)
         .contentShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
@@ -817,14 +817,14 @@ private struct SeriesCurrentWatchingCard: View {
     }
 
     private var heroTopBar: some View {
-        HStack(alignment: .center, spacing: 10) {
+        HStack(alignment: .center, spacing: 8) {
             Text(currentTitle)
                 .font(.system(size: 11, weight: .black))
                 .tracking(0.7)
                 .foregroundStyle(topPillTextColor)
                 .textCase(.uppercase)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 7)
+                .padding(.horizontal, 9)
+                .padding(.vertical, 6)
                 .background(topPillFill, in: Capsule())
                 .overlay {
                     Capsule().stroke(topPillStroke, lineWidth: 1)
@@ -836,8 +836,8 @@ private struct SeriesCurrentWatchingCard: View {
                 .foregroundStyle(topPillTextColor.opacity(0.84))
                 .lineLimit(1)
                 .minimumScaleFactor(0.78)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 7)
+                .padding(.horizontal, 9)
+                .padding(.vertical, 6)
                 .background(topPillFill.opacity(0.72), in: Capsule())
                 .overlay {
                     Capsule().stroke(topPillStroke.opacity(0.72), lineWidth: 1)
@@ -849,10 +849,10 @@ private struct SeriesCurrentWatchingCard: View {
     }
 
     private var heroMain: some View {
-        HStack(alignment: .bottom, spacing: 14) {
-            VStack(alignment: .leading, spacing: 9) {
+        HStack(alignment: .bottom, spacing: 12) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(entry.title)
-                    .font(.system(size: 30, weight: .black, design: .rounded))
+                    .font(.system(size: 28, weight: .black, design: .rounded))
                     .foregroundStyle(heroTitleColor)
                     .lineLimit(2)
                     .minimumScaleFactor(0.62)
@@ -866,24 +866,24 @@ private struct SeriesCurrentWatchingCard: View {
                         .monospacedDigit()
                 }
                 .foregroundStyle(AVBrandColor.accent)
-                .padding(.horizontal, 11)
-                .padding(.vertical, 7)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
                 .background(AVBrandColor.accent.opacity(colorScheme == .dark ? 0.18 : 0.14), in: Capsule())
             }
             .layoutPriority(1)
 
-            SeriesEntryArtworkView(entry: entry, size: 76)
+            SeriesEntryArtworkView(entry: entry, size: 70)
                 .accessibilityHidden(true)
         }
     }
 
     private var heroControls: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 9) {
             Button(action: primaryAction) {
                 Image(systemName: primaryIconName)
-                    .font(.system(size: 21, weight: .black))
+                    .font(.system(size: 20, weight: .black))
                     .foregroundStyle(Color.black.opacity(0.84))
-                    .frame(width: 54, height: 54)
+                    .frame(width: 50, height: 50)
                     .background(AVBrandColor.accent, in: Circle())
             }
             .buttonStyle(.plain)
@@ -893,9 +893,9 @@ private struct SeriesCurrentWatchingCard: View {
                 isShowingProgressSelector = true
             } label: {
                 Image(systemName: "scope")
-                    .font(.system(size: 18, weight: .bold))
+                    .font(.system(size: 17, weight: .bold))
                     .foregroundStyle(heroControlIconColor)
-                    .frame(width: 48, height: 48)
+                    .frame(width: 46, height: 46)
                     .background(heroControlSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
                     .overlay {
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
@@ -908,9 +908,9 @@ private struct SeriesCurrentWatchingCard: View {
             if entry.lastWatchedEpisodeCursor?.canStepBackQuickly == true {
                 Button(action: markPrevious) {
                     Image(systemName: "arrow.counterclockwise")
-                        .font(.system(size: 18, weight: .bold))
+                        .font(.system(size: 17, weight: .bold))
                         .foregroundStyle(heroControlIconColor)
-                        .frame(width: 48, height: 48)
+                        .frame(width: 46, height: 46)
                         .background(heroControlSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
                         .overlay {
                             RoundedRectangle(cornerRadius: 18, style: .continuous)
