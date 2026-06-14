@@ -65,6 +65,8 @@
 "home.editor.footer.realGuide" = "Elige el último episodio visto. Los anteriores quedan vistos y los posteriores pendientes.";
 "home.editor.footer.loadingGuide" = "Preparando episodios.";
 "home.editor.confirm" = "Fijar punto visto";
+"home.editor.confirmThrough" = "Fijar hasta %@";
+"home.editor.watchedThrough" = "Quedará visto hasta %@";
 "home.editor.startPrompt" = "Último episodio visto";
 "home.editor.confirmFirstPoint" = "Marcar este episodio visto";
 "home.editor.confirmStart" = "Empezar desde este punto";

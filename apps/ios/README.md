@@ -44,7 +44,11 @@ Current scaffold:
   should be shown once as the local tracked row.
 - Episode tracking uses one reversible progress cursor, compact season/episode
   selection, known episode guides when available, and generic large-range
-  episode navigation when no guide is available.
+  episode navigation when no guide is available. The progress editor must make
+  the resulting state explicit: the selected cursor is the last watched point,
+  all previous episodes become watched, following episodes become pending, the
+  next episode remains visible, and the primary action should include the exact
+  target cursor.
 - Unit-test build coverage for library identity, cursor updates, app-data sync
   envelopes, access entitlement resolution, account session hydration, and Pro
   purchase reconciliation.

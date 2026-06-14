@@ -65,6 +65,8 @@
 "home.editor.footer.realGuide" = "Waehle die zuletzt gesehene Folge. Fruehere Folgen gelten als gesehen, spaetere bleiben offen.";
 "home.editor.footer.loadingGuide" = "Folgen werden vorbereitet.";
 "home.editor.confirm" = "Gesehenen Punkt setzen";
+"home.editor.confirmThrough" = "Bis %@ setzen";
+"home.editor.watchedThrough" = "Gesehen bis %@";
 "home.editor.startPrompt" = "Zuletzt gesehene Folge";
 "home.editor.confirmFirstPoint" = "Diese Folge als gesehen markieren";
 "home.editor.confirmStart" = "Ab diesem Punkt starten";

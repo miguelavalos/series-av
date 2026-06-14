@@ -1497,17 +1497,25 @@ struct SeriesProgressEditorSheet: View {
                         .font(.system(size: 13, weight: .bold))
                         .foregroundStyle(.secondary)
 
-                    Text(selectedCursorLabel)
-                        .font(.system(size: 36, weight: .black, design: .rounded))
-                        .monospacedDigit()
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.75)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(selectedCursorLabel)
+                            .font(.system(size: 36, weight: .black, design: .rounded))
+                            .monospacedDigit()
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.75)
 
-                    Text(String(format: L10n.string("home.current.nextEpisode"), cursorLabel(selectedCursor.nextEpisode)))
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundStyle(AVBrandColor.accent)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
+                        Text(String(format: L10n.string("home.editor.watchedThrough"), selectedCursorLabel))
+                            .font(.system(size: 13, weight: .black))
+                            .foregroundStyle(.primary)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Text(String(format: L10n.string("home.current.nextEpisode"), cursorLabel(selectedCursor.nextEpisode)))
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(AVBrandColor.accent)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
                 .layoutPriority(1)
 
@@ -1623,7 +1631,7 @@ struct SeriesProgressEditorSheet: View {
     }
 
     private var confirmTitle: String {
-        entry.lastWatchedEpisodeCursor == nil ? L10n.string("home.editor.confirmFirstPoint") : L10n.string("home.editor.confirm")
+        String(format: L10n.string("home.editor.confirmThrough"), selectedCursorLabel)
     }
 
     private var selectedCursorLabel: String {

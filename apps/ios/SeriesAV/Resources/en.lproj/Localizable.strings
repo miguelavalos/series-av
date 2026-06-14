@@ -65,6 +65,8 @@
 "home.editor.footer.realGuide" = "Choose the last watched episode. Earlier episodes become watched and later episodes stay pending.";
 "home.editor.footer.loadingGuide" = "Preparing episodes.";
 "home.editor.confirm" = "Set watched point";
+"home.editor.confirmThrough" = "Set through %@";
+"home.editor.watchedThrough" = "Watched through %@";
 "home.editor.startPrompt" = "Last episode watched";
 "home.editor.confirmFirstPoint" = "Mark this episode watched";
 "home.editor.confirmStart" = "Start from this point";
