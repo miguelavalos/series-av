@@ -68,7 +68,7 @@ private struct SeriesWatchingHomeScreen: View {
     var body: some View {
         AVAppShellScrollableScreenScaffold(
             alignment: .leading,
-            spacing: 18
+            spacing: 16
         ) {
             AVBrandSurface.shellBackground
         } content: {
@@ -1066,92 +1066,6 @@ private struct SeriesCurrentWatchingCard: View {
     }
 }
 
-private struct SeriesProgressChoiceButton: View {
-    let entry: SeriesLibraryEntry
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 14) {
-                ZStack {
-                    Circle()
-                        .fill(AVBrandColor.accent.opacity(0.14))
-                    Image(systemName: "scope")
-                        .font(.system(size: 21, weight: .bold))
-                        .foregroundStyle(AVBrandColor.accent)
-                }
-                .frame(width: 46, height: 46)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(L10n.string("home.quickProgress.title"))
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(.secondary)
-                    Text(progressText)
-                        .font(.system(size: 19, weight: .black, design: .rounded))
-                        .foregroundStyle(.primary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.78)
-                    Text(L10n.string("home.editor.footer"))
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-                }
-
-                Spacer(minLength: 0)
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .buttonStyle(.plain)
-        .padding(14)
-        .background(Color(.secondarySystemGroupedBackground).opacity(0.74), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .stroke(Color.primary.opacity(0.07), lineWidth: 1)
-        }
-        .accessibilityHint(L10n.string("home.adjust"))
-    }
-
-    private var progressText: String {
-        if let lastWatched = entry.lastWatchedEpisodeCursor {
-            return String(format: L10n.string("home.current.progress"), cursorLabel(lastWatched))
-        }
-        return String(format: L10n.string("home.queue.wantToWatch.progress"), cursorLabel(entry.nextEpisodeCursor))
-    }
-}
-
-private struct SeriesPrimaryContinueButton: View {
-    let title: String
-    let episodeLabel: String
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 14) {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 24, weight: .bold))
-
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(title)
-                        .font(.system(size: 13, weight: .bold))
-                    Text(episodeLabel)
-                        .font(.system(size: 26, weight: .black, design: .rounded))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.72)
-                }
-
-                Spacer()
-            }
-            .frame(maxWidth: .infinity, minHeight: 86)
-            .padding(.horizontal, 16)
-        }
-        .buttonStyle(.borderedProminent)
-        .controlSize(.large)
-    }
-}
-
 private struct SeriesWatchingQueueSection: View {
     let entries: [SeriesLibraryEntry]
     let markNext: (SeriesLibraryEntry) -> Void
@@ -1170,12 +1084,14 @@ private struct SeriesWatchingQueueSection: View {
             VStack(spacing: 6) {
                 ForEach(entries) { entry in
                     HStack(spacing: 12) {
-                        SeriesEntryArtworkView(entry: entry, size: 40)
+                        SeriesEntryArtworkView(entry: entry, size: 42)
+                            .accessibilityHidden(true)
 
                         VStack(alignment: .leading, spacing: 3) {
                             Text(entry.title)
                                 .font(.system(size: 15, weight: .semibold))
                                 .lineLimit(2)
+                                .minimumScaleFactor(0.82)
                                 .fixedSize(horizontal: false, vertical: true)
                             Text(queueProgress(for: entry))
                                 .font(.system(size: 12, weight: .medium))
@@ -1190,10 +1106,13 @@ private struct SeriesWatchingQueueSection: View {
                         Button {
                             markNext(entry)
                         } label: {
-                            Image(systemName: "checkmark")
-                                .frame(width: 32, height: 32)
+                            Image(systemName: entry.status == .wantToWatch ? "play.fill" : "checkmark")
+                                .font(.system(size: 14, weight: .black))
+                                .foregroundStyle(Color.black.opacity(0.84))
+                                .frame(width: 34, height: 34)
+                                .background(AVBrandColor.accent, in: Circle())
                         }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(.plain)
                         .accessibilityLabel(primaryActionTitle(for: entry))
 
                         SeriesEntryActionsMenu(
