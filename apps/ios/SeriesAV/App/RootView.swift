@@ -68,7 +68,8 @@ private struct SeriesWatchingHomeScreen: View {
     var body: some View {
         AVAppShellScrollableScreenScaffold(
             alignment: .leading,
-            spacing: 16
+            spacing: 16,
+            bottomPadding: 176
         ) {
             AVBrandSurface.shellBackground
         } content: {
@@ -794,12 +795,12 @@ private struct SeriesCurrentWatchingCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 16) {
             heroTopBar
             heroMain
             heroControls
         }
-        .padding(20)
+        .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(heroBackground)
         .contentShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
@@ -848,13 +849,13 @@ private struct SeriesCurrentWatchingCard: View {
     }
 
     private var heroMain: some View {
-        HStack(alignment: .bottom, spacing: 16) {
-            VStack(alignment: .leading, spacing: 10) {
+        HStack(alignment: .bottom, spacing: 14) {
+            VStack(alignment: .leading, spacing: 9) {
                 Text(entry.title)
-                    .font(.system(size: 34, weight: .black, design: .rounded))
+                    .font(.system(size: 30, weight: .black, design: .rounded))
                     .foregroundStyle(heroTitleColor)
-                    .lineLimit(3)
-                    .minimumScaleFactor(0.66)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.62)
                     .fixedSize(horizontal: false, vertical: true)
 
                 HStack(spacing: 7) {
@@ -871,7 +872,7 @@ private struct SeriesCurrentWatchingCard: View {
             }
             .layoutPriority(1)
 
-            SeriesEntryArtworkView(entry: entry, size: 82)
+            SeriesEntryArtworkView(entry: entry, size: 76)
                 .accessibilityHidden(true)
         }
     }
@@ -882,7 +883,7 @@ private struct SeriesCurrentWatchingCard: View {
                 Image(systemName: primaryIconName)
                     .font(.system(size: 21, weight: .black))
                     .foregroundStyle(Color.black.opacity(0.84))
-                    .frame(width: 58, height: 58)
+                    .frame(width: 54, height: 54)
                     .background(AVBrandColor.accent, in: Circle())
             }
             .buttonStyle(.plain)
@@ -894,7 +895,7 @@ private struct SeriesCurrentWatchingCard: View {
                 Image(systemName: "scope")
                     .font(.system(size: 18, weight: .bold))
                     .foregroundStyle(heroControlIconColor)
-                    .frame(width: 52, height: 52)
+                    .frame(width: 48, height: 48)
                     .background(heroControlSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
                     .overlay {
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
@@ -909,7 +910,7 @@ private struct SeriesCurrentWatchingCard: View {
                     Image(systemName: "arrow.counterclockwise")
                         .font(.system(size: 18, weight: .bold))
                         .foregroundStyle(heroControlIconColor)
-                        .frame(width: 52, height: 52)
+                        .frame(width: 48, height: 48)
                         .background(heroControlSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
                         .overlay {
                             RoundedRectangle(cornerRadius: 18, style: .continuous)
@@ -1967,45 +1968,6 @@ private struct SeriesProgressEpisodeGuide: Equatable {
 
     private func index(for cursor: SeriesEpisodeCursor) -> [SeriesEpisodeGuideItem].Index? {
         items.firstIndex { $0.seasonNumber == cursor.seasonNumber && $0.episodeNumber == cursor.episodeNumber }
-    }
-}
-
-private struct SeriesEpisodeChip: View {
-    let title: String
-    let value: String
-    let systemImage: String
-    let action: () -> Void
-    var isProminent = false
-
-    @ViewBuilder
-    var body: some View {
-        if isProminent {
-            button
-                .buttonStyle(.borderedProminent)
-        } else {
-            button
-                .buttonStyle(.bordered)
-        }
-    }
-
-    private var button: some View {
-        Button(action: action) {
-            content
-        }
-    }
-
-    private var content: some View {
-        VStack(spacing: 8) {
-            Image(systemName: systemImage)
-                .font(.system(size: 16, weight: .bold))
-            Text(title)
-                .font(.system(size: 12, weight: .bold))
-            Text(value)
-                .font(.system(size: 16, weight: .bold, design: .rounded))
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-        }
-        .frame(maxWidth: .infinity, minHeight: 64)
     }
 }
 
