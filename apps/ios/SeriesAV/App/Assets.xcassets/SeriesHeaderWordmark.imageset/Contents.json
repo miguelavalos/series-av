@@ -3,6 +3,16 @@
     {
       "filename" : "series-av-wordmark.png",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "series-av-wordmark-dark.png",
+      "idiom" : "universal"
     }
   ],
   "info" : {

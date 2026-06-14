@@ -3,6 +3,16 @@
     {
       "filename" : "series-av-logo.png",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "series-av-logo-dark.png",
+      "idiom" : "universal"
     }
   ],
   "info" : {
