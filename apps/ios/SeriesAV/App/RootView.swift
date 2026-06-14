@@ -62,6 +62,7 @@ private struct SeriesWatchingHomeScreen: View {
     @State private var isShowingProPaywall = false
     @State private var pendingProPaywallAfterAddDismiss = false
     @State private var pendingSignInAfterAddDismiss = false
+    @State private var pendingProgressEditorAfterAddDismiss: SeriesLibraryEntry?
     @State private var pendingUndo: PendingLibraryUndo?
     @State private var pendingProgressUndo: PendingProgressUndo?
 
@@ -265,6 +266,7 @@ private struct SeriesWatchingHomeScreen: View {
                 didAddSeries: { entry in
                     pendingProgressUndo = nil
                     pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.added")
+                    pendingProgressEditorAfterAddDismiss = entry
                 }
             )
             .presentationDetents([.medium, .large])
@@ -287,6 +289,12 @@ private struct SeriesWatchingHomeScreen: View {
             if pendingSignInAfterAddDismiss {
                 pendingSignInAfterAddDismiss = false
                 startSignInFlow()
+                return
+            }
+
+            if let entry = pendingProgressEditorAfterAddDismiss {
+                pendingProgressEditorAfterAddDismiss = nil
+                editorEntry = entry
                 return
             }
 
@@ -352,6 +360,7 @@ private struct SeriesWatchingHomeScreen: View {
 
             pendingProgressUndo = nil
             pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.added")
+            editorEntry = entry
         }
     }
 
