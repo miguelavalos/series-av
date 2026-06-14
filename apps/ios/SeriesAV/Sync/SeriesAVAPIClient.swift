@@ -138,7 +138,7 @@ struct SeriesCatalogResolveClient: Sendable {
     func resolve(_ request: SeriesCatalogResolveRequest) async throws -> SeriesCatalogResolveResponse {
         let body = try encoder.encode(request)
         let (data, _) = try await apiClient.requestData(
-            path: "/v1/series/catalog/resolve",
+            path: "/v1/series/resolve",
             method: "POST",
             body: body,
             headers: ["Content-Type": "application/json"]
