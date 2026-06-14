@@ -17,7 +17,11 @@ struct SeriesSearchScreen: View {
     @State private var isSearchingCatalog = false
 
     var body: some View {
-        AVAppShellScrollableScreenScaffold {
+        AVAppShellScrollableScreenScaffold(
+            alignment: .leading,
+            spacing: 16,
+            bottomPadding: 176
+        ) {
             AVBrandSurface.shellBackground
         } content: {
             screenTitle(
@@ -235,49 +239,45 @@ struct SeriesSearchScreen: View {
     }
 
     private var searchResultsSection: some View {
-        AVAppShellCard {
-            VStack(alignment: .leading, spacing: 12) {
-                Text(resultsTitle)
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(AVBrandColor.textSecondary)
+        VStack(alignment: .leading, spacing: 12) {
+            Text(resultsTitle)
+                .font(.system(size: 17, weight: .black, design: .rounded))
+                .foregroundStyle(.primary)
 
-                if trimmedQuery.isEmpty == false && localMatches.isEmpty == false {
-                    ForEach(localMatches) { entry in
-                        SeriesLibrarySearchResultCard(
-                            entry: entry,
-                            editProgress: { editorEntry = entry },
-                            markNext: { store.markNextEpisodeWatched(for: entry.id) }
-                        )
-                    }
+            if trimmedQuery.isEmpty == false && localMatches.isEmpty == false {
+                ForEach(localMatches) { entry in
+                    SeriesLibrarySearchResultCard(
+                        entry: entry,
+                        editProgress: { editorEntry = entry },
+                        markNext: { store.markNextEpisodeWatched(for: entry.id) }
+                    )
                 }
+            }
 
-                if isSearchingCatalog && trimmedQuery.isEmpty == false {
-                    HStack(spacing: 10) {
-                        ProgressView()
-                        Text(L10n.string("search.loading"))
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 14)
-                } else if catalogResults.isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
-                        ContentUnavailableView(
-                            L10n.string("library.search.empty.title"),
-                            systemImage: "magnifyingglass",
-                            description: Text(L10n.string("library.search.empty.subtitle"))
-                        )
-                    }
-                } else {
-                    ForEach(catalogResults) { preview in
-                        SeriesCatalogResultCard(
-                            preview: preview,
-                            libraryEntry: libraryEntry(for: preview),
-                            canAddSeries: canAddSeries,
-                            follow: { follow(preview) },
-                            editProgress: { entry in editorEntry = entry }
-                        )
-                    }
+            if isSearchingCatalog && trimmedQuery.isEmpty == false {
+                HStack(spacing: 10) {
+                    ProgressView()
+                    Text(L10n.string("search.loading"))
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 14)
+            } else if catalogResults.isEmpty {
+                ContentUnavailableView(
+                    L10n.string("library.search.empty.title"),
+                    systemImage: "magnifyingglass",
+                    description: Text(L10n.string("library.search.empty.subtitle"))
+                )
+            } else {
+                ForEach(catalogResults) { preview in
+                    SeriesCatalogResultCard(
+                        preview: preview,
+                        libraryEntry: libraryEntry(for: preview),
+                        canAddSeries: canAddSeries,
+                        follow: { follow(preview) },
+                        editProgress: { entry in editorEntry = entry }
+                    )
                 }
             }
         }
@@ -434,20 +434,22 @@ private struct SeriesCatalogResultCard: View {
                     } label: {
                         Image(systemName: "scope")
                             .font(.system(size: 16, weight: .bold))
-                            .frame(width: 38, height: 38)
+                            .foregroundStyle(.primary)
+                            .frame(width: 40, height: 40)
+                            .background(Color(.tertiarySystemGroupedBackground), in: Circle())
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(.plain)
                     .accessibilityLabel(L10n.string("home.adjust"))
                 }
             } else {
                 Button(action: follow) {
                     Image(systemName: canAddSeries ? "plus" : "sparkles")
-                        .font(.system(size: 17, weight: .bold))
-                        .frame(width: 40, height: 40)
+                        .font(.system(size: 17, weight: .black))
+                        .foregroundStyle(canAddSeries ? Color.black.opacity(0.84) : AVBrandColor.accent)
+                        .frame(width: 42, height: 42)
+                        .background(canAddSeries ? AVBrandColor.accent : Color(.tertiarySystemGroupedBackground), in: Circle())
                 }
-                .buttonStyle(.bordered)
-                .tint(AVBrandColor.accent)
-                .controlSize(.regular)
+                .buttonStyle(.plain)
                 .accessibilityLabel(canAddSeries ? L10n.string("search.follow") : L10n.string("add.footer.upgrade"))
             }
         }
@@ -500,20 +502,21 @@ private struct SeriesLibrarySearchResultCard: View {
                 Button(action: editProgress) {
                     Image(systemName: "scope")
                         .font(.system(size: 16, weight: .bold))
-                        .frame(width: 38, height: 38)
+                        .foregroundStyle(.primary)
+                        .frame(width: 40, height: 40)
+                        .background(Color(.tertiarySystemGroupedBackground), in: Circle())
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.regular)
+                .buttonStyle(.plain)
                 .accessibilityLabel(L10n.string("home.adjust"))
 
                 Button(action: markNext) {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 16, weight: .bold))
-                        .frame(width: 38, height: 38)
+                        .font(.system(size: 16, weight: .black))
+                        .foregroundStyle(Color.black.opacity(0.84))
+                        .frame(width: 40, height: 40)
+                        .background(AVBrandColor.accent, in: Circle())
                 }
-                .buttonStyle(.bordered)
-                .tint(AVBrandColor.accent)
-                .controlSize(.regular)
+                .buttonStyle(.plain)
                 .accessibilityLabel(L10n.string("shell.watch.next"))
             }
         }
