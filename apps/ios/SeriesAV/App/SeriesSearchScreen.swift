@@ -98,6 +98,16 @@ struct SeriesSearchScreen: View {
         return store.searchEntries(matching: trimmedQuery)
     }
 
+    private var visibleCatalogResults: [SeriesCatalogPreview] {
+        let localTitles = Set(localMatches.map { SeriesLibraryIdentity.normalizedSearchText($0.title) })
+        guard localTitles.isEmpty == false else {
+            return catalogResults
+        }
+        return catalogResults.filter {
+            !localTitles.contains(SeriesLibraryIdentity.normalizedSearchText($0.title))
+        }
+    }
+
     private var searchRefreshKey: String {
         "\(selectedCollection.cacheKey)|\(trimmedQuery)"
     }
@@ -289,14 +299,14 @@ struct SeriesSearchScreen: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.vertical, 4)
-            } else if catalogResults.isEmpty {
+            } else if localMatches.isEmpty && visibleCatalogResults.isEmpty {
                 ContentUnavailableView(
                     L10n.string("library.search.empty.title"),
                     systemImage: "magnifyingglass",
                     description: Text(L10n.string("library.search.empty.subtitle"))
                 )
             } else {
-                ForEach(catalogResults) { preview in
+                ForEach(visibleCatalogResults) { preview in
                     SeriesCatalogResultCard(
                         preview: preview,
                         libraryEntry: libraryEntry(for: preview),
@@ -319,7 +329,7 @@ struct SeriesSearchScreen: View {
                 ? L10n.string("search.collection.updating")
                 : formattedCollectionCount(catalogResults.count)
         }
-        let count = localMatches.count + catalogResults.count
+        let count = localMatches.count + visibleCatalogResults.count
         return formattedResultsCount(count)
     }
 
@@ -343,6 +353,7 @@ struct SeriesSearchScreen: View {
             return
         }
         addedEntry = entry
+        editorEntry = entry
         query = ""
     }
 
@@ -373,6 +384,7 @@ struct SeriesSearchScreen: View {
                 return
             }
             addedEntry = entry
+            editorEntry = entry
         }
     }
 

@@ -39,7 +39,9 @@ Current scaffold:
   that has an approved provider poster should render it; text fallback artwork
   is only for missing/blocked posters. Search sections should expose a compact
   result count or update state so default collections and typed searches are
-  understandable without extra explanatory UI.
+  understandable without extra explanatory UI. Adding a series from Search
+  should immediately open progress adjustment, and exact local/catalog matches
+  should be shown once as the local tracked row.
 - Episode tracking uses one reversible progress cursor, compact season/episode
   selection, known episode guides when available, and generic large-range
   episode navigation when no guide is available.
