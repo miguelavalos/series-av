@@ -9,6 +9,7 @@ struct SeriesAppShellView: View {
 
     @Environment(\.avCommonAppExperience) private var appExperience
     @State private var store = SeriesLibraryStore.persisted()
+    @State private var librarySync = SeriesLibrarySyncCoordinator()
     @State private var chromeItem: AVAppShellChromeItem?
 
     var body: some View {
@@ -37,6 +38,12 @@ struct SeriesAppShellView: View {
                 EmptyView()
             }
         )
+        .task(id: accessController.accessMode) {
+            await librarySync.refresh(accessController: accessController, store: store)
+        }
+        .onChange(of: store.entries) { _, entries in
+            librarySync.localEntriesDidChange(entries, accessController: accessController)
+        }
     }
 
     private var footerAssistant: AVAppShellConfiguredAssistant {

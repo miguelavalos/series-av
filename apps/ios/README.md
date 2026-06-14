@@ -31,7 +31,9 @@ Current scaffold:
 - Visible Account/Profile/Settings shell using the shared Apps AV settings
   surfaces, with app language first, appearance second, local tracking context,
   help/legal links, session state, and account safety links.
-- Pro cloud-sync client contract for `/v1/apps/seriesav/data/seriesLibrary`.
+- Pro cloud-sync client and runtime coordinator for
+  `/v1/apps/seriesav/data/seriesLibrary`, enabled only when Apps AV access
+  exposes `canUseCloudSync`.
 - RevenueCat-backed Series AV Pro purchase/restore boundary and custom paywall
   shell, guarded by public xcconfig/Info.plist config and backend access
   reconciliation.
@@ -73,6 +75,7 @@ Still pending before App Store submission:
 
 - signed purchase/restore smoke through the submitted RevenueCat/App Store
   subscription configuration;
+- signed Pro cloud-sync smoke against the submitted Apps AV environment;
 - advanced account-management flows beyond shared links;
 - Convex realtime projection;
 - full catalog/enrichment polish beyond the current V1 search and fallback UI;
