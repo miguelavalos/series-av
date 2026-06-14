@@ -13,6 +13,9 @@ struct SeriesLocalEntitlementService: SeriesEntitlementServicing {
         if AppConfig.isDebugForceProModeEnabled {
             return .localFallback(for: .signedInPro)
         }
+        if SeriesUITestEnvironment.current.isProAccount {
+            return .localFallback(for: .signedInPro)
+        }
         guard user != nil else { return .guest }
         return .localFallback(for: .signedInFree)
     }

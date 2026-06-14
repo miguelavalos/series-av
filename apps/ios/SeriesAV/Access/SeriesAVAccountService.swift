@@ -40,14 +40,23 @@ struct DefaultSeriesAVAccountService: SeriesAVAccountServicing {
     )
 
     var isAvailable: Bool {
-        accountService.isAvailable
+        if Self.uiTestAccountUser != nil { return true }
+        return accountService.isAvailable
     }
 
     var providerSessionUser: SeriesAccountUser? {
-        Self.accountUser(from: accountService.providerSessionUser)
+        guard !Self.shouldForceGuestForUITests else { return nil }
+        if let uiTestAccountUser = Self.uiTestAccountUser {
+            return uiTestAccountUser
+        }
+        return Self.accountUser(from: accountService.providerSessionUser)
     }
 
     func restoreSession() async -> SeriesAVAccountSessionRestoreResult {
+        guard !Self.shouldForceGuestForUITests else { return .signedOut }
+        if let uiTestAccountUser = Self.uiTestAccountUser {
+            return .active(uiTestAccountUser)
+        }
         switch await accountService.restoreSession() {
         case .signedOut:
             return .signedOut
@@ -62,7 +71,13 @@ struct DefaultSeriesAVAccountService: SeriesAVAccountServicing {
     }
 
     func getToken() async throws -> String? {
-        try await accountService.getToken()
+        if Self.shouldUseGuestTokenForUITests {
+            return SeriesUITestEnvironment.accountToken
+        }
+        if Self.uiTestAccountUser != nil {
+            return SeriesUITestEnvironment.accountToken
+        }
+        return try await accountService.getToken()
     }
 
     func signInWithApple() async throws {
@@ -80,8 +95,27 @@ struct DefaultSeriesAVAccountService: SeriesAVAccountServicing {
     }
 
     func signOut() async throws {
+        if Self.uiTestAccountUser != nil { return }
         guard isAvailable else { return }
         try await accountService.signOut()
+    }
+
+    private static var shouldForceGuestForUITests: Bool {
+        SeriesUITestEnvironment.current.shouldForceGuest
+    }
+
+    private static var shouldUseGuestTokenForUITests: Bool {
+        let environment = SeriesUITestEnvironment.current
+        return environment.isEnabled && environment.shouldForceGuest
+    }
+
+    private static var uiTestAccountUser: SeriesAccountUser? {
+        guard SeriesUITestEnvironment.current.hasAccountOverride else { return nil }
+        return SeriesAccountUser(
+            id: SeriesUITestEnvironment.accountUserId,
+            displayName: SeriesUITestEnvironment.accountUserDisplayName,
+            emailAddress: SeriesUITestEnvironment.accountUserEmailAddress
+        )
     }
 
     private static func accountUser(from user: AccountAVUser?) -> SeriesAccountUser? {

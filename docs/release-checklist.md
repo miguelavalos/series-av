@@ -68,10 +68,10 @@ Because the iOS project currently has no native test targets, complete and sign 
 2. Sign in with Google from the simulator to confirm the web OAuth path still works.
 3. Sign in with a real Pro account in preview.
 4. Confirm account state resolves as Pro.
-5. Confirm cloud library sync runs and status updates in profile.
-6. Confirm shared lists load, open, add item, and remove item.
-7. Confirm recommendations load and status changes persist.
-8. Confirm signed-in search/detail can resolve backend-backed catalog data where expected.
+5. Confirm Pro active-series limits are exposed correctly.
+6. Confirm cloud library sync runs and status updates in profile when the submitted build enables Pro sync.
+7. Confirm signed-in search/detail can resolve backend-backed catalog data where expected.
+8. Confirm no visible shared-list, recommendation inbox, friends, public activity, or social-network surface is exposed in V1.
 
 ### Production Signed-In Smoke
 
@@ -97,11 +97,13 @@ Because the iOS project currently has no native test targets, complete and sign 
 2. Confirm the delete-account support URL is `https://series-av.avalsys.com/delete-account`.
 3. Confirm review notes explain the shared Apps AV account-deletion flow, linked-app blockers, and provider-managed subscription caveat.
 4. Confirm the build exposes the native in-app route at Profile > Account safety > Delete Apps AV account.
-5. Confirm store metadata does not promise cloud sync, Pro social, Avi actions,
-   or purchase flows that are not active in the submitted build.
+5. Confirm store metadata does not promise cloud sync, standalone Avi action
+   limits, social features, or purchase flows that are not active in the
+   submitted build.
 6. Confirm TVMaze attribution remains visible in-product.
-7. Confirm any visible TV/movie posters are supported by provider terms,
-   attribution, and release evidence.
+7. Confirm visible TV/movie posters come from approved catalog providers or
+   Series AV-owned/generated artwork, and that screenshot/release mode is using
+   the intended artwork policy.
 8. Confirm no company/platform/provider logos, availability badges, deep links,
    trailers, or embedded provider pages are visible without separate
    documented rights/terms evidence.
@@ -148,9 +150,9 @@ Current external setup snapshot, 2026-06-13:
    `seriesav_pro_monthly` to `seriesav`.
 4. Confirm visible purchase, restore, and manage-subscription actions match the
    submitted RevenueCat/App Store product configuration.
-5. Confirm Pro is framed as account-backed access for higher limits, Pro sync
-   readiness, and the future social base only where those features are active or
-   explicitly future-facing.
+5. Confirm Pro is framed only around benefits active in this submitted build:
+   higher tracking limits, active Pro account access, restore purchases, and
+   contextual Avi guidance that already exists in the app.
 6. Confirm App Store metadata advertises only the active Pro benefits in this
    submitted build.
 7. Confirm App Store review notes explain RevenueCat purchase/restore,

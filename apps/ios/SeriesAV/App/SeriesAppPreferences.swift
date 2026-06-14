@@ -23,9 +23,9 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     var autonym: String {
         switch self {
         case .english: "English"
-        case .spanish: "Espanol"
-        case .catalan: "Catala"
-        case .french: "Francais"
+        case .spanish: "Español"
+        case .catalan: "Català"
+        case .french: "Français"
         case .german: "Deutsch"
         }
     }

@@ -74,19 +74,29 @@ final class SeriesLibraryStore {
     }
 
     @discardableResult
-    func addLocalSeries(title rawTitle: String, at date: Date = Date()) -> SeriesLibraryEntry? {
+    func addLocalSeries(
+        title rawTitle: String,
+        seriesId resolvedSeriesId: String? = nil,
+        providerRef: SeriesProviderRef? = nil,
+        displayArtworkRef: String? = nil,
+        at date: Date = Date()
+    ) -> SeriesLibraryEntry? {
         let title = rawTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         guard title.isEmpty == false else {
             return nil
         }
 
-        let seriesId = "local-\(SeriesLibraryIdentity.slug(for: title))"
+        let normalizedSeriesId = resolvedSeriesId?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let seriesId = normalizedSeriesId?.isEmpty == false ? normalizedSeriesId : nil
+        let entryId = seriesId ?? "local-\(SeriesLibraryIdentity.slug(for: title))"
         let entry = SeriesLibraryEntry(
-            entryId: seriesId,
+            entryId: entryId,
             seriesId: seriesId,
+            providerRef: providerRef,
             title: title,
             status: .wantToWatch,
             lastWatchedEpisodeCursor: nil,
+            displayArtworkRef: displayArtworkRef,
             fallbackVisualSeed: title,
             addedAt: date,
             updatedAt: date,
@@ -230,6 +240,11 @@ final class SeriesLibraryStore {
 
     func replace(with incomingEntries: [SeriesLibraryEntry]) {
         entries = incomingEntries
+        persist()
+    }
+
+    func deleteAllLocalData() {
+        entries = []
         persist()
     }
 

@@ -14,34 +14,41 @@ enum AppConfig {
         BundleConfig.urlValue(for: "ACCOUNTAV_MANAGEMENT_URL")
     }
 
-    static var supportURL: URL? {
+    static var seriesConvexURL: String {
+        BundleConfig.stringValue(for: "SERIESAV_CONVEX_URL")
+    }
+
+    static var supportURL: URL {
         if let url = BundleConfig.urlValue(for: "SERIESAV_SUPPORT_URL") {
             return url
         }
 
         let email = BundleConfig.nonEmptyStringValue(for: "SERIESAV_SUPPORT_EMAIL")
-        guard let email else { return nil }
-        return URL(string: "mailto:\(email)")
+        guard let email, let emailURL = URL(string: "mailto:\(email)") else {
+            return URL(string: "mailto:support@avalsys.com")!
+        }
+        return emailURL
     }
 
-    static var termsURL: URL? {
-        BundleConfig.urlValue(for: "SERIESAV_TERMS_URL")
+    static var termsURL: URL {
+        configuredURL(for: "SERIESAV_TERMS_URL", fallback: "https://series-av.avalsys.com/terms")
     }
 
-    static var privacyURL: URL? {
-        BundleConfig.urlValue(for: "SERIESAV_PRIVACY_URL")
+    static var privacyURL: URL {
+        configuredURL(for: "SERIESAV_PRIVACY_URL", fallback: "https://series-av.avalsys.com/privacy")
     }
 
-    static var openSourceURL: URL? {
-        BundleConfig.urlValue(for: "SERIESAV_OPEN_SOURCE_URL")
+    static var openSourceURL: URL {
+        configuredURL(for: "SERIESAV_OPEN_SOURCE_URL", fallback: "https://github.com/avalsys/series-av")
     }
 
-    static var accountDeletionURL: URL? {
+    static var accountDeletionURL: URL {
         if let url = BundleConfig.urlValue(for: "SERIESAV_DELETE_ACCOUNT_URL") {
             return url
         }
 
         return accountManagementURL?.appending(path: "delete-account")
+            ?? URL(string: "https://account.avalsys.com/account/delete")!
     }
 
     static var revenueCatPublicAPIKey: String? {
@@ -66,6 +73,10 @@ enum AppConfig {
             publishableKey: avAccountKey,
             keychainService: BundleConfig.nonEmptyStringValue(for: "ACCOUNTAV_KEYCHAIN_SERVICE")
         )
+    }
+
+    private static func configuredURL(for key: String, fallback: String) -> URL {
+        BundleConfig.urlValue(for: key) ?? URL(string: fallback)!
     }
 }
 

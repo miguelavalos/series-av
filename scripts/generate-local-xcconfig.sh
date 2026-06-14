@@ -9,6 +9,9 @@ case "$profile" in
   local)
     bundle_identifier="com.avalsys.seriesav.dev"
     ;;
+  preview)
+    bundle_identifier="com.avalsys.seriesav.dev"
+    ;;
   production)
     bundle_identifier="com.avalsys.seriesav"
     ;;
@@ -39,6 +42,7 @@ xcodebuild_url_value() {
 
 account_publishable_key="$(printenv_value ACCOUNTAV_PUBLISHABLE_KEY)"
 avaccount_api_base_url="$(printenv_value ACCOUNTAV_API_BASE_URL)"
+seriesav_convex_url="$(printenv_value SERIESAV_CONVEX_URL)"
 account_management_url="$(printenv_value ACCOUNTAV_MANAGEMENT_URL)"
 revenuecat_public_api_key="$(printenv_value SERIESAV_REVENUECAT_PUBLIC_API_KEY)"
 revenuecat_offering_id="$(printenv_value SERIESAV_REVENUECAT_OFFERING_ID)"
@@ -52,6 +56,7 @@ development_team="$(printenv_value AVALSYS_APPLE_DEVELOPMENT_TEAM)"
 required_values=(
   account_publishable_key
   avaccount_api_base_url
+  seriesav_convex_url
   terms_url
   privacy_url
   account_management_url
@@ -83,11 +88,20 @@ case "$revenuecat_public_api_key" in
     ;;
 esac
 
+case "$seriesav_convex_url" in
+  https://*.convex.cloud) ;;
+  *)
+    echo "SERIESAV_CONVEX_URL must be a Convex cloud URL." >&2
+    exit 1
+    ;;
+esac
+
 rendered_config="$(cat <<EOF
 SERIESAV_BUNDLE_IDENTIFIER = $bundle_identifier
 AVALSYS_APPLE_DEVELOPMENT_TEAM = $development_team
 ACCOUNTAV_PUBLISHABLE_KEY = $account_publishable_key
 ACCOUNTAV_API_BASE_URL = $(xcodebuild_url_value "${avaccount_api_base_url:-}")
+SERIESAV_CONVEX_URL = $(xcodebuild_url_value "${seriesav_convex_url:-}")
 SERIESAV_REVENUECAT_PUBLIC_API_KEY = $revenuecat_public_api_key
 SERIESAV_REVENUECAT_OFFERING_ID = $revenuecat_offering_id
 SERIESAV_REVENUECAT_MONTHLY_PACKAGE_ID = $revenuecat_monthly_package_id

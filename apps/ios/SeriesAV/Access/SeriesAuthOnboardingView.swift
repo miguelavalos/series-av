@@ -14,22 +14,12 @@ struct SeriesAuthOnboardingView: View {
     private let authLogger = Logger(subsystem: "com.avalsys.seriesav", category: "auth")
 
     var body: some View {
-        AVAuthOnboardingScreen(
+        AVAuthConfiguredOnboardingScreen(
             authOptionsArePresented: authOptionsArePresentedBinding,
-            content: SeriesAppExperience.experience.onboardingContent,
             primaryAction: accountIsAvailable ? showAuthOptions : onSkip,
             secondaryAction: onSkip,
-            brand: {
-                Text(SeriesAppExperience.identity.displayName)
-                    .font(.system(size: 28, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.primary)
-            },
-            heroArtwork: {
-                AVAuthConfiguredHeroArtwork()
-            },
-            ctaCompanion: {
-                EmptyView()
-            },
+            brandWidth: 160,
+            ctaCompanionOffset: CGSize(width: -2, height: -112),
             authPanel: {
                 SeriesAuthOptionsPanel(
                     accountIsAvailable: accountIsAvailable,
@@ -204,12 +194,24 @@ private struct SeriesAuthOptionsPanel: View {
             onApple: onAppleTap,
             onGoogle: onGoogleTap,
             onSkip: onSkip
-        )
+        ) {
+            AVAuthConfiguredCompanionArtwork(
+                placement: .authPanel,
+                imageWidth: 126,
+                imageHeight: 126,
+                frameWidth: 140,
+                frameHeight: 110,
+                imageOffset: CGSize(width: 0, height: -5),
+                groundShadowColor: nil
+            )
+                .offset(x: -44, y: -91)
+                .allowsHitTesting(false)
+        }
     }
 
     private var legalConsentText: AttributedString {
-        let termsURL = appExperience.legalLinks.termsURL?.absoluteString ?? ""
-        let privacyURL = appExperience.legalLinks.privacyURL?.absoluteString ?? ""
+        let termsURL = appExperience.legalLinks.termsURL?.absoluteString ?? AppConfig.termsURL.absoluteString
+        let privacyURL = appExperience.legalLinks.privacyURL?.absoluteString ?? AppConfig.privacyURL.absoluteString
         let markdown = L10n.string("access.legal.markdown", termsURL, privacyURL)
         return (try? AttributedString(markdown: markdown)) ?? AttributedString(L10n.string("access.legal.fallback"))
     }

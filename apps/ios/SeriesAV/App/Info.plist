@@ -34,6 +34,8 @@
 	<true/>
 	<key>SERIESAV_CONFIG_ENVIRONMENT</key>
 	<string>$(SERIESAV_CONFIG_ENVIRONMENT)</string>
+	<key>SERIESAV_CONVEX_URL</key>
+	<string>$(SERIESAV_CONVEX_URL)</string>
 	<key>SERIESAV_DEBUG_FORCE_PRO_MODE</key>
 	<string>$(SERIESAV_DEBUG_FORCE_PRO_MODE)</string>
 	<key>SERIESAV_OPEN_SOURCE_URL</key>

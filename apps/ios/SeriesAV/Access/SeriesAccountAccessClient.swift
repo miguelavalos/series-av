@@ -1,5 +1,13 @@
 import Foundation
 
+@MainActor
+protocol AccountDeletionAPI {
+    func fetchAccountDeletionSummary() async throws -> AccountSummary
+    func requestAccountDeletion() async throws -> DeleteAccountRequestResponse
+    func finalizeAccountDeletion() async throws -> DeleteAccountFinalizeResponse
+    func unlinkCurrentApp() async throws -> UnlinkAppResponse
+}
+
 struct SeriesMeAccessResponse: Decodable, Equatable {
     let viewer: SeriesMeAccessViewer?
     let apps: [SeriesAppAccess]
@@ -144,5 +152,27 @@ struct SeriesAccountAccessClient: SeriesAccountAccessProviding, Sendable {
     func fetchMeAccess() async throws -> SeriesMeAccessResponse {
         let (data, _) = try await apiClient.requestData(path: "/v1/me/access")
         return try decoder.decode(SeriesMeAccessResponse.self, from: data)
+    }
+}
+
+extension SeriesAccountAccessClient: AccountDeletionAPI {
+    func fetchAccountDeletionSummary() async throws -> AccountSummary {
+        let (data, _) = try await apiClient.requestData(path: "/v1/me")
+        return try decoder.decode(AccountSummary.self, from: data)
+    }
+
+    func requestAccountDeletion() async throws -> DeleteAccountRequestResponse {
+        let (data, _) = try await apiClient.requestData(path: "/v1/me/delete-account-request", method: "POST")
+        return try decoder.decode(DeleteAccountRequestResponse.self, from: data)
+    }
+
+    func finalizeAccountDeletion() async throws -> DeleteAccountFinalizeResponse {
+        let (data, _) = try await apiClient.requestData(path: "/v1/me/delete-account-finalize", method: "POST")
+        return try decoder.decode(DeleteAccountFinalizeResponse.self, from: data)
+    }
+
+    func unlinkCurrentApp() async throws -> UnlinkAppResponse {
+        let (data, _) = try await apiClient.requestData(path: "/v1/apps/seriesav/link", method: "DELETE")
+        return try decoder.decode(UnlinkAppResponse.self, from: data)
     }
 }

@@ -101,7 +101,9 @@ final class SeriesAccessController {
             try? await Task.sleep(nanoseconds: nanoseconds)
         }
     ) {
-        let currentUser = Self.lastKnownAccountUser(from: userDefaults, key: lastKnownAccountUserKey)
+        let currentUser = Self.shouldForceGuestForUITests
+            ? nil
+            : Self.uiTestAccountUser ?? Self.lastKnownAccountUser(from: userDefaults, key: lastKnownAccountUserKey)
         let accessClient = SeriesAccountAccessClient(apiClient: SeriesAVAPIClient(
             baseURL: AppConfig.apiBaseURL,
             tokenProvider: { try await accountService.getToken() }
@@ -142,7 +144,17 @@ final class SeriesAccessController {
         accountService.isAvailable
     }
 
+    func authenticatedAPIClient() -> SeriesAVAPIClient {
+        SeriesAVAPIClient(
+            baseURL: AppConfig.apiBaseURL,
+            tokenProvider: { [accountService] in try await accountService.getToken() }
+        )
+    }
+
     var shouldAutoShowGuestOnboarding: Bool {
+        if SeriesUITestEnvironment.current.shouldForceGuestOnboarding {
+            return true
+        }
         guard accessMode == .guest else { return false }
         return guestOnboardingPolicy.shouldShowAutomatically(
             lastPromptAt: userDefaults.object(forKey: guestOnboardingLastPromptAtKey) as? Date,
@@ -166,6 +178,12 @@ final class SeriesAccessController {
     }
 
     func syncFromAccountProvider() async {
+        if Self.shouldForceGuestForUITests {
+            clearSignedOutAccountState()
+            await refreshAccess()
+            return
+        }
+
         accessRefreshGeneration += 1
         let generation = accessRefreshGeneration
 
@@ -362,6 +380,19 @@ final class SeriesAccessController {
     private static func lastKnownAccountUser(from userDefaults: UserDefaults, key: String) -> SeriesAccountUser? {
         guard let data = userDefaults.data(forKey: key) else { return nil }
         return try? JSONDecoder().decode(SeriesAccountUser.self, from: data)
+    }
+
+    private static var shouldForceGuestForUITests: Bool {
+        SeriesUITestEnvironment.current.shouldForceGuest
+    }
+
+    private static var uiTestAccountUser: SeriesAccountUser? {
+        guard SeriesUITestEnvironment.current.hasAccountOverride else { return nil }
+        return SeriesAccountUser(
+            id: SeriesUITestEnvironment.accountUserId,
+            displayName: SeriesUITestEnvironment.accountUserDisplayName,
+            emailAddress: SeriesUITestEnvironment.accountUserEmailAddress
+        )
     }
 
     private func persistLastKnownAccountUser(_ user: SeriesAccountUser) {

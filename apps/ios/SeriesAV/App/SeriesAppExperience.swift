@@ -15,20 +15,34 @@ enum SeriesAppExperience {
             identity: appIdentity,
             legalLinks: legalLinks,
             brandPalette: .standard,
+            visualAssets: visualAssets,
             splashTagline: L10n.string("app.splash.tagline"),
             splashStatus: L10n.string("app.splash.status"),
             onboardingTitle: L10n.string("app.onboarding.title"),
             onboardingSubtitle: L10n.string("app.onboarding.subtitle"),
             onboardingPrimaryTitle: L10n.string("app.onboarding.signIn"),
             onboardingSecondaryTitle: L10n.string("app.onboarding.skip"),
-            onboardingBackgroundStart: .init(red: 0.95, green: 0.97, blue: 0.99),
+            onboardingBackgroundStart: .init(red: 0.97, green: 0.94, blue: 0.86),
             onboardingBackgroundMid: AVBrandColor.neutral50,
-            onboardingBackgroundEnd: .init(red: 0.92, green: 0.95, blue: 0.91)
+            onboardingBackgroundEnd: .init(red: 0.9, green: 0.93, blue: 0.89)
         )
     }
 
     static var identity: AVAppIdentity {
         appIdentity
+    }
+
+    static var visualAssets: AVCommonAppVisualAssets {
+        AVCommonAppVisualAssets(
+            headerLogoName: "SeriesHeaderWordmark",
+            splashLogoName: "SeriesAVLogo",
+            splashHeroName: "SeriesSplashHero",
+            onboardingBrandName: "SeriesHeaderWordmark",
+            onboardingHeroName: "SeriesOnboardingHero",
+            onboardingCTACompanionName: "AviOnboardingCTA",
+            onboardingAuthPanelCompanionName: "AviLoginSheetPeek",
+            footerAssistantName: "AviFooterIcon"
+        )
     }
 
     @MainActor

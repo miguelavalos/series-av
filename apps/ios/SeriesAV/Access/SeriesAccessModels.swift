@@ -91,16 +91,15 @@ struct SeriesAccessCapabilities: Codable, Equatable {
 
 struct SeriesAccessLimits: Codable, Equatable {
     let activeLibrarySeries: Int?
-    let aviActionsPerDay: Int?
 
     static func forMode(_ accessMode: SeriesAccessMode) -> SeriesAccessLimits {
         switch accessMode {
         case .guest:
-            SeriesAccessLimits(activeLibrarySeries: 25, aviActionsPerDay: 5)
+            SeriesAccessLimits(activeLibrarySeries: 25)
         case .signedInFree:
-            SeriesAccessLimits(activeLibrarySeries: 75, aviActionsPerDay: 15)
+            SeriesAccessLimits(activeLibrarySeries: 75)
         case .signedInPro:
-            SeriesAccessLimits(activeLibrarySeries: 1_000, aviActionsPerDay: nil)
+            SeriesAccessLimits(activeLibrarySeries: 1_000)
         }
     }
 }

@@ -4,7 +4,7 @@ Open-source iOS app for Series AV.
 
 This repository contains the iOS client app, local watch-list and progress flows, Account AV UI, backend-aware access handling, and TV metadata integration used by the product.
 
-Before validating signed account, backend access, library sync, social/catalog,
+Before validating signed account, backend access, library sync, catalog,
 or deletion workflows, read [AGENTS.md](AGENTS.md). Those workflows are governed
 by private AVALSYS runbooks and must not be replaced with an invented local
 backend flow.
@@ -41,8 +41,11 @@ docs/
 
 - TV metadata currently comes from `TVmaze`.
 - TVmaze's API licensing requires attribution. The app now exposes a visible attribution path in `Settings`, and the repo/docs should continue to keep that dependency explicit.
-- TV/movie posters may be used as title-reference artwork when provider terms,
-  attribution, and release evidence support that use.
+- TV/movie posters from approved catalog providers may be used as
+  title-reference artwork in normal app UI by default; Series AV does not
+  require manual poster approval one title at a time.
+- Fallback artwork is used when a poster is missing, a source/policy flag blocks
+  it, or screenshot/release mode requires fallback.
 - Company/platform/provider logos, availability badges, deep links, trailers,
   and embedded provider pages are not covered by poster permission and require
   separate documented rights/terms evidence.
@@ -61,7 +64,6 @@ docs/
 - Backend-backed features used by Series AV come from private Account AV infrastructure.
 - When `ACCOUNTAV_API_BASE_URL` is configured, backend capabilities are authoritative for signed-in access.
 - The V1 rebuild sync resource is `seriesLibrary` at `/v1/apps/seriesav/data/seriesLibrary`.
-- Social features are intentionally not part of the V1 public client.
 
 ## Local Setup
 

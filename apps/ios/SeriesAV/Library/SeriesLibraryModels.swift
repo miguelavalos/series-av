@@ -65,7 +65,7 @@ struct SeriesLibraryEntry: Codable, Identifiable, Equatable, Sendable {
 
     var progressLabel: String {
         guard let cursor = lastWatchedEpisodeCursor else {
-            return status == .wantToWatch ? "Not started" : "No episode set"
+            return status == .wantToWatch ? L10n.string("home.notStarted") : L10n.string("home.noEpisodeSet")
         }
         return "S\(cursor.seasonNumber) E\(cursor.episodeNumber)"
     }

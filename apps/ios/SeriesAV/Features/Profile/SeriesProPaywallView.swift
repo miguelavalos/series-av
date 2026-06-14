@@ -1,3 +1,4 @@
+import AVAviFoundation
 import AVBrandFoundation
 import AVPaywallFoundation
 import SwiftUI
@@ -13,7 +14,7 @@ struct SeriesProPaywallView: View {
         AVPaywallSheetScaffold(
             navigationTitle: L10n.string("paywall.navigationTitle"),
             closeTitle: L10n.string("paywall.close"),
-            backgroundStyle: AnyShapeStyle(AVBrandColor.neutral50),
+            backgroundStyle: AnyShapeStyle(AVBrandSurface.shellBackground),
             onClose: { dismiss() }
         ) {
             AVPaywallHeader(
@@ -66,15 +67,14 @@ struct SeriesProPaywallView: View {
     }
 
     private var proAvatar: some View {
-        Image(systemName: "sparkles.tv")
-            .font(.system(size: 28, weight: .black))
-            .foregroundStyle(AVBrandColor.accent)
-            .frame(width: 68, height: 68)
-            .background(AVBrandColor.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .stroke(AVBrandColor.accent.opacity(0.28), lineWidth: 1)
-            }
+        AVAviAssetAvatarBadge(
+            assetName: "AviOnboardingCTA",
+            imageSize: 54,
+            badgeSize: 68,
+            padding: 7,
+            backgroundStyle: .accentSoft,
+            strokeStyle: .accentSoft
+        )
     }
 
     @ViewBuilder
@@ -151,32 +151,18 @@ struct SeriesProPaywallView: View {
                 systemImage: "sparkles",
                 title: L10n.string("paywall.benefit.avi.title"),
                 detail: L10n.string("paywall.benefit.avi")
-            ),
-            AVPaywallBenefitItem(
-                id: "future",
-                systemImage: "person.2",
-                title: L10n.string("paywall.benefit.future.title"),
-                detail: L10n.string("paywall.benefit.future")
             )
         ]
     }
 
     private var legalLinkItems: [AVPaywallLegalLink] {
-        var links: [AVPaywallLegalLink] = []
-        if let termsURL = AppConfig.termsURL {
-            links.append(
-                AVPaywallLegalLink(title: L10n.string("paywall.terms"), accessibilityIdentifier: "paywall.terms") {
-                    openURL(termsURL)
-                }
-            )
-        }
-        if let privacyURL = AppConfig.privacyURL {
-            links.append(
-                AVPaywallLegalLink(title: L10n.string("paywall.privacy"), accessibilityIdentifier: "paywall.privacy") {
-                    openURL(privacyURL)
-                }
-            )
-        }
-        return links
+        [
+            AVPaywallLegalLink(title: L10n.string("paywall.terms"), accessibilityIdentifier: "paywall.terms") {
+                openURL(AppConfig.termsURL)
+            },
+            AVPaywallLegalLink(title: L10n.string("paywall.privacy"), accessibilityIdentifier: "paywall.privacy") {
+                openURL(AppConfig.privacyURL)
+            }
+        ]
     }
 }

@@ -45,7 +45,6 @@ Not implemented yet:
 - advanced account-management flows beyond shared links;
 - Convex realtime projection;
 - catalog search/enrichment UI;
-- social features.
 
 The private rebuild decision record is:
 

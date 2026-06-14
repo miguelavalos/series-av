@@ -1,0 +1,274 @@
+import AVBrandFoundation
+import AVSettingsFoundation
+import SwiftUI
+
+struct SeriesAccountDeletionScreen: View {
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var viewModel: SeriesAccountDeletionViewModel
+
+    init(viewModel: SeriesAccountDeletionViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
+
+    var body: some View {
+        AVSettingsSheetScaffold(
+            spacing: 18,
+            horizontalPadding: 24,
+            topPadding: 24,
+            bottomPadding: 24,
+            backgroundStyle: AnyShapeStyle(AVBrandSurface.shellBackground),
+            closeTitle: L10n.string("common.done"),
+            closeAccessibilityIdentifier: "accountDeletion.done",
+            onClose: { dismiss() }
+        ) {
+            header
+
+            if viewModel.isLoading {
+                AVSettingsLoadingState(L10n.string("accountDeletion.loading"))
+            } else {
+                sharedAccountNotice
+                stateContent
+            }
+        }
+        .navigationTitle(L10n.string("accountDeletion.title"))
+        .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await viewModel.load()
+        }
+        .onChange(of: viewModel.didCompleteDeletion) { _, didComplete in
+            guard didComplete else { return }
+            dismiss()
+        }
+        .accessibilityIdentifier("accountDeletion.sheet")
+    }
+
+    private var header: some View {
+        AVSettingsScreenHeader(
+            title: L10n.string("accountDeletion.title"),
+            subtitle: L10n.string("accountDeletion.subtitle"),
+            titleAccessibilityIdentifier: "accountDeletion.title"
+        )
+    }
+
+    private var sharedAccountNotice: some View {
+        AVSettingsNoticeCard(
+            systemImage: "person.2.badge.gearshape",
+            title: L10n.string("accountDeletion.shared.title"),
+            detail: L10n.string("accountDeletion.shared.detail")
+        )
+    }
+
+    @ViewBuilder
+    private var stateContent: some View {
+        if let errorMessage = viewModel.errorMessage {
+            AVSettingsStatusCard(
+                systemImage: "exclamationmark.triangle",
+                title: L10n.string("accountDeletion.error.title"),
+                detail: errorMessage
+            )
+            .accessibilityIdentifier("accountDeletion.status.error")
+        }
+
+        if viewModel.didUnlinkCurrentApp {
+            AVSettingsStatusCard(
+                systemImage: "link.badge.minus",
+                title: L10n.string("accountDeletion.unlinked.title"),
+                detail: viewModel.unlinkMessage ?? L10n.string("accountDeletion.unlinked.detail")
+            )
+            .accessibilityIdentifier("accountDeletion.status.unlinked")
+        } else {
+            switch viewModel.resolvedEligibility?.status {
+            case .eligible:
+                eligibleContent
+            case .blocked:
+                blockedContent(title: L10n.string("accountDeletion.blocked.title"))
+            case .inProgress:
+                inProgressContent
+            case .completed:
+                AVSettingsStatusCard(
+                    systemImage: "checkmark.circle",
+                    title: L10n.string("accountDeletion.completed.title"),
+                    detail: L10n.string("accountDeletion.completed.detail")
+                )
+                .accessibilityIdentifier("accountDeletion.status.completed")
+            case .unavailable, .none:
+                unavailableContent
+            }
+        }
+    }
+
+    private var eligibleContent: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            AVSettingsStatusCard(
+                systemImage: "checkmark.shield",
+                title: L10n.string("accountDeletion.eligible.title"),
+                detail: L10n.string("accountDeletion.eligible.detail")
+            )
+            .accessibilityIdentifier("accountDeletion.status.eligible")
+
+            irreversibleImpactNotice
+            warningList
+
+            Text(L10n.string("accountDeletion.confirm.instructions"))
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(AVBrandColor.textPrimary)
+
+            AVSettingsTextField(
+                "DELETE",
+                text: $viewModel.confirmationText,
+                accessibilityIdentifier: "accountDeletion.confirmation"
+            )
+                .textInputAutocapitalization(.characters)
+                .autocorrectionDisabled()
+
+            AVSettingsButton(
+                title: viewModel.isSubmitting
+                    ? L10n.string("accountDeletion.deleting")
+                    : L10n.string("accountDeletion.deleteButton"),
+                style: .destructivePrimary,
+                isLoading: viewModel.isSubmitting
+            ) {
+                Task { await viewModel.requestDeletion() }
+            }
+            .disabled(!viewModel.canRequestDeletion || viewModel.isSubmitting)
+            .opacity(viewModel.canRequestDeletion ? 1 : 0.45)
+            .accessibilityIdentifier("accountDeletion.deleteButton")
+        }
+    }
+
+    @ViewBuilder
+    private var irreversibleImpactNotice: some View {
+        if viewModel.hasHighImpactDeletionWarnings {
+            AVSettingsStatusCard(
+                systemImage: "exclamationmark.octagon.fill",
+                title: L10n.string("accountDeletion.impact.high.title"),
+                detail: L10n.string("accountDeletion.impact.high.detail")
+            )
+            .accessibilityIdentifier("accountDeletion.impact.high")
+        } else if viewModel.hasLinkedAppDeletionWarnings {
+            AVSettingsStatusCard(
+                systemImage: "exclamationmark.triangle.fill",
+                title: L10n.string("accountDeletion.impact.linkedApps.title"),
+                detail: L10n.string("accountDeletion.impact.linkedApps.detail")
+            )
+            .accessibilityIdentifier("accountDeletion.impact.linkedApps")
+        }
+    }
+
+    private var inProgressContent: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            AVSettingsStatusCard(
+                systemImage: "clock.badge.exclamationmark",
+                title: L10n.string("accountDeletion.inProgress.title"),
+                detail: L10n.string("accountDeletion.inProgress.detail")
+            )
+            .accessibilityIdentifier("accountDeletion.status.inProgress")
+            blockerList
+            warningList
+
+            if viewModel.canFinalizeDeletion {
+                AVSettingsButton(
+                    title: viewModel.isSubmitting
+                        ? L10n.string("accountDeletion.finalizing")
+                        : L10n.string("accountDeletion.finalizeButton"),
+                    style: .primary,
+                    isLoading: viewModel.isSubmitting
+                ) {
+                    Task { await viewModel.finalizeDeletion() }
+                }
+                .disabled(viewModel.isSubmitting)
+                .accessibilityIdentifier("accountDeletion.finalizeButton")
+            }
+        }
+    }
+
+    private func blockedContent(title: String) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            AVSettingsStatusCard(
+                systemImage: "lock.shield",
+                title: title,
+                detail: L10n.string("accountDeletion.blocked.detail")
+            )
+            .accessibilityIdentifier("accountDeletion.status.blocked")
+            blockerList
+            warningList
+
+            if viewModel.canUnlinkCurrentApp {
+                AVSettingsButton(
+                    title: viewModel.isSubmitting
+                        ? L10n.string("accountDeletion.unlinking")
+                        : L10n.string("accountDeletion.unlinkButton"),
+                    style: .secondary,
+                    isLoading: viewModel.isSubmitting
+                ) {
+                    Task { await viewModel.unlinkCurrentApp() }
+                }
+                .disabled(!viewModel.canUnlinkCurrentApp)
+                .accessibilityIdentifier("accountDeletion.unlinkButton")
+            }
+
+            AVSettingsLinkButton(
+                title: L10n.string("accountDeletion.accountWebsiteLink"),
+                systemImage: "safari",
+                destination: AppConfig.accountDeletionURL
+            )
+            .accessibilityIdentifier("accountDeletion.accountWebsiteLink")
+        }
+    }
+
+    private var unavailableContent: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            AVSettingsStatusCard(
+                systemImage: "safari",
+                title: L10n.string("accountDeletion.unavailable.title"),
+                detail: L10n.string("accountDeletion.unavailable.detail")
+            )
+            .accessibilityIdentifier("accountDeletion.status.unavailable")
+            warningList
+
+            AVSettingsLinkButton(
+                title: L10n.string("accountDeletion.accountWebsiteLink"),
+                systemImage: "safari",
+                destination: AppConfig.accountDeletionURL
+            )
+            .accessibilityIdentifier("accountDeletion.accountWebsiteLink")
+        }
+    }
+
+    private var blockerList: some View {
+        AVSettingsDetailList(items: viewModel.blockers.map { blocker in
+            AVSettingsDetailListItem(
+                id: blocker.type.rawValue,
+                title: blocker.label,
+                detail: blockerDetail(for: blocker),
+                linkTitle: blocker.managementUrl == nil ? nil : L10n.string("accountDeletion.manageLink"),
+                linkDestination: blocker.managementUrl,
+                accessibilityIdentifier: "accountDeletion.blocker.\(blocker.type.rawValue)"
+            )
+        })
+    }
+
+    private func blockerDetail(for blocker: AccountDeletionBlocker) -> String? {
+        switch blocker.type {
+        case .eligibilityUnavailable:
+            return L10n.string("accountDeletion.blocked.detail")
+        case .deletionInProgress:
+            return blocker.detail
+        case .linkedApp, .activeAiCredits, .activeProAccess, .activeBillingSubscription, .identityProvider:
+            return blocker.detail
+        }
+    }
+
+    private var warningList: some View {
+        AVSettingsDetailList(items: viewModel.warnings.map { warning in
+            AVSettingsDetailListItem(
+                id: warning.type.rawValue,
+                title: warning.label,
+                detail: warning.detail,
+                linkTitle: warning.managementUrl == nil ? nil : L10n.string("accountDeletion.manageLink"),
+                linkDestination: warning.managementUrl,
+                accessibilityIdentifier: "accountDeletion.warning.\(warning.type.rawValue)"
+            )
+        })
+    }
+}

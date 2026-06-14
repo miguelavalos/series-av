@@ -13,6 +13,13 @@ case "$profile" in
     expected_api_base_url="http://127.0.0.1:8788"
     expected_management_host="account-av-preview.avalsys.com"
     ;;
+  preview)
+    expected_bundle_identifier="com.avalsys.seriesav.dev"
+    expected_key_prefix="pk_test_"
+    expected_revenuecat_key_prefix="appl_"
+    expected_api_base_url="https://api-account-av-preview.avalsys.com"
+    expected_management_host="account-av-preview.avalsys.com"
+    ;;
   production)
     expected_bundle_identifier="com.avalsys.seriesav"
     expected_key_prefix="pk_live_"
@@ -22,7 +29,7 @@ case "$profile" in
     configuration="Release"
     ;;
   *)
-    echo "Usage: $0 local|production [Debug|Release]" >&2
+    echo "Usage: $0 local|preview|production [Debug|Release]" >&2
     exit 2
     ;;
 esac

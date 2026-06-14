@@ -27,13 +27,13 @@ never put a RevenueCat secret key in native config.
 V1 uses the same guest/free local-only and Pro paywall/subscription pattern as
 Tune AV. Cloud sync is Pro-only.
 
-Accepted V1 access limits are compiled into the iOS access layer. The Avi daily
-limits are a reserved entitlement contract for later Avi-assisted Series AV
-flows; the current V1 iOS surface does not expose standalone Avi actions yet.
+Accepted V1 access limits are compiled into the iOS access layer. Avi is visible
+in V1 as contextual tracking guidance on Home and the Avi tab; it is not a
+separate metered action surface in the iOS client.
 
-- Guest: 25 active library series and 5 Avi actions/day.
-- Signed-in Free: 75 active library series and 15 Avi actions/day.
-- Pro: 1000 active library series and practical fair-use Avi.
+- Guest: 25 active library series.
+- Signed-in Free: 75 active library series.
+- Pro: 1000 active library series.
 
 ## Native iOS Build
 
@@ -42,6 +42,13 @@ Generate the Swift iOS local config from Infisical before building:
 ```bash
 bun run ios:config
 bun run ios:preflight
+```
+
+For preview Account AV validation against Cloudflare preview:
+
+```bash
+bun run ios:config:preview
+bun run ios:preflight:preview
 ```
 
 For production/App Store preparation:
@@ -66,9 +73,11 @@ printing secrets.
 
 `apps/ios/Config/Local.xcconfig` is gitignored. Do not commit it or copy production values into versioned files.
 
-## Switching Dev And Production
+## Switching Runtime Profiles
 
-Always regenerate and preflight the native config after switching between dev and production. Do this before opening Xcode, running the simulator, archiving, or testing Clerk/Account AV sign-in.
+Always regenerate and preflight the native config after switching between
+local, preview, and production. Do this before opening Xcode, running the
+simulator, archiving, or testing Clerk/Account AV sign-in.
 
 ## Dev Auth Smoke
 
@@ -90,6 +99,11 @@ resolve:
 - non-empty RevenueCat offering and monthly package ids
 - a concrete Apple development team
 - `SeriesAV/App/SeriesAV.entitlements` with Keychain access groups
+
+For preview Cloudflare validation, use `bun run ios:config:preview` and
+`bun run ios:preflight:preview`. The preview preflight must resolve the same
+development bundle id and test Clerk key, but the Account AV API must be
+`https://api-account-av-preview.avalsys.com`.
 
 Do not use the unsigned compile-only build for Google or Apple login. Clerk
 native auth stores its client and device token in Keychain; unsigned simulator

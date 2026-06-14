@@ -3,7 +3,7 @@
 This public repo does not define the full signed-runtime testing workflow.
 
 For any native app workflow validation that touches signed account state,
-backend-owned access, subscriptions, purchases, library sync, social/catalog
+backend-owned access, subscriptions, purchases, library sync, catalog
 backend routes, deletion flows, private API access, or provider tokens, follow
 the private AVALSYS guides. Do not invent a local runtime flow from this public
 repo.
@@ -31,8 +31,11 @@ Mandatory rules:
   ownership and backend-owned state must resolve through the internal Apps AV
   account user contract.
 - do not infer from Tune AV's station-logo rejection that Series AV must avoid
-  TV/movie posters. Posters can be title-reference artwork when provider terms
-  and release evidence allow them.
+  TV/movie posters. Posters from approved catalog providers are allowed as
+  title-reference artwork in normal app UI by default; do not require manual
+  approval one title at a time.
+- use fallback artwork only when a poster is missing, source/policy blocks it,
+  or screenshot/release mode requires fallback.
 - do not use Netflix, IMDb, TVmaze, TheTVDB, Apple, station, or other
   company/platform/provider logos, availability badges, or deep links without
   separate documented rights/terms evidence.

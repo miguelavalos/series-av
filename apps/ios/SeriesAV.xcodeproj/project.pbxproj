@@ -8,16 +8,27 @@
 
 /* Begin PBXBuildFile section */
 		06222EBFC1E985565D6B452D /* SeriesAppBootstrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557E2299A00C28395D71C339 /* SeriesAppBootstrapView.swift */; };
+		0C8D979E42E34E1EA3C9E7D1 /* SeriesAppShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8D979D42E34E1EA3C9E7D1 /* SeriesAppShellView.swift */; };
+		0E0B7E8E75D84E8FA3B6A8D1 /* SeriesLibraryTabScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0B7E8D75D84E8FA3B6A8D1 /* SeriesLibraryTabScreen.swift */; };
+		1260B04B1E6148B0B4D15168 /* SeriesLaunchContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1260B04A1E6148B0B4D15168 /* SeriesLaunchContext.swift */; };
 		159807956E30BB116384FADE /* SeriesEntitlementServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF356E2FD2CC3CC73B7B7490 /* SeriesEntitlementServiceTests.swift */; };
+		1C6E2F4E83D747B487AC9179 /* AVAviFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 1C6E2F4D83D747B487AC9179 /* AVAviFoundation */; };
+		2CEB8F0D42A744469C0A0A1E /* AVLaunchFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 2CEB8F0C42A744469C0A0A1E /* AVLaunchFoundation */; };
 		39D3F2C4743954A3DD315B15 /* AVSettingsFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 138FB23720DA324B605EBCC9 /* AVSettingsFoundation */; };
 		3BA53F4338BE907A4501FC94 /* SeriesAVAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE24F5B52463208C5E876228 /* SeriesAVAPIClient.swift */; };
 		3D36749576FEBB0BBB92401B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 72139F60FD554069885EE731 /* PrivacyInfo.xcprivacy */; };
 		3E6B8AE873E00FD5A55FDDEF /* SeriesLibraryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6E1160762AEF2A117BAE4A3 /* SeriesLibraryModels.swift */; };
 		40E46CA02D7EA0EEB7DCEE5B /* AVProductAccountFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 197D8D418F464FA352F78772 /* AVProductAccountFoundation */; };
 		4635329479183AA26672A051 /* SeriesAppDataSyncClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40364B2B84E6AC647B728FB /* SeriesAppDataSyncClient.swift */; };
+		46F69D0B02D54B14A4D3E17A /* SeriesAccountDeletionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F69D0A02D54B14A4D3E17A /* SeriesAccountDeletionScreen.swift */; };
+		47B8D8E7D43C4FC6B220EB29 /* SeriesUITestAccountDeletionAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B8D8E6D43C4FC6B220EB29 /* SeriesUITestAccountDeletionAPI.swift */; };
 		48F5DA44C9E47D08A707B9D1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C6F54EEDDB4D7438D5A4B50 /* Assets.xcassets */; };
 		4CA7CFF4D7974F4190454B09 /* SeriesAccessModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C97F5A3F29AAA0D7BB6E8D9 /* SeriesAccessModels.swift */; };
+		4F8E8FB15A984E2B8F3D2481 /* SeriesAccountDeletionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F8E8FB05A984E2B8F3D2481 /* SeriesAccountDeletionViewModel.swift */; };
+		5A1C122A84F64D76B17F987A /* AVAppShellFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 5A1C122984F64D76B17F987A /* AVAppShellFoundation */; };
 		6A5D801612D51B6F370F6949 /* SeriesAVAccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E35FAF1A25D734B526F9350 /* SeriesAVAccountService.swift */; };
+		6F6AA27B39584D20AA50FE62 /* SeriesRootTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F6AA27A39584D20AA50FE62 /* SeriesRootTab.swift */; };
+		7D27482DDEB34D428D8EB45A /* SeriesSearchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D27482CDEB34D428D8EB45A /* SeriesSearchScreen.swift */; };
 		93E1DFEF1203442F74B1D4BF /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2568399CFB4C7A1E14832801 /* AppConfig.swift */; };
 		96B90E763CC1A37D3DD098F1 /* SeriesLibraryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FAC949798DD909B4FF68C5 /* SeriesLibraryStoreTests.swift */; };
 		99C7AA7B52682CFDEA051A76 /* AVBrandFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 22C162D72D53D4477A9EC40E /* AVBrandFoundation */; };
@@ -28,11 +39,15 @@
 		B5255448167E43828252DB71 /* SeriesAuthOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AF87B75A9721D260B4C3E1 /* SeriesAuthOnboardingView.swift */; };
 		BA243CAA0B49EFED0D7B6F21 /* SeriesProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39E85DD4C7D5EBBF8721E3A /* SeriesProfileScreen.swift */; };
 		BC9DA56281027A4AE6B394B0 /* SeriesAccessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEBE0C665DDB4A48FE198C52 /* SeriesAccessController.swift */; };
+		BE12A6B5A9B84F37A6115E27 /* SeriesAccountDeletionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE12A6B4A9B84F37A6115E27 /* SeriesAccountDeletionModels.swift */; };
+		C1B53E99A5B94C0DAA2F60CC /* SeriesAviScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B53E98A5B94C0DAA2F60CC /* SeriesAviScreen.swift */; };
 		C2AA86A6CC3043D4021B9B09 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 86CE3F6EAA0958FB417BACCE /* Localizable.strings */; };
 		C6EB3E3CFAD3AF66C9C0471E /* SeriesEntitlementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A586B658AD9682B2BF8C0A92 /* SeriesEntitlementService.swift */; };
+		CF0430633B6F4B8EB8F75EAF /* SeriesAccountDeletionPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0430623B6F4B8EB8F75EAF /* SeriesAccountDeletionPolicy.swift */; };
 		D93665C7D4D8E3AF2A66912E /* AVPaywallFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = CA2084A4C124E233242FA2F9 /* AVPaywallFoundation */; };
 		DEE35176392FBAB1DB687472 /* SeriesProPaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 326ED2E28D2DC33ECDA6917C /* SeriesProPaywallView.swift */; };
 		E592D4F13BA7E38AFECB453C /* SeriesAVApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E930F20F64D72B22A232919B /* SeriesAVApp.swift */; };
+		E61F5B0DD88141B3AE6DA091 /* SeriesAVSplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61F5B0CD88141B3AE6DA091 /* SeriesAVSplashView.swift */; };
 		E5B43EA5B85A739C5D7E6CE8 /* SeriesAppDataSyncClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F51872EA7F30BA6B1A1475 /* SeriesAppDataSyncClientTests.swift */; };
 		E647737E0691166B0AE5E9F9 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145DE7E7B082B7D92C440A5B /* RootView.swift */; };
 		F06A3D772FAA19F807378474 /* SeriesAccountAccessClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E3280C62806B5F89C4728A /* SeriesAccountAccessClient.swift */; };
@@ -53,17 +68,25 @@
 
 /* Begin PBXFileReference section */
 		145DE7E7B082B7D92C440A5B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		0C8D979D42E34E1EA3C9E7D1 /* SeriesAppShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppShellView.swift; sourceTree = "<group>"; };
+		0E0B7E8D75D84E8FA3B6A8D1 /* SeriesLibraryTabScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLibraryTabScreen.swift; sourceTree = "<group>"; };
+		1260B04A1E6148B0B4D15168 /* SeriesLaunchContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLaunchContext.swift; sourceTree = "<group>"; };
 		1957FAE6E3298FDB2C8536F6 /* SeriesAppExperience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppExperience.swift; sourceTree = "<group>"; };
 		2568399CFB4C7A1E14832801 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		2A2E8FBF279E3A8C4EDC0B68 /* SeriesAV.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SeriesAV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2EF0BD8F6256FAEAD9C6EFA5 /* SeriesSubscriptionPurchasingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesSubscriptionPurchasingService.swift; sourceTree = "<group>"; };
 		326ED2E28D2DC33ECDA6917C /* SeriesProPaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesProPaywallView.swift; sourceTree = "<group>"; };
 		45AF87B75A9721D260B4C3E1 /* SeriesAuthOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAuthOnboardingView.swift; sourceTree = "<group>"; };
+		46F69D0A02D54B14A4D3E17A /* SeriesAccountDeletionScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccountDeletionScreen.swift; sourceTree = "<group>"; };
+		47B8D8E6D43C4FC6B220EB29 /* SeriesUITestAccountDeletionAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesUITestAccountDeletionAPI.swift; sourceTree = "<group>"; };
 		46116EC3820DEBFB599F0E49 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4C6F54EEDDB4D7438D5A4B50 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4C97F5A3F29AAA0D7BB6E8D9 /* SeriesAccessModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccessModels.swift; sourceTree = "<group>"; };
+		4F8E8FB05A984E2B8F3D2481 /* SeriesAccountDeletionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccountDeletionViewModel.swift; sourceTree = "<group>"; };
 		557E2299A00C28395D71C339 /* SeriesAppBootstrapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppBootstrapView.swift; sourceTree = "<group>"; };
 		5C2045BD1DAB63090578AC6B /* SeriesAV.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SeriesAV.entitlements; sourceTree = "<group>"; };
+		6F6AA27A39584D20AA50FE62 /* SeriesRootTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesRootTab.swift; sourceTree = "<group>"; };
+		7D27482CDEB34D428D8EB45A /* SeriesSearchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesSearchScreen.swift; sourceTree = "<group>"; };
 		68FAC949798DD909B4FF68C5 /* SeriesLibraryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLibraryStoreTests.swift; sourceTree = "<group>"; };
 		72139F60FD554069885EE731 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		8B4FC08F67E3286D84ADC057 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -73,15 +96,19 @@
 		A6E1160762AEF2A117BAE4A3 /* SeriesLibraryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLibraryModels.swift; sourceTree = "<group>"; };
 		AE24F5B52463208C5E876228 /* SeriesAVAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVAPIClient.swift; sourceTree = "<group>"; };
 		B39E85DD4C7D5EBBF8721E3A /* SeriesProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesProfileScreen.swift; sourceTree = "<group>"; };
+		BE12A6B4A9B84F37A6115E27 /* SeriesAccountDeletionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccountDeletionModels.swift; sourceTree = "<group>"; };
 		B608F239FAA9C18EE697CAC1 /* account-av */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "account-av"; path = "../../../account-av"; sourceTree = SOURCE_ROOT; };
 		C538F408F2AE4DD90050AD7A /* SeriesAVTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SeriesAVTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C57847956F08FF0FD0112E99 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		C64880B2D57EC391A9D4D766 /* SeriesAppPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppPreferences.swift; sourceTree = "<group>"; };
+		CF0430623B6F4B8EB8F75EAF /* SeriesAccountDeletionPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccountDeletionPolicy.swift; sourceTree = "<group>"; };
+		C1B53E98A5B94C0DAA2F60CC /* SeriesAviScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAviScreen.swift; sourceTree = "<group>"; };
 		CE164B8C0FC2D8FA1427899D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D2F51872EA7F30BA6B1A1475 /* SeriesAppDataSyncClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppDataSyncClientTests.swift; sourceTree = "<group>"; };
 		D40364B2B84E6AC647B728FB /* SeriesAppDataSyncClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppDataSyncClient.swift; sourceTree = "<group>"; };
 		D9E3280C62806B5F89C4728A /* SeriesAccountAccessClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccountAccessClient.swift; sourceTree = "<group>"; };
 		DDE4812452BF8D624A9DED3B /* apple */ = {isa = PBXFileReference; lastKnownFileType = folder; name = apple; path = "../../../apps-av/apple"; sourceTree = SOURCE_ROOT; };
+		E61F5B0CD88141B3AE6DA091 /* SeriesAVSplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVSplashView.swift; sourceTree = "<group>"; };
 		E646357FD1EDF6D21FE27826 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E930F20F64D72B22A232919B /* SeriesAVApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVApp.swift; sourceTree = "<group>"; };
 		E9BE2FCF29036CC49D6CFBEB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -98,9 +125,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				A058EA5097F7624496E4AEE8 /* AccountAV in Frameworks */,
+				5A1C122A84F64D76B17F987A /* AVAppShellFoundation in Frameworks */,
+				2CEB8F0D42A744469C0A0A1E /* AVLaunchFoundation in Frameworks */,
 				99C7AA7B52682CFDEA051A76 /* AVBrandFoundation in Frameworks */,
 				39D3F2C4743954A3DD315B15 /* AVSettingsFoundation in Frameworks */,
 				D93665C7D4D8E3AF2A66912E /* AVPaywallFoundation in Frameworks */,
+				1C6E2F4E83D747B487AC9179 /* AVAviFoundation in Frameworks */,
 				40E46CA02D7EA0EEB7DCEE5B /* AVProductAccountFoundation in Frameworks */,
 				A14CE6F47C0607F670434388 /* RevenueCat in Frameworks */,
 			);
@@ -139,11 +169,18 @@
 				CE164B8C0FC2D8FA1427899D /* Info.plist */,
 				72139F60FD554069885EE731 /* PrivacyInfo.xcprivacy */,
 				145DE7E7B082B7D92C440A5B /* RootView.swift */,
+				0C8D979D42E34E1EA3C9E7D1 /* SeriesAppShellView.swift */,
+				C1B53E98A5B94C0DAA2F60CC /* SeriesAviScreen.swift */,
 				557E2299A00C28395D71C339 /* SeriesAppBootstrapView.swift */,
 				1957FAE6E3298FDB2C8536F6 /* SeriesAppExperience.swift */,
+				1260B04A1E6148B0B4D15168 /* SeriesLaunchContext.swift */,
+				E61F5B0CD88141B3AE6DA091 /* SeriesAVSplashView.swift */,
+				0E0B7E8D75D84E8FA3B6A8D1 /* SeriesLibraryTabScreen.swift */,
 				C64880B2D57EC391A9D4D766 /* SeriesAppPreferences.swift */,
+				7D27482CDEB34D428D8EB45A /* SeriesSearchScreen.swift */,
 				5C2045BD1DAB63090578AC6B /* SeriesAV.entitlements */,
 				E930F20F64D72B22A232919B /* SeriesAVApp.swift */,
+				6F6AA27A39584D20AA50FE62 /* SeriesRootTab.swift */,
 				2EF0BD8F6256FAEAD9C6EFA5 /* SeriesSubscriptionPurchasingService.swift */,
 			);
 			path = App;
@@ -210,6 +247,8 @@
 			children = (
 				FEBE0C665DDB4A48FE198C52 /* SeriesAccessController.swift */,
 				4C97F5A3F29AAA0D7BB6E8D9 /* SeriesAccessModels.swift */,
+				BE12A6B4A9B84F37A6115E27 /* SeriesAccountDeletionModels.swift */,
+				CF0430623B6F4B8EB8F75EAF /* SeriesAccountDeletionPolicy.swift */,
 				D9E3280C62806B5F89C4728A /* SeriesAccountAccessClient.swift */,
 				45AF87B75A9721D260B4C3E1 /* SeriesAuthOnboardingView.swift */,
 				9E35FAF1A25D734B526F9350 /* SeriesAVAccountService.swift */,
@@ -239,6 +278,9 @@
 		F3A64473A350215E09C41F7C /* Profile */ = {
 			isa = PBXGroup;
 			children = (
+				46F69D0A02D54B14A4D3E17A /* SeriesAccountDeletionScreen.swift */,
+				4F8E8FB05A984E2B8F3D2481 /* SeriesAccountDeletionViewModel.swift */,
+				47B8D8E6D43C4FC6B220EB29 /* SeriesUITestAccountDeletionAPI.swift */,
 				B39E85DD4C7D5EBBF8721E3A /* SeriesProfileScreen.swift */,
 				326ED2E28D2DC33ECDA6917C /* SeriesProPaywallView.swift */,
 			);
@@ -281,9 +323,12 @@
 			name = SeriesAV;
 			packageProductDependencies = (
 				C2992247012F30B5FDE4706E /* AccountAV */,
+				5A1C122984F64D76B17F987A /* AVAppShellFoundation */,
+				2CEB8F0C42A744469C0A0A1E /* AVLaunchFoundation */,
 				22C162D72D53D4477A9EC40E /* AVBrandFoundation */,
 				138FB23720DA324B605EBCC9 /* AVSettingsFoundation */,
 				CA2084A4C124E233242FA2F9 /* AVPaywallFoundation */,
+				1C6E2F4D83D747B487AC9179 /* AVAviFoundation */,
 				197D8D418F464FA352F78772 /* AVProductAccountFoundation */,
 				DF538D2CBE6EEAF061AE84C4 /* RevenueCat */,
 			);
@@ -365,23 +410,35 @@
 			buildActionMask = 2147483647;
 			files = (
 				93E1DFEF1203442F74B1D4BF /* AppConfig.swift in Sources */,
+				0C8D979E42E34E1EA3C9E7D1 /* SeriesAppShellView.swift in Sources */,
+				C1B53E99A5B94C0DAA2F60CC /* SeriesAviScreen.swift in Sources */,
 				E647737E0691166B0AE5E9F9 /* RootView.swift in Sources */,
 				3BA53F4338BE907A4501FC94 /* SeriesAVAPIClient.swift in Sources */,
+				BE12A6B5A9B84F37A6115E27 /* SeriesAccountDeletionModels.swift in Sources */,
 				6A5D801612D51B6F370F6949 /* SeriesAVAccountService.swift in Sources */,
 				E592D4F13BA7E38AFECB453C /* SeriesAVApp.swift in Sources */,
 				BC9DA56281027A4AE6B394B0 /* SeriesAccessController.swift in Sources */,
 				4CA7CFF4D7974F4190454B09 /* SeriesAccessModels.swift in Sources */,
+				CF0430633B6F4B8EB8F75EAF /* SeriesAccountDeletionPolicy.swift in Sources */,
 				F06A3D772FAA19F807378474 /* SeriesAccountAccessClient.swift in Sources */,
 				06222EBFC1E985565D6B452D /* SeriesAppBootstrapView.swift in Sources */,
+				E61F5B0DD88141B3AE6DA091 /* SeriesAVSplashView.swift in Sources */,
+				0E0B7E8E75D84E8FA3B6A8D1 /* SeriesLibraryTabScreen.swift in Sources */,
 				4635329479183AA26672A051 /* SeriesAppDataSyncClient.swift in Sources */,
 				AAFA14FB0414B5EDE57EBA93 /* SeriesAppExperience.swift in Sources */,
+				1260B04B1E6148B0B4D15168 /* SeriesLaunchContext.swift in Sources */,
+				6F6AA27B39584D20AA50FE62 /* SeriesRootTab.swift in Sources */,
 				9A9910A6DD514535A83D6C1C /* SeriesAppPreferences.swift in Sources */,
+				7D27482DDEB34D428D8EB45A /* SeriesSearchScreen.swift in Sources */,
 				B5255448167E43828252DB71 /* SeriesAuthOnboardingView.swift in Sources */,
 				C6EB3E3CFAD3AF66C9C0471E /* SeriesEntitlementService.swift in Sources */,
 				3E6B8AE873E00FD5A55FDDEF /* SeriesLibraryModels.swift in Sources */,
 				F73DD51BA813EF38FE6083DE /* SeriesLibraryStore.swift in Sources */,
 				DEE35176392FBAB1DB687472 /* SeriesProPaywallView.swift in Sources */,
+				4F8E8FB15A984E2B8F3D2481 /* SeriesAccountDeletionViewModel.swift in Sources */,
+				47B8D8E7D43C4FC6B220EB29 /* SeriesUITestAccountDeletionAPI.swift in Sources */,
 				BA243CAA0B49EFED0D7B6F21 /* SeriesProfileScreen.swift in Sources */,
+				46F69D0B02D54B14A4D3E17A /* SeriesAccountDeletionScreen.swift in Sources */,
 				F448C655EF1E1DD18F113A54 /* SeriesSubscriptionPurchasingService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -674,6 +731,10 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = AVSettingsFoundation;
 		};
+		1C6E2F4D83D747B487AC9179 /* AVAviFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AVAviFoundation;
+		};
 		197D8D418F464FA352F78772 /* AVProductAccountFoundation */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AVProductAccountFoundation;
@@ -681,6 +742,14 @@
 		22C162D72D53D4477A9EC40E /* AVBrandFoundation */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AVBrandFoundation;
+		};
+		2CEB8F0C42A744469C0A0A1E /* AVLaunchFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AVLaunchFoundation;
+		};
+		5A1C122984F64D76B17F987A /* AVAppShellFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AVAppShellFoundation;
 		};
 		C2992247012F30B5FDE4706E /* AccountAV */ = {
 			isa = XCSwiftPackageProductDependency;

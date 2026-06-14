@@ -1,63 +1,69 @@
+import AVAppShellFoundation
 import AVBrandFoundation
 import AVSettingsFoundation
 import SwiftUI
 
 struct SeriesProfileScreen: View {
-    enum Mode {
-        case settings
-        case account
-    }
-
-    let mode: Mode
+    let mode: AVAppShellChromeItem
+    @Bindable var store: SeriesLibraryStore
+    let openSettings: () -> Void
+    let openAccount: () -> Void
     let accessController: SeriesAccessController
     let startSignInFlow: () -> Void
 
     @EnvironmentObject private var languageController: AppLanguageController
     @EnvironmentObject private var themeController: AppThemeController
     @Environment(\.avCommonAppExperience) private var appExperience
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @State private var isSigningOut = false
     @State private var signOutErrorMessage = ""
     @State private var isShowingSignOutError = false
     @State private var isShowingProPaywall = false
+    @State private var isShowingAccountDeletion = false
+    @State private var isShowingDeleteLocalDataConfirmation = false
 
     var body: some View {
-        NavigationStack {
-            AVSettingsProfileScreenScaffold(
-                title: screenTitle,
-                subtitle: screenSubtitle,
-                backgroundStyle: AnyShapeStyle(AVBrandColor.neutral50),
-                showsTopSafeAreaShield: true
-            ) {
-                EmptyView()
-            } content: {
-                switch mode {
-                case .settings:
-                    settingsContent
-                case .account:
-                    accountContent
-                }
+        AVSettingsProfileScreenScaffold(
+            title: screenTitle,
+            subtitle: screenSubtitle,
+            backgroundStyle: AnyShapeStyle(AVBrandSurface.shellBackground),
+            showsTopSafeAreaShield: true
+        ) {
+            AVAppShellConfiguredBrandHeader(
+                activeItem: mode,
+                openSettings: openSettings,
+                openAccount: openAccount
+            )
+        } content: {
+            switch mode {
+            case .settings:
+                settingsContent
+            case .account:
+                accountContent
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(L10n.string("common.close")) {
-                        dismiss()
-                    }
-                }
+        }
+        .toolbar(.hidden, for: .navigationBar)
+        .alert(L10n.string("profile.alert.signOutFailed.title"), isPresented: $isShowingSignOutError) {
+            Button(L10n.string("common.close"), role: .cancel) {}
+        } message: {
+            Text(signOutErrorMessage)
+        }
+        .alert(L10n.string("profile.local.delete.confirm.title"), isPresented: $isShowingDeleteLocalDataConfirmation) {
+            Button(L10n.string("common.cancel"), role: .cancel) {}
+            Button(L10n.string("profile.local.delete.confirm.action"), role: .destructive) {
+                store.deleteAllLocalData()
             }
-            .alert(L10n.string("profile.alert.signOutFailed.title"), isPresented: $isShowingSignOutError) {
-                Button(L10n.string("common.close"), role: .cancel) {}
-            } message: {
-                Text(signOutErrorMessage)
-            }
-            .sheet(isPresented: $isShowingProPaywall) {
-                SeriesProPaywallView(
-                    accessController: accessController,
-                    startSignInFlow: startSignInFlow
-                )
-            }
+        } message: {
+            Text(L10n.string("profile.local.delete.confirm.detail"))
+        }
+        .sheet(isPresented: $isShowingProPaywall) {
+            SeriesProPaywallView(
+                accessController: accessController,
+                startSignInFlow: startSignInFlow
+            )
+        }
+        .sheet(isPresented: $isShowingAccountDeletion) {
+            SeriesAccountDeletionScreen(viewModel: accountDeletionViewModel)
         }
     }
 
@@ -89,15 +95,11 @@ struct SeriesProfileScreen: View {
 
     @ViewBuilder
     private var accountContent: some View {
-        accountCard
         proCard
+        accountCard
         if accessController.isSignedIn {
             accountSafetyCard
         }
-        appPreferencesCard
-        seriesPreferencesCard
-        onThisDeviceCard
-        helpAndLegalCard
     }
 
     private var appPreferencesCard: some View {
@@ -152,10 +154,18 @@ struct SeriesProfileScreen: View {
                 detail: L10n.string("profile.local.library.detail")
             )
             AVSettingsInfoRow(
-                systemImage: "icloud",
+                systemImage: "internaldrive",
                 title: L10n.string("profile.local.sync.title"),
                 detail: L10n.string("profile.local.sync.detail")
             )
+            AVSettingsActionRow(
+                systemImage: "trash",
+                title: L10n.string("profile.local.delete.title"),
+                detail: localDeleteDetail,
+                action: { isShowingDeleteLocalDataConfirmation = true }
+            )
+            .disabled(store.entries.isEmpty)
+            .accessibilityIdentifier("profile.local.delete")
         }
     }
 
@@ -163,8 +173,8 @@ struct SeriesProfileScreen: View {
         AVSettingsHelpLegalSection(
             title: L10n.string("profile.help.title"),
             subtitle: L10n.string("profile.help.subtitle"),
-            openSourceTitle: AppConfig.openSourceURL == nil ? nil : L10n.string("profile.help.opensource.title"),
-            openSourceDetail: AppConfig.openSourceURL == nil ? nil : L10n.string("profile.help.opensource.detail"),
+            openSourceTitle: L10n.string("profile.help.opensource.title"),
+            openSourceDetail: L10n.string("profile.help.opensource.detail"),
             sourceCodeURL: AppConfig.openSourceURL,
             sourceCodeTitle: L10n.string("profile.help.sourceCode.title"),
             sourceCodeDetail: L10n.string("profile.help.sourceCode.detail"),
@@ -195,7 +205,7 @@ struct SeriesProfileScreen: View {
                     title: L10n.string("profile.summary.account.title"),
                     detail: sessionDetail
                 )
-                if let emailAddress = accessController.accountUser?.emailAddress {
+                if accessController.isSignedIn, let emailAddress = accessController.accountUser?.emailAddress {
                     AVSettingsInfoRow(
                         systemImage: "envelope",
                         title: L10n.string("profile.account.email.title"),
@@ -219,9 +229,19 @@ struct SeriesProfileScreen: View {
             subtitle: proSubtitle
         ) {
             AVSettingsInfoRow(
-                systemImage: "icloud.and.arrow.up",
-                title: L10n.string("profile.pro.sync.title"),
-                detail: L10n.string("profile.pro.sync.detail")
+                systemImage: "checkmark.seal.fill",
+                title: L10n.string("profile.pro.account.title"),
+                detail: L10n.string("profile.pro.account.detail")
+            )
+            AVSettingsInfoRow(
+                systemImage: "rectangle.stack.badge.person.crop",
+                title: L10n.string("profile.pro.library.title"),
+                detail: L10n.string("profile.pro.library.detail")
+            )
+            AVSettingsInfoRow(
+                systemImage: "sparkles",
+                title: L10n.string("profile.pro.avi.title"),
+                detail: L10n.string("profile.pro.avi.detail")
             )
             proActionButton
         }
@@ -235,7 +255,6 @@ struct SeriesProfileScreen: View {
                 title: L10n.string("profile.pro.signIn"),
                 style: .primary,
                 action: {
-                    dismiss()
                     startSignInFlow()
                 }
             )
@@ -276,7 +295,7 @@ struct SeriesProfileScreen: View {
                 systemImage: "exclamationmark.shield",
                 title: L10n.string("profile.safety.delete.title"),
                 detail: L10n.string("profile.safety.delete.detail"),
-                action: openAccountDeletion
+                action: { isShowingAccountDeletion = true }
             )
             .accessibilityIdentifier("profile.safety.delete")
         }
@@ -300,7 +319,6 @@ struct SeriesProfileScreen: View {
                     : L10n.string("profile.account.connectUnavailable"),
                 style: .primary,
                 action: {
-                    dismiss()
                     startSignInFlow()
                 }
             )
@@ -316,7 +334,11 @@ struct SeriesProfileScreen: View {
                     languageController.select(language)
                 } label: {
                     if languageController.currentLanguage == language {
-                        Label("\(language.displayName) (\(language.autonym))", systemImage: "checkmark")
+                        Label {
+                            Text("\(language.displayName) (\(language.autonym))")
+                        } icon: {
+                            Image(systemName: "checkmark")
+                        }
                     } else {
                         Text("\(language.displayName) (\(language.autonym))")
                     }
@@ -342,13 +364,15 @@ struct SeriesProfileScreen: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
-            .background(AVBrandColor.mutedSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(AVBrandColor.mutedSurface)
+            )
             .overlay {
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .stroke(AVBrandColor.borderSubtle, lineWidth: 1)
             }
         }
-        .accessibilityIdentifier("settings.language")
     }
 
     private var themeSelector: some View {
@@ -362,7 +386,6 @@ struct SeriesProfileScreen: View {
                 )
             }
         }
-        .accessibilityIdentifier("settings.theme")
     }
 
     private var accountIdentityDetail: String {
@@ -392,6 +415,14 @@ struct SeriesProfileScreen: View {
         case .signedInPro:
             L10n.string("profile.summary.plan.detail.pro")
         }
+    }
+
+    private var localDeleteDetail: String {
+        let count = store.entries.count
+        guard count > 0 else {
+            return L10n.string("profile.local.delete.empty")
+        }
+        return L10n.string("profile.local.delete.detail", count)
     }
 
     private var proSubtitle: String {
@@ -444,13 +475,26 @@ struct SeriesProfileScreen: View {
         }
     }
 
-    private func openAccountDeletion() {
-        guard let url = appExperience.legalLinks.accountDeletionURL ?? AppConfig.accountDeletionURL else { return }
-        openURL(url)
-    }
-
     private func openAppleSubscriptionManagement() {
         guard let url = URL(string: "https://apps.apple.com/account/subscriptions") else { return }
         openURL(url)
+    }
+
+    private var accountDeletionViewModel: SeriesAccountDeletionViewModel {
+        SeriesAccountDeletionViewModel(
+            api: accountDeletionAPI,
+            signOut: { try await accessController.signOut() }
+        )
+    }
+
+    private var accountDeletionAPI: AccountDeletionAPI {
+        if let uiTestAPI = SeriesUITestAccountDeletionAPI.fromEnvironment() {
+            return uiTestAPI
+        }
+        let accountService = DefaultSeriesAVAccountService()
+        return SeriesAccountAccessClient(apiClient: SeriesAVAPIClient(
+            baseURL: AppConfig.apiBaseURL,
+            tokenProvider: { try await accountService.getToken() }
+        ))
     }
 }
