@@ -13,7 +13,7 @@ struct SeriesProviderRef: Codable, Equatable, Hashable, Sendable {
     var isPrimary: Bool?
 }
 
-struct SeriesEpisodeCursor: Codable, Equatable, Comparable, Sendable {
+struct SeriesEpisodeCursor: Codable, Equatable, Hashable, Comparable, Sendable {
     var seasonNumber: Int
     var episodeNumber: Int
 

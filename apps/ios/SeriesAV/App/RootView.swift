@@ -1464,7 +1464,6 @@ struct SeriesProgressEditorSheet: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     progressHero
-                    quickStepper
                     seasonSelector
                     episodeSelector
                     explanation
@@ -1517,29 +1516,6 @@ struct SeriesProgressEditorSheet: View {
         }
     }
 
-    private var quickStepper: some View {
-        HStack(spacing: 10) {
-            Button {
-                moveSelection(by: -1)
-            } label: {
-                Label(L10n.string("home.editor.previousEpisode"), systemImage: "chevron.left")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
-            .disabled(selectedSeasonNumber == 1 && selectedEpisodeNumber == 1)
-
-            Button {
-                moveSelection(by: 1)
-            } label: {
-                Label(L10n.string("home.editor.nextEpisode"), systemImage: "chevron.right")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
-        }
-    }
-
     private var seasonSelector: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(L10n.string("home.editor.season.short"))
@@ -1584,26 +1560,32 @@ struct SeriesProgressEditorSheet: View {
                 }
             }
 
-            LazyVGrid(columns: episodeColumns, alignment: .leading, spacing: 8) {
-                ForEach(episodeNumbers, id: \.self) { episode in
-                    episodeChip(
-                        title: episodeChipTitle(for: episode),
-                        episode: episode
-                    ) {
-                        selectEpisode(episode)
+            if let loadedGuide {
+                LazyVStack(spacing: 8) {
+                    ForEach(loadedGuide.items(in: selectedSeasonNumber), id: \.cursor) { item in
+                        episodeGuideRow(item) {
+                            selectEpisode(item.episodeNumber)
+                        }
                     }
                 }
+            } else {
+                LazyVGrid(columns: episodeColumns, alignment: .leading, spacing: 8) {
+                    ForEach(episodeNumbers, id: \.self) { episode in
+                        episodeChip(
+                            title: episodeChipTitle(for: episode),
+                            episode: episode
+                        ) {
+                            selectEpisode(episode)
+                        }
+                    }
 
-                if shouldShowMoreEpisodes {
-                    moreChip(title: L10n.string("home.editor.moreEpisodes")) {
-                        isShowingExtendedEpisodes = true
-                        visibleEpisodeCount = Self.maxEpisodeCount
+                    if shouldShowMoreEpisodes {
+                        moreChip(title: L10n.string("home.editor.moreEpisodes")) {
+                            isShowingExtendedEpisodes = true
+                            visibleEpisodeCount = Self.maxEpisodeCount
+                        }
                     }
                 }
-            }
-
-            if let selectedEpisodeDetail {
-                episodeDetailRow(selectedEpisodeDetail)
             }
         }
     }
@@ -1691,10 +1673,6 @@ struct SeriesProgressEditorSheet: View {
         loadedGuide == nil && !isShowingExtendedEpisodes
     }
 
-    private var selectedEpisodeDetail: SeriesEpisodeGuideItem? {
-        loadedGuide?.item(for: selectedCursor)
-    }
-
     private var explanationText: String {
         switch episodeGuideState {
         case .loaded:
@@ -1710,34 +1688,109 @@ struct SeriesProgressEditorSheet: View {
         "E\(episode)"
     }
 
-    private func episodeDetailRow(_ item: SeriesEpisodeGuideItem) -> some View {
-        HStack(alignment: .top, spacing: 8) {
-            Image(systemName: "calendar")
-                .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(AVBrandColor.accent)
-                .padding(.top, 1)
+    private func episodeGuideRow(_ item: SeriesEpisodeGuideItem, action: @escaping () -> Void) -> some View {
+        let isSelected = item.cursor == selectedCursor
+        let isWatched = item.cursor <= selectedCursor
+        let fill = isSelected ? AVBrandColor.accent.opacity(0.20) : Color(.secondarySystemGroupedBackground)
+        let stroke = isSelected ? AVBrandColor.accent.opacity(0.9) : (isWatched ? AVBrandColor.accent.opacity(0.34) : Color.primary.opacity(0.08))
 
-            VStack(alignment: .leading, spacing: 4) {
-                if let title = item.title, !title.isEmpty {
-                    Text(title)
-                        .font(.system(size: 13, weight: .bold))
+        return Button(action: action) {
+            HStack(alignment: .center, spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(isSelected ? AVBrandColor.accent : Color(.tertiarySystemGroupedBackground))
+
+                    Text("E\(item.episodeNumber)")
+                        .font(.system(size: 15, weight: .black, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(isSelected ? Color.black.opacity(0.84) : Color.primary)
+                }
+                .frame(width: 48, height: 44)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(episodeTitle(for: item))
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
                         .foregroundStyle(.primary)
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
-                }
 
-                if let airDate = item.airDate, !airDate.isEmpty {
-                    Text(airDate)
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.82)
+                    if let airDate = item.airDate, !airDate.isEmpty {
+                        Text(airDate)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.82)
+                    }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Image(systemName: isWatched ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundStyle(isWatched ? AVBrandColor.accent : Color.secondary.opacity(0.45))
+                    .frame(width: 24, height: 24)
             }
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .buttonStyle(.plain)
+        .background(fill, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(stroke, lineWidth: 1)
+        }
+        .accessibilityLabel(String(format: L10n.string("home.editor.episode"), item.episodeNumber))
+    }
+
+    private func episodeTitle(for item: SeriesEpisodeGuideItem) -> String {
+        if let title = item.title?.trimmingCharacters(in: .whitespacesAndNewlines), !title.isEmpty {
+            return title
+        }
+        return String(format: L10n.string("home.editor.episode"), item.episodeNumber)
+    }
+
+    private func genericCursor(for episode: Int) -> SeriesEpisodeCursor {
+        SeriesEpisodeCursor(seasonNumber: selectedSeasonNumber, episodeNumber: episode)
+    }
+
+    private func genericEpisodeLabel(for episode: Int) -> some View {
+        let cursor = genericCursor(for: episode)
+        let isSelected = cursor == selectedCursor
+        let isWatched = cursor <= selectedCursor
+
+        return VStack(spacing: 5) {
+            Text("E\(episode)")
+                .font(.system(size: 14, weight: .black, design: .rounded))
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.74)
+
+            Image(systemName: isWatched ? "checkmark.circle.fill" : "circle")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(isSelected ? Color.white.opacity(0.88) : (isWatched ? AVBrandColor.accent : Color.secondary.opacity(0.55)))
+        }
+        .frame(maxWidth: .infinity, minHeight: 48)
+        .padding(.horizontal, 8)
+    }
+
+    private func episodeChip(title: String, episode: Int, action: @escaping () -> Void) -> some View {
+        let cursor = genericCursor(for: episode)
+        let isSelected = cursor == selectedCursor
+        let isWatched = cursor <= selectedCursor
+        let fill = isSelected ? AVBrandColor.accent : Color(.secondarySystemGroupedBackground)
+        let stroke = isSelected ? AVBrandColor.accent.opacity(0.8) : (isWatched ? AVBrandColor.accent.opacity(0.30) : Color.primary.opacity(0.08))
+        let foreground = isSelected ? Color.white : Color.primary
+
+        return Button(action: action) {
+            genericEpisodeLabel(for: episode)
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(foreground)
+        .background(fill, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(stroke, lineWidth: 1)
+        }
+        .accessibilityLabel(String(format: L10n.string("home.editor.episode"), episode))
     }
 
     private func selectorChip(title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
@@ -1759,46 +1812,11 @@ struct SeriesProgressEditorSheet: View {
         }
     }
 
-    private func episodeChip(title: String, episode: Int, action: @escaping () -> Void) -> some View {
-        let isSelected = selectedEpisodeNumber == episode
-        let isWatched = episode < selectedEpisodeNumber
-        let fill = isSelected ? AVBrandColor.accent : Color(.secondarySystemGroupedBackground)
-        let stroke = isSelected ? AVBrandColor.accent.opacity(0.8) : (isWatched ? AVBrandColor.accent.opacity(0.30) : Color.primary.opacity(0.08))
-        let foreground = isSelected ? Color.white : Color.primary
-
-        return Button(action: action) {
-            VStack(spacing: 5) {
-                Text(title)
-                    .font(.system(size: 14, weight: .black, design: .rounded))
-                    .monospacedDigit()
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.74)
-
-                Image(systemName: isWatched || isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(isSelected ? Color.white.opacity(0.88) : (isWatched ? AVBrandColor.accent : Color.secondary.opacity(0.55)))
-            }
-            .frame(maxWidth: .infinity, minHeight: 48)
-            .padding(.horizontal, 8)
-        }
-        .buttonStyle(.plain)
-        .foregroundStyle(foreground)
-        .background(fill, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .stroke(stroke, lineWidth: 1)
-        }
-        .accessibilityLabel(String(format: L10n.string("home.editor.episode"), episode))
-    }
-
     private func moreChip(title: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Label(title, systemImage: "plus")
-                .font(.system(size: 14, weight: .bold, design: .rounded))
-                .lineLimit(2)
-                .minimumScaleFactor(0.82)
+            Image(systemName: "plus")
+                .font(.system(size: 15, weight: .black))
                 .frame(maxWidth: .infinity, minHeight: 42)
-                .padding(.horizontal, 10)
         }
         .buttonStyle(.plain)
         .foregroundStyle(AVBrandColor.accent)
@@ -1807,6 +1825,7 @@ struct SeriesProgressEditorSheet: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .stroke(AVBrandColor.accent.opacity(0.28), lineWidth: 1)
         }
+        .accessibilityLabel(title)
     }
 
     private func selectSeason(_ season: Int) {
@@ -1830,38 +1849,6 @@ struct SeriesProgressEditorSheet: View {
             visibleEpisodeCount = Self.maxEpisodeCount
         } else {
             visibleEpisodeCount = Self.defaultEpisodeCount
-        }
-    }
-
-    private func moveSelection(by delta: Int) {
-        if let guide = loadedGuide {
-            let movedCursor = delta < 0 ? guide.previous(before: selectedCursor) : guide.next(after: selectedCursor)
-            guard let movedCursor else {
-                return
-            }
-            selectedSeasonNumber = movedCursor.seasonNumber
-            selectedEpisodeNumber = movedCursor.episodeNumber
-            return
-        }
-
-        let nextEpisode = selectedEpisodeNumber + delta
-        if nextEpisode >= 1 && nextEpisode <= Self.maxEpisodeCount {
-            selectEpisode(nextEpisode)
-            return
-        }
-
-        if nextEpisode < 1 && selectedSeasonNumber > 1 {
-            selectSeason(selectedSeasonNumber - 1)
-            selectEpisode(Self.defaultEpisodeCount)
-            isShowingExtendedEpisodes = false
-            visibleEpisodeCount = Self.defaultEpisodeCount
-            return
-        }
-
-        if nextEpisode > Self.maxEpisodeCount && selectedSeasonNumber < Self.maxSeasonCount {
-            selectSeason(selectedSeasonNumber + 1)
-            selectEpisode(1)
-            return
         }
     }
 
@@ -1923,6 +1910,10 @@ private struct SeriesProgressEpisodeGuide: Equatable {
         items
             .filter { $0.seasonNumber == season }
             .map(\.episodeNumber)
+    }
+
+    func items(in season: Int) -> [SeriesEpisodeGuideItem] {
+        items.filter { $0.seasonNumber == season }
     }
 
     func item(for cursor: SeriesEpisodeCursor) -> SeriesEpisodeGuideItem? {
