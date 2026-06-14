@@ -37,7 +37,9 @@ Current scaffold:
 - Search shows popular collections, genre/anime filters, backend-enriched
   signed-in results, and editorial fallback rows. Any catalog or fallback row
   that has an approved provider poster should render it; text fallback artwork
-  is only for missing/blocked posters.
+  is only for missing/blocked posters. Search sections should expose a compact
+  result count or update state so default collections and typed searches are
+  understandable without extra explanatory UI.
 - Episode tracking uses one reversible progress cursor, compact season/episode
   selection, known episode guides when available, and generic large-range
   episode navigation when no guide is available.

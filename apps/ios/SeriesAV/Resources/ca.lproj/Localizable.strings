@@ -366,3 +366,8 @@
 "search.follow" = "Seguir serie";
 "search.resultsFor" = "Resultats per a \"%@\"";
 "search.loading" = "Cercant";
+"search.collection.count.one" = "%d serie a punt per seguir.";
+"search.collection.count.other" = "%d series a punt per seguir.";
+"search.collection.updating" = "Actualitzant el cataleg";
+"search.results.count.one" = "%d resultat";
+"search.results.count.other" = "%d resultats";

@@ -366,3 +366,8 @@
 "search.follow" = "Seguir serie";
 "search.resultsFor" = "Resultados para \"%@\"";
 "search.loading" = "Buscando";
+"search.collection.count.one" = "%d serie lista para seguir.";
+"search.collection.count.other" = "%d series listas para seguir.";
+"search.collection.updating" = "Actualizando catálogo";
+"search.results.count.one" = "%d resultado";
+"search.results.count.other" = "%d resultados";

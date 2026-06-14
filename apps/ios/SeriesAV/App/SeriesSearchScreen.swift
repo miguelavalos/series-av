@@ -250,9 +250,16 @@ struct SeriesSearchScreen: View {
 
     private var searchResultsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(resultsTitle)
-                .font(.system(size: 17, weight: .black, design: .rounded))
-                .foregroundStyle(.primary)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(resultsTitle)
+                    .font(.system(size: 17, weight: .black, design: .rounded))
+                    .foregroundStyle(.primary)
+
+                Text(resultsSubtitle)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
 
             if trimmedQuery.isEmpty == false && localMatches.isEmpty == false {
                 ForEach(localMatches) { entry in
@@ -273,6 +280,15 @@ struct SeriesSearchScreen: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.vertical, 14)
+            } else if isSearchingCatalog && trimmedQuery.isEmpty {
+                HStack(spacing: 10) {
+                    ProgressView()
+                    Text(L10n.string("search.collection.updating"))
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 4)
             } else if catalogResults.isEmpty {
                 ContentUnavailableView(
                     L10n.string("library.search.empty.title"),
@@ -295,6 +311,28 @@ struct SeriesSearchScreen: View {
 
     private var resultsTitle: String {
         trimmedQuery.isEmpty ? selectedCollection.title : String(format: L10n.string("search.resultsFor"), trimmedQuery)
+    }
+
+    private var resultsSubtitle: String {
+        if trimmedQuery.isEmpty {
+            return isSearchingCatalog
+                ? L10n.string("search.collection.updating")
+                : formattedCollectionCount(catalogResults.count)
+        }
+        let count = localMatches.count + catalogResults.count
+        return formattedResultsCount(count)
+    }
+
+    private func formattedCollectionCount(_ count: Int) -> String {
+        count == 1
+            ? L10n.string("search.collection.count.one", count)
+            : L10n.string("search.collection.count.other", count)
+    }
+
+    private func formattedResultsCount(_ count: Int) -> String {
+        count == 1
+            ? L10n.string("search.results.count.one", count)
+            : L10n.string("search.results.count.other", count)
     }
 
     private func addTypedSeries() {

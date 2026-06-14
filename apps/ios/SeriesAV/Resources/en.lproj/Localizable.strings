@@ -366,3 +366,8 @@
 "search.follow" = "Follow series";
 "search.resultsFor" = "Results for \"%@\"";
 "search.loading" = "Searching";
+"search.collection.count.one" = "%d series ready to follow.";
+"search.collection.count.other" = "%d series ready to follow.";
+"search.collection.updating" = "Updating catalog";
+"search.results.count.one" = "%d result";
+"search.results.count.other" = "%d results";
