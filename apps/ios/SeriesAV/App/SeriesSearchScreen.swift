@@ -14,6 +14,8 @@ struct SeriesSearchScreen: View {
     @State private var selectedCollection: SeriesSearchCollection = .popular
     @State private var remoteCatalogResults: [SeriesCatalogPreview] = []
     @State private var remoteCatalogQuery = ""
+    @State private var remoteCollectionResults: [SeriesCatalogPreview] = []
+    @State private var remoteCollectionKey = ""
     @State private var isSearchingCatalog = false
 
     var body: some View {
@@ -51,8 +53,8 @@ struct SeriesSearchScreen: View {
             )
             .presentationDetents([.large])
         }
-        .task(id: trimmedQuery) {
-            await refreshCatalogSearch(for: trimmedQuery)
+        .task(id: searchRefreshKey) {
+            await refreshCatalog()
         }
     }
 
@@ -77,7 +79,11 @@ struct SeriesSearchScreen: View {
 
     private var catalogResults: [SeriesCatalogPreview] {
         if trimmedQuery.isEmpty {
-            return SeriesCatalogPreview.samples(for: selectedCollection)
+            let samples = SeriesCatalogPreview.samples(for: selectedCollection)
+            guard remoteCollectionKey == selectedCollection.cacheKey else {
+                return samples
+            }
+            return SeriesCatalogPreview.mergingBackendResults(remoteCollectionResults, over: samples)
         }
         guard remoteCatalogQuery == trimmedQuery else {
             return []
@@ -90,6 +96,10 @@ struct SeriesSearchScreen: View {
             return []
         }
         return store.searchEntries(matching: trimmedQuery)
+    }
+
+    private var searchRefreshKey: String {
+        "\(selectedCollection.cacheKey)|\(trimmedQuery)"
     }
 
     private var searchControls: some View {
@@ -353,12 +363,12 @@ struct SeriesSearchScreen: View {
         }
     }
 
-    private func refreshCatalogSearch(for rawQuery: String) async {
-        let searchQuery = rawQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+    private func refreshCatalog() async {
+        let searchQuery = trimmedQuery
         guard searchQuery.isEmpty == false else {
             remoteCatalogQuery = ""
             remoteCatalogResults = []
-            isSearchingCatalog = false
+            await refreshSelectedCollection()
             return
         }
 
@@ -375,12 +385,65 @@ struct SeriesSearchScreen: View {
             let response = try await client.resolve(SeriesCatalogResolveRequest(query: searchQuery))
             guard searchQuery == trimmedQuery else { return }
             remoteCatalogQuery = searchQuery
-            remoteCatalogResults = response.candidates.map(SeriesCatalogPreview.init(candidate:))
+            remoteCatalogResults = response.candidates.map { SeriesCatalogPreview(candidate: $0) }
         } catch {
             guard searchQuery == trimmedQuery else { return }
             remoteCatalogQuery = searchQuery
             remoteCatalogResults = SeriesCatalogPreview.searchSamples(searchQuery)
         }
+        isSearchingCatalog = false
+    }
+
+    private func refreshSelectedCollection() async {
+        guard accessController.isSignedIn else {
+            remoteCollectionKey = ""
+            remoteCollectionResults = []
+            isSearchingCatalog = false
+            return
+        }
+
+        let collection = selectedCollection
+        let collectionKey = collection.cacheKey
+        let samples = SeriesCatalogPreview.samples(for: collection)
+        guard samples.isEmpty == false else {
+            remoteCollectionKey = collectionKey
+            remoteCollectionResults = []
+            isSearchingCatalog = false
+            return
+        }
+
+        isSearchingCatalog = true
+        let client = SeriesCatalogResolveClient(apiClient: accessController.authenticatedAPIClient())
+        var resolvedPreviews: [SeriesCatalogPreview] = []
+
+        await withTaskGroup(of: SeriesCatalogPreview?.self) { group in
+            for sample in samples {
+                group.addTask {
+                    do {
+                        let response = try await client.resolve(SeriesCatalogResolveRequest(query: sample.title, year: sample.year))
+                        guard let candidate = response.candidates.first(where: { $0.matchConfidence == "exact" || $0.matchConfidence == "strong" }) ?? response.candidates.first else {
+                            return nil
+                        }
+                        return SeriesCatalogPreview(candidate: candidate, collections: sample.collections)
+                    } catch {
+                        return nil
+                    }
+                }
+            }
+
+            for await preview in group {
+                if let preview {
+                    resolvedPreviews.append(preview)
+                }
+            }
+        }
+
+        guard trimmedQuery.isEmpty, selectedCollection == collection else {
+            return
+        }
+
+        remoteCollectionKey = collectionKey
+        remoteCollectionResults = resolvedPreviews
         isSearchingCatalog = false
     }
 }
@@ -575,6 +638,23 @@ private enum SeriesSearchCollection: CaseIterable {
             return L10n.string("search.collection.animation")
         }
     }
+
+    var cacheKey: String {
+        switch self {
+        case .popular:
+            return "popular"
+        case .anime:
+            return "anime"
+        case .drama:
+            return "drama"
+        case .comedy:
+            return "comedy"
+        case .sciFi:
+            return "sci-fi"
+        case .animation:
+            return "animation"
+        }
+    }
 }
 
 private struct SeriesCatalogPreview: Identifiable {
@@ -604,7 +684,7 @@ private struct SeriesCatalogPreview: Identifiable {
         self.resolvedCandidate = resolvedCandidate
     }
 
-    init(candidate: SeriesCatalogResolveCandidate) {
+    init(candidate: SeriesCatalogResolveCandidate, collections: Set<SeriesSearchCollection> = []) {
         let series = candidate.series
         self.init(
             id: series.id,
@@ -612,7 +692,7 @@ private struct SeriesCatalogPreview: Identifiable {
             year: series.year,
             genres: series.genres,
             artwork: series.posterUrl.map { .approvedPoster($0.absoluteString, seed: series.title) } ?? .fallback(seed: series.title),
-            collections: [],
+            collections: collections,
             resolvedCandidate: candidate
         )
     }
@@ -635,6 +715,29 @@ private struct SeriesCatalogPreview: Identifiable {
         }
     }
 
+    static func mergingBackendResults(
+        _ backendResults: [SeriesCatalogPreview],
+        over samples: [SeriesCatalogPreview]
+    ) -> [SeriesCatalogPreview] {
+        var merged: [SeriesCatalogPreview] = []
+        var usedBackendIDs = Set<String>()
+
+        for sample in samples {
+            if let backend = backendResults.bestMatch(for: sample) {
+                merged.append(backend)
+                usedBackendIDs.insert(backend.id)
+            } else {
+                merged.append(sample)
+            }
+        }
+
+        for backend in backendResults where !usedBackendIDs.contains(backend.id) {
+            merged.append(backend)
+        }
+
+        return merged
+    }
+
     private static let samples: [SeriesCatalogPreview] = [
         SeriesCatalogPreview(id: "the-last-of-us", title: "The Last of Us", year: 2023, genres: ["Drama", "Sci-Fi"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/563/1409008.jpg", seed: "The Last of Us"), collections: [.popular, .drama, .sciFi]),
         SeriesCatalogPreview(id: "severance", title: "Severance", year: 2022, genres: ["Drama", "Sci-Fi"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/548/1371406.jpg", seed: "Severance"), collections: [.popular, .drama, .sciFi]),
@@ -643,9 +746,9 @@ private struct SeriesCatalogPreview: Identifiable {
         SeriesCatalogPreview(id: "abbott-elementary", title: "Abbott Elementary", year: 2021, genres: ["Comedia"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/586/1467109.jpg", seed: "Abbott Elementary"), collections: [.popular, .comedy]),
         SeriesCatalogPreview(id: "rick-and-morty", title: "Rick and Morty", year: 2013, genres: ["Animacion", "Sci-Fi"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/626/1566363.jpg", seed: "Rick and Morty"), collections: [.popular, .animation, .sciFi, .comedy]),
         SeriesCatalogPreview(id: "arcane", title: "Arcane", year: 2021, genres: ["Animacion", "Drama"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/536/1340287.jpg", seed: "Arcane"), collections: [.popular, .animation, .drama]),
-        SeriesCatalogPreview(id: "attack-on-titan", title: "Attack on Titan", year: nil, genres: ["Anime", "Drama"], artwork: .fallback(seed: "Attack on Titan"), collections: [.popular, .anime, .animation, .drama]),
-        SeriesCatalogPreview(id: "death-note", title: "Death Note", year: nil, genres: ["Anime", "Drama"], artwork: .fallback(seed: "Death Note"), collections: [.anime, .animation, .drama]),
-        SeriesCatalogPreview(id: "liar-game", title: "Liar Game", year: nil, genres: ["Anime"], artwork: .fallback(seed: "Liar Game"), collections: [.anime]),
+        SeriesCatalogPreview(id: "attack-on-titan", title: "Attack on Titan", year: 2013, genres: ["Anime", "Fantasy"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/476/1191684.jpg", seed: "Attack on Titan"), collections: [.popular, .anime, .animation, .drama]),
+        SeriesCatalogPreview(id: "death-note", title: "Death Note", year: 2006, genres: ["Anime", "Thriller"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/499/1249019.jpg", seed: "Death Note"), collections: [.anime, .animation, .drama]),
+        SeriesCatalogPreview(id: "liar-game", title: "Liar Game", year: 2026, genres: ["Anime", "Thriller"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/620/1551709.jpg", seed: "Liar Game"), collections: [.anime]),
         SeriesCatalogPreview(id: "for-all-mankind", title: "For All Mankind", year: 2019, genres: ["Drama", "Sci-Fi"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/616/1541416.jpg", seed: "For All Mankind"), collections: [.sciFi, .drama]),
         SeriesCatalogPreview(id: "brooklyn-nine-nine", title: "Brooklyn Nine-Nine", year: 2013, genres: ["Comedia"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/402/1007484.jpg", seed: "Brooklyn Nine-Nine"), collections: [.comedy]),
         SeriesCatalogPreview(id: "bojack-horseman", title: "BoJack Horseman", year: 2014, genres: ["Animacion", "Comedia"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/405/1012627.jpg", seed: "BoJack Horseman"), collections: [.animation, .comedy])
@@ -740,6 +843,19 @@ private struct SeriesSearchPosterView: View {
             case .fallbackOnly:
                 SeriesPosterMark(seed: artwork.fallbackSeed, size: width)
             }
+        }
+    }
+}
+
+private extension Array where Element == SeriesCatalogPreview {
+    func bestMatch(for sample: SeriesCatalogPreview) -> SeriesCatalogPreview? {
+        let sampleTitle = SeriesLibraryIdentity.normalizedSearchText(sample.title)
+        if let exact = first(where: { SeriesLibraryIdentity.normalizedSearchText($0.title) == sampleTitle }) {
+            return exact
+        }
+        return first {
+            SeriesLibraryIdentity.normalizedSearchText($0.title).contains(sampleTitle)
+                || sampleTitle.contains(SeriesLibraryIdentity.normalizedSearchText($0.title))
         }
     }
 }

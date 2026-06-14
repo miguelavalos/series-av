@@ -34,8 +34,10 @@ Current scaffold:
   shell, guarded by public xcconfig/Info.plist config and backend access
   reconciliation.
 - Home, Library, Search, and Avi product tabs using the shared Apps AV shell.
-- Search shows popular collections, genre/anime filters, local fallback results,
-  poster-capable catalog cards, and compact icon actions.
+- Search shows popular collections, genre/anime filters, backend-enriched
+  signed-in results, and editorial fallback rows. Any catalog or fallback row
+  that has an approved provider poster should render it; text fallback artwork
+  is only for missing/blocked posters.
 - Episode tracking uses one reversible progress cursor, compact season/episode
   selection, known episode guides when available, and generic large-range
   episode navigation when no guide is available.

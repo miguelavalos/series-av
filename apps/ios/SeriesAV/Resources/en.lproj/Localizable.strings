@@ -103,9 +103,9 @@
 "add.action" = "Add to watch list";
 "add.action.alreadyAdded" = "Already added";
 "add.matches.title" = "Already in your library";
-"add.footer.pro" = "Pro libraries can keep adding series.";
+"add.footer.pro" = "Choose a series and mark the exact season and episode point.";
 "add.footer.remaining" = "%d active slots remaining.";
-"add.footer.hint" = "New series start in To watch, ready to begin from Home.";
+"add.footer.hint" = "If you already follow it, search opens the quick progress adjustment.";
 "add.footer.limitReached" = "Your active library limit is full.";
 "add.footer.connectAccount" = "Connect account";
 "add.footer.upgrade" = "View Pro";

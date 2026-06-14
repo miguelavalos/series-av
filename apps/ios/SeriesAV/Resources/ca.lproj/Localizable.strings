@@ -103,9 +103,9 @@
 "add.action" = "Afegir a la llista";
 "add.action.alreadyAdded" = "Ja afegida";
 "add.matches.title" = "Ja a la teva biblioteca";
-"add.footer.pro" = "Les biblioteques Pro poden seguir afegint series.";
+"add.footer.pro" = "Tria una serie i marca el punt exacte per temporada i episodi.";
 "add.footer.remaining" = "Queden %d espais actius.";
-"add.footer.hint" = "Les series noves comencen a Per veure, a punt per comencar des de Home.";
+"add.footer.hint" = "Si ja la segueixes, la cerca obre l'ajust rapid de progres.";
 "add.footer.limitReached" = "El limit de biblioteca activa esta ple.";
 "add.footer.connectAccount" = "Connectar compte";
 "add.footer.upgrade" = "Veure Pro";

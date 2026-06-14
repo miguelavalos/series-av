@@ -103,9 +103,9 @@
 "add.action" = "Ajouter a la liste";
 "add.action.alreadyAdded" = "Deja ajoutee";
 "add.matches.title" = "Deja dans votre bibliotheque";
-"add.footer.pro" = "Les bibliotheques Pro peuvent continuer a ajouter des series.";
+"add.footer.pro" = "Choisis une serie et marque le point exact par saison et episode.";
 "add.footer.remaining" = "%d emplacements actifs restants.";
-"add.footer.hint" = "Les nouvelles series commencent dans A regarder, pretes a demarrer depuis Home.";
+"add.footer.hint" = "Si tu la suis deja, la recherche ouvre l'ajustement rapide de progression.";
 "add.footer.limitReached" = "Votre limite de bibliotheque active est atteinte.";
 "add.footer.connectAccount" = "Connecter un compte";
 "add.footer.upgrade" = "Voir Pro";

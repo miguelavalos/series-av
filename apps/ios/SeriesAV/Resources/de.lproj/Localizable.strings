@@ -103,9 +103,9 @@
 "add.action" = "Zur Merkliste hinzufuegen";
 "add.action.alreadyAdded" = "Schon hinzugefuegt";
 "add.matches.title" = "Schon in deiner Bibliothek";
-"add.footer.pro" = "Pro-Bibliotheken koennen weiter Serien hinzufuegen.";
+"add.footer.pro" = "Waehle eine Serie und markiere den genauen Staffel- und Episodenpunkt.";
 "add.footer.remaining" = "%d aktive Plaetze uebrig.";
-"add.footer.hint" = "Neue Serien starten in der Merkliste, bereit zum Start von Home.";
+"add.footer.hint" = "Wenn du sie schon verfolgst, oeffnet die Suche die schnelle Fortschrittsanpassung.";
 "add.footer.limitReached" = "Dein aktives Bibliothekslimit ist voll.";
 "add.footer.connectAccount" = "Account verbinden";
 "add.footer.upgrade" = "Pro ansehen";
