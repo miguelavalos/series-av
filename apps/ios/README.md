@@ -33,18 +33,23 @@ Current scaffold:
 - RevenueCat-backed Series AV Pro purchase/restore boundary and custom paywall
   shell, guarded by public xcconfig/Info.plist config and backend access
   reconciliation.
+- Home, Library, Search, and Avi product tabs using the shared Apps AV shell.
+- Search shows popular collections, genre/anime filters, local fallback results,
+  poster-capable catalog cards, and compact icon actions.
+- Episode tracking uses one reversible progress cursor, compact season/episode
+  selection, known episode guides when available, and generic large-range
+  episode navigation when no guide is available.
 - Unit-test build coverage for library identity, cursor updates, app-data sync
   envelopes, access entitlement resolution, account session hydration, and Pro
   purchase reconciliation.
 
 Not implemented yet:
 
-- final Series AV UI redesign;
 - private RevenueCat/App Store product configuration, Apps AV product-map
   readiness, and signed purchase/restore smoke;
 - advanced account-management flows beyond shared links;
 - Convex realtime projection;
-- catalog search/enrichment UI;
+- full catalog/enrichment polish beyond the current V1 search and fallback UI;
 
 The private rebuild decision record is:
 

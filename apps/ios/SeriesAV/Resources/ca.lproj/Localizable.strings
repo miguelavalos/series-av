@@ -357,6 +357,7 @@
 
 "common.clear" = "Esborrar";
 "search.addTyped" = "Afegir \"%@\"";
+"search.collection.anime" = "Anime";
 "search.collection.animation" = "Animacio";
 "search.collection.comedy" = "Comedia";
 "search.collection.drama" = "Drama";

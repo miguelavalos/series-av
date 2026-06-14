@@ -1455,7 +1455,7 @@ struct SeriesProgressEditorSheet: View {
         _selectedSeasonNumber = State(initialValue: boundedSeason)
         _selectedEpisodeNumber = State(initialValue: boundedEpisode)
         _visibleSeasonCount = State(initialValue: max(8, boundedSeason + 2))
-        _visibleEpisodeCount = State(initialValue: boundedEpisode > Self.defaultEpisodeCount ? Self.maxEpisodeCount : Self.defaultEpisodeCount)
+        _visibleEpisodeCount = State(initialValue: min(Self.maxEpisodeCount, max(Self.defaultEpisodeCount, boundedEpisode + 6)))
         _isShowingExtendedEpisodes = State(initialValue: boundedEpisode > Self.defaultEpisodeCount)
     }
 
@@ -1526,7 +1526,8 @@ struct SeriesProgressEditorSheet: View {
                 HStack(spacing: 8) {
                     ForEach(seasonNumbers, id: \.self) { season in
                         selectorChip(
-                            title: String(format: L10n.string("home.editor.season"), season),
+                            title: "S\(season)",
+                            accessibilityLabel: String(format: L10n.string("home.editor.season"), season),
                             isSelected: selectedSeasonNumber == season
                         ) {
                             selectSeason(season)
@@ -1582,7 +1583,7 @@ struct SeriesProgressEditorSheet: View {
                     if shouldShowMoreEpisodes {
                         moreChip(title: L10n.string("home.editor.moreEpisodes")) {
                             isShowingExtendedEpisodes = true
-                            visibleEpisodeCount = Self.maxEpisodeCount
+                            visibleEpisodeCount = min(visibleEpisodeCount + Self.defaultEpisodeCount, Self.maxEpisodeCount)
                         }
                     }
                 }
@@ -1647,9 +1648,9 @@ struct SeriesProgressEditorSheet: View {
         return Array(1...min(visibleEpisodeCount, Self.maxEpisodeCount))
     }
 
-    private static let maxSeasonCount = 12
+    private static let maxSeasonCount = 30
     private static let defaultEpisodeCount = 12
-    private static let maxEpisodeCount = 24
+    private static let maxEpisodeCount = 200
 
     private var canShowMoreSeasons: Bool {
         if loadedGuide != nil {
@@ -1670,7 +1671,7 @@ struct SeriesProgressEditorSheet: View {
     }
 
     private var shouldShowMoreEpisodes: Bool {
-        loadedGuide == nil && !isShowingExtendedEpisodes
+        loadedGuide == nil && visibleEpisodeCount < Self.maxEpisodeCount
     }
 
     private var explanationText: String {
@@ -1793,7 +1794,7 @@ struct SeriesProgressEditorSheet: View {
         .accessibilityLabel(String(format: L10n.string("home.editor.episode"), episode))
     }
 
-    private func selectorChip(title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+    private func selectorChip(title: String, accessibilityLabel: String? = nil, isSelected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title)
                 .font(.system(size: 14, weight: .bold, design: .rounded))
@@ -1810,6 +1811,7 @@ struct SeriesProgressEditorSheet: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .stroke(isSelected ? AVBrandColor.accent.opacity(0.8) : Color.primary.opacity(0.08), lineWidth: 1)
         }
+        .accessibilityLabel(accessibilityLabel ?? title)
     }
 
     private func moreChip(title: String, action: @escaping () -> Void) -> some View {
@@ -1844,9 +1846,9 @@ struct SeriesProgressEditorSheet: View {
         }
         if episode > Self.defaultEpisodeCount {
             isShowingExtendedEpisodes = true
-            visibleEpisodeCount = Self.maxEpisodeCount
+            visibleEpisodeCount = min(Self.maxEpisodeCount, max(visibleEpisodeCount, episode + 6))
         } else if isShowingExtendedEpisodes {
-            visibleEpisodeCount = Self.maxEpisodeCount
+            visibleEpisodeCount = max(visibleEpisodeCount, Self.defaultEpisodeCount * 2)
         } else {
             visibleEpisodeCount = Self.defaultEpisodeCount
         }

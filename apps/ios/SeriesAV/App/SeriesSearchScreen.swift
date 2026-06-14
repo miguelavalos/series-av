@@ -553,6 +553,7 @@ private struct SeriesLibrarySearchResultCard: View {
 
 private enum SeriesSearchCollection: CaseIterable {
     case popular
+    case anime
     case drama
     case comedy
     case sciFi
@@ -562,6 +563,8 @@ private enum SeriesSearchCollection: CaseIterable {
         switch self {
         case .popular:
             return L10n.string("search.collection.popular")
+        case .anime:
+            return L10n.string("search.collection.anime")
         case .drama:
             return L10n.string("search.collection.drama")
         case .comedy:
@@ -623,6 +626,9 @@ private struct SeriesCatalogPreview: Identifiable {
         guard normalizedQuery.isEmpty == false else {
             return samples(for: .popular)
         }
+        if ["anime", "animes"].contains(normalizedQuery) {
+            return samples(for: .anime)
+        }
         return samples.filter {
             SeriesLibraryIdentity.normalizedSearchText($0.title).contains(normalizedQuery)
                 || $0.genres.contains { SeriesLibraryIdentity.normalizedSearchText($0).contains(normalizedQuery) }
@@ -637,6 +643,9 @@ private struct SeriesCatalogPreview: Identifiable {
         SeriesCatalogPreview(id: "abbott-elementary", title: "Abbott Elementary", year: 2021, genres: ["Comedia"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/586/1467109.jpg", seed: "Abbott Elementary"), collections: [.popular, .comedy]),
         SeriesCatalogPreview(id: "rick-and-morty", title: "Rick and Morty", year: 2013, genres: ["Animacion", "Sci-Fi"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/626/1566363.jpg", seed: "Rick and Morty"), collections: [.popular, .animation, .sciFi, .comedy]),
         SeriesCatalogPreview(id: "arcane", title: "Arcane", year: 2021, genres: ["Animacion", "Drama"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/536/1340287.jpg", seed: "Arcane"), collections: [.popular, .animation, .drama]),
+        SeriesCatalogPreview(id: "attack-on-titan", title: "Attack on Titan", year: nil, genres: ["Anime", "Drama"], artwork: .fallback(seed: "Attack on Titan"), collections: [.popular, .anime, .animation, .drama]),
+        SeriesCatalogPreview(id: "death-note", title: "Death Note", year: nil, genres: ["Anime", "Drama"], artwork: .fallback(seed: "Death Note"), collections: [.anime, .animation, .drama]),
+        SeriesCatalogPreview(id: "liar-game", title: "Liar Game", year: nil, genres: ["Anime"], artwork: .fallback(seed: "Liar Game"), collections: [.anime]),
         SeriesCatalogPreview(id: "for-all-mankind", title: "For All Mankind", year: 2019, genres: ["Drama", "Sci-Fi"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/616/1541416.jpg", seed: "For All Mankind"), collections: [.sciFi, .drama]),
         SeriesCatalogPreview(id: "brooklyn-nine-nine", title: "Brooklyn Nine-Nine", year: 2013, genres: ["Comedia"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/402/1007484.jpg", seed: "Brooklyn Nine-Nine"), collections: [.comedy]),
         SeriesCatalogPreview(id: "bojack-horseman", title: "BoJack Horseman", year: 2014, genres: ["Animacion", "Comedia"], artwork: .approvedPoster("https://static.tvmaze.com/uploads/images/medium_portrait/405/1012627.jpg", seed: "BoJack Horseman"), collections: [.animation, .comedy])
