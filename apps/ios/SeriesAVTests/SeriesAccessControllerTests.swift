@@ -147,14 +147,21 @@ final class SeriesAccessControllerTests: XCTestCase {
         XCTAssertTrue(controller.shouldAutoShowGuestOnboarding)
     }
 
-    func testGuestOnboardingDoesNotAutoShowForSignedInAccess() {
+    func testGuestOnboardingDoesNotAutoShowForSignedInAccess() async {
         let controller = SeriesAccessController(
-            accountService: StubSeriesAVAccountService(restoreResult: .active(SeriesAccountUser(
+            accountService: StubSeriesAVAccountService(
+                restoreResult: .active(SeriesAccountUser(
+                    id: "apps-av-user-1",
+                    displayName: "Apps AV User",
+                    emailAddress: "apps@example.com"
+                )),
+                token: "provider-token"
+            ),
+            profileResolver: StubSeriesAccountProfileResolver(user: SeriesAccountUser(
                 id: "apps-av-user-1",
                 displayName: "Apps AV User",
                 emailAddress: "apps@example.com"
-            ))),
-            profileResolver: StubSeriesAccountProfileResolver(user: nil),
+            )),
             entitlementService: StubSeriesEntitlementService(access: SeriesResolvedAccess(
                 platformUserId: "apps-av-user-1",
                 planTier: .free,
@@ -166,6 +173,8 @@ final class SeriesAccessControllerTests: XCTestCase {
             guestOnboardingPolicy: SeriesGuestOnboardingPolicy(cooldown: 10),
             now: { Date(timeIntervalSince1970: 100) }
         )
+
+        await controller.syncFromAccountProvider()
 
         XCTAssertFalse(controller.shouldAutoShowGuestOnboarding)
     }
