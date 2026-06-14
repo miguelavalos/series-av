@@ -82,11 +82,13 @@ fi
 version="$(plist_print "$app_info" "CFBundleShortVersionString")"
 build="$(plist_print "$app_info" "CFBundleVersion")"
 bundle_id="$(plist_print "$app_info" "CFBundleIdentifier")"
+accountav_keychain_access_group="$(plist_print "$app_info" "ACCOUNTAV_KEYCHAIN_ACCESS_GROUP")"
 archive_team="$(plist_print "$archive_path/Info.plist" "ApplicationProperties:Team")"
 architectures="$(plist_print "$archive_path/Info.plist" "ApplicationProperties:Architectures")"
 app_binary="$app_path/SeriesAV"
 
 [ "$bundle_id" = "$expected_bundle_id" ] || fail "bundle id must be $expected_bundle_id, got ${bundle_id:-<missing>}"
+[ "$accountav_keychain_access_group" = "935PM55U6R.$expected_bundle_id" ] || fail "ACCOUNTAV_KEYCHAIN_ACCESS_GROUP must be 935PM55U6R.$expected_bundle_id, got ${accountav_keychain_access_group:-<missing>}"
 [ -f "$app_binary" ] || fail "app binary is missing: $app_binary"
 [ -n "$archive_team" ] || fail "archive metadata is missing ApplicationProperties:Team; Xcode will not export this archive"
 [ -n "$architectures" ] || fail "archive metadata is missing ApplicationProperties:Architectures; Xcode will not export this archive"
@@ -135,6 +137,7 @@ iOS release archive passed.
   version: $version
   build: $build
   bundle id: $bundle_id
+  Account AV keychain access group: $accountav_keychain_access_group
   team id: $codesign_team
   app UUID: $app_uuid
   Sentry UUID: $sentry_report

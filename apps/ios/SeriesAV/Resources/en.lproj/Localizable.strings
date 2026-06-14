@@ -192,8 +192,8 @@
 "paywall.navigationTitle" = "Series AV Pro";
 "paywall.close" = "Close";
 "paywall.eyebrow" = "Series AV Pro";
-"paywall.title" = "Keep your series with you";
-"paywall.subtitle" = "Upgrade your Series AV account with higher limits for tracking series.";
+"paywall.title" = "Track more series";
+"paywall.subtitle" = "Upgrade Series AV when you need more room for active series.";
 "paywall.scene.title" = "Monthly Pro";
 "paywall.scene.detail" = "More room for active series.";
 "paywall.subscriptionTerms" = "Series AV Pro is a monthly auto-renewable subscription. You will be charged %@ for each 1-month period until you cancel in App Store settings.";
@@ -204,7 +204,7 @@
 "paywall.restore.loading" = "Restoring…";
 "paywall.status.purchasePending" = "Purchase received. Series AV will unlock Pro after Apps AV confirms your account access.";
 "paywall.status.restorePending" = "Restore completed. If your App Store account has an active subscription, Series AV will unlock Pro after Apps AV confirms access.";
-"paywall.benefit.sync.title" = "Pro account";
+"paywall.benefit.sync.title" = "Account access";
 "paywall.benefit.sync" = "Keep Pro access linked to your Apps AV account.";
 "paywall.benefit.library.title" = "Larger library";
 "paywall.benefit.library" = "Track up to 1000 active series.";

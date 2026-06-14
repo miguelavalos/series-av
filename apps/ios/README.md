@@ -1,6 +1,6 @@
 # Series AV iOS Rebuild
 
-Status: V1 rebuild scaffold.
+Status: V1 rebuild in TestFlight preparation.
 
 The previous iOS app has been moved to:
 
@@ -33,6 +33,8 @@ Current scaffold:
 - RevenueCat-backed Series AV Pro purchase/restore boundary and custom paywall
   shell, guarded by public xcconfig/Info.plist config and backend access
   reconciliation.
+- Runtime config preflight for Account AV, Convex URL, RevenueCat, keychain
+  access group, support/legal URLs, and release archive checks.
 - Home, Library, Search, and Avi product tabs using the shared Apps AV shell.
 - Search shows popular collections, genre/anime filters, backend-enriched
   signed-in results, and editorial fallback rows. Any catalog or fallback row
@@ -55,10 +57,10 @@ Current scaffold:
   envelopes, access entitlement resolution, account session hydration, and Pro
   purchase reconciliation.
 
-Not implemented yet:
+Still pending before App Store submission:
 
-- private RevenueCat/App Store product configuration, Apps AV product-map
-  readiness, and signed purchase/restore smoke;
+- signed purchase/restore smoke through the submitted RevenueCat/App Store
+  subscription configuration;
 - advanced account-management flows beyond shared links;
 - Convex realtime projection;
 - full catalog/enrichment polish beyond the current V1 search and fallback UI;

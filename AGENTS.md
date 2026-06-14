@@ -22,6 +22,7 @@ repo.
 
 - `private/avalsys-suite/docs/platform/native-preview-dev-validation-guide.md`
 - `private/avalsys-suite/docs/platform/native-account-identity-contract.md`
+- `private/avalsys-suite/docs/platform/account-av-ios-testflight-contract.md`
 - `private/avalsys-suite/docs/agents/plan-step.md` when the user says
   `usa plan-step` or asks for step-by-step plan execution.
 - `private/avalsys-suite/docs/agents/plan-goal.md` when the user says
@@ -37,6 +38,10 @@ Mandatory rules:
   defines one;
 - use Infisical/Varlock-backed private tooling for config, deploy keys, and
   secret resolution;
+- Account AV iOS login must match Tune AV's keychain pattern:
+  `ACCOUNTAV_PUBLISHABLE_KEY`, `ACCOUNTAV_KEYCHAIN_SERVICE`, and
+  `ACCOUNTAV_KEYCHAIN_ACCESS_GROUP` must be exposed through Info.plist,
+  passed to Account AV, and validated by the runtime config check;
 - keep private URLs, service identifiers, approval status, and operations
   evidence out of this public repo;
 - treat Account AV provider session identity as session metadata only; product

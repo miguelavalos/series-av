@@ -34,7 +34,8 @@ enum SeriesAVAccountServiceError: LocalizedError {
 struct DefaultSeriesAVAccountService: SeriesAVAccountServicing {
     private let accountService = ClerkAccountAVService(
         publishableKeyProvider: { AppConfig.avAccountKey },
-        keychainServiceProvider: { BundleConfig.stringValue(for: "ACCOUNTAV_KEYCHAIN_SERVICE") },
+        keychainServiceProvider: { BundleConfig.nonEmptyStringValue(for: "ACCOUNTAV_KEYCHAIN_SERVICE") },
+        keychainAccessGroupProvider: { BundleConfig.nonEmptyStringValue(for: "ACCOUNTAV_KEYCHAIN_ACCESS_GROUP") },
         fallbackDisplayName: "Series AV",
         loggerSubsystem: "com.avalsys.seriesav"
     )

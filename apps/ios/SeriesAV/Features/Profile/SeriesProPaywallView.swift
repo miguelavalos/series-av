@@ -135,10 +135,10 @@ struct SeriesProPaywallView: View {
     private var benefitItems: [AVPaywallBenefitItem] {
         [
             AVPaywallBenefitItem(
-                id: "sync",
-                systemImage: "icloud",
-                title: L10n.string("paywall.benefit.sync.title"),
-                detail: L10n.string("paywall.benefit.sync")
+                id: "avi",
+                systemImage: "sparkles",
+                title: L10n.string("paywall.benefit.avi.title"),
+                detail: L10n.string("paywall.benefit.avi")
             ),
             AVPaywallBenefitItem(
                 id: "library",
@@ -147,10 +147,10 @@ struct SeriesProPaywallView: View {
                 detail: L10n.string("paywall.benefit.library")
             ),
             AVPaywallBenefitItem(
-                id: "avi",
-                systemImage: "sparkles",
-                title: L10n.string("paywall.benefit.avi.title"),
-                detail: L10n.string("paywall.benefit.avi")
+                id: "sync",
+                systemImage: "icloud",
+                title: L10n.string("paywall.benefit.sync.title"),
+                detail: L10n.string("paywall.benefit.sync")
             )
         ]
     }

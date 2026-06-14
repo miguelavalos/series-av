@@ -192,8 +192,8 @@
 "paywall.navigationTitle" = "Series AV Pro";
 "paywall.close" = "Tancar";
 "paywall.eyebrow" = "Series AV Pro";
-"paywall.title" = "Porta les teves series amb tu";
-"paywall.subtitle" = "Millora el teu compte de Series AV amb limits mes alts per seguir series.";
+"paywall.title" = "Segueix mes series";
+"paywall.subtitle" = "Millora Series AV quan necessitis mes espai per a series actives.";
 "paywall.scene.title" = "Pro mensual";
 "paywall.scene.detail" = "Mes espai per a series actives.";
 "paywall.subscriptionTerms" = "Series AV Pro es una subscripcio mensual amb renovacio automatica. Se't cobrara %@ per cada periode d'1 mes fins que cancel.lis als ajustos de l'App Store.";
@@ -204,7 +204,7 @@
 "paywall.restore.loading" = "Restaurant…";
 "paywall.status.purchasePending" = "Compra rebuda. Series AV desbloquejara Pro quan Apps AV confirmi l'acces del compte.";
 "paywall.status.restorePending" = "Restauracio completada. Si l'App Store te una subscripcio activa, Series AV desbloquejara Pro quan Apps AV confirmi l'acces.";
-"paywall.benefit.sync.title" = "Compte Pro";
+"paywall.benefit.sync.title" = "Acces de compte";
 "paywall.benefit.sync" = "Mantén l'accés Pro vinculat al teu compte d'Apps AV.";
 "paywall.benefit.library.title" = "Biblioteca mes gran";
 "paywall.benefit.library" = "Segueix fins a 1000 sèries actives.";

@@ -71,7 +71,8 @@ enum AppConfig {
     static func configureAVAccountIfPossible() {
         AccountAVClerk.configureIfPossible(
             publishableKey: avAccountKey,
-            keychainService: BundleConfig.nonEmptyStringValue(for: "ACCOUNTAV_KEYCHAIN_SERVICE")
+            keychainService: BundleConfig.nonEmptyStringValue(for: "ACCOUNTAV_KEYCHAIN_SERVICE"),
+            keychainAccessGroup: BundleConfig.nonEmptyStringValue(for: "ACCOUNTAV_KEYCHAIN_ACCESS_GROUP")
         )
     }
 

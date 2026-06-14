@@ -192,8 +192,8 @@
 "paywall.navigationTitle" = "Series AV Pro";
 "paywall.close" = "Cerrar";
 "paywall.eyebrow" = "Series AV Pro";
-"paywall.title" = "Lleva tus series contigo";
-"paywall.subtitle" = "Mejora tu cuenta de Series AV con límites mayores para seguir series.";
+"paywall.title" = "Sigue más series";
+"paywall.subtitle" = "Mejora Series AV cuando necesites más espacio para series activas.";
 "paywall.scene.title" = "Pro mensual";
 "paywall.scene.detail" = "Más espacio para series activas.";
 "paywall.subscriptionTerms" = "Series AV Pro es una suscripción mensual con renovación automática. Se te cobrará %@ por cada periodo de 1 mes hasta que canceles en los ajustes del App Store.";
@@ -204,7 +204,7 @@
 "paywall.restore.loading" = "Restaurando…";
 "paywall.status.purchasePending" = "Compra recibida. Series AV desbloqueará Pro cuando Apps AV confirme el acceso de tu cuenta.";
 "paywall.status.restorePending" = "Restauración completada. Si tu App Store tiene una suscripción activa, Series AV desbloqueará Pro cuando Apps AV confirme el acceso.";
-"paywall.benefit.sync.title" = "Cuenta Pro";
+"paywall.benefit.sync.title" = "Acceso de cuenta";
 "paywall.benefit.sync" = "Mantén el acceso Pro vinculado a tu cuenta de Apps AV.";
 "paywall.benefit.library.title" = "Biblioteca mayor";
 "paywall.benefit.library" = "Sigue hasta 1000 series activas.";
