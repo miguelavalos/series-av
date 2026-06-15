@@ -66,6 +66,7 @@ private struct SeriesWatchingHomeScreen: View {
     @State private var pendingUndo: PendingLibraryUndo?
     @State private var pendingProgressUndo: PendingProgressUndo?
     @State private var popularPreviews: [SeriesHomeDiscoveryPreview] = []
+    @State private var upcomingPreviews: [SeriesHomeDiscoveryPreview] = []
     @State private var recommendedPreviews: [SeriesHomeDiscoveryPreview] = []
 
     var body: some View {
@@ -169,6 +170,18 @@ private struct SeriesWatchingHomeScreen: View {
             SeriesHomeDiscoveryRail(
                 title: L10n.string("home.rail.popular"),
                 previews: popularPreviews,
+                libraryEntries: store.activeEntries,
+                canAddSeries: canAddSeries,
+                addSeries: addDiscoverySeries,
+                editProgress: { entry in
+                    editorEntry = entry
+                },
+                showLimitAction: showLimitAction
+            )
+
+            SeriesHomeDiscoveryRail(
+                title: L10n.string("upcoming.home.title"),
+                previews: upcomingPreviews,
                 libraryEntries: store.activeEntries,
                 canAddSeries: canAddSeries,
                 addSeries: addDiscoverySeries,
@@ -371,9 +384,11 @@ private struct SeriesWatchingHomeScreen: View {
     private func refreshHomeDiscovery() async {
         let client = SeriesCatalogSearchClient()
         async let popular = try? client.popular(locale: Locale.current.identifier, surface: "home", limit: 10)
+        async let upcoming = try? client.popular(locale: Locale.current.identifier, surface: "upcoming", limit: 10)
         async let recommended = try? client.popular(locale: Locale.current.identifier, surface: "avi", limit: 10)
 
         popularPreviews = (await popular)?.results.map { SeriesHomeDiscoveryPreview(catalogItem: $0) } ?? []
+        upcomingPreviews = (await upcoming)?.results.map { SeriesHomeDiscoveryPreview(catalogItem: $0) } ?? []
         recommendedPreviews = (await recommended)?.results.map { SeriesHomeDiscoveryPreview(catalogItem: $0) } ?? []
     }
 
