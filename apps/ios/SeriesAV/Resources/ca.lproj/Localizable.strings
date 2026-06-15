@@ -100,6 +100,12 @@
 "library.status.wantToWatch" = "Per veure";
 "library.status.watching" = "Veient";
 "library.status.watched" = "Vista";
+"upcoming.title" = "Pròxims";
+"upcoming.subtitle" = "Els següents episodis amb data de les teves sèries desades.";
+"upcoming.loading" = "Cercant pròxims episodis";
+"upcoming.adjustProgress" = "Ajustar progrés";
+"upcoming.home.title" = "Pròximament";
+"upcoming.home.openLibrary" = "Veure-ho tot";
 "add.title" = "Afegir serie";
 "add.search.placeholder" = "Titol de la serie";
 "add.action" = "Afegir a la llista";

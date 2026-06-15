@@ -127,6 +127,11 @@ private struct SeriesWatchingHomeScreen: View {
                 }
             }
 
+            SeriesHomeUpcomingEpisodesSection(
+                entries: store.activeEntries,
+                openLibrary: openLibraryTab
+            )
+
             if secondaryEntries.isEmpty == false {
                 SeriesWatchingQueueSection(
                     entries: secondaryEntries,

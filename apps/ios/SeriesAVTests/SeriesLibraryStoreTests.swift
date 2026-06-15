@@ -228,7 +228,7 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertNil(store.entries[0].lastWatchedEpisodeCursor)
     }
 
-    func testAddLocalSeriesTrimsTitleAndDeduplicatesByLocalSeriesId() {
+    func testAddLocalSeriesTrimsTitleAndDeduplicatesByLocalEntryIdentity() {
         let date = Date(timeIntervalSince1970: 1_800_000_000)
         let store = SeriesLibraryStore()
 
@@ -236,7 +236,9 @@ final class SeriesLibraryStoreTests: XCTestCase {
         let second = store.addLocalSeries(title: "Example Show", at: date.addingTimeInterval(10))
 
         XCTAssertEqual(first?.title, "Example Show")
-        XCTAssertEqual(second?.seriesId, "local-example-show")
+        XCTAssertNil(second?.seriesId)
+        XCTAssertNil(second?.providerRef)
+        XCTAssertEqual(second?.entryId, first?.entryId)
         XCTAssertEqual(store.entries.count, 1)
         XCTAssertEqual(store.entries[0].status, .wantToWatch)
     }

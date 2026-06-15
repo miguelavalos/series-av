@@ -31,6 +31,15 @@ struct SeriesLibraryTabScreen: View {
                     )
                 }
             } else {
+                if selectedFilter == .all && normalizedQuery.isEmpty {
+                    SeriesUpcomingEpisodesSection(
+                        entries: store.activeEntries,
+                        editProgress: { entry in
+                            editorEntry = entry
+                        }
+                    )
+                }
+
                 if filteredActiveEntries.isEmpty == false {
                     librarySection(title: L10n.string("library.active.title"), entries: filteredActiveEntries, isArchived: false)
                 }

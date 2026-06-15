@@ -100,6 +100,12 @@
 "library.status.wantToWatch" = "To watch";
 "library.status.watching" = "Watching";
 "library.status.watched" = "Watched";
+"upcoming.title" = "Upcoming";
+"upcoming.subtitle" = "Next dated episodes from your saved series.";
+"upcoming.loading" = "Checking upcoming episodes";
+"upcoming.adjustProgress" = "Adjust progress";
+"upcoming.home.title" = "Coming soon";
+"upcoming.home.openLibrary" = "View all";
 "add.title" = "Add series";
 "add.search.placeholder" = "Series title";
 "add.action" = "Add to watch list";

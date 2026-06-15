@@ -100,6 +100,12 @@
 "library.status.wantToWatch" = "Por ver";
 "library.status.watching" = "Viendo";
 "library.status.watched" = "Vista";
+"upcoming.title" = "Próximos";
+"upcoming.subtitle" = "Los siguientes episodios con fecha de tus series guardadas.";
+"upcoming.loading" = "Buscando próximos episodios";
+"upcoming.adjustProgress" = "Ajustar progreso";
+"upcoming.home.title" = "Próximamente";
+"upcoming.home.openLibrary" = "Ver todo";
 "add.title" = "Añadir serie";
 "add.search.placeholder" = "Título de la serie";
 "add.action" = "Añadir a lista";

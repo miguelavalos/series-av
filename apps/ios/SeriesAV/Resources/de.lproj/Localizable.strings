@@ -100,6 +100,12 @@
 "library.status.wantToWatch" = "Merkliste";
 "library.status.watching" = "Aktuell";
 "library.status.watched" = "Gesehen";
+"upcoming.title" = "Demnaechst";
+"upcoming.subtitle" = "Die naechsten datierten Folgen deiner gespeicherten Serien.";
+"upcoming.loading" = "Suche nach kommenden Folgen";
+"upcoming.adjustProgress" = "Fortschritt anpassen";
+"upcoming.home.title" = "Kommt bald";
+"upcoming.home.openLibrary" = "Alle anzeigen";
 "add.title" = "Serie hinzufuegen";
 "add.search.placeholder" = "Serientitel";
 "add.action" = "Zur Merkliste hinzufuegen";
