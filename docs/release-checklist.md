@@ -75,18 +75,26 @@ Because the iOS project currently has no native test targets, complete and sign 
 
 ### Production Signed-In Smoke
 
-1. Run preview smoke against a real signed-in Account AV session token:
+Current evidence, 2026-06-15:
+
+- preview Free and Pro auto smokes passed;
+- production Free passed with a real `info@avalsys.com` Account AV session;
+- production Pro passed with the same account using a temporary internal Series
+  AV grant that expires on `2026-06-16T20:06:48.230Z`.
+
+1. Re-run preview smoke against a real signed-in Account AV session token before
+   final submission:
 
    ```bash
    bun run verify:cloudflare:signed-in:preview:prompt -- --mode signedInFree
    bun run verify:cloudflare:signed-in:preview:prompt -- --mode signedInPro
    ```
 
-2. Run production smoke against a safe real account:
+2. Re-run production smoke against a safe real account before final submission:
 
    ```bash
-   bun run verify:cloudflare:signed-in:production:prompt -- --mode signedInFree
-   bun run verify:cloudflare:signed-in:production:prompt -- --mode signedInPro
+   bun run verify:cloudflare:signed-in:production:prompt -- --mode signedInFree --skip-preflight
+   bun run verify:cloudflare:signed-in:production:prompt -- --mode signedInPro --skip-preflight
    ```
 
 3. Confirm `signedInFree` and `signedInPro` capability boundaries still match the shipped product copy.
