@@ -55,11 +55,6 @@ print_exports() {
 
 bootstrap_file="${SERIESAV_INFISICAL_BOOTSTRAP_FILE:-${INFISICAL_BOOTSTRAP_FILE:-$workspace_root/.infisical/bootstrap.env}}"
 
-if has_required_keys; then
-  print_exports
-  exit 0
-fi
-
 if [ -f "$bootstrap_file" ]; then
   set -a
   # shellcheck disable=SC1090
@@ -82,6 +77,11 @@ if [ -f "$bootstrap_file" ]; then
     print_exports
     exit 0
   fi
+fi
+
+if has_required_keys; then
+  print_exports
+  exit 0
 fi
 
 echo "Unable to resolve Infisical bootstrap env for profile '$profile'." >&2

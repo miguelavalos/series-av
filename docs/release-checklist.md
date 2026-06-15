@@ -170,9 +170,11 @@ Do not submit until these are true:
 4. All public/legal/support URLs are reachable.
 5. The archive submitted to App Store Connect matches the reviewed build.
 
-## Native Test Gap
+## Native Test Coverage
 
-The iOS project currently has no native unit or UI test targets. Before submission, add an XCTest target or complete manual backend-fixture QA for:
+The iOS project has a native XCTest target. The latest local run on 2026-06-15
+passed 42 tests on the iPhone 17 simulator. Before submission, keep this target
+green and add or manually sign off the remaining real-account flows:
 
 1. Signed-in free Series-only account is eligible and can request deletion after typing `DELETE`.
 2. Tune AV linked app blocks deletion.
