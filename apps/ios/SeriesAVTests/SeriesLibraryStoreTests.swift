@@ -405,6 +405,7 @@ final class SeriesLibraryStoreTests: XCTestCase {
             title: title,
             startYear: 2026,
             statusText: "Running",
+            summary: nil,
             genres: ["Drama"],
             displayArtwork: SeriesCatalogItem.DisplayArtwork(
                 kind: "providerPoster",

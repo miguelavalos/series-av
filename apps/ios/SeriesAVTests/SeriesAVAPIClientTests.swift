@@ -29,6 +29,7 @@ final class SeriesAVAPIClientTests: XCTestCase {
               "title": "Demon Slayer: Kimetsu no Yaiba",
               "startYear": 2019,
               "statusText": "Running",
+              "summary": "A reviewed English catalog summary.",
               "genres": ["Anime"],
               "displayArtwork": {
                 "kind": "providerPoster",
