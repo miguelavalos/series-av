@@ -44,6 +44,7 @@ account_publishable_key="$(printenv_value ACCOUNTAV_PUBLISHABLE_KEY)"
 account_keychain_service="$(printenv_value ACCOUNTAV_KEYCHAIN_SERVICE)"
 account_keychain_access_group="$(printenv_value ACCOUNTAV_KEYCHAIN_ACCESS_GROUP)"
 avaccount_api_base_url="$(printenv_value ACCOUNTAV_API_BASE_URL)"
+seriesav_api_base_url="$(printenv_value SERIESAV_API_BASE_URL)"
 seriesav_convex_url="$(printenv_value SERIESAV_CONVEX_URL)"
 account_management_url="$(printenv_value ACCOUNTAV_MANAGEMENT_URL)"
 revenuecat_public_api_key="$(printenv_value SERIESAV_REVENUECAT_PUBLIC_API_KEY)"
@@ -62,6 +63,7 @@ fi
 required_values=(
   account_publishable_key
   avaccount_api_base_url
+  seriesav_api_base_url
   seriesav_convex_url
   terms_url
   privacy_url
@@ -109,6 +111,7 @@ ACCOUNTAV_PUBLISHABLE_KEY = $account_publishable_key
 ACCOUNTAV_KEYCHAIN_SERVICE = $account_keychain_service
 ACCOUNTAV_KEYCHAIN_ACCESS_GROUP = $account_keychain_access_group
 ACCOUNTAV_API_BASE_URL = $(xcodebuild_url_value "${avaccount_api_base_url:-}")
+SERIESAV_API_BASE_URL = $(xcodebuild_url_value "${seriesav_api_base_url:-}")
 SERIESAV_CONVEX_URL = $(xcodebuild_url_value "${seriesav_convex_url:-}")
 SERIESAV_REVENUECAT_PUBLIC_API_KEY = $revenuecat_public_api_key
 SERIESAV_REVENUECAT_OFFERING_ID = $revenuecat_offering_id

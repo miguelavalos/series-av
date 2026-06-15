@@ -94,6 +94,7 @@ resolve:
 - bundle identifier: `com.avalsys.seriesav.dev`
 - Clerk key prefix: `pk_test_`
 - Account AV API: `http://127.0.0.1:8788`
+- Series AV API: `http://127.0.0.1:8791`
 - Account AV management URL host: `account-av-preview.avalsys.com`
 - RevenueCat public SDK key prefix: `appl_`
 - non-empty RevenueCat offering and monthly package ids
@@ -103,7 +104,8 @@ resolve:
 For preview Cloudflare validation, use `bun run ios:config:preview` and
 `bun run ios:preflight:preview`. The preview preflight must resolve the same
 development bundle id and test Clerk key, but the Account AV API must be
-`https://api-account-av-preview.avalsys.com`.
+`https://api-account-av-preview.avalsys.com` and the Series AV API must be
+`https://api-series-av-preview.avalsys.com`.
 
 Do not use the unsigned compile-only build for Google or Apple login. Clerk
 native auth stores its client and device token in Keychain; unsigned simulator

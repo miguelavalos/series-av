@@ -11,6 +11,7 @@ case "$profile" in
     expected_key_prefix="pk_test_"
     expected_revenuecat_key_prefix="appl_"
     expected_api_base_url="http://127.0.0.1:8788"
+    expected_series_api_base_url="http://127.0.0.1:8791"
     expected_keychain_access_group="935PM55U6R.com.avalsys.seriesav.dev"
     expected_management_host="account-av-preview.avalsys.com"
     ;;
@@ -19,6 +20,7 @@ case "$profile" in
     expected_key_prefix="pk_test_"
     expected_revenuecat_key_prefix="appl_"
     expected_api_base_url="https://api-account-av-preview.avalsys.com"
+    expected_series_api_base_url="https://api-series-av-preview.avalsys.com"
     expected_keychain_access_group="935PM55U6R.com.avalsys.seriesav.dev"
     expected_management_host="account-av-preview.avalsys.com"
     ;;
@@ -27,6 +29,7 @@ case "$profile" in
     expected_key_prefix="pk_live_"
     expected_revenuecat_key_prefix="appl_"
     expected_api_base_url="https://api-account-av.avalsys.com"
+    expected_series_api_base_url="https://api-series-av.avalsys.com"
     expected_keychain_access_group="935PM55U6R.com.avalsys.seriesav"
     expected_management_host="account-av.avalsys.com"
     configuration="Release"
@@ -87,6 +90,7 @@ expect_prefix "ACCOUNTAV_PUBLISHABLE_KEY" "$(setting_value ACCOUNTAV_PUBLISHABLE
 expect_value "ACCOUNTAV_KEYCHAIN_ACCESS_GROUP" "$(setting_value ACCOUNTAV_KEYCHAIN_ACCESS_GROUP)" "$expected_keychain_access_group"
 expect_prefix "SERIESAV_REVENUECAT_PUBLIC_API_KEY" "$(setting_value SERIESAV_REVENUECAT_PUBLIC_API_KEY)" "$expected_revenuecat_key_prefix"
 expect_value "ACCOUNTAV_API_BASE_URL" "$(setting_value ACCOUNTAV_API_BASE_URL)" "$expected_api_base_url"
+expect_value "SERIESAV_API_BASE_URL" "$(setting_value SERIESAV_API_BASE_URL)" "$expected_series_api_base_url"
 
 revenuecat_public_api_key="$(setting_value SERIESAV_REVENUECAT_PUBLIC_API_KEY)"
 if [[ "$revenuecat_public_api_key" == sk_* ]]; then
