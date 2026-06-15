@@ -419,6 +419,7 @@ final class SeriesLibraryStoreTests: XCTestCase {
                     evaluatedAt: Date(timeIntervalSince1970: 1_800_000_000)
                 )
             ),
+            displayBackdrop: nil,
             episodeGuideState: "available",
             visibility: "public",
             enrichmentStatus: "providerFallback",

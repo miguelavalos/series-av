@@ -155,6 +155,7 @@ struct SeriesCatalogItem: Codable, Identifiable, Equatable, Sendable {
     var summary: String?
     var genres: [String]
     var displayArtwork: DisplayArtwork
+    var displayBackdrop: DisplayArtwork?
     var episodeGuideState: String
     var visibility: String
     var enrichmentStatus: String

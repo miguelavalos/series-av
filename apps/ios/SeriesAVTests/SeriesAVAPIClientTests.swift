@@ -42,6 +42,15 @@ final class SeriesAVAPIClientTests: XCTestCase {
                   "evaluatedAt": "2026-06-15T15:02:03.456Z"
                 }
               },
+              "displayBackdrop": {
+                "kind": "curated",
+                "url": "https://artwork.example/demon-slayer-backdrop.jpg",
+                "aspectRatio": 1.7777777778,
+                "policy": {
+                  "displayState": "displayable",
+                  "evaluatedAt": "2026-06-15T15:02:03.456Z"
+                }
+              },
               "episodeGuideState": "available",
               "visibility": "public",
               "enrichmentStatus": "enriched",
@@ -88,6 +97,7 @@ final class SeriesAVAPIClientTests: XCTestCase {
             URLQueryItem(name: "surface", value: "upcoming")
         ])
         XCTAssertEqual(result.results.first?.title, "Demon Slayer: Kimetsu no Yaiba")
+        XCTAssertEqual(result.results.first?.displayBackdrop?.url?.absoluteString, "https://artwork.example/demon-slayer-backdrop.jpg")
         let metadataUpdatedAt = try XCTUnwrap(result.results.first?.metadataUpdatedAt)
         XCTAssertEqual(metadataUpdatedAt.timeIntervalSince1970, 1_781_535_723.789, accuracy: 0.001)
         XCTAssertEqual(result.generatedAt.timeIntervalSince1970, 1_781_535_724.123, accuracy: 0.001)
