@@ -32,7 +32,8 @@ struct SeriesAVAPIClient: Sendable {
             throw SeriesAVAPIClientError.missingBaseURL
         }
 
-        var request = URLRequest(url: baseURL.appending(path: path))
+        let requestURL = URL(string: path, relativeTo: baseURL)?.absoluteURL ?? baseURL.appending(path: path)
+        var request = URLRequest(url: requestURL)
         request.httpMethod = method
         request.httpBody = body
         if let token = try await tokenProvider(), !token.isEmpty {
@@ -178,7 +179,7 @@ struct SeriesCatalogSearchClient: Sendable {
 
     private static func makeDecoder() -> JSONDecoder {
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
+        decoder.dateDecodingStrategy = .seriesAVISO8601
         return decoder
     }
 }
@@ -217,7 +218,7 @@ struct SeriesCatalogResolveClient: Sendable {
 
     private static func makeDecoder() -> JSONDecoder {
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
+        decoder.dateDecodingStrategy = .seriesAVISO8601
         return decoder
     }
 }
@@ -247,7 +248,40 @@ struct SeriesEpisodeGuideClient: Sendable {
 
     private static func makeDecoder() -> JSONDecoder {
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
+        decoder.dateDecodingStrategy = .seriesAVISO8601
         return decoder
+    }
+}
+
+private extension JSONDecoder.DateDecodingStrategy {
+    static var seriesAVISO8601: JSONDecoder.DateDecodingStrategy {
+        .custom { decoder in
+            let container = try decoder.singleValueContainer()
+            let value = try container.decode(String.self)
+
+            if let date = SeriesAVDateFormatters.iso8601WithFractionalSeconds().date(from: value)
+                ?? SeriesAVDateFormatters.iso8601().date(from: value) {
+                return date
+            }
+
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "Invalid ISO 8601 date: \(value)"
+            )
+        }
+    }
+}
+
+private enum SeriesAVDateFormatters {
+    static func iso8601WithFractionalSeconds() -> ISO8601DateFormatter {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }
+
+    static func iso8601() -> ISO8601DateFormatter {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter
     }
 }
