@@ -65,6 +65,8 @@ private struct SeriesWatchingHomeScreen: View {
     @State private var pendingProgressEditorAfterAddDismiss: SeriesLibraryEntry?
     @State private var pendingUndo: PendingLibraryUndo?
     @State private var pendingProgressUndo: PendingProgressUndo?
+    @State private var popularPreviews: [SeriesHomeDiscoveryPreview] = []
+    @State private var recommendedPreviews: [SeriesHomeDiscoveryPreview] = []
 
     var body: some View {
         AVAppShellScrollableScreenScaffold(
@@ -166,7 +168,7 @@ private struct SeriesWatchingHomeScreen: View {
 
             SeriesHomeDiscoveryRail(
                 title: L10n.string("home.rail.popular"),
-                previews: SeriesHomeDiscoveryPreview.popular,
+                previews: popularPreviews,
                 libraryEntries: store.activeEntries,
                 canAddSeries: canAddSeries,
                 addSeries: addDiscoverySeries,
@@ -178,7 +180,7 @@ private struct SeriesWatchingHomeScreen: View {
 
             SeriesHomeDiscoveryRail(
                 title: L10n.string("home.rail.recommended"),
-                previews: SeriesHomeDiscoveryPreview.recommended,
+                previews: recommendedPreviews,
                 libraryEntries: store.activeEntries,
                 canAddSeries: canAddSeries,
                 addSeries: addDiscoverySeries,
@@ -304,6 +306,9 @@ private struct SeriesWatchingHomeScreen: View {
             }
 
         }
+        .task {
+            await refreshHomeDiscovery()
+        }
     }
 
     private var currentEntry: SeriesLibraryEntry? {
@@ -353,13 +358,7 @@ private struct SeriesWatchingHomeScreen: View {
         }
 
         Task {
-            let resolved = await resolve(preview)
-            guard let entry = store.addLocalSeries(
-                title: preview.title,
-                seriesId: resolved?.series.id,
-                providerRef: resolved?.series.providerRefs.first,
-                displayArtworkRef: resolved?.series.posterUrl?.absoluteString ?? preview.posterURL?.absoluteString
-            ) else {
+            guard let entry = store.addCatalogSeries(preview.catalogItem) else {
                 return
             }
 
@@ -369,18 +368,13 @@ private struct SeriesWatchingHomeScreen: View {
         }
     }
 
-    private func resolve(_ preview: SeriesHomeDiscoveryPreview) async -> SeriesCatalogResolveCandidate? {
-        guard accessController.isSignedIn else {
-            return nil
-        }
+    private func refreshHomeDiscovery() async {
+        let client = SeriesCatalogSearchClient()
+        async let popular = try? client.popular(locale: Locale.current.identifier, surface: "home", limit: 10)
+        async let recommended = try? client.popular(locale: Locale.current.identifier, surface: "avi", limit: 10)
 
-        do {
-            let client = SeriesCatalogResolveClient(apiClient: accessController.authenticatedAPIClient())
-            let response = try await client.resolve(SeriesCatalogResolveRequest(query: preview.title, year: preview.year))
-            return response.candidates.first { $0.matchConfidence == "exact" || $0.matchConfidence == "strong" } ?? response.candidates.first
-        } catch {
-            return nil
-        }
+        popularPreviews = (await popular)?.results.map { SeriesHomeDiscoveryPreview(catalogItem: $0) } ?? []
+        recommendedPreviews = (await recommended)?.results.map { SeriesHomeDiscoveryPreview(catalogItem: $0) } ?? []
     }
 
     private func showLimitAction() {
@@ -581,6 +575,7 @@ struct SeriesAddSheet: View {
     let didAddSeries: (SeriesLibraryEntry) -> Void
 
     @State private var query = ""
+    @State private var isSearching = false
 
     var body: some View {
         NavigationStack {
@@ -593,7 +588,7 @@ struct SeriesAddSheet: View {
                             .textInputAutocapitalization(.words)
                             .submitLabel(.done)
                             .onSubmit {
-                                addSeries()
+                                Task { await addSeries() }
                             }
 
                         Rectangle()
@@ -608,10 +603,15 @@ struct SeriesAddSheet: View {
                     }
 
                     Button {
-                        addSeries()
+                        Task { await addSeries() }
                     } label: {
-                        Label(addActionTitle, systemImage: exactMatchingEntry == nil ? "plus" : "checkmark")
-                            .frame(maxWidth: .infinity)
+                        if isSearching {
+                            ProgressView()
+                                .frame(maxWidth: .infinity)
+                        } else {
+                            Label(addActionTitle, systemImage: exactMatchingEntry == nil ? "plus" : "checkmark")
+                                .frame(maxWidth: .infinity)
+                        }
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
@@ -721,6 +721,7 @@ struct SeriesAddSheet: View {
 
     private var canSubmit: Bool {
         canAddSeries
+            && !isSearching
             && query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
             && exactMatchingEntry == nil
     }
@@ -745,11 +746,19 @@ struct SeriesAddSheet: View {
         return "\(statusTitle(entry.status)) · \(entry.progressLabel)"
     }
 
-    private func addSeries() {
+    private func addSeries() async {
         guard canSubmit else {
             return
         }
-        guard let entry = store.addLocalSeries(title: query) else {
+        let searchQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        isSearching = true
+        defer { isSearching = false }
+
+        let response = try? await SeriesCatalogSearchClient()
+            .search(query: searchQuery, locale: Locale.current.identifier, limit: 5)
+
+        guard let catalogItem = response?.results.first,
+            let entry = store.addCatalogSeries(catalogItem) else {
             return
         }
         didAddSeries(entry)
@@ -1180,32 +1189,34 @@ private struct SeriesHomeDiscoveryRail: View {
     let showLimitAction: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(title)
-                .font(.system(size: 17, weight: .black, design: .rounded))
-                .foregroundStyle(.primary)
+        if previews.isEmpty == false {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(title)
+                    .font(.system(size: 17, weight: .black, design: .rounded))
+                    .foregroundStyle(.primary)
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: 10) {
-                    ForEach(previews) { preview in
-                        SeriesHomeDiscoveryCard(
-                            preview: preview,
-                            libraryEntry: libraryEntry(for: preview),
-                            canAddSeries: canAddSeries,
-                            addSeries: { addSeries(preview) },
-                            editProgress: editProgress,
-                            showLimitAction: showLimitAction
-                        )
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(alignment: .top, spacing: 10) {
+                        ForEach(previews) { preview in
+                            SeriesHomeDiscoveryCard(
+                                preview: preview,
+                                libraryEntry: libraryEntry(for: preview),
+                                canAddSeries: canAddSeries,
+                                addSeries: { addSeries(preview) },
+                                editProgress: editProgress,
+                                showLimitAction: showLimitAction
+                            )
+                        }
                     }
+                    .padding(.vertical, 2)
                 }
-                .padding(.vertical, 2)
             }
         }
     }
 
     private func libraryEntry(for preview: SeriesHomeDiscoveryPreview) -> SeriesLibraryEntry? {
         libraryEntries.first {
-            SeriesLibraryIdentity.normalizedSearchText($0.title) == SeriesLibraryIdentity.normalizedSearchText(preview.title)
+            $0.seriesId == preview.id
         }
     }
 }
@@ -1324,30 +1335,16 @@ private struct SeriesHomeDiscoveryPreview: Identifiable, Equatable {
     let year: Int?
     let genres: [String]
     let posterURL: URL?
+    let catalogItem: SeriesCatalogItem
 
-    init(id: String, title: String, year: Int?, genres: [String], posterURL: String) {
-        self.id = id
-        self.title = title
-        self.year = year
-        self.genres = genres
-        self.posterURL = URL(string: posterURL)
+    init(catalogItem: SeriesCatalogItem) {
+        self.id = catalogItem.seriesId
+        self.title = catalogItem.title
+        self.year = catalogItem.startYear
+        self.genres = catalogItem.genres
+        self.posterURL = catalogItem.displayArtwork.url
+        self.catalogItem = catalogItem
     }
-
-    static let popular: [SeriesHomeDiscoveryPreview] = [
-        SeriesHomeDiscoveryPreview(id: "the-last-of-us", title: "The Last of Us", year: 2023, genres: ["Drama", "Sci-Fi"], posterURL: "https://static.tvmaze.com/uploads/images/medium_portrait/563/1409008.jpg"),
-        SeriesHomeDiscoveryPreview(id: "the-bear", title: "The Bear", year: 2022, genres: ["Drama", "Comedia"], posterURL: "https://static.tvmaze.com/uploads/images/medium_portrait/626/1567246.jpg"),
-        SeriesHomeDiscoveryPreview(id: "slow-horses", title: "Slow Horses", year: 2022, genres: ["Drama"], posterURL: "https://static.tvmaze.com/uploads/images/medium_portrait/593/1484384.jpg"),
-        SeriesHomeDiscoveryPreview(id: "abbott-elementary", title: "Abbott Elementary", year: 2021, genres: ["Comedia"], posterURL: "https://static.tvmaze.com/uploads/images/medium_portrait/586/1467109.jpg"),
-        SeriesHomeDiscoveryPreview(id: "rick-and-morty", title: "Rick and Morty", year: 2013, genres: ["Animacion"], posterURL: "https://static.tvmaze.com/uploads/images/medium_portrait/626/1566363.jpg")
-    ]
-
-    static let recommended: [SeriesHomeDiscoveryPreview] = [
-        SeriesHomeDiscoveryPreview(id: "severance", title: "Severance", year: 2022, genres: ["Drama", "Sci-Fi"], posterURL: "https://static.tvmaze.com/uploads/images/medium_portrait/548/1371406.jpg"),
-        SeriesHomeDiscoveryPreview(id: "arcane", title: "Arcane", year: 2021, genres: ["Animacion"], posterURL: "https://static.tvmaze.com/uploads/images/medium_portrait/536/1340287.jpg"),
-        SeriesHomeDiscoveryPreview(id: "for-all-mankind", title: "For All Mankind", year: 2019, genres: ["Drama", "Sci-Fi"], posterURL: "https://static.tvmaze.com/uploads/images/medium_portrait/616/1541416.jpg"),
-        SeriesHomeDiscoveryPreview(id: "brooklyn-nine-nine", title: "Brooklyn Nine-Nine", year: 2013, genres: ["Comedia"], posterURL: "https://static.tvmaze.com/uploads/images/medium_portrait/402/1007484.jpg"),
-        SeriesHomeDiscoveryPreview(id: "bojack-horseman", title: "BoJack Horseman", year: 2014, genres: ["Animacion"], posterURL: "https://static.tvmaze.com/uploads/images/medium_portrait/405/1012627.jpg")
-    ]
 }
 
 private struct SeriesEntryActionsMenu: View {
@@ -1495,7 +1492,7 @@ struct SeriesProgressEditorSheet: View {
                     }
                 }
             }
-            .task(id: entry.seriesId ?? entry.entryId) {
+            .task(id: entry.seriesId) {
                 await loadEpisodeGuide()
             }
         }
@@ -1877,7 +1874,7 @@ struct SeriesProgressEditorSheet: View {
     }
 
     private func loadEpisodeGuide() async {
-        guard let seriesId = entry.seriesId, !seriesId.isEmpty, !seriesId.hasPrefix("local-") else {
+        guard !entry.seriesId.isEmpty else {
             episodeGuideState = .generic
             return
         }
@@ -1886,7 +1883,7 @@ struct SeriesProgressEditorSheet: View {
 
         do {
             let response = try await episodeGuideClient.episodes(
-                for: seriesId,
+                for: entry.seriesId,
                 lastWatchedEpisodeCursor: entry.lastWatchedEpisodeCursor
             )
             let guide = SeriesProgressEpisodeGuide(items: response.items)

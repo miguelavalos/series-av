@@ -28,19 +28,18 @@ final class SeriesLibrarySyncCoordinatorTests: XCTestCase {
         XCTAssertEqual(merged.first?.lastWatchedEpisodeCursor, SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 4))
     }
 
-    func testMergeUsesProviderIdentityBeforeCanonicalSeriesIdExists() {
-        let providerRef = SeriesProviderRef(provider: "tvmaze", providerSeriesId: "123", providerUrl: nil, isPrimary: true)
+    func testMergeUsesCanonicalSeriesIdForCatalogEntries() {
         let remote = makeEntry(
             entryId: "remote-provider",
+            seriesId: "series-arcane",
             title: "Arcane",
-            providerRef: providerRef,
             updatedAt: date("2026-06-14T10:00:00Z"),
             lastInteractedAt: date("2026-06-14T10:00:00Z")
         )
         let local = makeEntry(
             entryId: "local-provider",
+            seriesId: "series-arcane",
             title: "Arcane",
-            providerRef: providerRef,
             updatedAt: date("2026-06-14T12:00:00Z"),
             lastInteractedAt: date("2026-06-14T12:00:00Z")
         )
@@ -51,9 +50,9 @@ final class SeriesLibrarySyncCoordinatorTests: XCTestCase {
         XCTAssertEqual(merged.first?.entryId, "local-provider")
     }
 
-    func testMergeKeepsDistinctUnresolvedLocalEntries() {
-        let first = makeEntry(entryId: "local-one", title: "One", updatedAt: date("2026-06-14T10:00:00Z"))
-        let second = makeEntry(entryId: "local-two", title: "Two", updatedAt: date("2026-06-14T11:00:00Z"))
+    func testMergeKeepsDistinctCatalogEntries() {
+        let first = makeEntry(entryId: "local-one", seriesId: "series-one", title: "One", updatedAt: date("2026-06-14T10:00:00Z"))
+        let second = makeEntry(entryId: "local-two", seriesId: "series-two", title: "Two", updatedAt: date("2026-06-14T11:00:00Z"))
 
         let merged = SeriesLibrarySyncCoordinator.merge(local: [first, second], remote: [])
 
@@ -62,9 +61,8 @@ final class SeriesLibrarySyncCoordinatorTests: XCTestCase {
 
     private func makeEntry(
         entryId: String,
-        seriesId: String? = nil,
+        seriesId: String,
         title: String,
-        providerRef: SeriesProviderRef? = nil,
         updatedAt: Date,
         lastInteractedAt: Date? = nil,
         cursor: SeriesEpisodeCursor? = nil
@@ -72,7 +70,6 @@ final class SeriesLibrarySyncCoordinatorTests: XCTestCase {
         SeriesLibraryEntry(
             entryId: entryId,
             seriesId: seriesId,
-            providerRef: providerRef,
             title: title,
             status: cursor == nil ? .wantToWatch : .watching,
             lastWatchedEpisodeCursor: cursor,

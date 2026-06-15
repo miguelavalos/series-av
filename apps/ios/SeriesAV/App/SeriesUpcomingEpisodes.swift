@@ -48,7 +48,7 @@ final class SeriesUpcomingEpisodesModel: ObservableObject {
     func load(entries: [SeriesLibraryEntry]) async {
         let resolvedEntries = entries
             .filter { $0.archivedAt == nil && $0.deletedAt == nil }
-            .filter { $0.seriesId?.isEmpty == false }
+            .filter { $0.seriesId.isEmpty == false }
 
         guard !resolvedEntries.isEmpty else {
             state = .loaded([])
@@ -62,10 +62,9 @@ final class SeriesUpcomingEpisodesModel: ObservableObject {
         let loadedItems = await withTaskGroup(of: [SeriesUpcomingEpisode].self) { group in
             for entry in resolvedEntries {
                 group.addTask { [client] in
-                    guard let seriesId = entry.seriesId else { return [] }
                     do {
                         let response = try await client.episodes(
-                            for: seriesId,
+                            for: entry.seriesId,
                             lastWatchedEpisodeCursor: entry.lastWatchedEpisodeCursor
                         )
                         return response.items.compactMap { item in
@@ -340,7 +339,7 @@ private extension Array where Element == SeriesLibraryEntry {
         map { entry in
             [
                 entry.id,
-                entry.seriesId ?? "",
+                entry.seriesId,
                 entry.lastWatchedEpisodeCursor.map(cursorLabel) ?? "",
                 entry.updatedAt.ISO8601Format()
             ].joined(separator: ":")

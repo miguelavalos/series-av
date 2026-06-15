@@ -47,8 +47,7 @@ struct SeriesEpisodeCursor: Codable, Equatable, Hashable, Comparable, Sendable {
 
 struct SeriesLibraryEntry: Codable, Identifiable, Equatable, Sendable {
     var entryId: String
-    var seriesId: String?
-    var providerRef: SeriesProviderRef?
+    var seriesId: String
     var title: String
     var status: SeriesLibraryEntryStatus
     var lastWatchedEpisodeCursor: SeriesEpisodeCursor?
@@ -129,4 +128,40 @@ struct SeriesLibraryDocument: Codable, Equatable, Sendable {
     var updatedAt: Date
     var revision: Int
     var etag: String?
+}
+
+struct SeriesCatalogItem: Codable, Identifiable, Equatable, Sendable {
+    struct DisplayArtwork: Codable, Equatable, Sendable {
+        struct Policy: Codable, Equatable, Sendable {
+            var displayState: String
+            var reasonCode: String?
+            var evaluatedAt: Date
+        }
+
+        var kind: String
+        var url: URL?
+        var assetName: String?
+        var fallbackSeed: String?
+        var aspectRatio: Double?
+        var policy: Policy
+    }
+
+    var seriesId: String
+    var providerRef: SeriesProviderRef?
+    var providerRefs: [SeriesProviderRef]
+    var title: String
+    var startYear: Int?
+    var statusText: String?
+    var genres: [String]
+    var displayArtwork: DisplayArtwork
+    var episodeGuideState: String
+    var visibility: String
+    var enrichmentStatus: String
+    var artworkStatus: String
+    var metadataUpdatedAt: Date?
+
+    var id: String { seriesId }
+    var displayArtworkRef: String? {
+        displayArtwork.url?.absoluteString ?? displayArtwork.assetName
+    }
 }

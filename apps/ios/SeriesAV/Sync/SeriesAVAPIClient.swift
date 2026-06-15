@@ -120,6 +120,69 @@ struct SeriesCatalogResolveResponse: Codable, Equatable, Sendable {
     var generatedAt: Date
 }
 
+struct SeriesCatalogSearchResponse: Codable, Equatable, Sendable {
+    struct Pagination: Codable, Equatable, Sendable {
+        var total: Int?
+        var limit: Int
+        var returned: Int
+        var hasMore: Bool
+        var nextCursor: String?
+        var totalIsExact: Bool
+    }
+
+    var results: [SeriesCatalogItem]
+    var pagination: Pagination?
+    var source: String
+    var generatedAt: Date
+}
+
+struct SeriesCatalogSearchClient: Sendable {
+    var apiClient: SeriesAVAPIClient
+    var decoder: JSONDecoder
+
+    init(apiClient: SeriesAVAPIClient = SeriesAVAPIClient(), decoder: JSONDecoder = SeriesCatalogSearchClient.makeDecoder()) {
+        self.apiClient = apiClient
+        self.decoder = decoder
+    }
+
+    func search(query: String, locale: String? = nil, limit: Int = 12) async throws -> SeriesCatalogSearchResponse {
+        var items = [
+            URLQueryItem(name: "q", value: query),
+            URLQueryItem(name: "limit", value: String(limit))
+        ]
+        if let locale, locale.isEmpty == false {
+            items.append(URLQueryItem(name: "locale", value: locale))
+        }
+        return try await request(path: "/v1/series/search", queryItems: items)
+    }
+
+    func popular(locale: String? = nil, surface: String = "home", limit: Int = 12) async throws -> SeriesCatalogSearchResponse {
+        var items = [
+            URLQueryItem(name: "surface", value: surface),
+            URLQueryItem(name: "limit", value: String(limit))
+        ]
+        if let locale, locale.isEmpty == false {
+            items.append(URLQueryItem(name: "locale", value: locale))
+        }
+        return try await request(path: "/v1/series/popular", queryItems: items)
+    }
+
+    private func request(path: String, queryItems: [URLQueryItem]) async throws -> SeriesCatalogSearchResponse {
+        var components = URLComponents()
+        components.path = path
+        components.queryItems = queryItems
+        let resolvedPath = components.string ?? path
+        let (data, _) = try await apiClient.requestData(path: resolvedPath, requiresAuth: false)
+        return try decoder.decode(SeriesCatalogSearchResponse.self, from: data)
+    }
+
+    private static func makeDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return decoder
+    }
+}
+
 struct SeriesCatalogResolveClient: Sendable {
     var apiClient: SeriesAVAPIClient
     var encoder: JSONEncoder

@@ -74,29 +74,26 @@ final class SeriesLibraryStore {
     }
 
     @discardableResult
-    func addLocalSeries(
-        title rawTitle: String,
-        seriesId resolvedSeriesId: String? = nil,
-        providerRef: SeriesProviderRef? = nil,
-        displayArtworkRef: String? = nil,
+    func addCatalogSeries(
+        _ catalogItem: SeriesCatalogItem,
         at date: Date = Date()
     ) -> SeriesLibraryEntry? {
-        let title = rawTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        let title = catalogItem.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let seriesId = catalogItem.seriesId.trimmingCharacters(in: .whitespacesAndNewlines)
         guard title.isEmpty == false else {
             return nil
         }
+        guard seriesId.isEmpty == false else {
+            return nil
+        }
 
-        let normalizedSeriesId = resolvedSeriesId?.trimmingCharacters(in: .whitespacesAndNewlines)
-        let seriesId = normalizedSeriesId?.isEmpty == false ? normalizedSeriesId : nil
-        let entryId = seriesId ?? "local-\(SeriesLibraryIdentity.slug(for: title))"
         let entry = SeriesLibraryEntry(
-            entryId: entryId,
+            entryId: seriesId,
             seriesId: seriesId,
-            providerRef: providerRef,
             title: title,
             status: .wantToWatch,
             lastWatchedEpisodeCursor: nil,
-            displayArtworkRef: displayArtworkRef,
+            displayArtworkRef: catalogItem.displayArtworkRef,
             fallbackVisualSeed: title,
             addedAt: date,
             updatedAt: date,
@@ -346,15 +343,7 @@ private enum SeriesLibraryCoding {
 
 enum SeriesLibraryIdentity {
     static func key(for entry: SeriesLibraryEntry) -> String {
-        if let seriesId = normalized(entry.seriesId) {
-            return "series:\(seriesId)"
-        }
-        if let providerRef = entry.providerRef,
-           let provider = normalized(providerRef.provider),
-           let providerSeriesId = normalized(providerRef.providerSeriesId) {
-            return "provider:\(provider):\(providerSeriesId)"
-        }
-        return "entry:\(entry.entryId.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())"
+        "series:\(entry.seriesId.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())"
     }
 
     static func sameSeries(_ lhs: SeriesLibraryEntry, _ rhs: SeriesLibraryEntry) -> Bool {
@@ -368,25 +357,4 @@ enum SeriesLibraryIdentity {
             .lowercased()
     }
 
-    static func slug(for value: String) -> String {
-        let normalizedValue = normalizedSearchText(value)
-        let allowed = CharacterSet.alphanumerics
-        let scalars = normalizedValue.unicodeScalars.map { scalar in
-            allowed.contains(scalar) ? Character(scalar) : "-"
-        }
-        let slug = String(scalars)
-            .split(separator: "-")
-            .joined(separator: "-")
-        return slug.isEmpty ? UUID().uuidString.lowercased() : slug
-    }
-
-    private static func normalized(_ value: String?) -> String? {
-        guard let normalizedValue = value?
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .lowercased(),
-            !normalizedValue.isEmpty else {
-            return nil
-        }
-        return normalizedValue
-    }
 }

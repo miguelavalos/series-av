@@ -169,14 +169,7 @@ final class SeriesLibrarySyncCoordinator {
     }
 
     private static func identityKey(for entry: SeriesLibraryEntry) -> String {
-        if let seriesId = entry.seriesId?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !seriesId.isEmpty {
-            return "series:\(seriesId)"
-        }
-        if let providerRef = entry.providerRef {
-            return "provider:\(providerRef.provider):\(providerRef.providerSeriesId)"
-        }
-        return "entry:\(entry.entryId)"
+        "series:\(entry.seriesId.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())"
     }
 
     private static func stableDeviceId(userDefaults: UserDefaults) -> String {

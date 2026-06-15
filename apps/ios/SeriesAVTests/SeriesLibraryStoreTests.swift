@@ -53,12 +53,12 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertEqual(store.entries[0].lastWatchedEpisodeCursor, SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 1))
     }
 
-    func testUpsertDeduplicatesByProviderRefBeforeLocalEntryId() {
+    func testUpsertDeduplicatesByCanonicalSeriesId() {
         let date = Date(timeIntervalSince1970: 1_800_000_000)
         let store = SeriesLibraryStore(entries: [
             SeriesLibraryEntry(
                 entryId: "local-a",
-                providerRef: SeriesProviderRef(provider: "tvmaze", providerSeriesId: "123"),
+                seriesId: "series-123",
                 title: "Provider Series",
                 status: .wantToWatch,
                 addedAt: date,
@@ -70,7 +70,7 @@ final class SeriesLibraryStoreTests: XCTestCase {
         store.upsert(
             SeriesLibraryEntry(
                 entryId: "local-b",
-                providerRef: SeriesProviderRef(provider: "tvmaze", providerSeriesId: "123"),
+                seriesId: "series-123",
                 title: "Provider Series",
                 status: .watching,
                 lastWatchedEpisodeCursor: SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 1),
@@ -228,16 +228,15 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertNil(store.entries[0].lastWatchedEpisodeCursor)
     }
 
-    func testAddLocalSeriesTrimsTitleAndDeduplicatesByLocalEntryIdentity() {
+    func testAddCatalogSeriesTrimsTitleAndDeduplicatesBySeriesId() {
         let date = Date(timeIntervalSince1970: 1_800_000_000)
         let store = SeriesLibraryStore()
 
-        let first = store.addLocalSeries(title: "  Example Show  ", at: date)
-        let second = store.addLocalSeries(title: "Example Show", at: date.addingTimeInterval(10))
+        let first = store.addCatalogSeries(catalogItem(id: "series-example", title: "  Example Show  "), at: date)
+        let second = store.addCatalogSeries(catalogItem(id: "series-example", title: "Example Show"), at: date.addingTimeInterval(10))
 
         XCTAssertEqual(first?.title, "Example Show")
-        XCTAssertNil(second?.seriesId)
-        XCTAssertNil(second?.providerRef)
+        XCTAssertEqual(second?.seriesId, "series-example")
         XCTAssertEqual(second?.entryId, first?.entryId)
         XCTAssertEqual(store.entries.count, 1)
         XCTAssertEqual(store.entries[0].status, .wantToWatch)
@@ -290,11 +289,11 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertEqual(store.searchEntries(matching: "misterio").map(\.entryId), ["entry-1"])
     }
 
-    func testPersistedStoreLoadsSavedLocalSeries() {
+    func testPersistedStoreLoadsSavedCatalogSeries() {
         let defaults = isolatedUserDefaults()
         let store = SeriesLibraryStore.persisted(userDefaults: defaults)
 
-        store.addLocalSeries(title: "Persisted Show", at: Date(timeIntervalSince1970: 1_800_000_000))
+        store.addCatalogSeries(catalogItem(id: "series-persisted", title: "Persisted Show"), at: Date(timeIntervalSince1970: 1_800_000_000))
 
         let reloadedStore = SeriesLibraryStore.persisted(userDefaults: defaults)
         XCTAssertEqual(reloadedStore.entries.map(\.title), ["Persisted Show"])
@@ -304,7 +303,7 @@ final class SeriesLibraryStoreTests: XCTestCase {
     func testPersistedStoreSavesProgressChanges() {
         let defaults = isolatedUserDefaults()
         let store = SeriesLibraryStore.persisted(userDefaults: defaults)
-        let entry = store.addLocalSeries(title: "Progress Show", at: Date(timeIntervalSince1970: 1_800_000_000))
+        let entry = store.addCatalogSeries(catalogItem(id: "series-progress", title: "Progress Show"), at: Date(timeIntervalSince1970: 1_800_000_000))
 
         store.markWatchedThrough(SeriesEpisodeCursor(seasonNumber: 2, episodeNumber: 8), for: entry?.id ?? "")
 
@@ -396,5 +395,34 @@ final class SeriesLibraryStoreTests: XCTestCase {
         let defaults = UserDefaults(suiteName: suiteName)!
         defaults.removePersistentDomain(forName: suiteName)
         return defaults
+    }
+
+    private func catalogItem(id: String, title: String) -> SeriesCatalogItem {
+        SeriesCatalogItem(
+            seriesId: id,
+            providerRef: SeriesProviderRef(provider: "tvmaze", providerSeriesId: id, providerUrl: nil, isPrimary: true),
+            providerRefs: [SeriesProviderRef(provider: "tvmaze", providerSeriesId: id, providerUrl: nil, isPrimary: true)],
+            title: title,
+            startYear: 2026,
+            statusText: "Running",
+            genres: ["Drama"],
+            displayArtwork: SeriesCatalogItem.DisplayArtwork(
+                kind: "providerPoster",
+                url: nil,
+                assetName: nil,
+                fallbackSeed: title,
+                aspectRatio: nil,
+                policy: SeriesCatalogItem.DisplayArtwork.Policy(
+                    displayState: "fallbackOnly",
+                    reasonCode: nil,
+                    evaluatedAt: Date(timeIntervalSince1970: 1_800_000_000)
+                )
+            ),
+            episodeGuideState: "available",
+            visibility: "public",
+            enrichmentStatus: "providerFallback",
+            artworkStatus: "none",
+            metadataUpdatedAt: Date(timeIntervalSince1970: 1_800_000_000)
+        )
     }
 }
