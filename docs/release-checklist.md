@@ -73,6 +73,33 @@ Because the iOS project currently has no native test targets, complete and sign 
 7. Confirm signed-in search/detail can resolve backend-backed catalog data where expected.
 8. Confirm no visible shared-list, recommendation inbox, friends, public activity, or social-network surface is exposed in V1.
 
+### Production iOS QA Before TestFlight
+
+App Store/TestFlight purchase, restore, webhook, and review screenshot evidence
+is parked until a processed build can be used. The next local QA pass should use
+production config and the temporary `info@avalsys.com` Series AV Pro grant while
+it is active.
+
+1. Generate production iOS config and run the app:
+
+   ```bash
+   bun run ios:config:production
+   ```
+
+2. Sign in as `info@avalsys.com` and confirm Account AV access hydrates as
+   Series AV Pro.
+3. Confirm Pro cloud sync uses `/v1/apps/seriesav/data/seriesLibrary`:
+   add a series, change progress, archive/delete where applicable, relaunch,
+   and verify sync status updates.
+4. Confirm Search/resolve returns canonical backend `seriesId` values.
+5. Confirm resolved series load the compact episode guide and the
+   season/episode selector uses real backend data instead of the generic
+   fallback.
+6. Run light mode, Dynamic Type, five-locale, and long-string checks across
+   Home, Library, Search, Profile, Account, Settings, and Paywall.
+7. Revoke or allow expiry of the temporary grant after QA. It is smoke/QA
+   evidence only and must not replace purchase/restore validation.
+
 ### Production Signed-In Smoke
 
 Current evidence, 2026-06-15:
