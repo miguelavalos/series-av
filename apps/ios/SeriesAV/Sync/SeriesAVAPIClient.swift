@@ -12,7 +12,7 @@ struct SeriesAVAPIClient: Sendable {
     var urlSession: URLSession
 
     init(
-        baseURL: URL? = AppConfig.apiBaseURL,
+        baseURL: URL? = AppConfig.seriesAPIBaseURL,
         urlSession: URLSession = .shared,
         tokenProvider: @escaping @Sendable () async throws -> String? = { nil }
     ) {

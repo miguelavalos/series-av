@@ -146,7 +146,7 @@ final class SeriesAccessController {
 
     func authenticatedAPIClient() -> SeriesAVAPIClient {
         SeriesAVAPIClient(
-            baseURL: AppConfig.apiBaseURL,
+            baseURL: AppConfig.seriesAPIBaseURL,
             tokenProvider: { [accountService] in try await accountService.getToken() }
         )
     }

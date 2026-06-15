@@ -12,6 +12,8 @@
 	<string>$(ACCOUNTAV_MANAGEMENT_URL)</string>
 	<key>ACCOUNTAV_PUBLISHABLE_KEY</key>
 	<string>$(ACCOUNTAV_PUBLISHABLE_KEY)</string>
+	<key>SERIESAV_API_BASE_URL</key>
+	<string>$(SERIESAV_API_BASE_URL)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

@@ -10,6 +10,10 @@ enum AppConfig {
         BundleConfig.urlValue(for: "ACCOUNTAV_API_BASE_URL")
     }
 
+    static var seriesAPIBaseURL: URL? {
+        BundleConfig.urlValue(for: "SERIESAV_API_BASE_URL") ?? apiBaseURL
+    }
+
     static var accountManagementURL: URL? {
         BundleConfig.urlValue(for: "ACCOUNTAV_MANAGEMENT_URL")
     }

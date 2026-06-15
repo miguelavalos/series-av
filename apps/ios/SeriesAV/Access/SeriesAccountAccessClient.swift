@@ -133,7 +133,7 @@ struct SeriesAccountAccessClient: SeriesAccountAccessProviding, Sendable {
     var decoder: JSONDecoder
 
     init(
-        apiClient: SeriesAVAPIClient = SeriesAVAPIClient(),
+        apiClient: SeriesAVAPIClient = SeriesAVAPIClient(baseURL: AppConfig.apiBaseURL),
         decoder: JSONDecoder = JSONDecoder()
     ) {
         self.apiClient = apiClient
