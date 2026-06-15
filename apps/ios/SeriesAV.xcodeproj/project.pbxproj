@@ -11,6 +11,7 @@
 		017A7189DBCB8238A1D3BBB4 /* SeriesAccountDeletionPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7EC623CC9D9F5E4C53AA024 /* SeriesAccountDeletionPolicy.swift */; };
 		06222EBFC1E985565D6B452D /* SeriesAppBootstrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557E2299A00C28395D71C339 /* SeriesAppBootstrapView.swift */; };
 		071057CF3EB0157C84455449 /* SeriesAccountDeletionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACDE5B246EE20134733B58AA /* SeriesAccountDeletionScreen.swift */; };
+		0B8D4D7F9B1F4C2A8F3A41D0 /* SeriesAVAPIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8D4D7E9B1F4C2A8F3A41D0 /* SeriesAVAPIClientTests.swift */; };
 		159807956E30BB116384FADE /* SeriesEntitlementServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF356E2FD2CC3CC73B7B7490 /* SeriesEntitlementServiceTests.swift */; };
 		190C3AD6D65815C057B5FE9C /* SeriesAccountDeletionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 425BB0E0381300D68D5D8878 /* SeriesAccountDeletionViewModel.swift */; };
 		39D3F2C4743954A3DD315B15 /* AVSettingsFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 138FB23720DA324B605EBCC9 /* AVSettingsFoundation */; };
@@ -74,6 +75,7 @@
 		27130155C28FD9D15535EDFB /* SeriesAccountDeletionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccountDeletionModels.swift; sourceTree = "<group>"; };
 		2A2E8FBF279E3A8C4EDC0B68 /* SeriesAV.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SeriesAV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2EF0BD8F6256FAEAD9C6EFA5 /* SeriesSubscriptionPurchasingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesSubscriptionPurchasingService.swift; sourceTree = "<group>"; };
+		0B8D4D7E9B1F4C2A8F3A41D0 /* SeriesAVAPIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVAPIClientTests.swift; sourceTree = "<group>"; };
 		326ED2E28D2DC33ECDA6917C /* SeriesProPaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesProPaywallView.swift; sourceTree = "<group>"; };
 		332AC1912A119DE4FCDA1227 /* SeriesLibraryTabScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLibraryTabScreen.swift; sourceTree = "<group>"; };
 		425BB0E0381300D68D5D8878 /* SeriesAccountDeletionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccountDeletionViewModel.swift; sourceTree = "<group>"; };
@@ -228,6 +230,7 @@
 		825310051FB4D111A5F95839 /* SeriesAVTests */ = {
 			isa = PBXGroup;
 			children = (
+				0B8D4D7E9B1F4C2A8F3A41D0 /* SeriesAVAPIClientTests.swift */,
 				EF565349F86597C1E4C0AC86 /* SeriesAccessControllerTests.swift */,
 				D2F51872EA7F30BA6B1A1475 /* SeriesAppDataSyncClientTests.swift */,
 				FF356E2FD2CC3CC73B7B7490 /* SeriesEntitlementServiceTests.swift */,
@@ -398,6 +401,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0B8D4D7F9B1F4C2A8F3A41D0 /* SeriesAVAPIClientTests.swift in Sources */,
 				F080E9F4FD5DFE9C674174EC /* SeriesAccessControllerTests.swift in Sources */,
 				E5B43EA5B85A739C5D7E6CE8 /* SeriesAppDataSyncClientTests.swift in Sources */,
 				159807956E30BB116384FADE /* SeriesEntitlementServiceTests.swift in Sources */,
