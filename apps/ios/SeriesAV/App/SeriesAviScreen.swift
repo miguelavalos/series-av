@@ -24,7 +24,7 @@ struct SeriesAviScreen: View {
         ) {
             EmptyView()
         } heroAvatar: {
-            Image("AviOnboardingCTA")
+            Image("AviFullBody")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 82, height: 82)
