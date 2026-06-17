@@ -37,9 +37,25 @@ Use this checklist before uploading the first App Store build and before later p
 4. Build a release candidate locally from Xcode before archiving for App Store Connect.
 5. Confirm the shipping version and build number are correct for App Store Connect. `1.0 (1)` is acceptable only if this is the first uploaded build for version `1.0`; otherwise increment `CFBundleVersion`.
 
-## Manual QA
+## Automated And Manual QA
 
-Because the iOS project currently has no native test targets, complete and sign off this manual smoke before release.
+The iOS project has native XCTest and UI test targets. Run the native suite
+before manual release sign-off:
+
+```bash
+xcodebuild test \
+  -project apps/ios/SeriesAV.xcodeproj \
+  -scheme SeriesAV \
+  -configuration Debug \
+  -destination 'platform=iOS Simulator,name=<simulator name>' \
+  -derivedDataPath .DerivedData-seriesav-ui-tests
+```
+
+The suite covers local library behavior, account/access policy, sync merge
+behavior, follow-from-search smoke, populated-library smoke, progress-editor
+smoke, and guest/free/pro paywall/account smoke states. Manual QA still must
+cover real signed sessions, App Store purchase dialogs, provider callbacks, and
+device-specific Apple auth behavior.
 
 ### Guest
 
@@ -47,7 +63,7 @@ Because the iOS project currently has no native test targets, complete and sign 
 2. Dismiss onboarding and continue as guest.
 3. Verify Home loads featured rows and continue-watching state without crash.
 4. Search for at least one known show and open detail.
-5. Add a show to library and confirm it appears in `Biblioteca`.
+5. Follow a catalog result and confirm it appears in `Biblioteca`.
 6. Open `Próximos` and verify next-up content renders.
 7. Open `Perfil` and confirm privacy, terms, support, source code, and TVMaze data-source attribution are visible.
 
@@ -76,9 +92,10 @@ Because the iOS project currently has no native test targets, complete and sign 
 ### Production iOS QA Before TestFlight
 
 App Store/TestFlight purchase, restore, webhook, and review screenshot evidence
-is parked until a processed build can be used. The next local QA pass should use
-production config and the temporary `info@avalsys.com` Series AV Pro grant while
-it is active.
+must still be completed on an approved TestFlight/App Store build. Local
+simulator QA can validate production config, signed Account AV session restore,
+paywall offer loading, restore button visibility, and non-purchase UI behavior,
+but it must not replace a real store purchase/restore validation.
 
 1. Generate production iOS config and run the app:
 
@@ -86,28 +103,43 @@ it is active.
    bun run ios:config:production
    ```
 
-2. Sign in as `info@avalsys.com` and confirm Account AV access hydrates as
-   Series AV Pro.
-3. Confirm Pro cloud sync uses `/v1/apps/seriesav/data/seriesLibrary`:
-   add a series, change progress, archive/delete where applicable, relaunch,
-   and verify sync status updates.
+2. Sign in with a safe production Account AV account and confirm Account AV
+   access hydrates as signed-in Free or Pro according to its current backend
+   entitlement.
+3. Confirm Pro cloud sync uses `/v1/apps/seriesav/data/seriesLibrary` when the
+   account has Pro access:
+   follow a catalog result, change progress, archive/delete where applicable,
+   relaunch, and verify sync status updates.
 4. Confirm Search/resolve returns canonical backend `seriesId` values.
 5. Confirm resolved series load the compact episode guide and the
    season/episode selector uses real backend data instead of the generic
    fallback.
-6. Run light mode, Dynamic Type, five-locale, and long-string checks across
-   Home, Library, Search, Profile, Account, Settings, and Paywall.
-7. Revoke or allow expiry of the temporary grant after QA. It is smoke/QA
-   evidence only and must not replace purchase/restore validation.
+6. Run light mode, dark mode, Dynamic Type, five-locale, and long-string checks
+   across Home, Library, Search, Profile, Account, Settings, Avi, progress
+   editor, and Paywall.
+7. If a temporary internal grant is used for QA, revoke or allow it to expire
+   after QA. It is smoke/QA evidence only and must not replace purchase/restore
+   validation.
 
 ### Production Signed-In Smoke
 
-Current evidence, 2026-06-15:
+Current evidence:
 
 - preview Free and Pro auto smokes passed;
-- production Free passed with a real `info@avalsys.com` Account AV session;
-- production Pro passed with the same account using a temporary internal Series
-  AV grant that expires on `2026-06-16T20:06:48.230Z`.
+- production Free passed with a safe real Account AV session;
+- production Pro passed with a safe real Account AV session using a temporary
+  internal Series AV grant.
+
+Additional local simulator evidence, 2026-06-17:
+
+- production Release build restored an existing signed Account AV session and
+  displayed the signed-in account email in the Account screen;
+- production RevenueCat offer loading returned `seriesav_pro_monthly` with
+  display price `$2.99`;
+- dark mode and Dynamic Type checks passed visually across Home, Search,
+  Library, Account, Settings, Onboarding/Auth, Avi, progress editor, and
+  Paywall;
+- no purchase was initiated.
 
 1. Re-run preview smoke against a real signed-in Account AV session token before
    final submission:
@@ -169,6 +201,11 @@ Current external setup snapshot, 2026-06-13:
   entitlement `pro` and included in offering `default`, package `$rc_monthly`.
 - Production `ios:preflight`, iOS simulator build, and private production
   subscription-readiness checks passed after the setup.
+- Local production simulator offer loading on 2026-06-17 confirmed
+  `seriesav_pro_monthly` loads through RevenueCat and displays `$2.99`.
+  RevenueCat also logged non-blocking warnings for empty non-Series offerings
+  (`moments_credits` and `animate_credits`); clean or remove those offerings in
+  RevenueCat/config before release so production logs stay actionable.
 
 1. Confirm the private Series AV subscription readiness checker passes for both
    preview and production before any App Store/TestFlight submission:
@@ -207,9 +244,10 @@ Do not submit until these are true:
 
 ## Native Test Coverage
 
-The iOS project has a native XCTest target. The latest local run on 2026-06-15
-passed 42 tests on the iPhone 17 simulator. Before submission, keep this target
-green and add or manually sign off the remaining real-account flows:
+The iOS project has native XCTest and UI test targets. The latest local run on
+2026-06-17 passed 50 tests on the iPhone 17 simulator. Before submission, keep
+this target green and add or manually sign off the remaining real-account
+flows:
 
 1. Signed-in free Series-only account is eligible and can request deletion after typing `DELETE`.
 2. Tune AV linked app blocks deletion.

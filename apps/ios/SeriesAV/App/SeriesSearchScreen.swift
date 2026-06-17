@@ -21,7 +21,7 @@ struct SeriesSearchScreen: View {
     var body: some View {
         AVAppShellScrollableScreenScaffold(
             alignment: .leading,
-            spacing: 16,
+            spacing: 22,
             bottomPadding: 236
         ) {
             AVBrandSurface.shellBackground
@@ -118,7 +118,7 @@ struct SeriesSearchScreen: View {
                     .font(.system(size: 20, weight: .bold))
                     .foregroundStyle(AVBrandColor.accent)
 
-                TextField(L10n.string("add.search.placeholder"), text: $query)
+                TextField(L10n.string("search.placeholder"), text: $query)
                     .font(.system(size: 20, weight: .bold))
                     .textInputAutocapitalization(.words)
                     .submitLabel(.search)
@@ -276,15 +276,8 @@ struct SeriesSearchScreen: View {
                 }
             }
 
-            if isSearchingCatalog && trimmedQuery.isEmpty == false {
-                HStack(spacing: 10) {
-                    ProgressView()
-                    Text(L10n.string("search.loading"))
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.vertical, 14)
+            if isSearchingCatalog {
+                SeriesCatalogResultsSkeleton()
             } else if localMatches.isEmpty && visibleCatalogResults.isEmpty {
                 ContentUnavailableView(
                     L10n.string("library.search.empty.title"),
@@ -406,6 +399,44 @@ struct SeriesSearchScreen: View {
     }
 }
 
+private struct SeriesCatalogResultsSkeleton: View {
+    var body: some View {
+        VStack(spacing: 10) {
+            ForEach(0..<4, id: \.self) { index in
+                HStack(alignment: .center, spacing: 12) {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color(.tertiarySystemGroupedBackground))
+                        .frame(width: 64, height: 88)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        skeletonLine(width: index.isMultiple(of: 2) ? 172 : 136, height: 18)
+                        skeletonLine(width: index.isMultiple(of: 2) ? 98 : 124, height: 12)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    Circle()
+                        .fill(Color(.tertiarySystemGroupedBackground))
+                        .frame(width: 42, height: 42)
+                }
+                .padding(10)
+                .background(Color(.secondarySystemGroupedBackground).opacity(0.74), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+                }
+            }
+        }
+        .redacted(reason: .placeholder)
+        .accessibilityHidden(true)
+    }
+}
+
+private func skeletonLine(width: CGFloat, height: CGFloat) -> some View {
+    RoundedRectangle(cornerRadius: height / 2, style: .continuous)
+        .fill(Color(.tertiarySystemGroupedBackground))
+        .frame(width: width, height: height)
+}
+
 private struct SeriesCatalogResultCard: View {
     let preview: SeriesCatalogPreview
     let libraryEntry: SeriesLibraryEntry?
@@ -427,19 +458,11 @@ private struct SeriesCatalogResultCard: View {
                     .lineLimit(2)
                     .minimumScaleFactor(0.82)
 
-                HStack(spacing: 7) {
-                    if let year = preview.year {
-                        Text(String(year))
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundStyle(.secondary)
-                    }
-
-                    ForEach(preview.genres.prefix(2), id: \.self) { genre in
-                        Text(genre)
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundStyle(AVBrandColor.accent)
-                    }
-                }
+                Text(metadataText)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.82)
 
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -480,6 +503,17 @@ private struct SeriesCatalogResultCard: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .stroke(Color.primary.opacity(0.06), lineWidth: 1)
         }
+    }
+
+    private var metadataText: String {
+        let parts = [
+            preview.year.map(String.init)
+        ] + preview.genres.prefix(2).map(Optional.some)
+
+        return parts
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { $0.isEmpty == false }
+            .joined(separator: " · ")
     }
 }
 

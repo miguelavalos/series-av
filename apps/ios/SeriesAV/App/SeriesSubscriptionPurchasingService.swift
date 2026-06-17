@@ -76,6 +76,41 @@ final class NoopSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasing {
     }
 }
 
+@MainActor
+final class UITestSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasing {
+    private let offer: SeriesSubscriptionOffer
+
+    init(localizedPrice: String) {
+        offer = SeriesSubscriptionOffer(
+            identifier: "$rc_monthly",
+            productIdentifier: "com.avalsys.seriesav.pro.monthly",
+            localizedTitle: "Series AV Pro",
+            localizedPrice: localizedPrice
+        )
+    }
+
+    func prepare(for user: SeriesAccountUser?) async throws {
+        guard user != nil else {
+            throw SeriesSubscriptionPurchaseError.missingAccountUser
+        }
+    }
+
+    func loadMonthlyOffer(for user: SeriesAccountUser?) async throws -> SeriesSubscriptionOffer {
+        try await prepare(for: user)
+        return offer
+    }
+
+    func purchaseMonthlyPro(for user: SeriesAccountUser?) async throws -> SeriesPurchaseOutcome {
+        try await prepare(for: user)
+        return SeriesPurchaseOutcome(shouldRefreshAccess: false, customerUserID: user?.id ?? "")
+    }
+
+    func restorePurchases(for user: SeriesAccountUser?) async throws -> SeriesPurchaseOutcome {
+        try await prepare(for: user)
+        return SeriesPurchaseOutcome(shouldRefreshAccess: false, customerUserID: user?.id ?? "")
+    }
+}
+
 #if canImport(RevenueCat)
 @MainActor
 final class RevenueCatSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasing {

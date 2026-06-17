@@ -5,7 +5,7 @@ import SwiftUI
 struct SeriesAppBootstrapView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var accessController = SeriesAccessController()
-    @State private var selectedTab: SeriesRootTab = .home
+    @State private var selectedTab: SeriesRootTab
     @State private var authPresentationState: AVProductAccountAuthPresentationState = .hidden
     @State private var authenticationWasSkipped = false
     @State private var automaticGuestOnboardingIsPresented = false
@@ -16,6 +16,10 @@ struct SeriesAppBootstrapView: View {
     private let launchContext = SeriesLaunchContext.current
     private var splashPolicy: AVSplashTransitionPolicy {
         AVSplashTransitionPolicy(isDisabled: launchContext.shouldDisableSplash)
+    }
+
+    init() {
+        _selectedTab = State(initialValue: SeriesLaunchContext.current.initialTab)
     }
 
     var body: some View {
@@ -137,7 +141,9 @@ struct SeriesAppBootstrapView: View {
         guard !authenticationWasSkipped else { return }
         guard authPresentationState == .hidden else { return }
         automaticGuestOnboardingIsPresented = true
-        authPresentationState = .onboardingCollapsed
+        authPresentationState = SeriesUITestEnvironment.current.shouldShowExpandedOnboardingAuthOptions
+            ? .onboardingOptions
+            : .onboardingCollapsed
     }
 
     private func skipAuthentication() {

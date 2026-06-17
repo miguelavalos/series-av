@@ -115,10 +115,7 @@ if [[ "$management_url" != *"$expected_management_host"* ]]; then
 fi
 
 development_team="$(setting_value DEVELOPMENT_TEAM)"
-if [ -z "$development_team" ] || [ "$development_team" = '$(inherited)' ]; then
-  printf 'Mismatch: DEVELOPMENT_TEAM is not resolved. Actual: %s\n' "${development_team:-<empty>}" >&2
-  failures=$((failures + 1))
-fi
+expect_value "DEVELOPMENT_TEAM" "$development_team" "935PM55U6R"
 
 if [ "$(setting_value CODE_SIGN_ENTITLEMENTS)" != "SeriesAV/App/SeriesAV.entitlements" ]; then
   printf 'Mismatch: CODE_SIGN_ENTITLEMENTS is not SeriesAV/App/SeriesAV.entitlements.\n' >&2
@@ -127,6 +124,14 @@ fi
 
 if ! plutil -extract keychain-access-groups raw "$repo_root/apps/ios/SeriesAV/App/SeriesAV.entitlements" >/dev/null 2>&1; then
   printf 'Mismatch: SeriesAV.entitlements must include keychain-access-groups for Clerk native auth.\n' >&2
+  failures=$((failures + 1))
+fi
+
+url_scheme="$(
+  plutil -extract CFBundleURLTypes.0.CFBundleURLSchemes.0 raw "$repo_root/apps/ios/SeriesAV/App/Info.plist" 2>/dev/null || true
+)"
+if [ "$url_scheme" != '$(PRODUCT_BUNDLE_IDENTIFIER)' ]; then
+  printf 'Mismatch: Info.plist must register PRODUCT_BUNDLE_IDENTIFIER as the Clerk callback URL scheme.\n' >&2
   failures=$((failures + 1))
 fi
 

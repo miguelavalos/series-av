@@ -32,6 +32,7 @@ schemes:
       config: Debug
       targets:
         - SeriesAVTests
+        - SeriesAVUITests
     analyze:
       config: Debug
     profile:
@@ -95,3 +96,18 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: "$(SERIESAV_BUNDLE_IDENTIFIER).tests"
         TARGETED_DEVICE_FAMILY: "1"
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/SeriesAV.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SeriesAV"
+
+  SeriesAVUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: SeriesAVUITests
+    dependencies:
+      - target: SeriesAV
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_MODULE_NAME: SeriesAVUITests
+        PRODUCT_BUNDLE_IDENTIFIER: "$(SERIESAV_BUNDLE_IDENTIFIER).uitests"
+        TARGETED_DEVICE_FAMILY: "1"
+        TEST_TARGET_NAME: SeriesAV

@@ -11,6 +11,7 @@ struct RootView: View {
     let openSettings: () -> Void
     let openAccount: () -> Void
     let openLibraryTab: () -> Void
+    let openSearch: () -> Void
     let openAvi: () -> Void
 
     var body: some View {
@@ -21,6 +22,7 @@ struct RootView: View {
             openSettings: openSettings,
             openAccount: openAccount,
             openLibraryTab: openLibraryTab,
+            openSearch: openSearch,
             openAvi: openAvi,
             startSignInFlow: startSignInFlow
         )
@@ -35,6 +37,7 @@ struct RootView: View {
         openSettings: {},
         openAccount: {},
         openLibraryTab: {},
+        openSearch: {},
         openAvi: {}
     )
 }
@@ -54,25 +57,24 @@ private struct SeriesWatchingHomeScreen: View {
     let openSettings: () -> Void
     let openAccount: () -> Void
     let openLibraryTab: () -> Void
+    let openSearch: () -> Void
     let openAvi: () -> Void
     let startSignInFlow: () -> Void
 
     @State private var editorEntry: SeriesLibraryEntry?
-    @State private var isShowingAddSheet = false
     @State private var isShowingProPaywall = false
-    @State private var pendingProPaywallAfterAddDismiss = false
-    @State private var pendingSignInAfterAddDismiss = false
-    @State private var pendingProgressEditorAfterAddDismiss: SeriesLibraryEntry?
     @State private var pendingUndo: PendingLibraryUndo?
     @State private var pendingProgressUndo: PendingProgressUndo?
     @State private var popularPreviews: [SeriesHomeDiscoveryPreview] = []
     @State private var upcomingPreviews: [SeriesHomeDiscoveryPreview] = []
     @State private var recommendedPreviews: [SeriesHomeDiscoveryPreview] = []
+    @State private var isLoadingHomeDiscovery = true
+    @State private var artworkReconciliationSignature = ""
 
     var body: some View {
         AVAppShellScrollableScreenScaffold(
             alignment: .leading,
-            spacing: 16,
+            spacing: 22,
             bottomPadding: 176
         ) {
             AVBrandSurface.shellBackground
@@ -125,9 +127,7 @@ private struct SeriesWatchingHomeScreen: View {
                     }
                 )
             } else {
-                SeriesEmptyWatchingView {
-                    isShowingAddSheet = true
-                }
+                SeriesEmptyWatchingView(openSearch: openSearch)
             }
 
             SeriesHomeUpcomingEpisodesSection(
@@ -170,36 +170,30 @@ private struct SeriesWatchingHomeScreen: View {
             SeriesHomeDiscoveryRail(
                 title: L10n.string("home.rail.popular"),
                 previews: popularPreviews,
+                isLoading: isLoadingHomeDiscovery,
                 libraryEntries: store.activeEntries,
                 canAddSeries: canAddSeries,
                 addSeries: addDiscoverySeries,
-                editProgress: { entry in
-                    editorEntry = entry
-                },
                 showLimitAction: showLimitAction
             )
 
             SeriesHomeDiscoveryRail(
                 title: L10n.string("upcoming.home.title"),
                 previews: upcomingPreviews,
+                isLoading: isLoadingHomeDiscovery,
                 libraryEntries: store.activeEntries,
                 canAddSeries: canAddSeries,
                 addSeries: addDiscoverySeries,
-                editProgress: { entry in
-                    editorEntry = entry
-                },
                 showLimitAction: showLimitAction
             )
 
             SeriesHomeDiscoveryRail(
                 title: L10n.string("home.rail.recommended"),
                 previews: recommendedPreviews,
+                isLoading: isLoadingHomeDiscovery,
                 libraryEntries: store.activeEntries,
                 canAddSeries: canAddSeries,
                 addSeries: addDiscoverySeries,
-                editProgress: { entry in
-                    editorEntry = entry
-                },
                 showLimitAction: showLimitAction
             )
         }
@@ -238,10 +232,8 @@ private struct SeriesWatchingHomeScreen: View {
                 }
 
                 if currentEntry == nil {
-                    Button {
-                        isShowingAddSheet = true
-                    } label: {
-                        Label(L10n.string("home.add"), systemImage: "plus")
+                    Button(action: openSearch) {
+                        Label(L10n.string("home.add"), systemImage: "magnifyingglass")
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
@@ -268,59 +260,22 @@ private struct SeriesWatchingHomeScreen: View {
             )
             .presentationDetents([.large])
         }
-        .sheet(isPresented: $isShowingAddSheet) {
-            SeriesAddSheet(
-                store: store,
-                canAddSeries: canAddSeries,
-                accessMode: accessController.accessMode,
-                accountIsAvailable: accessController.accountIsAvailable,
-                remainingSeriesCount: remainingSeriesCount,
-                openProPaywall: {
-                    pendingProPaywallAfterAddDismiss = true
-                    isShowingAddSheet = false
-                },
-                startSignInFlow: {
-                    pendingSignInAfterAddDismiss = true
-                    isShowingAddSheet = false
-                },
-                didAddSeries: { entry in
-                    pendingProgressUndo = nil
-                    pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.added")
-                    pendingProgressEditorAfterAddDismiss = entry
-                }
-            )
-            .presentationDetents([.medium, .large])
-        }
         .sheet(isPresented: $isShowingProPaywall) {
             SeriesProPaywallView(
                 accessController: accessController,
                 startSignInFlow: startSignInFlow
             )
         }
-        .onChange(of: isShowingAddSheet) { _, isShowing in
-            guard !isShowing else { return }
-
-            if pendingProPaywallAfterAddDismiss {
-                pendingProPaywallAfterAddDismiss = false
-                isShowingProPaywall = true
-                return
-            }
-
-            if pendingSignInAfterAddDismiss {
-                pendingSignInAfterAddDismiss = false
-                startSignInFlow()
-                return
-            }
-
-            if let entry = pendingProgressEditorAfterAddDismiss {
-                pendingProgressEditorAfterAddDismiss = nil
-                editorEntry = entry
-                return
-            }
-
-        }
         .task {
             await refreshHomeDiscovery()
+        }
+        .onAppear {
+            if SeriesUITestEnvironment.current.shouldShowProgressEditor, editorEntry == nil {
+                editorEntry = currentEntry ?? store.activeEntries.first
+            }
+        }
+        .task(id: missingArtworkSignature) {
+            await reconcileMissingArtwork()
         }
     }
 
@@ -345,6 +300,16 @@ private struct SeriesWatchingHomeScreen: View {
 
     private var remainingSeriesCount: Int? {
         activeLibraryLimitPolicy.remainingSeriesCount
+    }
+
+    private var missingArtworkEntries: [SeriesLibraryEntry] {
+        store.activeEntries.filter { $0.displayArtworkRef?.isEmpty != false }
+    }
+
+    private var missingArtworkSignature: String {
+        missingArtworkEntries
+            .map { "\($0.entryId):\($0.seriesId):\($0.title)" }
+            .joined(separator: "|")
     }
 
     private func countActiveEntries(with status: SeriesLibraryEntryStatus) -> Int {
@@ -382,6 +347,7 @@ private struct SeriesWatchingHomeScreen: View {
     }
 
     private func refreshHomeDiscovery() async {
+        isLoadingHomeDiscovery = true
         let client = SeriesCatalogSearchClient()
         async let popular = try? client.popular(locale: Locale.current.identifier, surface: "home", limit: 10)
         async let upcoming = try? client.popular(locale: Locale.current.identifier, surface: "upcoming", limit: 10)
@@ -390,6 +356,50 @@ private struct SeriesWatchingHomeScreen: View {
         popularPreviews = (await popular)?.results.map { SeriesHomeDiscoveryPreview(catalogItem: $0) } ?? []
         upcomingPreviews = (await upcoming)?.results.map { SeriesHomeDiscoveryPreview(catalogItem: $0) } ?? []
         recommendedPreviews = (await recommended)?.results.map { SeriesHomeDiscoveryPreview(catalogItem: $0) } ?? []
+        reconcileMissingArtwork(from: popularPreviews + upcomingPreviews + recommendedPreviews)
+        isLoadingHomeDiscovery = false
+    }
+
+    private func reconcileMissingArtwork(from previews: [SeriesHomeDiscoveryPreview]) {
+        for entry in missingArtworkEntries {
+            guard let preview = previews.first(where: { SeriesLibraryIdentity.sameSeries(entry, $0.catalogItem) }) else {
+                continue
+            }
+            store.updateArtworkIfMissing(
+                for: entry.entryId,
+                displayArtworkRef: preview.catalogItem.displayArtworkRef,
+                fallbackVisualSeed: preview.title
+            )
+        }
+    }
+
+    private func reconcileMissingArtwork() async {
+        let signature = missingArtworkSignature
+        guard signature.isEmpty == false, signature != artworkReconciliationSignature else {
+            return
+        }
+        artworkReconciliationSignature = signature
+
+        let client = SeriesCatalogSearchClient()
+        for entry in missingArtworkEntries.prefix(6) {
+            guard entry.displayArtworkRef?.isEmpty != false else {
+                continue
+            }
+
+            let normalizedTitle = SeriesLibraryIdentity.normalizedSearchText(entry.title)
+            guard let response = try? await client.search(query: entry.title, locale: Locale.current.identifier, limit: 4),
+                  let catalogItem = response.results.first(where: { SeriesLibraryIdentity.sameSeries(entry, $0) })
+                    ?? response.results.first(where: { SeriesLibraryIdentity.normalizedSearchText($0.title) == normalizedTitle }),
+                  catalogItem.displayArtworkRef?.isEmpty == false else {
+                continue
+            }
+
+            store.updateArtworkIfMissing(
+                for: entry.entryId,
+                displayArtworkRef: catalogItem.displayArtworkRef,
+                fallbackVisualSeed: catalogItem.title
+            )
+        }
     }
 
     private func showLimitAction() {
@@ -421,6 +431,7 @@ private struct SeriesWatchingHomeScreen: View {
                 openAvi: openAvi
             )
         }
+        .padding(.bottom, 8)
     }
 
 }
@@ -578,220 +589,6 @@ struct SeriesLibraryRow<MenuContent: View>: View {
     }
 }
 
-struct SeriesAddSheet: View {
-    @Environment(\.dismiss) private var dismiss
-    @Bindable var store: SeriesLibraryStore
-    let canAddSeries: Bool
-    let accessMode: SeriesAccessMode
-    let accountIsAvailable: Bool
-    let remainingSeriesCount: Int?
-    let openProPaywall: () -> Void
-    let startSignInFlow: () -> Void
-    let didAddSeries: (SeriesLibraryEntry) -> Void
-
-    @State private var query = ""
-    @State private var isSearching = false
-
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        TextField(L10n.string("add.search.placeholder"), text: $query)
-                            .font(.system(size: 24, weight: .bold))
-                            .textFieldStyle(.plain)
-                            .textInputAutocapitalization(.words)
-                            .submitLabel(.done)
-                            .onSubmit {
-                                Task { await addSeries() }
-                            }
-
-                        Rectangle()
-                            .fill(Color.primary.opacity(0.12))
-                            .frame(height: 1)
-                    }
-                    .padding(18)
-                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
-                            .stroke(Color.primary.opacity(0.06), lineWidth: 1)
-                    }
-
-                    Button {
-                        Task { await addSeries() }
-                    } label: {
-                        if isSearching {
-                            ProgressView()
-                                .frame(maxWidth: .infinity)
-                        } else {
-                            Label(addActionTitle, systemImage: exactMatchingEntry == nil ? "plus" : "checkmark")
-                                .frame(maxWidth: .infinity)
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
-                    .disabled(!canSubmit)
-
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text(limitText)
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        if shouldShowUpgradeAction {
-                            Button {
-                                runLimitAction()
-                            } label: {
-                                Label(limitActionTitle, systemImage: limitActionSystemImage)
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .disabled(accessMode == .guest && !accountIsAvailable)
-                        }
-                    }
-
-                    if matchingEntries.isEmpty == false {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text(L10n.string("add.matches.title"))
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundStyle(.secondary)
-
-                            VStack(spacing: 0) {
-                                ForEach(matchingEntries) { entry in
-                                    HStack(spacing: 12) {
-                                        SeriesEntryArtworkView(entry: entry, size: 34)
-                                        VStack(alignment: .leading, spacing: 3) {
-                                            Text(entry.title)
-                                                .font(.system(size: 15, weight: .semibold))
-                                            Text(matchDetail(for: entry))
-                                                .font(.system(size: 12, weight: .medium))
-                                                .foregroundStyle(.secondary)
-                                        }
-                                        Spacer(minLength: 0)
-                                    }
-                                    .padding(.vertical, 8)
-
-                                    if entry.id != matchingEntries.last?.id {
-                                        Divider()
-                                    }
-                                }
-                            }
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 6)
-                            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                        }
-                    }
-                }
-                .padding(20)
-            }
-            .background(AVBrandSurface.shellBackground.ignoresSafeArea())
-            .navigationTitle(L10n.string("add.title"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(L10n.string("common.cancel")) {
-                        dismiss()
-                    }
-                }
-            }
-        }
-    }
-
-    private var matchingEntries: [SeriesLibraryEntry] {
-        store.searchEntries(matching: query)
-    }
-
-    private var shouldShowUpgradeAction: Bool {
-        remainingSeriesCount != nil && !canAddSeries && accessMode != .signedInPro
-    }
-
-    private var limitActionTitle: String {
-        switch accessMode {
-        case .guest:
-            accountIsAvailable ? L10n.string("add.footer.connectAccount") : L10n.string("profile.account.connectUnavailable")
-        case .signedInFree:
-            L10n.string("add.footer.upgrade")
-        case .signedInPro:
-            L10n.string("add.footer.upgrade")
-        }
-    }
-
-    private var limitActionSystemImage: String {
-        accessMode == .guest ? "person.crop.circle.badge.plus" : "sparkles"
-    }
-
-    private var exactMatchingEntry: SeriesLibraryEntry? {
-        let normalizedQuery = SeriesLibraryIdentity.normalizedSearchText(query)
-        guard normalizedQuery.isEmpty == false else {
-            return nil
-        }
-        return store.activeEntries.first {
-            SeriesLibraryIdentity.normalizedSearchText($0.title) == normalizedQuery
-        }
-    }
-
-    private var addActionTitle: String {
-        exactMatchingEntry == nil ? L10n.string("add.action") : L10n.string("add.action.alreadyAdded")
-    }
-
-    private var canSubmit: Bool {
-        canAddSeries
-            && !isSearching
-            && query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
-            && exactMatchingEntry == nil
-    }
-
-    private var limitText: String {
-        if accessMode == .signedInPro && canAddSeries {
-            return "\(L10n.string("add.footer.pro"))\n\(L10n.string("add.footer.hint"))"
-        }
-        guard let remainingSeriesCount else {
-            return "\(L10n.string("add.footer.pro"))\n\(L10n.string("add.footer.hint"))"
-        }
-        if canAddSeries {
-            return "\(String(format: L10n.string("add.footer.remaining"), remainingSeriesCount))\n\(L10n.string("add.footer.hint"))"
-        }
-        return L10n.string("add.footer.limitReached")
-    }
-
-    private func matchDetail(for entry: SeriesLibraryEntry) -> String {
-        if entry.status == .wantToWatch {
-            return "\(statusTitle(entry.status)) · \(String(format: L10n.string("home.queue.wantToWatch.progress"), cursorLabel(entry.nextEpisodeCursor)))"
-        }
-        return "\(statusTitle(entry.status)) · \(entry.progressLabel)"
-    }
-
-    private func addSeries() async {
-        guard canSubmit else {
-            return
-        }
-        let searchQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        isSearching = true
-        defer { isSearching = false }
-
-        let response = try? await SeriesCatalogSearchClient()
-            .search(query: searchQuery, locale: Locale.current.identifier, limit: 5)
-
-        guard let catalogItem = response?.results.first,
-            let entry = store.addCatalogSeries(catalogItem) else {
-            return
-        }
-        didAddSeries(entry)
-        dismiss()
-    }
-
-    private func runLimitAction() {
-        switch accessMode {
-        case .guest:
-            startSignInFlow()
-        case .signedInFree:
-            openProPaywall()
-        case .signedInPro:
-            break
-        }
-    }
-}
-
 private struct SeriesCurrentWatchingCard: View {
     @Environment(\.colorScheme) private var colorScheme
 
@@ -833,12 +630,12 @@ private struct SeriesCurrentWatchingCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 16) {
             heroTopBar
             heroMain
             heroControls
         }
-        .padding(16)
+        .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(heroBackground)
         .contentShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
@@ -887,8 +684,8 @@ private struct SeriesCurrentWatchingCard: View {
     }
 
     private var heroMain: some View {
-        HStack(alignment: .bottom, spacing: 12) {
-            VStack(alignment: .leading, spacing: 8) {
+        HStack(alignment: .bottom, spacing: 14) {
+            VStack(alignment: .leading, spacing: 10) {
                 Text(entry.title)
                     .font(.system(size: 28, weight: .black, design: .rounded))
                     .foregroundStyle(heroTitleColor)
@@ -916,7 +713,7 @@ private struct SeriesCurrentWatchingCard: View {
     }
 
     private var heroControls: some View {
-        HStack(spacing: 9) {
+        HStack(spacing: 10) {
             Button(action: primaryAction) {
                 Image(systemName: primaryIconName)
                     .font(.system(size: 20, weight: .black))
@@ -1197,114 +994,144 @@ private struct SeriesWatchingQueueSection: View {
 private struct SeriesHomeDiscoveryRail: View {
     let title: String
     let previews: [SeriesHomeDiscoveryPreview]
+    let isLoading: Bool
     let libraryEntries: [SeriesLibraryEntry]
     let canAddSeries: Bool
     let addSeries: (SeriesHomeDiscoveryPreview) -> Void
-    let editProgress: (SeriesLibraryEntry) -> Void
     let showLimitAction: () -> Void
 
     var body: some View {
-        if previews.isEmpty == false {
-            VStack(alignment: .leading, spacing: 12) {
+        if isLoading || visiblePreviews.isEmpty == false {
+            VStack(alignment: .leading, spacing: 14) {
                 Text(title)
                     .font(.system(size: 17, weight: .black, design: .rounded))
                     .foregroundStyle(.primary)
 
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(alignment: .top, spacing: 10) {
-                        ForEach(previews) { preview in
-                            SeriesHomeDiscoveryCard(
-                                preview: preview,
-                                libraryEntry: libraryEntry(for: preview),
-                                canAddSeries: canAddSeries,
-                                addSeries: { addSeries(preview) },
-                                editProgress: editProgress,
-                                showLimitAction: showLimitAction
-                            )
+                    HStack(alignment: .top, spacing: 12) {
+                        if isLoading && previews.isEmpty {
+                            ForEach(0..<4, id: \.self) { index in
+                                SeriesHomeDiscoverySkeletonCard(seed: index)
+                            }
+                        } else {
+                            ForEach(visiblePreviews) { preview in
+                                SeriesHomeDiscoveryCard(
+                                    preview: preview,
+                                    canAddSeries: canAddSeries,
+                                    addSeries: { addSeries(preview) },
+                                    showLimitAction: showLimitAction
+                                )
+                            }
                         }
                     }
-                    .padding(.vertical, 2)
+                    .padding(.vertical, 3)
                 }
             }
+            .padding(.top, 6)
         }
     }
 
-    private func libraryEntry(for preview: SeriesHomeDiscoveryPreview) -> SeriesLibraryEntry? {
-        libraryEntries.first {
-            $0.seriesId == preview.id
+    private var visiblePreviews: [SeriesHomeDiscoveryPreview] {
+        previews.filter { preview in
+            libraryEntries.contains { SeriesLibraryIdentity.sameSeries($0, preview.catalogItem) } == false
         }
     }
 }
 
+private struct SeriesHomeDiscoverySkeletonCard: View {
+    let seed: Int
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 9) {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color(.tertiarySystemGroupedBackground))
+                .frame(width: 92, height: 128)
+                .overlay(alignment: .bottomTrailing) {
+                    Circle()
+                        .fill(Color(.secondarySystemGroupedBackground))
+                        .frame(width: 34, height: 34)
+                        .padding(7)
+                }
+
+            skeletonLine(width: seed.isMultiple(of: 2) ? 82 : 68, height: 14)
+            skeletonLine(width: seed.isMultiple(of: 2) ? 52 : 64, height: 11)
+        }
+        .frame(width: SeriesHomeDiscoveryCard.itemWidth, alignment: .leading)
+        .redacted(reason: .placeholder)
+        .accessibilityHidden(true)
+    }
+}
+
+private func skeletonLine(width: CGFloat, height: CGFloat) -> some View {
+    RoundedRectangle(cornerRadius: height / 2, style: .continuous)
+        .fill(Color(.tertiarySystemGroupedBackground))
+        .frame(width: width, height: height)
+}
+
 private struct SeriesHomeDiscoveryCard: View {
+    static let itemWidth: CGFloat = 108
+    private static let artworkWidth: CGFloat = 96
+
     let preview: SeriesHomeDiscoveryPreview
-    let libraryEntry: SeriesLibraryEntry?
     let canAddSeries: Bool
     let addSeries: () -> Void
-    let editProgress: (SeriesLibraryEntry) -> Void
     let showLimitAction: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
             ZStack(alignment: .bottomTrailing) {
-                SeriesHomePreviewArtwork(preview: preview, width: 92, height: 128)
+                SeriesHomePreviewArtwork(preview: preview, width: Self.artworkWidth, height: 132)
 
                 actionButton
                     .padding(7)
             }
 
             Text(preview.title)
-                .font(.system(size: 14, weight: .black, design: .rounded))
+                .font(.system(size: titleFontSize, weight: .black, design: .rounded))
                 .foregroundStyle(.primary)
                 .lineLimit(2)
-                .minimumScaleFactor(0.78)
-                .frame(width: 92, alignment: .leading)
+                .allowsTightening(true)
+                .truncationMode(.tail)
+                .frame(width: Self.artworkWidth, height: 36, alignment: .topLeading)
 
-            HStack(spacing: 5) {
-                if let year = preview.year {
-                    Text(String(year))
-                }
-
-                ForEach(preview.genres.prefix(1), id: \.self) { genre in
-                    Text(genre)
-                }
-            }
+            Text(metadataText)
             .font(.system(size: 11, weight: .bold))
             .foregroundStyle(.secondary)
-            .lineLimit(2)
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(width: 92, alignment: .leading)
+            .lineLimit(1)
+            .minimumScaleFactor(0.82)
+            .frame(width: Self.artworkWidth, alignment: .leading)
         }
-        .frame(width: 100, alignment: .leading)
+        .frame(width: Self.itemWidth, alignment: .leading)
     }
+
+    private var metadataText: String {
+        let parts = [
+            preview.year.map(String.init),
+            preview.genres.first
+        ].compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { $0.isEmpty == false }
+
+        return parts.joined(separator: " · ")
+    }
+
+    private var titleFontSize: CGFloat {
+        preview.title.count > 30 ? 12.5 : 14
+    }
+
 
     @ViewBuilder
     private var actionButton: some View {
-        if let libraryEntry {
-            Button {
-                editProgress(libraryEntry)
-            } label: {
-                Image(systemName: "checkmark")
-                    .font(.system(size: 15, weight: .black))
-                    .foregroundStyle(AVBrandColor.accent)
-                    .frame(width: 34, height: 34)
-                    .background(.regularMaterial, in: Circle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(L10n.string("home.adjust"))
-        } else {
-            Button {
-                canAddSeries ? addSeries() : showLimitAction()
-            } label: {
-                Image(systemName: canAddSeries ? "plus" : "sparkles")
-                    .font(.system(size: 15, weight: .black))
-                    .foregroundStyle(AVBrandColor.accent)
-                    .frame(width: 34, height: 34)
-                    .background(.regularMaterial, in: Circle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(canAddSeries ? L10n.string("search.follow") : L10n.string("add.footer.upgrade"))
+        Button {
+            canAddSeries ? addSeries() : showLimitAction()
+        } label: {
+            Image(systemName: canAddSeries ? "plus" : "sparkles")
+                .font(.system(size: 15, weight: .black))
+                .foregroundStyle(AVBrandColor.accent)
+                .frame(width: 34, height: 34)
+                .background(.regularMaterial, in: Circle())
         }
+        .buttonStyle(.plain)
+        .accessibilityLabel(canAddSeries ? L10n.string("search.follow") : L10n.string("add.footer.upgrade"))
     }
 }
 
@@ -2100,19 +1927,11 @@ struct SeriesPosterMark: View {
 }
 
 private struct SeriesEmptyWatchingView: View {
-    let addSeries: () -> Void
+    let openSearch: () -> Void
 
     var body: some View {
         HStack(alignment: .center, spacing: 16) {
-            ZStack {
-                SeriesPosterMark(seed: "Series AV", size: 74)
-
-                Image(systemName: "plus")
-                    .font(.system(size: 18, weight: .black))
-                    .foregroundStyle(.white)
-                    .frame(width: 34, height: 34)
-                    .background(.ultraThinMaterial, in: Circle())
-            }
+            SeriesEmptyPosterPlaceholder(size: 74)
 
             VStack(alignment: .leading, spacing: 10) {
                 VStack(alignment: .leading, spacing: 4) {
@@ -2124,8 +1943,8 @@ private struct SeriesEmptyWatchingView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                Button(action: addSeries) {
-                    Label(L10n.string("home.add"), systemImage: "plus")
+                Button(action: openSearch) {
+                    Label(L10n.string("home.add"), systemImage: "magnifyingglass")
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.regular)
@@ -2134,6 +1953,37 @@ private struct SeriesEmptyWatchingView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+}
+
+private struct SeriesEmptyPosterPlaceholder: View {
+    let size: CGFloat
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color(.tertiarySystemGroupedBackground))
+                .frame(width: size, height: size * 1.38)
+                .overlay(alignment: .topLeading) {
+                    RoundedRectangle(cornerRadius: 3, style: .continuous)
+                        .fill(Color(.secondarySystemGroupedBackground))
+                        .frame(width: size * 0.42, height: 8)
+                        .padding(10)
+                }
+                .overlay(alignment: .bottomTrailing) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 18, weight: .black))
+                        .foregroundStyle(.white)
+                        .frame(width: 34, height: 34)
+                        .background(AVBrandColor.accent, in: Circle())
+                        .padding(7)
+                }
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(Color.primary.opacity(0.07), lineWidth: 1)
+                }
+        }
+        .accessibilityHidden(true)
     }
 }
 

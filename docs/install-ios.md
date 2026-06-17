@@ -73,6 +73,26 @@ printing secrets.
 
 `apps/ios/Config/Local.xcconfig` is gitignored. Do not commit it or copy production values into versioned files.
 
+## Native Tests
+
+Series AV includes native unit and UI smoke tests. Use a signed or unsigned
+Debug simulator test build for local regression checks; keep DerivedData
+repo-local and purpose-named:
+
+```bash
+xcodebuild test \
+  -project apps/ios/SeriesAV.xcodeproj \
+  -scheme SeriesAV \
+  -configuration Debug \
+  -destination 'platform=iOS Simulator,name=<simulator name>' \
+  -derivedDataPath .DerivedData-seriesav-ui-tests
+```
+
+The UI test target uses `SERIESAV_UI_TESTS` launch-environment hooks for
+deterministic guest/free/pro, populated-library, paywall, and progress-editor
+states. These hooks must stay test-only and must not be used as evidence for
+real signed Account AV, RevenueCat purchase, or backend provider validation.
+
 ## Switching Runtime Profiles
 
 Always regenerate and preflight the native config after switching between

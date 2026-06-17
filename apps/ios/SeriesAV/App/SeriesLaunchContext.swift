@@ -1,9 +1,11 @@
+import AVAppShellFoundation
 import Foundation
 
 struct SeriesLaunchContext {
     let isUITesting: Bool
     let shouldDisableSplash: Bool
     let shouldDisableOnboarding: Bool
+    let initialTab: SeriesRootTab
 
     static let current = SeriesLaunchContext(environment: ProcessInfo.processInfo.environment)
 
@@ -12,6 +14,14 @@ struct SeriesLaunchContext {
         shouldDisableSplash = isUITesting || environment["SERIESAV_DISABLE_SPLASH"] == "1"
         shouldDisableOnboarding = environment["SERIESAV_UI_TESTS_SHOW_ONBOARDING"] != "1"
             && (isUITesting || environment["SERIESAV_DISABLE_ONBOARDING"] == "1")
+        if isUITesting,
+           let requestedTab = environment["SERIESAV_UI_TESTS_INITIAL_TAB"],
+           let initialTab = SeriesRootTab(rawValue: requestedTab),
+           SeriesRootTab.footerTabs.contains(initialTab) || initialTab == .avi {
+            self.initialTab = initialTab
+        } else {
+            initialTab = .home
+        }
     }
 }
 
@@ -30,6 +40,43 @@ struct SeriesUITestEnvironment {
 
     var shouldForceGuestOnboarding: Bool {
         isEnabled && environment["SERIESAV_UI_TESTS_SHOW_ONBOARDING"] == "1"
+    }
+
+    var shouldShowExpandedOnboardingAuthOptions: Bool {
+        isEnabled && environment["SERIESAV_UI_TESTS_SHOW_AUTH_OPTIONS"] == "1"
+    }
+
+    var shouldShowPaywall: Bool {
+        isEnabled && environment["SERIESAV_UI_TESTS_SHOW_PAYWALL"] == "1"
+    }
+
+    var subscriptionOfferPrice: String? {
+        guard isEnabled else { return nil }
+        return environment["SERIESAV_UI_TESTS_SUBSCRIPTION_PRICE"]
+    }
+
+    var shouldResetPersistentState: Bool {
+        isEnabled && environment["SERIESAV_UI_TESTS_RESET_STATE"] == "1"
+    }
+
+    var shouldUseSampleLibrary: Bool {
+        isEnabled && environment["SERIESAV_UI_TESTS_SAMPLE_LIBRARY"] == "1"
+    }
+
+    var shouldShowProgressEditor: Bool {
+        isEnabled && environment["SERIESAV_UI_TESTS_SHOW_PROGRESS_EDITOR"] == "1"
+    }
+
+    var initialChromeItem: AVAppShellChromeItem? {
+        guard isEnabled else { return nil }
+        switch environment["SERIESAV_UI_TESTS_INITIAL_CHROME"] {
+        case "account":
+            return .account
+        case "settings":
+            return .settings
+        default:
+            return nil
+        }
     }
 
     var accountMode: String? {

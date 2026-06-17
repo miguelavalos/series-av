@@ -11,6 +11,18 @@ struct SeriesAppShellView: View {
     @State private var store = SeriesLibraryStore.persisted()
     @State private var librarySync = SeriesLibrarySyncCoordinator()
     @State private var chromeItem: AVAppShellChromeItem?
+    @State private var isShowingUITestPaywall = SeriesUITestEnvironment.current.shouldShowPaywall
+
+    init(
+        selectedTab: Binding<SeriesRootTab>,
+        accessController: SeriesAccessController,
+        startSignInFlow: @escaping () -> Void
+    ) {
+        _selectedTab = selectedTab
+        self.accessController = accessController
+        self.startSignInFlow = startSignInFlow
+        _chromeItem = State(initialValue: SeriesUITestEnvironment.current.initialChromeItem)
+    }
 
     var body: some View {
         AVAppShellConfiguredScaffold(
@@ -43,6 +55,12 @@ struct SeriesAppShellView: View {
         }
         .onChange(of: store.entries) { _, entries in
             librarySync.localEntriesDidChange(entries, accessController: accessController)
+        }
+        .sheet(isPresented: $isShowingUITestPaywall) {
+            SeriesProPaywallView(
+                accessController: accessController,
+                startSignInFlow: startSignInFlow
+            )
         }
     }
 
@@ -80,6 +98,7 @@ struct SeriesAppShellView: View {
                     openSettings: { chromeItem = .settings },
                     openAccount: { chromeItem = .account },
                     openLibraryTab: { selectedTab = .library },
+                    openSearch: { selectedTab = .search },
                     openAvi: { selectedTab = .avi }
                 )
             case .library:

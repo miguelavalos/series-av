@@ -170,6 +170,37 @@ final class SeriesLibraryStore {
         persist()
     }
 
+    @discardableResult
+    func updateArtworkIfMissing(
+        for entryId: String,
+        displayArtworkRef: String?,
+        fallbackVisualSeed: String?,
+        at date: Date = Date()
+    ) -> Bool {
+        guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
+            return false
+        }
+
+        guard entries[index].displayArtworkRef?.isEmpty != false else {
+            return false
+        }
+
+        let normalizedArtworkRef = displayArtworkRef?.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard normalizedArtworkRef?.isEmpty == false else {
+            return false
+        }
+
+        entries[index].displayArtworkRef = normalizedArtworkRef
+        if entries[index].fallbackVisualSeed?.isEmpty != false,
+           let fallbackVisualSeed,
+           fallbackVisualSeed.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false {
+            entries[index].fallbackVisualSeed = fallbackVisualSeed.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        entries[index].updatedAt = date
+        persist()
+        return true
+    }
+
     func setPinned(_ isPinned: Bool, for entryId: String, at date: Date = Date()) {
         guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
             return
@@ -254,6 +285,14 @@ final class SeriesLibraryStore {
             userDefaults: userDefaults,
             key: storageKey
         )
+        if SeriesUITestEnvironment.current.shouldResetPersistentState {
+            persistence.save([])
+        }
+        if SeriesUITestEnvironment.current.shouldUseSampleLibrary {
+            let sampleEntries = SeriesLibraryStore.sample().entries
+            persistence.save(sampleEntries)
+            return SeriesLibraryStore(entries: sampleEntries, persistence: persistence)
+        }
         return SeriesLibraryStore(entries: persistence.load(), persistence: persistence)
     }
 
@@ -346,7 +385,15 @@ enum SeriesLibraryIdentity {
         "series:\(entry.seriesId.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())"
     }
 
+    static func key(for catalogItem: SeriesCatalogItem) -> String {
+        "series:\(catalogItem.seriesId.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())"
+    }
+
     static func sameSeries(_ lhs: SeriesLibraryEntry, _ rhs: SeriesLibraryEntry) -> Bool {
+        key(for: lhs) == key(for: rhs)
+    }
+
+    static func sameSeries(_ lhs: SeriesLibraryEntry, _ rhs: SeriesCatalogItem) -> Bool {
         key(for: lhs) == key(for: rhs)
     }
 

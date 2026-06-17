@@ -56,6 +56,15 @@ support_email="$(printenv_value SERIESAV_SUPPORT_EMAIL)"
 open_source_url="$(printenv_value SERIESAV_OPEN_SOURCE_URL)"
 development_team="$(printenv_value AVALSYS_APPLE_DEVELOPMENT_TEAM)"
 
+if [ -z "$development_team" ]; then
+  development_team="\$(inherited)"
+fi
+
+if [ "$development_team" = "346677S99H" ]; then
+  echo "Warning: replacing stale non-Avalsys Apple team 346677S99H with 935PM55U6R." >&2
+  development_team="935PM55U6R"
+fi
+
 if [ -z "$account_keychain_access_group" ]; then
   account_keychain_access_group="935PM55U6R.$bundle_identifier"
 fi

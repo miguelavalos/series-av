@@ -50,6 +50,17 @@
                ReferencedContainer = "container:SeriesAV.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "8365E0E52BCD36100BB97DCD"
+               BuildableName = "SeriesAVUITests.xctest"
+               BlueprintName = "SeriesAVUITests"
+               ReferencedContainer = "container:SeriesAV.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <CommandLineArguments>
       </CommandLineArguments>

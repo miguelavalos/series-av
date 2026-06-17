@@ -85,6 +85,60 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertEqual(store.entries[0].status, .watching)
     }
 
+    func testUpdateArtworkIfMissingFillsPosterWithoutChangingInteractionOrder() {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let updateDate = date.addingTimeInterval(100)
+        let store = SeriesLibraryStore(entries: [
+            SeriesLibraryEntry(
+                entryId: "series-a",
+                seriesId: "series-a",
+                title: "Series A",
+                status: .wantToWatch,
+                addedAt: date,
+                updatedAt: date,
+                lastInteractedAt: date
+            )
+        ])
+
+        let didUpdate = store.updateArtworkIfMissing(
+            for: "series-a",
+            displayArtworkRef: "https://img.example.com/poster.jpg",
+            fallbackVisualSeed: "Series A",
+            at: updateDate
+        )
+
+        XCTAssertTrue(didUpdate)
+        XCTAssertEqual(store.entries[0].displayArtworkRef, "https://img.example.com/poster.jpg")
+        XCTAssertEqual(store.entries[0].updatedAt, updateDate)
+        XCTAssertEqual(store.entries[0].lastInteractedAt, date)
+    }
+
+    func testUpdateArtworkIfMissingDoesNotReplaceExistingPoster() {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = SeriesLibraryStore(entries: [
+            SeriesLibraryEntry(
+                entryId: "series-a",
+                seriesId: "series-a",
+                title: "Series A",
+                status: .wantToWatch,
+                displayArtworkRef: "https://img.example.com/original.jpg",
+                addedAt: date,
+                updatedAt: date,
+                lastInteractedAt: date
+            )
+        ])
+
+        let didUpdate = store.updateArtworkIfMissing(
+            for: "series-a",
+            displayArtworkRef: "https://img.example.com/new.jpg",
+            fallbackVisualSeed: "Series A",
+            at: date.addingTimeInterval(100)
+        )
+
+        XCTAssertFalse(didUpdate)
+        XCTAssertEqual(store.entries[0].displayArtworkRef, "https://img.example.com/original.jpg")
+    }
+
     func testActiveEntriesPrioritizePinnedAndRecentInteractions() {
         let older = Date(timeIntervalSince1970: 1_800_000_000)
         let newer = Date(timeIntervalSince1970: 1_800_000_100)

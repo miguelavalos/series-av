@@ -12,7 +12,10 @@ struct SeriesLibraryTabScreen: View {
     @State private var pendingProgressUndo: PendingProgressUndo?
 
     var body: some View {
-        AVAppShellScrollableScreenScaffold {
+        AVAppShellScrollableScreenScaffold(
+            alignment: .leading,
+            spacing: 22
+        ) {
             AVBrandSurface.shellBackground
         } content: {
             screenTitle(
@@ -104,10 +107,34 @@ struct SeriesLibraryTabScreen: View {
 
     private var libraryControls: some View {
         VStack(alignment: .leading, spacing: 12) {
-            TextField(L10n.string("library.search.placeholder"), text: $query)
-                .textInputAutocapitalization(.words)
-                .submitLabel(.search)
-                .textFieldStyle(.roundedBorder)
+            HStack(spacing: 12) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(AVBrandColor.accent)
+
+                TextField(L10n.string("library.search.placeholder"), text: $query)
+                    .font(.system(size: 17, weight: .semibold))
+                    .textInputAutocapitalization(.words)
+                    .submitLabel(.search)
+
+                if normalizedQuery.isEmpty == false {
+                    Button {
+                        query = ""
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(L10n.string("common.clear"))
+                }
+            }
+            .padding(14)
+            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+            }
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {

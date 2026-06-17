@@ -11,7 +11,7 @@
 		017A7189DBCB8238A1D3BBB4 /* SeriesAccountDeletionPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7EC623CC9D9F5E4C53AA024 /* SeriesAccountDeletionPolicy.swift */; };
 		06222EBFC1E985565D6B452D /* SeriesAppBootstrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557E2299A00C28395D71C339 /* SeriesAppBootstrapView.swift */; };
 		071057CF3EB0157C84455449 /* SeriesAccountDeletionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACDE5B246EE20134733B58AA /* SeriesAccountDeletionScreen.swift */; };
-		0B8D4D7F9B1F4C2A8F3A41D0 /* SeriesAVAPIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8D4D7E9B1F4C2A8F3A41D0 /* SeriesAVAPIClientTests.swift */; };
+		1282829F9FCEA7EB96F1860B /* SeriesAVSmokeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61BEF06D424DD86E80985D0 /* SeriesAVSmokeUITests.swift */; };
 		159807956E30BB116384FADE /* SeriesEntitlementServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF356E2FD2CC3CC73B7B7490 /* SeriesEntitlementServiceTests.swift */; };
 		190C3AD6D65815C057B5FE9C /* SeriesAccountDeletionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 425BB0E0381300D68D5D8878 /* SeriesAccountDeletionViewModel.swift */; };
 		39D3F2C4743954A3DD315B15 /* AVSettingsFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 138FB23720DA324B605EBCC9 /* AVSettingsFoundation */; };
@@ -28,13 +28,13 @@
 		6A5D801612D51B6F370F6949 /* SeriesAVAccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E35FAF1A25D734B526F9350 /* SeriesAVAccountService.swift */; };
 		746B14FC2CD38E7E91127C9B /* SeriesAviScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72508EE57AAF005C7D57D90F /* SeriesAviScreen.swift */; };
 		871C806FAACFA72CA1394932 /* SeriesLibrarySyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E1FC5BF89B517580742A64 /* SeriesLibrarySyncCoordinator.swift */; };
-		8D6D69038B2C4B7C9E6C6B40 /* SeriesUpcomingEpisodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6369F964FF5806F3FD1844DD /* SeriesUpcomingEpisodes.swift */; };
 		93E1DFEF1203442F74B1D4BF /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2568399CFB4C7A1E14832801 /* AppConfig.swift */; };
 		96B90E763CC1A37D3DD098F1 /* SeriesLibraryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FAC949798DD909B4FF68C5 /* SeriesLibraryStoreTests.swift */; };
 		99C7AA7B52682CFDEA051A76 /* AVBrandFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 22C162D72D53D4477A9EC40E /* AVBrandFoundation */; };
 		9A9910A6DD514535A83D6C1C /* SeriesAppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = C64880B2D57EC391A9D4D766 /* SeriesAppPreferences.swift */; };
 		9BF3018BC8451990CAFEA5B0 /* SeriesUITestAccountDeletionAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A181631A36DECD5130422384 /* SeriesUITestAccountDeletionAPI.swift */; };
 		A058EA5097F7624496E4AEE8 /* AccountAV in Frameworks */ = {isa = PBXBuildFile; productRef = C2992247012F30B5FDE4706E /* AccountAV */; };
+		A0CA52CBB01A3578A1F75CE6 /* SeriesAVAPIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A739BAB1FD09E7206A78B9 /* SeriesAVAPIClientTests.swift */; };
 		A14CE6F47C0607F670434388 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = DF538D2CBE6EEAF061AE84C4 /* RevenueCat */; };
 		AAFA14FB0414B5EDE57EBA93 /* SeriesAppExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1957FAE6E3298FDB2C8536F6 /* SeriesAppExperience.swift */; };
 		B5255448167E43828252DB71 /* SeriesAuthOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AF87B75A9721D260B4C3E1 /* SeriesAuthOnboardingView.swift */; };
@@ -46,6 +46,7 @@
 		CA067A25B1C6C592C7DBC4A1 /* SeriesAppShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887A34EB62001F540D97883D /* SeriesAppShellView.swift */; };
 		D93665C7D4D8E3AF2A66912E /* AVPaywallFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = CA2084A4C124E233242FA2F9 /* AVPaywallFoundation */; };
 		DEE35176392FBAB1DB687472 /* SeriesProPaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 326ED2E28D2DC33ECDA6917C /* SeriesProPaywallView.swift */; };
+		E3FF7A5AD98B4C00583B498D /* SeriesUpcomingEpisodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99FE30D7480CA22D50E207D7 /* SeriesUpcomingEpisodes.swift */; };
 		E592D4F13BA7E38AFECB453C /* SeriesAVApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E930F20F64D72B22A232919B /* SeriesAVApp.swift */; };
 		E5B43EA5B85A739C5D7E6CE8 /* SeriesAppDataSyncClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F51872EA7F30BA6B1A1475 /* SeriesAppDataSyncClientTests.swift */; };
 		E647737E0691166B0AE5E9F9 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145DE7E7B082B7D92C440A5B /* RootView.swift */; };
@@ -65,6 +66,13 @@
 			remoteGlobalIDString = 5E6D90780F878770BBB2E021;
 			remoteInfo = SeriesAV;
 		};
+		83C0B40A311610AD5019A16A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 37E45FDB34881B5563BC6921 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5E6D90780F878770BBB2E021;
+			remoteInfo = SeriesAV;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -75,7 +83,6 @@
 		27130155C28FD9D15535EDFB /* SeriesAccountDeletionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccountDeletionModels.swift; sourceTree = "<group>"; };
 		2A2E8FBF279E3A8C4EDC0B68 /* SeriesAV.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SeriesAV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2EF0BD8F6256FAEAD9C6EFA5 /* SeriesSubscriptionPurchasingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesSubscriptionPurchasingService.swift; sourceTree = "<group>"; };
-		0B8D4D7E9B1F4C2A8F3A41D0 /* SeriesAVAPIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVAPIClientTests.swift; sourceTree = "<group>"; };
 		326ED2E28D2DC33ECDA6917C /* SeriesProPaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesProPaywallView.swift; sourceTree = "<group>"; };
 		332AC1912A119DE4FCDA1227 /* SeriesLibraryTabScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLibraryTabScreen.swift; sourceTree = "<group>"; };
 		425BB0E0381300D68D5D8878 /* SeriesAccountDeletionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccountDeletionViewModel.swift; sourceTree = "<group>"; };
@@ -85,7 +92,7 @@
 		54848FD3FA8A4FAE5ABAC868 /* SeriesAVSplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVSplashView.swift; sourceTree = "<group>"; };
 		557E2299A00C28395D71C339 /* SeriesAppBootstrapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppBootstrapView.swift; sourceTree = "<group>"; };
 		56E1FC5BF89B517580742A64 /* SeriesLibrarySyncCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLibrarySyncCoordinator.swift; sourceTree = "<group>"; };
-		6369F964FF5806F3FD1844DD /* SeriesUpcomingEpisodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesUpcomingEpisodes.swift; sourceTree = "<group>"; };
+		59A739BAB1FD09E7206A78B9 /* SeriesAVAPIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVAPIClientTests.swift; sourceTree = "<group>"; };
 		5C2045BD1DAB63090578AC6B /* SeriesAV.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SeriesAV.entitlements; sourceTree = "<group>"; };
 		68FAC949798DD909B4FF68C5 /* SeriesLibraryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLibraryStoreTests.swift; sourceTree = "<group>"; };
 		72139F60FD554069885EE731 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -95,6 +102,7 @@
 		8B4FC08F67E3286D84ADC057 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		916AF9EA3C1212E25351DD1D /* SeriesLibrarySyncCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLibrarySyncCoordinatorTests.swift; sourceTree = "<group>"; };
 		930B112F6F8AF2FEE47D085D /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		99FE30D7480CA22D50E207D7 /* SeriesUpcomingEpisodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesUpcomingEpisodes.swift; sourceTree = "<group>"; };
 		9E35FAF1A25D734B526F9350 /* SeriesAVAccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVAccountService.swift; sourceTree = "<group>"; };
 		A181631A36DECD5130422384 /* SeriesUITestAccountDeletionAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesUITestAccountDeletionAPI.swift; sourceTree = "<group>"; };
 		A586B658AD9682B2BF8C0A92 /* SeriesEntitlementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesEntitlementService.swift; sourceTree = "<group>"; };
@@ -111,10 +119,12 @@
 		CE164B8C0FC2D8FA1427899D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D2F51872EA7F30BA6B1A1475 /* SeriesAppDataSyncClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppDataSyncClientTests.swift; sourceTree = "<group>"; };
 		D40364B2B84E6AC647B728FB /* SeriesAppDataSyncClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAppDataSyncClient.swift; sourceTree = "<group>"; };
+		D61BEF06D424DD86E80985D0 /* SeriesAVSmokeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVSmokeUITests.swift; sourceTree = "<group>"; };
 		D9E3280C62806B5F89C4728A /* SeriesAccountAccessClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccountAccessClient.swift; sourceTree = "<group>"; };
 		DDE4812452BF8D624A9DED3B /* apple */ = {isa = PBXFileReference; lastKnownFileType = folder; name = apple; path = "../../../apps-av/apple"; sourceTree = SOURCE_ROOT; };
 		E646357FD1EDF6D21FE27826 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E930F20F64D72B22A232919B /* SeriesAVApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVApp.swift; sourceTree = "<group>"; };
+		E95BFDFEB1227DF76A87DD4C /* SeriesAVUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SeriesAVUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9BE2FCF29036CC49D6CFBEB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		EBFD99725B527557EED246FB /* SeriesLaunchContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLaunchContext.swift; sourceTree = "<group>"; };
 		EF565349F86597C1E4C0AC86 /* SeriesAccessControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccessControllerTests.swift; sourceTree = "<group>"; };
@@ -182,9 +192,9 @@
 				EBFD99725B527557EED246FB /* SeriesLaunchContext.swift */,
 				332AC1912A119DE4FCDA1227 /* SeriesLibraryTabScreen.swift */,
 				7A61A33B6821805C523ACDBE /* SeriesRootTab.swift */,
-				6369F964FF5806F3FD1844DD /* SeriesUpcomingEpisodes.swift */,
 				21C8D017E63E4B405AB9FB3C /* SeriesSearchScreen.swift */,
 				2EF0BD8F6256FAEAD9C6EFA5 /* SeriesSubscriptionPurchasingService.swift */,
+				99FE30D7480CA22D50E207D7 /* SeriesUpcomingEpisodes.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -204,6 +214,7 @@
 				2FC7BAE7883FEE4CB3DD6DCC /* Packages */,
 				0D239A4F9BC368710EAABA77 /* SeriesAV */,
 				825310051FB4D111A5F95839 /* SeriesAVTests */,
+				6A608BC2418E402D04C52495 /* SeriesAVUITests */,
 				61ADF309C27D450FA7B67C86 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -223,16 +234,25 @@
 			children = (
 				2A2E8FBF279E3A8C4EDC0B68 /* SeriesAV.app */,
 				C538F408F2AE4DD90050AD7A /* SeriesAVTests.xctest */,
+				E95BFDFEB1227DF76A87DD4C /* SeriesAVUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		6A608BC2418E402D04C52495 /* SeriesAVUITests */ = {
+			isa = PBXGroup;
+			children = (
+				D61BEF06D424DD86E80985D0 /* SeriesAVSmokeUITests.swift */,
+			);
+			path = SeriesAVUITests;
 			sourceTree = "<group>";
 		};
 		825310051FB4D111A5F95839 /* SeriesAVTests */ = {
 			isa = PBXGroup;
 			children = (
-				0B8D4D7E9B1F4C2A8F3A41D0 /* SeriesAVAPIClientTests.swift */,
 				EF565349F86597C1E4C0AC86 /* SeriesAccessControllerTests.swift */,
 				D2F51872EA7F30BA6B1A1475 /* SeriesAppDataSyncClientTests.swift */,
+				59A739BAB1FD09E7206A78B9 /* SeriesAVAPIClientTests.swift */,
 				FF356E2FD2CC3CC73B7B7490 /* SeriesEntitlementServiceTests.swift */,
 				68FAC949798DD909B4FF68C5 /* SeriesLibraryStoreTests.swift */,
 				916AF9EA3C1212E25351DD1D /* SeriesLibrarySyncCoordinatorTests.swift */,
@@ -339,6 +359,24 @@
 			productReference = 2A2E8FBF279E3A8C4EDC0B68 /* SeriesAV.app */;
 			productType = "com.apple.product-type.application";
 		};
+		8365E0E52BCD36100BB97DCD /* SeriesAVUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6E982DA29E987F66B8305E82 /* Build configuration list for PBXNativeTarget "SeriesAVUITests" */;
+			buildPhases = (
+				DE4D38271B5D5834267F3E09 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1D14751A05ACD1C34E6BE2C6 /* PBXTargetDependency */,
+			);
+			name = SeriesAVUITests;
+			packageProductDependencies = (
+			);
+			productName = SeriesAVUITests;
+			productReference = E95BFDFEB1227DF76A87DD4C /* SeriesAVUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -351,6 +389,9 @@
 					5E6D90780F878770BBB2E021 = {
 						DevelopmentTeam = "$(AVALSYS_APPLE_DEVELOPMENT_TEAM)";
 						ProvisioningStyle = Automatic;
+					};
+					8365E0E52BCD36100BB97DCD = {
+						TestTargetID = 5E6D90780F878770BBB2E021;
 					};
 				};
 			};
@@ -379,6 +420,7 @@
 			targets = (
 				5E6D90780F878770BBB2E021 /* SeriesAV */,
 				0A972D836B9163E1BAB1D49F /* SeriesAVTests */,
+				8365E0E52BCD36100BB97DCD /* SeriesAVUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -401,7 +443,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0B8D4D7F9B1F4C2A8F3A41D0 /* SeriesAVAPIClientTests.swift in Sources */,
+				A0CA52CBB01A3578A1F75CE6 /* SeriesAVAPIClientTests.swift in Sources */,
 				F080E9F4FD5DFE9C674174EC /* SeriesAccessControllerTests.swift in Sources */,
 				E5B43EA5B85A739C5D7E6CE8 /* SeriesAppDataSyncClientTests.swift in Sources */,
 				159807956E30BB116384FADE /* SeriesEntitlementServiceTests.swift in Sources */,
@@ -440,19 +482,32 @@
 				F73DD51BA813EF38FE6083DE /* SeriesLibraryStore.swift in Sources */,
 				871C806FAACFA72CA1394932 /* SeriesLibrarySyncCoordinator.swift in Sources */,
 				005900FEAB0A22F3BE44CB08 /* SeriesLibraryTabScreen.swift in Sources */,
-				8D6D69038B2C4B7C9E6C6B40 /* SeriesUpcomingEpisodes.swift in Sources */,
 				DEE35176392FBAB1DB687472 /* SeriesProPaywallView.swift in Sources */,
 				BA243CAA0B49EFED0D7B6F21 /* SeriesProfileScreen.swift in Sources */,
 				68E429A2674985B0A0EFBD40 /* SeriesRootTab.swift in Sources */,
 				624F078872F0733DF5C0E7EB /* SeriesSearchScreen.swift in Sources */,
 				F448C655EF1E1DD18F113A54 /* SeriesSubscriptionPurchasingService.swift in Sources */,
 				9BF3018BC8451990CAFEA5B0 /* SeriesUITestAccountDeletionAPI.swift in Sources */,
+				E3FF7A5AD98B4C00583B498D /* SeriesUpcomingEpisodes.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DE4D38271B5D5834267F3E09 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1282829F9FCEA7EB96F1860B /* SeriesAVSmokeUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1D14751A05ACD1C34E6BE2C6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5E6D90780F878770BBB2E021 /* SeriesAV */;
+			targetProxy = 83C0B40A311610AD5019A16A /* PBXContainerItemProxy */;
+		};
 		F5C3448D69E1A766D0EAC62B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 5E6D90780F878770BBB2E021 /* SeriesAV */;
@@ -540,6 +595,24 @@
 			};
 			name = Debug;
 		};
+		4F745C501598602C53A83BE4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(SERIESAV_BUNDLE_IDENTIFIER).uitests";
+				PRODUCT_MODULE_NAME = SeriesAVUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = SeriesAV;
+			};
+			name = Debug;
+		};
 		56E61AE291D9455BD6DD036F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -594,6 +667,24 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		618D78833F4F77D4D5008959 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(SERIESAV_BUNDLE_IDENTIFIER).uitests";
+				PRODUCT_MODULE_NAME = SeriesAVUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = SeriesAV;
 			};
 			name = Release;
 		};
@@ -682,6 +773,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		6E982DA29E987F66B8305E82 /* Build configuration list for PBXNativeTarget "SeriesAVUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4F745C501598602C53A83BE4 /* Debug */,
+				618D78833F4F77D4D5008959 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		8B072713624AA71A7EEA1EBD /* Build configuration list for PBXProject "SeriesAV" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

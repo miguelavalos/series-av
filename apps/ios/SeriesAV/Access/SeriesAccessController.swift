@@ -114,7 +114,7 @@ final class SeriesAccessController {
         self.entitlementService = entitlementService ?? SeriesPlatformEntitlementService(
             accessClient: accessClient
         )
-        self.subscriptionPurchasing = subscriptionPurchasing
+        self.subscriptionPurchasing = Self.subscriptionPurchasingForCurrentEnvironment(defaultPurchasing: subscriptionPurchasing)
         self.userDefaults = userDefaults
         self.guestOnboardingPolicy = guestOnboardingPolicy
         self.now = now
@@ -393,6 +393,15 @@ final class SeriesAccessController {
             displayName: SeriesUITestEnvironment.accountUserDisplayName,
             emailAddress: SeriesUITestEnvironment.accountUserEmailAddress
         )
+    }
+
+    private static func subscriptionPurchasingForCurrentEnvironment(
+        defaultPurchasing: SeriesSubscriptionPurchasing
+    ) -> SeriesSubscriptionPurchasing {
+        guard let subscriptionOfferPrice = SeriesUITestEnvironment.current.subscriptionOfferPrice else {
+            return defaultPurchasing
+        }
+        return UITestSeriesSubscriptionPurchasing(localizedPrice: subscriptionOfferPrice)
     }
 
     private func persistLastKnownAccountUser(_ user: SeriesAccountUser) {
