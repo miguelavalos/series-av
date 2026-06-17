@@ -201,10 +201,10 @@ Current external setup snapshot, 2026-06-17:
 - Production `ios:preflight` and iOS simulator build passed after the setup.
 - Local production simulator offer loading on 2026-06-17 confirmed
   `seriesav_pro_monthly` loads through RevenueCat and displays `$2.99`.
-- Current release blocker: the live Series AV RevenueCat offerings payload still
-  includes empty non-Series offerings (`moments_credits` and `animate_credits`).
-  Remove those offerings from the Series AV RevenueCat app, then rerun the
-  private subscription readiness checks for preview and production.
+- The RevenueCat project is shared across Apps AV products, so Moments AV and
+  Animate AV offerings may also exist in the same project. Do not remove those
+  offerings for Series AV; the Series AV release gate is that `default` contains
+  `$rc_monthly -> seriesav_pro_monthly` and the private readiness checks pass.
 
 1. Confirm the private Series AV subscription readiness checker passes for both
    preview and production before any App Store/TestFlight submission:
