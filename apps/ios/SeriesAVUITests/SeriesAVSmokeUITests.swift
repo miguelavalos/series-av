@@ -1,8 +1,72 @@
 import XCTest
 
 final class SeriesAVSmokeUITests: XCTestCase {
+    private struct LocaleSmokeConfiguration {
+        let language: String
+        let locale: String
+        let homeTitle: String
+        let searchTab: String
+        let searchTitle: String
+        let libraryTab: String
+        let libraryTitle: String
+        let accountTitle: String
+        let paywallTitle: String
+    }
+
+    private let localeSmokeConfigurations = [
+        LocaleSmokeConfiguration(
+            language: "es",
+            locale: "es_ES",
+            homeTitle: "Sigue tu primera serie",
+            searchTab: "Buscar",
+            searchTitle: "Buscar series",
+            libraryTab: "Biblioteca",
+            libraryTitle: "Biblioteca",
+            accountTitle: "Cuenta",
+            paywallTitle: "Sigue más series"
+        ),
+        LocaleSmokeConfiguration(
+            language: "ca",
+            locale: "ca_ES",
+            homeTitle: "Segueix la primera serie",
+            searchTab: "Cerca",
+            searchTitle: "Cercar series",
+            libraryTab: "Biblioteca",
+            libraryTitle: "Biblioteca",
+            accountTitle: "Compte",
+            paywallTitle: "Segueix mes series"
+        ),
+        LocaleSmokeConfiguration(
+            language: "fr",
+            locale: "fr_FR",
+            homeTitle: "Suivez votre premiere serie",
+            searchTab: "Recherche",
+            searchTitle: "Rechercher des series",
+            libraryTab: "Bibliotheque",
+            libraryTitle: "Bibliotheque",
+            accountTitle: "Compte",
+            paywallTitle: "Suivez plus de series"
+        ),
+        LocaleSmokeConfiguration(
+            language: "de",
+            locale: "de_DE",
+            homeTitle: "Erster Serie folgen",
+            searchTab: "Suche",
+            searchTitle: "Serien suchen",
+            libraryTab: "Bibliothek",
+            libraryTitle: "Bibliothek",
+            accountTitle: "Konto",
+            paywallTitle: "Verfolge mehr Serien"
+        )
+    ]
+
     @MainActor
-    private func makeApp(environment: [String: String] = [:]) -> XCUIApplication {
+    private func makeApp(
+        environment: [String: String] = [:],
+        language: String = "es",
+        locale: String = "es_ES",
+        contentSizeCategory: String? = nil
+    ) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment["SERIESAV_UI_TESTS"] = "1"
         app.launchEnvironment["SERIESAV_UI_TESTS_FORCE_GUEST"] = "1"
@@ -12,7 +76,10 @@ final class SeriesAVSmokeUITests: XCTestCase {
         for (key, value) in environment {
             app.launchEnvironment[key] = value
         }
-        app.launchArguments += ["-AppleLanguages", "(es)", "-AppleLocale", "es_ES"]
+        app.launchArguments += ["-AppleLanguages", "(\(language))", "-AppleLocale", locale]
+        if let contentSizeCategory {
+            app.launchArguments += ["-UIPreferredContentSizeCategoryName", contentSizeCategory]
+        }
         return app
     }
 
@@ -43,6 +110,12 @@ final class SeriesAVSmokeUITests: XCTestCase {
 
         XCTAssertTrue(app.staticTexts["\"The Last of Us\" seguida"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Último episodio visto"].waitForExistence(timeout: 5))
+        XCTAssertTrue(
+            app.staticTexts["Elige el último episodio visto. Los anteriores quedan vistos y los posteriores pendientes."]
+                .waitForExistence(timeout: 10)
+        )
+        XCTAssertTrue(app.buttons["Episodio 1"].exists)
+        XCTAssertTrue(app.buttons["Episodio 2"].exists)
         XCTAssertFalse(app.staticTexts["Añadir serie"].exists)
 
         app.buttons["Cancelar"].tap()
@@ -150,5 +223,63 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["S1 E2"].exists)
         XCTAssertTrue(app.buttons["Fijar hasta S1 E2"].exists)
         XCTAssertTrue(app.buttons["Sin empezar"].exists)
+    }
+
+    @MainActor
+    func testLocalizedHomeSearchAndLibraryRenderWithLargeDynamicType() throws {
+        continueAfterFailure = false
+
+        for configuration in localeSmokeConfigurations {
+            let app = makeApp(
+                language: configuration.language,
+                locale: configuration.locale,
+                contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL"
+            )
+            app.launch()
+
+            XCTAssertTrue(app.staticTexts[configuration.homeTitle].waitForExistence(timeout: 10))
+
+            app.buttons[configuration.searchTab].tap()
+            XCTAssertTrue(app.staticTexts[configuration.searchTitle].waitForExistence(timeout: 10))
+
+            app.buttons[configuration.libraryTab].tap()
+            XCTAssertTrue(app.staticTexts[configuration.libraryTitle].waitForExistence(timeout: 10))
+
+            app.terminate()
+        }
+    }
+
+    @MainActor
+    func testLocalizedAccountAndPaywallRenderWithLargeDynamicType() throws {
+        continueAfterFailure = false
+
+        for configuration in localeSmokeConfigurations {
+            let paywallApp = makeApp(
+                environment: [
+                    "SERIESAV_UI_TESTS_SHOW_PAYWALL": "1"
+                ],
+                language: configuration.language,
+                locale: configuration.locale,
+                contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL"
+            )
+            paywallApp.launch()
+            XCTAssertTrue(paywallApp.staticTexts[configuration.paywallTitle].waitForExistence(timeout: 10))
+            paywallApp.terminate()
+
+            let accountApp = makeApp(
+                environment: [
+                    "SERIESAV_UI_TESTS_FORCE_GUEST": "0",
+                    "SERIESAV_UI_TESTS_ACCOUNT_MODE": "pro",
+                    "SERIESAV_UI_TESTS_INITIAL_CHROME": "account"
+                ],
+                language: configuration.language,
+                locale: configuration.locale,
+                contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL"
+            )
+            accountApp.launch()
+            XCTAssertTrue(accountApp.staticTexts[configuration.accountTitle].waitForExistence(timeout: 10))
+            XCTAssertTrue(accountApp.staticTexts["Series AV Pro"].exists)
+            accountApp.terminate()
+        }
     }
 }
