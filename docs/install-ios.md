@@ -126,6 +126,28 @@ and Apple Sign In entitlements active. For auth smoke testing, run from Xcode
 with the generated development team selected or use the signed iOS simulator
 build/run workflow from Codex/Xcode.
 
+## Local Build Cache Cleanup
+
+Xcode `DerivedData` can grow by several gigabytes per build/test profile,
+especially when agents repeat simulator, device, and archive validation. For
+manual `xcodebuild` commands, keep build output repo-local and purpose-named:
+
+```bash
+xcodebuild ... -derivedDataPath .DerivedData-<task-name>
+```
+
+Measure local native caches before closing the task:
+
+```bash
+find . -type d \( -name '.DerivedData*' -o -name '.derived-data*' -o -name 'DerivedData' \) -prune -print0 | xargs -0 du -sh
+```
+
+Clean only when no active build is using those directories:
+
+```bash
+find . -type d \( -name '.DerivedData*' -o -name '.derived-data*' -o -name 'DerivedData' \) -prune -print0 | xargs -0 rm -rf
+```
+
 ## Production Runtime Check
 
 Before archiving or uploading a production build:
