@@ -104,6 +104,14 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.textFields["Buscar por título"].exists)
         XCTAssertTrue(app.staticTexts["The Last of Us"].waitForExistence(timeout: 10))
 
+        let firstInfoButton = app.buttons["Ver info"].firstMatch
+        XCTAssertTrue(firstInfoButton.waitForExistence(timeout: 5))
+        firstInfoButton.tap()
+        XCTAssertTrue(app.staticTexts["Info de serie"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Seguimiento"].exists)
+        XCTAssertTrue(app.staticTexts["Episodios"].exists)
+        app.buttons["Cerrar"].tap()
+
         let firstFollowButton = app.buttons.matching(identifier: "plus").firstMatch
         XCTAssertTrue(firstFollowButton.waitForExistence(timeout: 5))
         firstFollowButton.tap()

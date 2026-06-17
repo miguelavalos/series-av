@@ -8,6 +8,7 @@ struct SeriesLibraryTabScreen: View {
     @State private var query = ""
     @State private var selectedFilter: SeriesLibraryFilter = .all
     @State private var editorEntry: SeriesLibraryEntry?
+    @State private var detailEntry: SeriesLibraryEntry?
     @State private var pendingLibraryUndo: PendingLibraryMutationUndo?
     @State private var pendingProgressUndo: PendingProgressUndo?
 
@@ -61,6 +62,27 @@ struct SeriesLibraryTabScreen: View {
                     store.markWatchedThrough(cursor, for: entry.id)
                 },
                 clearProgress: {
+                    pendingProgressUndo = progressUndo(for: entry)
+                    pendingLibraryUndo = nil
+                    store.clearProgress(for: entry.id)
+                }
+            )
+            .presentationDetents([.large])
+        }
+        .sheet(item: $detailEntry) { entry in
+            SeriesDetailScreen(
+                entry: entry,
+                markNext: { entry in
+                    pendingProgressUndo = progressUndo(for: entry)
+                    pendingLibraryUndo = nil
+                    store.markNextEpisodeWatched(for: entry.id)
+                },
+                markWatchedThrough: { entry, cursor in
+                    pendingProgressUndo = progressUndo(for: entry)
+                    pendingLibraryUndo = nil
+                    store.markWatchedThrough(cursor, for: entry.id)
+                },
+                clearProgress: { entry in
                     pendingProgressUndo = progressUndo(for: entry)
                     pendingLibraryUndo = nil
                     store.clearProgress(for: entry.id)
@@ -208,6 +230,14 @@ struct SeriesLibraryTabScreen: View {
     @ViewBuilder
     private func activeMenu(for entry: SeriesLibraryEntry) -> some View {
         Button {
+            detailEntry = entry
+        } label: {
+            Label(L10n.string("detail.open"), systemImage: "info.circle")
+        }
+
+        Divider()
+
+        Button {
             pendingProgressUndo = progressUndo(for: entry)
             pendingLibraryUndo = nil
             store.markNextEpisodeWatched(for: entry.id)
@@ -264,6 +294,14 @@ struct SeriesLibraryTabScreen: View {
 
     @ViewBuilder
     private func archivedMenu(for entry: SeriesLibraryEntry) -> some View {
+        Button {
+            detailEntry = entry
+        } label: {
+            Label(L10n.string("detail.open"), systemImage: "info.circle")
+        }
+
+        Divider()
+
         Button {
             pendingLibraryUndo = PendingLibraryMutationUndo(
                 entryId: entry.id,

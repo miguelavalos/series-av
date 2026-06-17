@@ -62,6 +62,7 @@ private struct SeriesWatchingHomeScreen: View {
     let startSignInFlow: () -> Void
 
     @State private var editorEntry: SeriesLibraryEntry?
+    @State private var detailEntry: SeriesLibraryEntry?
     @State private var isShowingProPaywall = false
     @State private var pendingUndo: PendingLibraryUndo?
     @State private var pendingProgressUndo: PendingProgressUndo?
@@ -110,6 +111,9 @@ private struct SeriesWatchingHomeScreen: View {
                     togglePinned: {
                         store.setPinned(currentEntry.isPinnedHomeSeries != true, for: currentEntry.id)
                     },
+                    openDetail: {
+                        detailEntry = currentEntry
+                    },
                     setStatus: { status in
                         pendingProgressUndo = progressUndo(for: currentEntry, messageKey: "home.undo.status")
                         pendingUndo = nil
@@ -148,6 +152,9 @@ private struct SeriesWatchingHomeScreen: View {
                     },
                     togglePinned: { entry in
                         store.setPinned(entry.isPinnedHomeSeries != true, for: entry.id)
+                    },
+                    openDetail: { entry in
+                        detailEntry = entry
                     },
                     setStatus: { entry, status in
                         pendingProgressUndo = progressUndo(for: entry, messageKey: "home.undo.status")
@@ -253,6 +260,27 @@ private struct SeriesWatchingHomeScreen: View {
                     store.markWatchedThrough(cursor, for: entry.id)
                 },
                 clearProgress: {
+                    pendingProgressUndo = progressUndo(for: entry)
+                    pendingUndo = nil
+                    store.clearProgress(for: entry.id)
+                }
+            )
+            .presentationDetents([.large])
+        }
+        .sheet(item: $detailEntry) { entry in
+            SeriesDetailScreen(
+                entry: entry,
+                markNext: { entry in
+                    pendingProgressUndo = progressUndo(for: entry)
+                    pendingUndo = nil
+                    store.markNextEpisodeWatched(for: entry.id)
+                },
+                markWatchedThrough: { entry, cursor in
+                    pendingProgressUndo = progressUndo(for: entry)
+                    pendingUndo = nil
+                    store.markWatchedThrough(cursor, for: entry.id)
+                },
+                clearProgress: { entry in
                     pendingProgressUndo = progressUndo(for: entry)
                     pendingUndo = nil
                     store.clearProgress(for: entry.id)
@@ -599,6 +627,7 @@ private struct SeriesCurrentWatchingCard: View {
     let markWatchedThrough: (SeriesEpisodeCursor) -> Void
     let editProgress: () -> Void
     let togglePinned: () -> Void
+    let openDetail: () -> Void
     let setStatus: (SeriesLibraryEntryStatus) -> Void
     let archive: () -> Void
     let delete: () -> Void
@@ -613,6 +642,7 @@ private struct SeriesCurrentWatchingCard: View {
         markWatchedThrough: @escaping (SeriesEpisodeCursor) -> Void,
         editProgress: @escaping () -> Void,
         togglePinned: @escaping () -> Void,
+        openDetail: @escaping () -> Void,
         setStatus: @escaping (SeriesLibraryEntryStatus) -> Void,
         archive: @escaping () -> Void,
         delete: @escaping () -> Void
@@ -624,6 +654,7 @@ private struct SeriesCurrentWatchingCard: View {
         self.markWatchedThrough = markWatchedThrough
         self.editProgress = editProgress
         self.togglePinned = togglePinned
+        self.openDetail = openDetail
         self.setStatus = setStatus
         self.archive = archive
         self.delete = delete
@@ -764,6 +795,7 @@ private struct SeriesCurrentWatchingCard: View {
         SeriesEntryActionsMenu(
             entry: entry,
             togglePinned: togglePinned,
+            openDetail: openDetail,
             setStatus: setStatus,
             archive: archive,
             delete: delete
@@ -907,6 +939,7 @@ private struct SeriesWatchingQueueSection: View {
     let markNext: (SeriesLibraryEntry) -> Void
     let editProgress: (SeriesLibraryEntry) -> Void
     let togglePinned: (SeriesLibraryEntry) -> Void
+    let openDetail: (SeriesLibraryEntry) -> Void
     let setStatus: (SeriesLibraryEntry, SeriesLibraryEntryStatus) -> Void
     let archive: (SeriesLibraryEntry) -> Void
     let delete: (SeriesLibraryEntry) -> Void
@@ -954,6 +987,7 @@ private struct SeriesWatchingQueueSection: View {
                         SeriesEntryActionsMenu(
                             entry: entry,
                             togglePinned: { togglePinned(entry) },
+                            openDetail: { openDetail(entry) },
                             editProgress: { editProgress(entry) },
                             setStatus: { setStatus(entry, $0) },
                             archive: { archive(entry) },
@@ -1192,6 +1226,7 @@ private struct SeriesHomeDiscoveryPreview: Identifiable, Equatable {
 private struct SeriesEntryActionsMenu: View {
     let entry: SeriesLibraryEntry
     let togglePinned: () -> Void
+    var openDetail: (() -> Void)? = nil
     var editProgress: (() -> Void)? = nil
     let setStatus: (SeriesLibraryEntryStatus) -> Void
     let archive: () -> Void
@@ -1199,6 +1234,14 @@ private struct SeriesEntryActionsMenu: View {
 
     var body: some View {
         Menu {
+            if let openDetail {
+                Button(action: openDetail) {
+                    Label(L10n.string("detail.open"), systemImage: "info.circle")
+                }
+
+                Divider()
+            }
+
             SeriesStatusButtons(entry: entry, setStatus: setStatus)
 
             if let editProgress {

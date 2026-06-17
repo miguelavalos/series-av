@@ -17,6 +17,7 @@ struct SeriesSearchScreen: View {
     @State private var remoteCollectionResults: [SeriesCatalogPreview] = []
     @State private var remoteCollectionKey = ""
     @State private var isSearchingCatalog = false
+    @State private var detailSelection: SeriesSearchDetailSelection?
 
     var body: some View {
         AVAppShellScrollableScreenScaffold(
@@ -48,6 +49,29 @@ struct SeriesSearchScreen: View {
                     store.markWatchedThrough(cursor, for: entry.id)
                 },
                 clearProgress: {
+                    store.clearProgress(for: entry.id)
+                }
+            )
+            .presentationDetents([.large])
+        }
+        .sheet(item: $detailSelection) { selection in
+            SeriesDetailScreen(
+                catalogItem: selection.catalogItem,
+                entry: selection.entry,
+                canFollow: canAddSeries,
+                follow: selection.entry == nil ? {
+                    if let catalogItem = selection.catalogItem {
+                        follow(catalogItem)
+                        detailSelection = nil
+                    }
+                } : nil,
+                markNext: { entry in
+                    store.markNextEpisodeWatched(for: entry.id)
+                },
+                markWatchedThrough: { entry, cursor in
+                    store.markWatchedThrough(cursor, for: entry.id)
+                },
+                clearProgress: { entry in
                     store.clearProgress(for: entry.id)
                 }
             )
@@ -270,6 +294,7 @@ struct SeriesSearchScreen: View {
                 ForEach(localMatches) { entry in
                     SeriesLibrarySearchResultCard(
                         entry: entry,
+                        openDetail: { detailSelection = SeriesSearchDetailSelection(entry: entry) },
                         editProgress: { editorEntry = entry },
                         markNext: { store.markNextEpisodeWatched(for: entry.id) }
                     )
@@ -290,6 +315,12 @@ struct SeriesSearchScreen: View {
                         preview: preview,
                         libraryEntry: libraryEntry(for: preview),
                         canAddSeries: canAddSeries,
+                        openDetail: {
+                            detailSelection = SeriesSearchDetailSelection(
+                                catalogItem: preview.catalogItem,
+                                entry: libraryEntry(for: preview)
+                            )
+                        },
                         follow: { follow(preview) },
                         editProgress: { entry in editorEntry = entry }
                     )
@@ -331,13 +362,19 @@ struct SeriesSearchScreen: View {
     }
 
     private func follow(_ preview: SeriesCatalogPreview) {
+        guard let catalogItem = preview.catalogItem else {
+            return
+        }
+        follow(catalogItem)
+    }
+
+    private func follow(_ catalogItem: SeriesCatalogItem) {
         guard canAddSeries else {
             runLimitAction()
             return
         }
         Task {
-            guard let catalogItem = preview.catalogItem,
-                  let entry = store.addCatalogSeries(catalogItem) else {
+            guard let entry = store.addCatalogSeries(catalogItem) else {
                 return
             }
             addedEntry = entry
@@ -441,6 +478,7 @@ private struct SeriesCatalogResultCard: View {
     let preview: SeriesCatalogPreview
     let libraryEntry: SeriesLibraryEntry?
     let canAddSeries: Bool
+    let openDetail: () -> Void
     let follow: () -> Void
     let editProgress: (SeriesLibraryEntry) -> Void
 
@@ -473,6 +511,8 @@ private struct SeriesCatalogResultCard: View {
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(AVBrandColor.accent)
 
+                    detailButton
+
                     Button {
                         editProgress(libraryEntry)
                     } label: {
@@ -486,15 +526,19 @@ private struct SeriesCatalogResultCard: View {
                     .accessibilityLabel(L10n.string("home.adjust"))
                 }
             } else {
-                Button(action: follow) {
-                    Image(systemName: canAddSeries ? "plus" : "sparkles")
-                        .font(.system(size: 17, weight: .black))
-                        .foregroundStyle(canAddSeries ? Color.black.opacity(0.84) : AVBrandColor.accent)
-                        .frame(width: 42, height: 42)
-                        .background(canAddSeries ? AVBrandColor.accent : Color(.tertiarySystemGroupedBackground), in: Circle())
+                VStack(spacing: 8) {
+                    detailButton
+
+                    Button(action: follow) {
+                        Image(systemName: canAddSeries ? "plus" : "sparkles")
+                            .font(.system(size: 17, weight: .black))
+                            .foregroundStyle(canAddSeries ? Color.black.opacity(0.84) : AVBrandColor.accent)
+                            .frame(width: 42, height: 42)
+                            .background(canAddSeries ? AVBrandColor.accent : Color(.tertiarySystemGroupedBackground), in: Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(canAddSeries ? L10n.string("search.follow") : L10n.string("add.footer.upgrade"))
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel(canAddSeries ? L10n.string("search.follow") : L10n.string("add.footer.upgrade"))
             }
         }
         .padding(10)
@@ -503,6 +547,18 @@ private struct SeriesCatalogResultCard: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .stroke(Color.primary.opacity(0.06), lineWidth: 1)
         }
+    }
+
+    private var detailButton: some View {
+        Button(action: openDetail) {
+            Image(systemName: "info.circle")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(.primary)
+                .frame(width: 40, height: 40)
+                .background(Color(.tertiarySystemGroupedBackground), in: Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(L10n.string("detail.open"))
     }
 
     private var metadataText: String {
@@ -519,6 +575,7 @@ private struct SeriesCatalogResultCard: View {
 
 private struct SeriesLibrarySearchResultCard: View {
     let entry: SeriesLibraryEntry
+    let openDetail: () -> Void
     let editProgress: () -> Void
     let markNext: () -> Void
 
@@ -554,6 +611,16 @@ private struct SeriesLibrarySearchResultCard: View {
             .layoutPriority(1)
 
             VStack(spacing: 8) {
+                Button(action: openDetail) {
+                    Image(systemName: "info.circle")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(.primary)
+                        .frame(width: 40, height: 40)
+                        .background(Color(.tertiarySystemGroupedBackground), in: Circle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(L10n.string("detail.open"))
+
                 Button(action: editProgress) {
                     Image(systemName: "scope")
                         .font(.system(size: 16, weight: .bold))
@@ -603,6 +670,25 @@ private struct SeriesLibrarySearchResultCard: View {
         case .watched:
             return "checkmark.circle"
         }
+    }
+}
+
+private struct SeriesSearchDetailSelection: Identifiable {
+    let catalogItem: SeriesCatalogItem?
+    let entry: SeriesLibraryEntry?
+
+    init(catalogItem: SeriesCatalogItem?, entry: SeriesLibraryEntry?) {
+        self.catalogItem = catalogItem
+        self.entry = entry
+    }
+
+    init(entry: SeriesLibraryEntry) {
+        self.catalogItem = nil
+        self.entry = entry
+    }
+
+    var id: String {
+        entry?.seriesId ?? catalogItem?.seriesId ?? UUID().uuidString
     }
 }
 

@@ -51,6 +51,17 @@
 "home.undo.progress" = "Progression de \"%@\" modifiee";
 "home.undo.restored" = "\"%@\" restauree";
 "home.undo.status" = "Statut de \"%@\" modifie";
+"detail.title" = "Info serie";
+"detail.open" = "Voir info";
+"detail.summary.unavailable" = "Series AV affiche seulement les informations utiles pour decider et suivre cette serie.";
+"detail.tracking.title" = "Suivi";
+"detail.tracking.notFollowed" = "Cette serie n'est pas encore dans votre bibliotheque.";
+"detail.episodes.title" = "Episodes";
+"detail.episodes.unavailable" = "Guide indisponible";
+"detail.episodes.unavailable.detail" = "Cette serie n'a pas encore de guide fiable.";
+"detail.episodes.retryLater" = "Le guide n'a pas pu etre charge pour le moment.";
+"detail.episodes.untitled" = "Episode";
+"detail.episodes.more" = "%d episodes de plus";
 "home.queue.title" = "Aussi en cours";
 "home.queue.progress" = "%@ vu, %@ suivant";
 "home.queue.wantToWatch.title" = "Pretes a demarrer";

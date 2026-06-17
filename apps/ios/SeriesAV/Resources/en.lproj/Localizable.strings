@@ -51,6 +51,17 @@
 "home.undo.progress" = "\"%@\" progress changed";
 "home.undo.restored" = "\"%@\" restored";
 "home.undo.status" = "\"%@\" status changed";
+"detail.title" = "Series info";
+"detail.open" = "View info";
+"detail.summary.unavailable" = "Series AV only shows the information needed to decide and track this series.";
+"detail.tracking.title" = "Tracking";
+"detail.tracking.notFollowed" = "This series is not in your library yet.";
+"detail.episodes.title" = "Episodes";
+"detail.episodes.unavailable" = "Guide unavailable";
+"detail.episodes.unavailable.detail" = "This series does not have a reliable guide yet.";
+"detail.episodes.retryLater" = "The guide could not be loaded right now.";
+"detail.episodes.untitled" = "Episode";
+"detail.episodes.more" = "%d more episodes";
 "home.queue.title" = "Also watching";
 "home.queue.progress" = "%@ watched, %@ next";
 "home.queue.wantToWatch.title" = "Ready to start";

@@ -51,6 +51,17 @@
 "home.undo.progress" = "Progres de \"%@\" canviat";
 "home.undo.restored" = "\"%@\" restaurada";
 "home.undo.status" = "Estat de \"%@\" canviat";
+"detail.title" = "Info de serie";
+"detail.open" = "Veure info";
+"detail.summary.unavailable" = "Series AV nomes mostra la informacio necessaria per decidir i seguir la serie.";
+"detail.tracking.title" = "Seguiment";
+"detail.tracking.notFollowed" = "Encara no es a la teva biblioteca.";
+"detail.episodes.title" = "Episodis";
+"detail.episodes.unavailable" = "Guia no disponible";
+"detail.episodes.unavailable.detail" = "Aquesta serie encara no te una guia fiable.";
+"detail.episodes.retryLater" = "No s'ha pogut carregar la guia ara mateix.";
+"detail.episodes.untitled" = "Episodi";
+"detail.episodes.more" = "%d episodis mes";
 "home.queue.title" = "Tambe veient";
 "home.queue.progress" = "%@ vist, %@ seguent";
 "home.queue.wantToWatch.title" = "A punt per comencar";
