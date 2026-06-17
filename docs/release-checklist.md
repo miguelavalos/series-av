@@ -188,24 +188,23 @@ Additional local simulator evidence, 2026-06-17:
 The first iOS release ships with the Tune AV-style Pro paywall, RevenueCat
 purchase/restore handling, and App Store subscription management.
 
-Current external setup snapshot, 2026-06-13:
+Current external setup snapshot, 2026-06-17:
 
-- App Store Connect app `6766831320` has subscription group `Series AV Pro`
-  (`22155014`) and monthly product `seriesav_pro_monthly`
-  (`6779974260`) configured at USD 2.99 base price, all current countries and
-  regions, and future country/region availability enabled.
+- App Store Connect has subscription group `Series AV Pro` and monthly product
+  `seriesav_pro_monthly` configured at USD 2.99 base price, all current
+  countries and regions, and future country/region availability enabled.
 - App Store Connect still reports the subscription as missing metadata until the
   required review screenshot is uploaded and the first subscription is submitted
   with the app version.
-- RevenueCat app `app0468cf478e` has product `seriesav_pro_monthly` attached to
-  entitlement `pro` and included in offering `default`, package `$rc_monthly`.
-- Production `ios:preflight`, iOS simulator build, and private production
-  subscription-readiness checks passed after the setup.
+- RevenueCat has product `seriesav_pro_monthly` attached to entitlement `pro`
+  and included in offering `default`, package `$rc_monthly`.
+- Production `ios:preflight` and iOS simulator build passed after the setup.
 - Local production simulator offer loading on 2026-06-17 confirmed
   `seriesav_pro_monthly` loads through RevenueCat and displays `$2.99`.
-  RevenueCat also logged non-blocking warnings for empty non-Series offerings
-  (`moments_credits` and `animate_credits`); clean or remove those offerings in
-  RevenueCat/config before release so production logs stay actionable.
+- Current release blocker: the live Series AV RevenueCat offerings payload still
+  includes empty non-Series offerings (`moments_credits` and `animate_credits`).
+  Remove those offerings from the Series AV RevenueCat app, then rerun the
+  private subscription readiness checks for preview and production.
 
 1. Confirm the private Series AV subscription readiness checker passes for both
    preview and production before any App Store/TestFlight submission:
