@@ -6,10 +6,12 @@ import SwiftUI
 struct SeriesProfileScreen: View {
     let mode: AVAppShellChromeItem
     @Bindable var store: SeriesLibraryStore
+    @Bindable var librarySync: SeriesLibrarySyncCoordinator
     let openSettings: () -> Void
     let openAccount: () -> Void
     let accessController: SeriesAccessController
     let startSignInFlow: () -> Void
+    let synchronizeLibraryNow: () async -> Void
 
     @EnvironmentObject private var languageController: AppLanguageController
     @EnvironmentObject private var themeController: AppThemeController
@@ -96,6 +98,9 @@ struct SeriesProfileScreen: View {
     @ViewBuilder
     private var accountContent: some View {
         proCard
+        if accessController.capabilities.canUseCloudSync {
+            cloudSyncCard
+        }
         accountCard
         if accessController.isSignedIn {
             accountSafetyCard
@@ -185,8 +190,8 @@ struct SeriesProfileScreen: View {
             privacyDetail: L10n.string("profile.help.privacy.detail"),
             termsTitle: L10n.string("profile.help.terms.title"),
             termsDetail: L10n.string("profile.help.terms.detail"),
-            accountDeletionTitle: "",
-            accountDeletionDetail: "",
+            accountDeletionTitle: L10n.string("profile.safety.delete.title"),
+            accountDeletionDetail: L10n.string("profile.safety.delete.detail"),
             openURL: { url in openURL(url) }
         )
     }
@@ -221,6 +226,36 @@ struct SeriesProfileScreen: View {
 
             accountActionButton
         }
+    }
+
+    private var cloudSyncCard: some View {
+        AVSettingsSectionCard(
+            title: L10n.string("profile.sync.title"),
+            subtitle: L10n.string("profile.sync.subtitle")
+        ) {
+            AVSettingsInfoRow(
+                systemImage: cloudSyncIcon,
+                title: cloudSyncHeadline,
+                detail: cloudSyncDetail
+            )
+            .accessibilityIdentifier("profile.sync.status")
+
+            AVSettingsButton(
+                title: librarySync.state == .syncing
+                    ? L10n.string("profile.sync.retry.syncing")
+                    : L10n.string("profile.sync.retry"),
+                style: .secondary,
+                isLoading: librarySync.state == .syncing,
+                action: {
+                    Task {
+                        await synchronizeLibraryNow()
+                    }
+                }
+            )
+            .disabled(librarySync.state == .syncing)
+            .accessibilityIdentifier("profile.sync.retry")
+        }
+        .accessibilityIdentifier("profile.sync.card")
     }
 
     private var proCard: some View {
@@ -423,6 +458,45 @@ struct SeriesProfileScreen: View {
             return L10n.string("profile.local.delete.empty")
         }
         return L10n.string("profile.local.delete.detail", count)
+    }
+
+    private var cloudSyncHeadline: String {
+        switch librarySync.state {
+        case .disabled:
+            L10n.string("profile.sync.headline.disabled")
+        case .idle:
+            L10n.string("profile.sync.headline.synced")
+        case .syncing:
+            L10n.string("profile.sync.headline.syncing")
+        case .failed:
+            L10n.string("profile.sync.headline.failed")
+        }
+    }
+
+    private var cloudSyncDetail: String {
+        switch librarySync.state {
+        case .disabled:
+            L10n.string("profile.sync.detail.disabled")
+        case .idle:
+            L10n.string("profile.sync.detail.synced")
+        case .syncing:
+            L10n.string("profile.sync.detail.syncing")
+        case .failed:
+            L10n.string("profile.sync.detail.failed")
+        }
+    }
+
+    private var cloudSyncIcon: String {
+        switch librarySync.state {
+        case .disabled:
+            "icloud.slash"
+        case .idle:
+            "checkmark.icloud"
+        case .syncing:
+            "arrow.triangle.2.circlepath.icloud"
+        case .failed:
+            "xmark.icloud"
+        }
     }
 
     private var proSubtitle: String {

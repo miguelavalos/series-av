@@ -115,8 +115,8 @@ but it must not replace a real store purchase/restore validation.
    season/episode selector uses real backend data instead of the generic
    fallback.
 6. Run light mode, dark mode, Dynamic Type, five-locale, and long-string checks
-   across Home, Library, Search, Profile, Account, Settings, Avi, progress
-   editor, and Paywall.
+   across Home, Library, Search, Detail, Profile, Account, Settings, Avi,
+   progress editor, and Paywall.
 7. If a temporary internal grant is used for QA, revoke or allow it to expire
    after QA. It is smoke/QA evidence only and must not replace purchase/restore
    validation.

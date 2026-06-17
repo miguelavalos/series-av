@@ -113,6 +113,47 @@ final class SeriesAccessControllerTests: XCTestCase {
         XCTAssertEqual(controller.accessMode, .guest)
     }
 
+    func testSignOutDuringAccessRefreshDoesNotApplyStaleAccess() async throws {
+        let entitlementService = DelayedSeriesEntitlementService(access: SeriesResolvedAccess(
+            platformUserId: "apps-av-user-1",
+            planTier: .pro,
+            accessMode: .signedInPro,
+            capabilities: .forMode(.signedInPro),
+            limits: .forMode(.signedInPro)
+        ))
+        let controller = SeriesAccessController(
+            accountService: StubSeriesAVAccountService(
+                restoreResult: .active(SeriesAccountUser(
+                    id: "provider-user-1",
+                    displayName: "Provider User",
+                    emailAddress: "provider@example.com"
+                )),
+                token: "provider-token"
+            ),
+            profileResolver: StubSeriesAccountProfileResolver(user: SeriesAccountUser(
+                id: "apps-av-user-1",
+                displayName: "Apps AV User",
+                emailAddress: "apps@example.com"
+            )),
+            entitlementService: entitlementService,
+            userDefaults: isolatedUserDefaults()
+        )
+
+        let syncTask = Task {
+            await controller.syncFromAccountProvider()
+        }
+
+        await entitlementService.waitUntilRefreshStarted()
+        try await controller.signOut()
+        await entitlementService.finishRefresh()
+        await syncTask.value
+
+        XCTAssertNil(controller.accountUser)
+        XCTAssertEqual(controller.accessMode, .guest)
+        XCTAssertEqual(controller.planTier, .free)
+        XCTAssertNil(controller.platformUserId)
+    }
+
     func testGuestOnboardingShowsWhenNoPromptRecorded() {
         let controller = SeriesAccessController(
             accountService: StubSeriesAVAccountService(restoreResult: .signedOut),
@@ -383,6 +424,45 @@ private final class SequenceSeriesEntitlementService: SeriesEntitlementServicing
             lastAccess = accesses.removeFirst()
         }
         return lastAccess
+    }
+}
+
+@MainActor
+private final class DelayedSeriesEntitlementService: SeriesEntitlementServicing {
+    private let access: SeriesResolvedAccess
+    private var refreshStartedContinuation: CheckedContinuation<Void, Never>?
+    private var finishRefreshContinuation: CheckedContinuation<Void, Never>?
+    private var didStartRefresh = false
+
+    init(access: SeriesResolvedAccess) {
+        self.access = access
+    }
+
+    func resolveAccess(for user: SeriesAccountUser?) -> SeriesResolvedAccess {
+        user == nil ? .guest : access
+    }
+
+    func refreshAccess(for user: SeriesAccountUser?) async -> SeriesResolvedAccess {
+        guard user != nil else { return .guest }
+        didStartRefresh = true
+        refreshStartedContinuation?.resume()
+        refreshStartedContinuation = nil
+        await withCheckedContinuation { continuation in
+            finishRefreshContinuation = continuation
+        }
+        return access
+    }
+
+    func waitUntilRefreshStarted() async {
+        guard !didStartRefresh else { return }
+        await withCheckedContinuation { continuation in
+            refreshStartedContinuation = continuation
+        }
+    }
+
+    func finishRefresh() async {
+        finishRefreshContinuation?.resume()
+        finishRefreshContinuation = nil
     }
 }
 

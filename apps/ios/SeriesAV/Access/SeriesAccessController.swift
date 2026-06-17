@@ -215,7 +215,10 @@ final class SeriesAccessController {
     }
 
     func refreshAccess() async {
-        let resolvedAccess = await entitlementService.refreshAccess(for: accountUser)
+        let generation = accessRefreshGeneration
+        let userForRefresh = accountUser
+        let resolvedAccess = await entitlementService.refreshAccess(for: userForRefresh)
+        guard generation == accessRefreshGeneration, accountUser == userForRefresh else { return }
         applyResolvedAccess(resolvedAccess)
     }
 

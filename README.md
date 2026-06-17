@@ -118,9 +118,11 @@ For simulator or physical iPhone installs, follow [docs/install-ios.md](docs/ins
 
 1. Finish TestFlight/App Store purchase, restore, webhook, and review
    screenshot validation for `seriesav_pro_monthly`.
-2. Clean or remove non-Series empty RevenueCat offerings that produce
-   production log warnings while Series AV loads its own offer.
-3. Finish backend-backed catalog routes where V1 needs account-aware data.
+2. Keep the shared RevenueCat project intact. Moments AV and Animate AV
+   offerings may exist beside Series AV; Series AV readiness depends on
+   offering `default` containing `$rc_monthly -> seriesav_pro_monthly`.
+3. Finish production QA for backend-backed catalog routes where V1 needs
+   account-aware data: Search/resolve, Detail, and compact episode guide.
 4. Keep the reserved Avi limits documented, but do not expose Avi action copy or
    UI until Series AV has real Avi-assisted flows.
 

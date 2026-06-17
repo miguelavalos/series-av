@@ -30,7 +30,7 @@ struct SeriesAppShellView: View {
             tabs: SeriesRootTab.footerTabs.map(\.shellTab),
             assistantID: .avi,
             assistant: footerAssistant,
-            hasAssistantActiveContext: false,
+            hasAssistantActiveContext: hasAssistantActiveContext,
             footerConfiguration: appExperience.footerConfiguration,
             onSelectTab: { tab in
                 chromeItem = nil
@@ -73,6 +73,10 @@ struct SeriesAppShellView: View {
         )
     }
 
+    private var hasAssistantActiveContext: Bool {
+        selectedTab != .avi && store.homeEntries.isEmpty == false
+    }
+
     private var footerSelectedTab: SeriesRootTab {
         chromeItem == nil ? selectedTab : .profile
     }
@@ -83,10 +87,14 @@ struct SeriesAppShellView: View {
             SeriesProfileScreen(
                 mode: chromeItem,
                 store: store,
+                librarySync: librarySync,
                 openSettings: { self.chromeItem = .settings },
                 openAccount: { self.chromeItem = .account },
                 accessController: accessController,
-                startSignInFlow: startSignInFlow
+                startSignInFlow: startSignInFlow,
+                synchronizeLibraryNow: {
+                    await librarySync.refresh(accessController: accessController, store: store)
+                }
             )
         } else {
             switch tab {
