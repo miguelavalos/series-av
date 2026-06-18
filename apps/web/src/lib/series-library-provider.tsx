@@ -204,7 +204,8 @@ export function SeriesLibraryProvider({ children }: { children: ReactNode }) {
         mutateEntries((current) => replaceEntry(current, entryId, clearProgress));
       },
       clearLocalData() {
-        mutateEntries(() => []);
+        latestEntriesRef.current = [];
+        setEntries([]);
       },
       deleteEntry(entryId) {
         mutateEntries((current) => replaceEntry(current, entryId, deleteEntry));

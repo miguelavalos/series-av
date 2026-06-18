@@ -88,6 +88,7 @@ const en = {
     search: "Series search"
   },
   nav: {
+    account: "Account",
     avi: "Avi",
     aviLabel: "Open Avi guidance",
     home: "Home",
@@ -96,7 +97,8 @@ const en = {
     mobileNavigation: "Mobile navigation",
     openNavigation: "Open navigation",
     primaryNavigation: "Primary navigation",
-    search: "Search"
+    search: "Search",
+    settings: "Settings"
   },
   protected: {
     body: "Sign in to open your library, search the catalog, and let Avi help you choose what to watch next.",
@@ -197,6 +199,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       search: "Cerca de sèries"
     },
     nav: {
+      account: "Compte",
       avi: "Avi",
       aviLabel: "Obre la guia d'Avi",
       home: "Inici",
@@ -205,7 +208,8 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       mobileNavigation: "Navegació mòbil",
       openNavigation: "Obre la navegació",
       primaryNavigation: "Navegació principal",
-      search: "Cerca"
+      search: "Cerca",
+      settings: "Configuració"
     },
     protected: {
       body: "Inicia sessió per obrir la biblioteca, cercar el catàleg i deixar que Avi t'ajudi a triar què mirar després.",
@@ -304,6 +308,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       search: "Seriensuche"
     },
     nav: {
+      account: "Konto",
       avi: "Avi",
       aviLabel: "Avi-Hilfe öffnen",
       home: "Start",
@@ -312,7 +317,8 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       mobileNavigation: "Mobile Navigation",
       openNavigation: "Navigation öffnen",
       primaryNavigation: "Hauptnavigation",
-      search: "Suche"
+      search: "Suche",
+      settings: "Einstellungen"
     },
     protected: {
       body: "Melde dich an, um deine Bibliothek zu öffnen, den Katalog zu durchsuchen und Avi bei der nächsten Wahl helfen zu lassen.",
@@ -412,6 +418,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       search: "Búsqueda de series"
     },
     nav: {
+      account: "Cuenta",
       avi: "Avi",
       aviLabel: "Abrir guía de Avi",
       home: "Inicio",
@@ -420,7 +427,8 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       mobileNavigation: "Navegación móvil",
       openNavigation: "Abrir navegación",
       primaryNavigation: "Navegación principal",
-      search: "Buscar"
+      search: "Buscar",
+      settings: "Ajustes"
     },
     protected: {
       body: "Inicia sesión para abrir tu biblioteca, buscar en el catálogo y dejar que Avi te ayude a elegir qué ver después.",
@@ -519,6 +527,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       search: "Recherche de séries"
     },
     nav: {
+      account: "Compte",
       avi: "Avi",
       aviLabel: "Ouvrir les conseils d'Avi",
       home: "Accueil",
@@ -527,7 +536,8 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       mobileNavigation: "Navigation mobile",
       openNavigation: "Ouvrir la navigation",
       primaryNavigation: "Navigation principale",
-      search: "Recherche"
+      search: "Recherche",
+      settings: "Réglages"
     },
     protected: {
       body: "Connectez-vous pour ouvrir votre bibliothèque, parcourir le catalogue et laisser Avi vous aider à choisir la suite.",
@@ -569,8 +579,8 @@ export function useSeriesNavLinks(): AppsAvProductLink[] {
     { href: localizedSeriesPath("/library", locale), label: text.nav.library },
     { href: localizedSeriesPath("/search", locale), label: text.nav.search },
     { href: localizedSeriesPath("/avi", locale), label: text.nav.avi },
-    { href: localizedSeriesPath("/account", locale), label: "Account" },
-    { href: localizedSeriesPath("/settings", locale), label: "Settings" }
+    { href: localizedSeriesPath("/account", locale), label: text.nav.account },
+    { href: localizedSeriesPath("/settings", locale), label: text.nav.settings }
   ];
 }
 
