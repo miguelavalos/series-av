@@ -21,6 +21,6 @@ web visual audit.
 - Web app desktop and mobile browser QA passed.
 - Protected app routes require sign-in and keep `?lang` on redirects.
 - The commercial Apps AV CTA was adjusted to preserve the active locale.
-- Follow-up: align preview app legal/support/account links with the shared
-  policy that preview app deployments should use preview legal/support/account
-  URLs when those URLs exist.
+- Preview app legal/support/account links should use preview URLs when those
+  URLs exist; production links from preview are allowed only as documented
+  temporary exceptions until matching preview targets exist.
