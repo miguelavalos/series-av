@@ -2,8 +2,8 @@ import { AccountSignIn, SignedIn, SignedOut } from "@avalsys/account-av-web";
 import { AvAppFooter, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { seriesBrandAssets, seriesProductConfig } from "@/lib/series-config";
-import { localizedSeriesPath, useSeriesText } from "@/lib/series-i18n";
+import { seriesBrandAssets } from "@/lib/series-config";
+import { localizedSeriesPath, useSeriesProductConfig, useSeriesText } from "@/lib/series-i18n";
 
 export const Route = createFileRoute("/sign-in")({
   component: SignInRoute
@@ -12,13 +12,14 @@ export const Route = createFileRoute("/sign-in")({
 function SignInRoute() {
   const locale = useAppsAvLocale();
   const text = useSeriesText();
+  const productConfig = useSeriesProductConfig();
 
   return (
     <div className="series-paper flex min-h-screen flex-col bg-[#fff3cf]">
       <main className="grid flex-1 lg:grid-cols-[0.92fr_1.08fr]">
         <section className="relative hidden min-h-screen overflow-hidden bg-[#10284f] p-10 text-white lg:flex lg:flex-col lg:justify-between">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_25%,rgba(109,190,69,0.2),transparent_28%),linear-gradient(160deg,#17386c_0%,#10284f_54%,#07162e_100%)]" />
-          <Link className="relative inline-flex items-center gap-2 text-sm font-medium text-white/76 transition hover:text-white" to="/">
+          <Link className="relative inline-flex items-center gap-2 text-sm font-medium text-white/76 transition hover:text-white" to={localizedSeriesPath("/", locale)}>
             <ArrowLeft className="size-4" aria-hidden="true" />
             Series AV
           </Link>
@@ -44,7 +45,7 @@ function SignInRoute() {
 
         <section className="flex min-h-screen items-center justify-center px-5 py-10">
           <div className="w-full max-w-md">
-            <Link className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-[#334766] transition hover:text-[#112a55] lg:hidden" to="/">
+            <Link className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-[#334766] transition hover:text-[#112a55] lg:hidden" to={localizedSeriesPath("/", locale)}>
               <ArrowLeft className="size-4" aria-hidden="true" />
               Series AV
             </Link>
@@ -56,7 +57,7 @@ function SignInRoute() {
             <SignedIn>
               <div className="rounded-2xl border border-[#d7c494] bg-[#fff8df] p-6 text-center shadow-lg shadow-[#172f5c]/10">
                 <p className="text-sm font-semibold text-[#112a55]">{text.signIn.signedIn}</p>
-                <Link className="mt-4 inline-flex h-10 items-center justify-center rounded-full bg-[#112a55] px-4 text-sm font-semibold text-white" to="/">
+                <Link className="mt-4 inline-flex h-10 items-center justify-center rounded-full bg-[#112a55] px-4 text-sm font-semibold text-white" to={localizedSeriesPath("/", locale)}>
                   {text.signIn.continue}
                 </Link>
               </div>
@@ -67,7 +68,7 @@ function SignInRoute() {
           </div>
         </section>
       </main>
-      <AvAppFooter labels={text.footer} product={seriesProductConfig} />
+      <AvAppFooter labels={text.footer} product={productConfig} />
     </div>
   );
 }

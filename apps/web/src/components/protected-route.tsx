@@ -1,13 +1,14 @@
 import { AuthLoading, SignedIn, SignedOut } from "@avalsys/account-av-web";
 import { AuthSkeleton, AvAppFooter, useAppsAvLocale } from "@avalsys/apps-av-web";
 import type { ReactNode } from "react";
-import { seriesBrandAssets, seriesProductConfig } from "@/lib/series-config";
-import { useSeriesText } from "@/lib/series-i18n";
+import { seriesBrandAssets } from "@/lib/series-config";
+import { localizedSeriesPath, useSeriesProductConfig, useSeriesText } from "@/lib/series-i18n";
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const text = useSeriesText();
   const locale = useAppsAvLocale();
-  const signInHref = locale === "en" ? "/sign-in" : `/sign-in?lang=${locale}`;
+  const productConfig = useSeriesProductConfig();
+  const signInHref = localizedSeriesPath("/sign-in", locale);
 
   return (
     <>
@@ -33,7 +34,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
               <img className="absolute bottom-0 right-5 w-28 translate-y-6 sm:hidden" src={seriesBrandAssets.aviFullBody} alt="Avi" />
             </div>
           </main>
-          <AvAppFooter className="border-transparent bg-transparent" labels={text.footer} product={seriesProductConfig} />
+          <AvAppFooter className="border-transparent bg-transparent" labels={text.footer} product={productConfig} />
         </div>
       </SignedOut>
     </>

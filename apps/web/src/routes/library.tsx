@@ -1,27 +1,28 @@
 import { AccountUserButton } from "@avalsys/account-av-web";
-import { AppShell } from "@avalsys/apps-av-web";
+import { AppShell, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { Archive, BookOpenCheck, CalendarDays, ListChecks, Search } from "lucide-react";
 import type { ReactNode } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { seriesProductConfig } from "@/lib/series-config";
-import { useSeriesNavLinks, useSeriesShellLabels, useSeriesText } from "@/lib/series-i18n";
+import { localizedSeriesPath, useSeriesNavLinks, useSeriesProductConfig, useSeriesShellLabels, useSeriesText } from "@/lib/series-i18n";
 
 export const Route = createFileRoute("/library")({
   component: LibraryRoute
 });
 
 function LibraryRoute() {
+  const locale = useAppsAvLocale();
   const text = useSeriesText();
   const navLinks = useSeriesNavLinks();
+  const productConfig = useSeriesProductConfig();
   const shellLabels = useSeriesShellLabels();
   const hintIcons = [<ListChecks className="size-4" />, <CalendarDays className="size-4" />, <Archive className="size-4" />];
 
   return (
     <ProtectedRoute>
-      <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} labels={shellLabels} navLinks={navLinks} product={seriesProductConfig}>
+      <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} labels={shellLabels} navLinks={navLinks} product={productConfig}>
         <section className="grid gap-6 lg:grid-cols-[1fr_22rem]">
           <Card className="series-paper gap-0 rounded-[1.5rem] border-[#d7c494] p-6 py-6 shadow-lg shadow-[#172f5c]/8 sm:p-8 sm:py-8">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
@@ -33,7 +34,7 @@ function LibraryRoute() {
                 </p>
               </div>
               <Button asChild className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]">
-                <Link to="/search">
+                <Link to={localizedSeriesPath("/search", locale)}>
                   <Search className="size-4" aria-hidden="true" />
                   {text.library.add}
                 </Link>

@@ -1,27 +1,29 @@
 import { AccountUserButton } from "@avalsys/account-av-web";
-import { AppShell } from "@avalsys/apps-av-web";
+import { AppShell, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { BookOpenCheck, CalendarDays, Compass, Search, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { seriesBrandAssets, seriesProductConfig } from "@/lib/series-config";
-import { useSeriesNavLinks, useSeriesShellLabels, useSeriesText } from "@/lib/series-i18n";
+import { seriesBrandAssets } from "@/lib/series-config";
+import { localizedSeriesPath, useSeriesNavLinks, useSeriesProductConfig, useSeriesShellLabels, useSeriesText } from "@/lib/series-i18n";
 
 export const Route = createFileRoute("/avi")({
   component: AviRoute
 });
 
 function AviRoute() {
+  const locale = useAppsAvLocale();
   const text = useSeriesText();
   const navLinks = useSeriesNavLinks();
+  const productConfig = useSeriesProductConfig();
   const shellLabels = useSeriesShellLabels();
   const cardIcons = [<BookOpenCheck className="size-4" />, <CalendarDays className="size-4" />, <Compass className="size-4" />];
 
   return (
     <ProtectedRoute>
-      <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} labels={shellLabels} navLinks={navLinks} product={seriesProductConfig}>
+      <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} labels={shellLabels} navLinks={navLinks} product={productConfig}>
         <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
           <Card className="series-paper gap-0 overflow-hidden rounded-[1.5rem] border-[#d7c494] p-0 text-[#112a55] shadow-lg shadow-[#172f5c]/8">
             <div className="grid min-h-[32rem] lg:grid-cols-[0.95fr_1.05fr]">
@@ -38,13 +40,13 @@ function AviRoute() {
                 </div>
                 <div className="flex flex-wrap gap-3">
                   <Button asChild className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]">
-                    <Link to="/search">
+                    <Link to={localizedSeriesPath("/search", locale)}>
                       <Search className="size-4" aria-hidden="true" />
                       {text.avi.searchCta}
                     </Link>
                   </Button>
                   <Button asChild variant="outline" className="rounded-full border-[#c8ad72] bg-[#fff8df]/76">
-                    <Link to="/library">{text.avi.libraryCta}</Link>
+                    <Link to={localizedSeriesPath("/library", locale)}>{text.avi.libraryCta}</Link>
                   </Button>
                 </div>
               </div>

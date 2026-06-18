@@ -1,9 +1,11 @@
-import { useAppsAvLocale, type AppsAvLocale, type AppsAvProductLink } from "@avalsys/apps-av-web";
+import { useMemo } from "react";
+import { useAppsAvLocale, type AppsAvLocale, type AppsAvProductConfig, type AppsAvProductLink } from "@avalsys/apps-av-web";
 import { caES } from "@clerk/localizations/ca-ES";
 import { deDE } from "@clerk/localizations/de-DE";
 import { enUS } from "@clerk/localizations/en-US";
 import { esES } from "@clerk/localizations/es-ES";
 import { frFR } from "@clerk/localizations/fr-FR";
+import { seriesProductConfig } from "@/lib/series-config";
 
 const en = {
   account: {
@@ -568,6 +570,22 @@ export function useSeriesNavLinks(): AppsAvProductLink[] {
     { href: localizedSeriesPath("/search", locale), label: text.nav.search },
     { href: localizedSeriesPath("/avi", locale), label: text.nav.avi }
   ];
+}
+
+export function useSeriesProductConfig(): AppsAvProductConfig {
+  const locale = useAppsAvLocale();
+  const text = useSeriesText();
+
+  return useMemo(() => ({
+    ...seriesProductConfig,
+    assistant: seriesProductConfig.assistant
+      ? {
+        ...seriesProductConfig.assistant,
+        href: localizedSeriesPath(seriesProductConfig.assistant.href, locale),
+        label: text.nav.aviLabel
+      }
+      : undefined
+  }), [locale, text.nav.aviLabel]);
 }
 
 export function useSeriesApiLocale() {

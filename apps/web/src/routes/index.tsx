@@ -6,8 +6,8 @@ import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SeriesLoginPage } from "@/components/series-login-page";
-import { seriesBrandAssets, seriesProductConfig } from "@/lib/series-config";
-import { localizedSeriesPath, useSeriesNavLinks, useSeriesShellLabels, useSeriesText } from "@/lib/series-i18n";
+import { seriesBrandAssets } from "@/lib/series-config";
+import { localizedSeriesPath, useSeriesNavLinks, useSeriesProductConfig, useSeriesShellLabels, useSeriesText } from "@/lib/series-i18n";
 
 export const Route = createFileRoute("/")({
   component: IndexRoute
@@ -17,6 +17,7 @@ function IndexRoute() {
   const locale = useAppsAvLocale();
   const text = useSeriesText();
   const navLinks = useSeriesNavLinks();
+  const productConfig = useSeriesProductConfig();
   const shellLabels = useSeriesShellLabels();
   const homeIcons = [<Search className="size-4" />, <BookOpenCheck className="size-4" />, <CalendarDays className="size-4" />];
 
@@ -26,7 +27,7 @@ function IndexRoute() {
         <SeriesLoginPage />
       </SignedOut>
       <SignedIn>
-        <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} labels={shellLabels} navLinks={navLinks} product={seriesProductConfig}>
+        <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} labels={shellLabels} navLinks={navLinks} product={productConfig}>
           <section className="grid gap-6 lg:grid-cols-[1fr_22rem]">
             <Card className="series-paper gap-0 overflow-hidden rounded-[1.5rem] border-[#d7c494] p-6 py-6 shadow-lg shadow-[#172f5c]/8 sm:p-8 sm:py-8">
               <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
@@ -36,7 +37,7 @@ function IndexRoute() {
                     {text.home.body}
                   </p>
                 </div>
-                <Link to="/search">
+                <Link to={localizedSeriesPath("/search", locale)}>
                   {text.home.cta}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>

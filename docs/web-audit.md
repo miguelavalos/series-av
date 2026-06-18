@@ -27,3 +27,7 @@ web visual audit.
 - The preview web app build no longer emits the large client chunk warning:
   vendor chunks are split for Clerk, serialization, UI, and app bootstrap while
   keeping the same public `/`, sign-in, and protected-route behavior.
+- The production web app was deployed at `https://app.series-av.avalsys.com`.
+  Production QA exposed app-owned CTAs and Avi/footer links that dropped
+  non-English `?lang`; the app now localizes those links before shell, footer,
+  sign-in, and product CTAs render.

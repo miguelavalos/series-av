@@ -4,12 +4,13 @@ import type { ReactNode } from "react";
 import { AvAppFooter, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { seriesBrandAssets, seriesProductConfig } from "@/lib/series-config";
-import { localizedSeriesPath, useSeriesText } from "@/lib/series-i18n";
+import { seriesBrandAssets } from "@/lib/series-config";
+import { localizedSeriesPath, useSeriesProductConfig, useSeriesText } from "@/lib/series-i18n";
 
 export function SeriesLoginPage() {
   const locale = useAppsAvLocale();
   const text = useSeriesText();
+  const productConfig = useSeriesProductConfig();
 
   return (
     <div className="series-paper min-h-screen overflow-hidden px-5 pt-5 sm:px-8">
@@ -73,7 +74,7 @@ export function SeriesLoginPage() {
           </div>
         </section>
       </main>
-      <AvAppFooter className="mt-4 border-transparent bg-transparent px-0 pb-4 pt-2" labels={text.footer} product={seriesProductConfig} />
+      <AvAppFooter className="mt-4 border-transparent bg-transparent px-0 pb-4 pt-2" labels={text.footer} product={productConfig} />
     </div>
   );
 }
