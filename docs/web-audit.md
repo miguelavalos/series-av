@@ -128,6 +128,14 @@ web visual audit.
   `https://app.series-av.avalsys.com` after explicit approval. The shared web
   smoke passed there for `en`, `es`, `fr`, `de`, and `ca`, and `/account`,
   `/settings`, and `/series/thetvdb%3A348545` now return 200.
+- Post-production browser QA on 2026-06-18 initially found the Detail route
+  rendering the catalog fallback because the production Series API worker did
+  not return CORS allow-origin headers for `https://app.series-av.avalsys.com`.
+  Redeploying `seriesav-api-production` with the existing allowed-origin config
+  restored authenticated Detail and episode-guide loading. Browser QA then
+  confirmed `Demon Slayer: Kimetsu no Yaiba`, the compact episode guide, no
+  `Failed to fetch`, no guest copy, and no console errors on
+  `/series/thetvdb%3A348545?lang=es`.
 - Validation run after implementation:
   - `bun run --cwd apps/web test`
   - `bun run --cwd apps/web typecheck`
@@ -135,6 +143,8 @@ web visual audit.
   - `bun run --cwd apps/web qa:shared`
   - `SERIESAV_WEB_QA_BASE_URL=https://app.series-av-preview.avalsys.com bun run --cwd apps/web qa:shared`
   - `SERIESAV_WEB_QA_BASE_URL=https://app.series-av.avalsys.com bun run --cwd apps/web qa:shared`
+  - `bun run --cwd services/series-api deploy:production`
+  - `bun run smoke:series-api:production`
 - Commercial desktop and mobile browser QA passed.
 - Web app desktop and mobile browser QA passed.
 - Protected app routes require sign-in and keep `?lang` on redirects.
