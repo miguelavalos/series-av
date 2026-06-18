@@ -1,13 +1,14 @@
-import { AccountUserButton } from "@avalsys/account-av-web";
-import { AppShell, useAppsAvLocale } from "@avalsys/apps-av-web";
+import { useAppsAvLocale } from "@avalsys/apps-av-web";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { BookOpenCheck, CalendarDays, Compass, Search, Sparkles } from "lucide-react";
-import type { ReactNode } from "react";
+import { BookOpenCheck, Pin, Search, Sparkles, StepBack, StepForward } from "lucide-react";
 import { ProtectedRoute } from "@/components/protected-route";
+import { SeriesAppShell } from "@/components/series-app-shell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { seriesBrandAssets } from "@/lib/series-config";
-import { localizedSeriesPath, useSeriesNavLinks, useSeriesProductConfig, useSeriesShellLabels, useSeriesText } from "@/lib/series-i18n";
+import { useSeriesLibrary } from "@/lib/series-library-provider";
+import { cursorLabel, nextEpisodeCursor, progressLabel } from "@/lib/series-library";
+import { localizedSeriesPath, useSeriesText } from "@/lib/series-i18n";
 
 export const Route = createFileRoute("/avi")({
   component: AviRoute
@@ -16,16 +17,15 @@ export const Route = createFileRoute("/avi")({
 function AviRoute() {
   const locale = useAppsAvLocale();
   const text = useSeriesText();
-  const navLinks = useSeriesNavLinks();
-  const productConfig = useSeriesProductConfig();
-  const shellLabels = useSeriesShellLabels();
-  const cardIcons = [<BookOpenCheck className="size-4" />, <CalendarDays className="size-4" />, <Compass className="size-4" />];
+  const library = useSeriesLibrary();
+  const current = library.snapshot.homeEntries[0] ?? null;
+  const next = current ? nextEpisodeCursor(current.lastWatchedEpisodeCursor) : null;
 
   return (
     <ProtectedRoute>
-      <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} labels={shellLabels} navLinks={navLinks} product={productConfig}>
+      <SeriesAppShell>
         <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-          <Card className="series-paper gap-0 overflow-hidden rounded-[1.5rem] border-[#d7c494] p-0 text-[#112a55] shadow-lg shadow-[#172f5c]/8">
+          <Card className="series-paper gap-0 overflow-hidden rounded-lg border-[#d7c494] p-0 text-[#112a55] shadow-lg shadow-[#172f5c]/8">
             <div className="grid min-h-[32rem] lg:grid-cols-[0.95fr_1.05fr]">
               <div className="flex flex-col justify-between gap-8 p-6 sm:p-8">
                 <div>
@@ -33,18 +33,34 @@ function AviRoute() {
                     <Sparkles className="size-4" aria-hidden="true" />
                     Avi
                   </p>
-                  <h1 className="mt-3 text-4xl font-semibold leading-tight">{text.avi.title}</h1>
+                  <h1 className="mt-3 text-4xl font-semibold leading-tight">{current ? `Focus on ${current.title}` : text.avi.title}</h1>
                   <p className="mt-4 text-base leading-7 text-[#334766]">
-                    {text.avi.body}
+                    {current ? `${progressLabel(current, "Not started", "No episode set")} saved. The next useful step is ${cursorLabel(next ?? { episodeNumber: 1, seasonNumber: 1 })}.` : text.avi.body}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-3">
-                  <Button asChild className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]">
-                    <Link to={localizedSeriesPath("/search", locale)}>
-                      <Search className="size-4" aria-hidden="true" />
-                      {text.avi.searchCta}
-                    </Link>
-                  </Button>
+                  {current ? (
+                    <>
+                      <Button className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" onClick={() => library.markNextEpisodeWatched(current.entryId)}>
+                        <StepForward className="size-4" /> Mark next
+                      </Button>
+                      {current.lastWatchedEpisodeCursor ? (
+                        <Button variant="outline" className="rounded-full border-[#c8ad72] bg-[#fff8df]/76" onClick={() => library.markPreviousEpisodeWatched(current.entryId)}>
+                          <StepBack className="size-4" /> Previous
+                        </Button>
+                      ) : null}
+                      <Button variant="outline" className="rounded-full border-[#c8ad72] bg-[#fff8df]/76" onClick={() => library.setPinned(current.entryId, current.isPinnedHomeSeries !== true)}>
+                        <Pin className="size-4" /> {current.isPinnedHomeSeries ? "Unpin" : "Pin"}
+                      </Button>
+                    </>
+                  ) : (
+                    <Button asChild className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]">
+                      <Link to={localizedSeriesPath("/search", locale)}>
+                        <Search className="size-4" aria-hidden="true" />
+                        {text.avi.searchCta}
+                      </Link>
+                    </Button>
+                  )}
                   <Button asChild variant="outline" className="rounded-full border-[#c8ad72] bg-[#fff8df]/76">
                     <Link to={localizedSeriesPath("/library", locale)}>{text.avi.libraryCta}</Link>
                   </Button>
@@ -58,24 +74,24 @@ function AviRoute() {
           </Card>
 
           <div className="grid gap-4">
-            {text.avi.cards.map((card, index) => (
-              <AviCard key={card.title} icon={cardIcons[index]} title={card.title} text={card.text} />
-            ))}
+            <AviMetric title="Watching" value={String(library.snapshot.watchingEntries.length)} icon={<StepForward className="size-4" />} />
+            <AviMetric title="Active" value={String(library.snapshot.activeEntries.length)} icon={<BookOpenCheck className="size-4" />} />
+            <AviMetric title="Archived" value={String(library.snapshot.archivedEntries.length)} icon={<BookOpenCheck className="size-4" />} />
           </div>
         </section>
-      </AppShell>
+      </SeriesAppShell>
     </ProtectedRoute>
   );
 }
 
-function AviCard({ icon, text, title }: { icon: ReactNode; text: string; title: string }) {
+function AviMetric({ icon, title, value }: { icon: React.ReactNode; title: string; value: string }) {
   return (
-    <Card className="gap-2 rounded-[1.25rem] border-[#d7c494] bg-[#fff8df]/88 p-5 py-5 text-[#112a55] shadow-sm shadow-[#172f5c]/6">
+    <Card className="gap-2 rounded-lg border-[#d7c494] bg-[#fff8df]/88 p-5 py-5 text-[#112a55] shadow-sm shadow-[#172f5c]/6">
       <div className="flex items-center gap-2 text-sm font-semibold">
         <span className="text-[#5a8f2f]">{icon}</span>
         {title}
       </div>
-      <p className="text-sm leading-6 text-[#53617a]">{text}</p>
+      <p className="text-2xl font-semibold">{value}</p>
     </Card>
   );
 }

@@ -568,7 +568,9 @@ export function useSeriesNavLinks(): AppsAvProductLink[] {
     { href: localizedSeriesPath("/", locale), label: text.nav.home },
     { href: localizedSeriesPath("/library", locale), label: text.nav.library },
     { href: localizedSeriesPath("/search", locale), label: text.nav.search },
-    { href: localizedSeriesPath("/avi", locale), label: text.nav.avi }
+    { href: localizedSeriesPath("/avi", locale), label: text.nav.avi },
+    { href: localizedSeriesPath("/account", locale), label: "Account" },
+    { href: localizedSeriesPath("/settings", locale), label: "Settings" }
   ];
 }
 

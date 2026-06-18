@@ -10,14 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as AviRouteImport } from './routes/avi'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SeriesSeriesIdRouteImport } from './routes/series.$seriesId'
 
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
   path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -35,48 +43,95 @@ const AviRoute = AviRouteImport.update({
   path: '/avi',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SeriesSeriesIdRoute = SeriesSeriesIdRouteImport.update({
+  id: '/series/$seriesId',
+  path: '/series/$seriesId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/avi': typeof AviRoute
   '/library': typeof LibraryRoute
   '/search': typeof SearchRoute
+  '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
+  '/series/$seriesId': typeof SeriesSeriesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/avi': typeof AviRoute
   '/library': typeof LibraryRoute
   '/search': typeof SearchRoute
+  '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
+  '/series/$seriesId': typeof SeriesSeriesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/avi': typeof AviRoute
   '/library': typeof LibraryRoute
   '/search': typeof SearchRoute
+  '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
+  '/series/$seriesId': typeof SeriesSeriesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/avi' | '/library' | '/search' | '/sign-in'
+  fullPaths:
+    | '/'
+    | '/account'
+    | '/avi'
+    | '/library'
+    | '/search'
+    | '/settings'
+    | '/sign-in'
+    | '/series/$seriesId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/avi' | '/library' | '/search' | '/sign-in'
-  id: '__root__' | '/' | '/avi' | '/library' | '/search' | '/sign-in'
+  to:
+    | '/'
+    | '/account'
+    | '/avi'
+    | '/library'
+    | '/search'
+    | '/settings'
+    | '/sign-in'
+    | '/series/$seriesId'
+  id:
+    | '__root__'
+    | '/'
+    | '/account'
+    | '/avi'
+    | '/library'
+    | '/search'
+    | '/settings'
+    | '/sign-in'
+    | '/series/$seriesId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
   AviRoute: typeof AviRoute
   LibraryRoute: typeof LibraryRoute
   SearchRoute: typeof SearchRoute
+  SettingsRoute: typeof SettingsRoute
   SignInRoute: typeof SignInRoute
+  SeriesSeriesIdRoute: typeof SeriesSeriesIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -86,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/sign-in'
       fullPath: '/sign-in'
       preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -109,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AviRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -116,15 +185,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/series/$seriesId': {
+      id: '/series/$seriesId'
+      path: '/series/$seriesId'
+      fullPath: '/series/$seriesId'
+      preLoaderRoute: typeof SeriesSeriesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
   AviRoute: AviRoute,
   LibraryRoute: LibraryRoute,
   SearchRoute: SearchRoute,
+  SettingsRoute: SettingsRoute,
   SignInRoute: SignInRoute,
+  SeriesSeriesIdRoute: SeriesSeriesIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

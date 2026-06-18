@@ -1,36 +1,45 @@
-import { AccountUserButton } from "@avalsys/account-av-web";
-import { AppShell, useAppsAvLocale } from "@avalsys/apps-av-web";
+import { EmptyState, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Archive, BookOpenCheck, CalendarDays, ListChecks, Search } from "lucide-react";
-import type { ReactNode } from "react";
+import { Search } from "lucide-react";
+import { useMemo, useState } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
+import { SeriesAppShell } from "@/components/series-app-shell";
+import { SeriesEntryRow } from "@/components/series-library-ui";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { localizedSeriesPath, useSeriesNavLinks, useSeriesProductConfig, useSeriesShellLabels, useSeriesText } from "@/lib/series-i18n";
+import { useSeriesLibrary } from "@/lib/series-library-provider";
+import { normalizeSearchText, type SeriesLibraryEntry } from "@/lib/series-library";
+import { localizedSeriesPath, useSeriesText } from "@/lib/series-i18n";
 
 export const Route = createFileRoute("/library")({
   component: LibraryRoute
 });
 
+type Filter = "all" | "watching" | "wantToWatch" | "watched" | "archived";
+
 function LibraryRoute() {
   const locale = useAppsAvLocale();
   const text = useSeriesText();
-  const navLinks = useSeriesNavLinks();
-  const productConfig = useSeriesProductConfig();
-  const shellLabels = useSeriesShellLabels();
-  const hintIcons = [<ListChecks className="size-4" />, <CalendarDays className="size-4" />, <Archive className="size-4" />];
+  const library = useSeriesLibrary();
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<Filter>("all");
+  const normalizedQuery = normalizeSearchText(query);
+  const active = useMemo(() => filterEntries(library.snapshot.activeEntries, filter, normalizedQuery), [filter, library.snapshot.activeEntries, normalizedQuery]);
+  const archived = useMemo(() => filterEntries(library.snapshot.archivedEntries, filter, normalizedQuery), [filter, library.snapshot.archivedEntries, normalizedQuery]);
+  const showArchived = filter === "all" || filter === "archived";
 
   return (
     <ProtectedRoute>
-      <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} labels={shellLabels} navLinks={navLinks} product={productConfig}>
-        <section className="grid gap-6 lg:grid-cols-[1fr_22rem]">
-          <Card className="series-paper gap-0 rounded-[1.5rem] border-[#d7c494] p-6 py-6 shadow-lg shadow-[#172f5c]/8 sm:p-8 sm:py-8">
+      <SeriesAppShell>
+        <section className="flex flex-col gap-6">
+          <Card className="series-paper gap-0 rounded-lg border-[#d7c494] p-6 py-6 shadow-lg shadow-[#172f5c]/8 sm:p-8 sm:py-8">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="text-sm font-semibold text-[#5a8f2f]">{text.library.kicker}</p>
                 <h1 className="mt-2 text-4xl font-semibold leading-tight text-[#112a55]">{text.library.title}</h1>
-                <p className="mt-4 max-w-2xl text-base leading-7 text-[#334766]">
-                  {text.library.body}
+                <p className="mt-4 max-w-2xl text-base leading-7 text-[#334766]">{text.library.body}</p>
+                <p className="mt-3 text-sm font-semibold text-[#53617a]">
+                  {library.limit.activeCount}/{library.limit.activeLimit} active · Sync {library.syncState}
                 </p>
               </div>
               <Button asChild className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]">
@@ -40,47 +49,55 @@ function LibraryRoute() {
                 </Link>
               </Button>
             </div>
-
-            <div className="mt-8 flex flex-wrap gap-2">
-              {text.library.filters.map((filter, index) => (
-                <button
-                  key={filter}
-                  className={index === 0 ? "rounded-full bg-[#112a55] px-3 py-2 text-sm font-semibold text-white" : "rounded-full border border-[#d7c494] bg-[#fff8df]/80 px-3 py-2 text-sm font-semibold text-[#334766] transition hover:border-[#8bc342] hover:text-[#112a55]"}
-                  type="button"
-                >
-                  {filter}
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-8 rounded-2xl border border-dashed border-[#c8ad72] bg-[#fff8df]/70 p-8 text-center">
-              <BookOpenCheck className="mx-auto size-10 text-[#5a8f2f]" aria-hidden="true" />
-              <h2 className="mt-4 text-2xl font-semibold text-[#112a55]">{text.library.emptyTitle}</h2>
-              <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-[#53617a]">
-                {text.library.emptyBody}
-              </p>
+            <div className="mt-6 grid gap-3 lg:grid-cols-[1fr_auto]">
+              <input className="h-11 rounded-full border border-[#d7c494] bg-[#fff8df] px-4 text-[#112a55]" placeholder="Search your library" value={query} onChange={(event) => setQuery(event.target.value)} />
+              <div className="flex flex-wrap gap-2">
+                {filters.map((item, index) => (
+                  <button key={item} className={filter === item ? "rounded-full bg-[#112a55] px-3 py-2 text-sm font-semibold text-white" : "rounded-full border border-[#d7c494] bg-[#fff8df]/80 px-3 py-2 text-sm font-semibold text-[#334766]"} type="button" onClick={() => setFilter(item)}>
+                    {text.library.filters[index] ?? item}
+                  </button>
+                ))}
+              </div>
             </div>
           </Card>
 
-          <aside className="grid gap-4">
-            {text.library.hints.map((hint, index) => (
-              <LibraryHint key={hint.title} icon={hintIcons[index]} title={hint.title} text={hint.text} />
-            ))}
-          </aside>
+          {active.length === 0 && archived.length === 0 ? (
+            <EmptyState className="border-[#d7c494] bg-[#fff8df]" description={text.library.emptyBody} title={text.library.emptyTitle} />
+          ) : null}
+
+          {active.length > 0 ? (
+            <section className="grid gap-3">
+              <h2 className="text-sm font-bold uppercase text-[#53617a]">Active</h2>
+              {active.map((entry) => (
+                <SeriesEntryRow key={entry.entryId} entry={entry} locale={locale} />
+              ))}
+            </section>
+          ) : null}
+
+          {showArchived && archived.length > 0 ? (
+            <section className="grid gap-3">
+              <h2 className="text-sm font-bold uppercase text-[#53617a]">Archived</h2>
+              {archived.map((entry) => (
+                <SeriesEntryRow key={entry.entryId} entry={entry} locale={locale} showArchive={false} />
+              ))}
+            </section>
+          ) : null}
         </section>
-      </AppShell>
+      </SeriesAppShell>
     </ProtectedRoute>
   );
 }
 
-function LibraryHint({ icon, text, title }: { icon: ReactNode; text: string; title: string }) {
-  return (
-    <Card className="gap-2 rounded-[1.25rem] border-[#d7c494] bg-[#fff8df]/88 p-5 py-5 text-[#112a55] shadow-sm shadow-[#172f5c]/6">
-      <div className="flex items-center gap-2 text-sm font-semibold">
-        <span className="text-[#5a8f2f]">{icon}</span>
-        {title}
-      </div>
-      <p className="text-sm leading-6 text-[#53617a]">{text}</p>
-    </Card>
-  );
+const filters: Filter[] = ["all", "watching", "wantToWatch", "watched", "archived"];
+
+function filterEntries(entries: SeriesLibraryEntry[], filter: Filter, normalizedQuery: string) {
+  return entries.filter((entry) => {
+    if (normalizedQuery && !normalizeSearchText(entry.title).includes(normalizedQuery)) {
+      return false;
+    }
+    if (filter === "all" || filter === "archived") {
+      return true;
+    }
+    return entry.status === filter;
+  });
 }

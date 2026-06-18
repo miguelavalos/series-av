@@ -37,6 +37,7 @@ interface SeriesLibraryContextValue {
   archive: (entryId: string) => void;
   canAddSeries: boolean;
   clearProgress: (entryId: string) => void;
+  clearLocalData: () => void;
   deleteEntry: (entryId: string) => void;
   entries: SeriesLibraryEntry[];
   findEntryBySeriesId: (seriesId: string) => SeriesLibraryEntry | null;
@@ -201,6 +202,9 @@ export function SeriesLibraryProvider({ children }: { children: ReactNode }) {
       canAddSeries: limit.canAddSeries,
       clearProgress(entryId) {
         mutateEntries((current) => replaceEntry(current, entryId, clearProgress));
+      },
+      clearLocalData() {
+        mutateEntries(() => []);
       },
       deleteEntry(entryId) {
         mutateEntries((current) => replaceEntry(current, entryId, deleteEntry));
