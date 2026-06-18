@@ -4,6 +4,7 @@ import { HeadContent, Outlet, Scripts, createRootRoute, useRouterState } from "@
 import type { ReactNode } from "react";
 import { getAccountApiBaseUrl, getAccountPublishableKey } from "@/lib/series-config";
 import { localizedSeriesPath, useSeriesAccountLocalization, useSeriesText } from "@/lib/series-i18n";
+import { SeriesLibraryProvider } from "@/lib/series-library-provider";
 import "../styles.css";
 
 export const Route = createRootRoute({
@@ -64,7 +65,7 @@ function AccountBoundary({ children }: Readonly<{ children: ReactNode }>) {
       signInUrl={localizedSeriesPath("/sign-in", locale)}
       signUpUrl={localizedSeriesPath("/sign-in", locale)}
     >
-      {children}
+      <SeriesLibraryProvider>{children}</SeriesLibraryProvider>
     </AccountAvProvider>
   );
 }
