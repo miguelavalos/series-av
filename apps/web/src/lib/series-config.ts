@@ -16,7 +16,7 @@ export const seriesProductConfig: AppsAvProductConfig = {
   links: {
     deleteAccount: externalLink(accountManagementUrl("/account/delete"), "Delete account"),
     privacy: externalLink(import.meta.env.VITE_SERIESAV_PRIVACY_URL, "Privacy"),
-    suite: externalLink(import.meta.env.VITE_ACCOUNTAV_MANAGEMENT_URL, "Avalsyst apps"),
+    suite: externalLink(import.meta.env.VITE_ACCOUNTAV_MANAGEMENT_URL, "Apps"),
     support: externalLink(supportUrl(), "Support"),
     terms: externalLink(import.meta.env.VITE_SERIESAV_TERMS_URL, "Terms")
   }
