@@ -1,10 +1,11 @@
 import { AccountUserButton, SignedIn, SignedOut } from "@avalsys/account-av-web";
 import { AppShell, useAppsAvLocale } from "@avalsys/apps-av-web";
-import { Link, Navigate, createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, BookOpenCheck, CalendarDays, Search, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { SeriesLoginPage } from "@/components/series-login-page";
 import { seriesBrandAssets, seriesProductConfig } from "@/lib/series-config";
 import { localizedSeriesPath, useSeriesNavLinks, useSeriesShellLabels, useSeriesText } from "@/lib/series-i18n";
 
@@ -22,7 +23,7 @@ function IndexRoute() {
   return (
     <>
       <SignedOut>
-        <Navigate to={localizedSeriesPath("/sign-in", locale)} />
+        <SeriesLoginPage />
       </SignedOut>
       <SignedIn>
         <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} labels={shellLabels} navLinks={navLinks} product={seriesProductConfig}>
