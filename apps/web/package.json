@@ -13,6 +13,7 @@
     "deploy:production": "bun run build:production && bash ../../../../private/avalsys-suite/scripts/wrangler-account.sh deploy --config wrangler.production.jsonc",
     "deploy:preview:dry-run": "bun run build:preview && bash ../../../../private/avalsys-suite/scripts/wrangler-account.sh deploy --dry-run --config wrangler.preview.jsonc",
     "deploy:production:dry-run": "bun run build:production && bash ../../../../private/avalsys-suite/scripts/wrangler-account.sh deploy --dry-run --config wrangler.production.jsonc",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
@@ -39,6 +40,7 @@
     "@types/node": "^25.9.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
   }
 }
