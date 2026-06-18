@@ -27,6 +27,7 @@ const en = {
     title: "Keep your series notebook with you."
   },
   signIn: {
+    aviPanelBody: "A quiet nudge when the next episode is unclear.",
     body: "Sign in to keep your shows, next episodes, and Avi recommendations connected with your AV account.",
     continue: "Continue",
     signedIn: "You are signed in.",
@@ -62,6 +63,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       title: "Porta el teu quadern de series amb tu."
     },
     signIn: {
+      aviPanelBody: "Un petit impuls quan el proper episodi no queda clar.",
       body: "Inicia sessio per mantenir les series, els propers episodis i les recomanacions d'Avi connectades amb el teu compte AV.",
       continue: "Continua",
       signedIn: "Ja has iniciat sessio.",
@@ -95,6 +97,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       title: "Nimm dein Seriennotizbuch mit."
     },
     signIn: {
+      aviPanelBody: "Ein ruhiger Hinweis, wenn die naechste Folge unklar ist.",
       body: "Melde dich an, damit deine Serien, naechsten Folgen und Avi-Empfehlungen mit deinem AV-Konto verbunden bleiben.",
       continue: "Weiter",
       signedIn: "Du bist angemeldet.",
@@ -129,6 +132,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       title: "Lleva tu cuaderno de series contigo."
     },
     signIn: {
+      aviPanelBody: "Un pequeno empujon cuando el proximo episodio no esta claro.",
       body: "Inicia sesion para mantener tus series, proximos episodios y recomendaciones de Avi conectados con tu cuenta AV.",
       continue: "Continuar",
       signedIn: "Has iniciado sesion.",
@@ -162,6 +166,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       title: "Gardez votre carnet de series avec vous."
     },
     signIn: {
+      aviPanelBody: "Un petit coup de pouce quand le prochain episode n'est pas clair.",
       body: "Connectez-vous pour garder vos series, prochains episodes et recommandations d'Avi liees a votre compte AV.",
       continue: "Continuer",
       signedIn: "Vous etes connecte.",

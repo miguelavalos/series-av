@@ -15,7 +15,7 @@ function SignInRoute() {
   return (
     <div className="series-paper flex min-h-screen flex-col bg-[#fff3cf]">
       <main className="grid flex-1 lg:grid-cols-[0.92fr_1.08fr]">
-        <section className="relative hidden overflow-hidden bg-[#10284f] p-10 text-white lg:flex lg:flex-col lg:justify-between">
+        <section className="relative hidden min-h-screen overflow-hidden bg-[#10284f] p-10 text-white lg:flex lg:flex-col lg:justify-between">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_25%,rgba(109,190,69,0.2),transparent_28%),linear-gradient(160deg,#17386c_0%,#10284f_54%,#07162e_100%)]" />
           <Link className="relative inline-flex items-center gap-2 text-sm font-medium text-white/76 transition hover:text-white" to="/">
             <ArrowLeft className="size-4" aria-hidden="true" />
@@ -28,7 +28,17 @@ function SignInRoute() {
               {text.signIn.body}
             </p>
           </div>
-          <img className="relative -mb-16 ml-auto w-72 max-w-[70%] opacity-95" src={seriesBrandAssets.aviLoginPeek} alt="" />
+          <div className="relative overflow-hidden rounded-[1.5rem] border border-white/12 bg-[#fff0c7] p-5 pb-0 text-[#112a55] shadow-2xl shadow-black/22">
+            <div className="relative z-10 max-w-xs pb-28">
+              <p className="text-sm font-semibold text-[#5a8f2f]">Avi</p>
+              <p className="mt-2 font-serif text-3xl leading-tight">{text.signIn.aviPanelBody}</p>
+            </div>
+            <img
+              className="absolute bottom-0 right-6 w-52 translate-y-8 drop-shadow-2xl"
+              src={seriesBrandAssets.aviLoginSheetPeek}
+              alt="Avi"
+            />
+          </div>
         </section>
 
         <section className="flex min-h-screen items-center justify-center px-5 py-10">
