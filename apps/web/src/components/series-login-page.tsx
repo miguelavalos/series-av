@@ -1,13 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, BookOpenCheck, ListChecks, Search, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
-import { AvAppFooter } from "@avalsys/apps-av-web";
+import { AvAppFooter, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { seriesBrandAssets, seriesProductConfig } from "@/lib/series-config";
-import { useSeriesText } from "@/lib/series-i18n";
+import { localizedSeriesPath, useSeriesText } from "@/lib/series-i18n";
 
 export function SeriesLoginPage() {
+  const locale = useAppsAvLocale();
   const text = useSeriesText();
 
   return (
@@ -30,7 +31,7 @@ export function SeriesLoginPage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild className="h-12 rounded-full bg-[#112a55] px-5 text-white shadow-lg shadow-[#112a55]/18 hover:bg-[#19396f]">
-                <Link to="/sign-in">
+                <Link to={localizedSeriesPath("/sign-in", locale)}>
                   {text.login.cta}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>

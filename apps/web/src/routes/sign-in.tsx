@@ -1,15 +1,16 @@
 import { AccountSignIn, SignedIn, SignedOut } from "@avalsys/account-av-web";
-import { AvAppFooter } from "@avalsys/apps-av-web";
+import { AvAppFooter, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { seriesBrandAssets, seriesProductConfig } from "@/lib/series-config";
-import { useSeriesText } from "@/lib/series-i18n";
+import { localizedSeriesPath, useSeriesText } from "@/lib/series-i18n";
 
 export const Route = createFileRoute("/sign-in")({
   component: SignInRoute
 });
 
 function SignInRoute() {
+  const locale = useAppsAvLocale();
   const text = useSeriesText();
 
   return (
@@ -61,7 +62,7 @@ function SignInRoute() {
               </div>
             </SignedIn>
             <SignedOut>
-              <AccountSignIn fallbackRedirectUrl="/" path="/sign-in" />
+              <AccountSignIn fallbackRedirectUrl={localizedSeriesPath("/", locale)} path={localizedSeriesPath("/sign-in", locale)} />
             </SignedOut>
           </div>
         </section>
