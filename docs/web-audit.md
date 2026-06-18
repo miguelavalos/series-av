@@ -54,8 +54,9 @@ web visual audit.
 - The signed-in app now keeps iOS-style simplicity on web: primary episode
   progress actions stay visible, while secondary library actions are grouped in
   a compact menu instead of exposed as a full row of buttons.
-- The Series AV web app supports system dark mode with Series-specific paper,
-  card, border, and text color overrides.
+- The Series AV web app supports a Settings theme preference with System,
+  Light, and Dark modes, plus Series-specific paper, card, border, and text
+  color overrides.
 - Validation run after implementation:
   - `bun run --cwd apps/web test`
   - `bun run --cwd apps/web typecheck`

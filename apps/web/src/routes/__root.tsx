@@ -1,7 +1,7 @@
 import { AccountAvProvider } from "@avalsys/account-av-web";
 import { AppsAvWebProvider, getAppsAvLocaleFromSearch, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { HeadContent, Outlet, Scripts, createRootRoute, useRouterState } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { getAccountApiBaseUrl, getAccountPublishableKey } from "@/lib/series-config";
 import { localizedSeriesPath, useSeriesAccountLocalization, useSeriesText } from "@/lib/series-i18n";
 import { SeriesLibraryProvider } from "@/lib/series-library-provider";
@@ -30,6 +30,15 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const search = useRouterState({ select: (state) => state.location.searchStr });
   const initialLocale = getAppsAvLocaleFromSearch(search);
 
+  useEffect(() => {
+    const storedTheme = readStoredTheme();
+    if (storedTheme === "light" || storedTheme === "dark") {
+      document.documentElement.dataset.seriesTheme = storedTheme;
+      return;
+    }
+    delete document.documentElement.dataset.seriesTheme;
+  }, []);
+
   return (
     <html lang={initialLocale}>
       <head>
@@ -43,6 +52,14 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </body>
     </html>
   );
+}
+
+function readStoredTheme() {
+  try {
+    return window.localStorage?.getItem("series-av.theme");
+  } catch {
+    return null;
+  }
 }
 
 function AccountBoundary({ children }: Readonly<{ children: ReactNode }>) {
