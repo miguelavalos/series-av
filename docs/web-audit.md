@@ -24,3 +24,6 @@ web visual audit.
 - Preview app legal/support/account links should use preview URLs when those
   URLs exist; production links from preview are allowed only as documented
   temporary exceptions until matching preview targets exist.
+- The preview web app build no longer emits the large client chunk warning:
+  vendor chunks are split for Clerk, serialization, UI, and app bootstrap while
+  keeping the same public `/`, sign-in, and protected-route behavior.
