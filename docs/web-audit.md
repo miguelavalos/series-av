@@ -124,16 +124,17 @@ web visual audit.
   `https://app.series-av-preview.avalsys.com`. The shared web smoke passed
   there for `en`, `es`, `fr`, `de`, and `ca` across public `/`, public
   `/sign-in`, protected functional routes, and Detail.
-- Production web smoke on 2026-06-18 still sees an older deployment at
-  `https://app.series-av.avalsys.com`: `/account`, `/settings`, and
-  `/series/thetvdb%3A348545` return 404. Production web deploy is therefore the
-  remaining release action, and must wait for explicit production approval.
+- Production web deploy on 2026-06-18 published the same parity build to
+  `https://app.series-av.avalsys.com` after explicit approval. The shared web
+  smoke passed there for `en`, `es`, `fr`, `de`, and `ca`, and `/account`,
+  `/settings`, and `/series/thetvdb%3A348545` now return 200.
 - Validation run after implementation:
   - `bun run --cwd apps/web test`
   - `bun run --cwd apps/web typecheck`
   - `bun run --cwd apps/web build`
   - `bun run --cwd apps/web qa:shared`
   - `SERIESAV_WEB_QA_BASE_URL=https://app.series-av-preview.avalsys.com bun run --cwd apps/web qa:shared`
+  - `SERIESAV_WEB_QA_BASE_URL=https://app.series-av.avalsys.com bun run --cwd apps/web qa:shared`
 - Commercial desktop and mobile browser QA passed.
 - Web app desktop and mobile browser QA passed.
 - Protected app routes require sign-in and keep `?lang` on redirects.
