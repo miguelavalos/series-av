@@ -21,6 +21,7 @@ import {
   searchLibraryEntries,
   setPinned,
   setStatus,
+  updateCatalogMetadataIfPlaceholder as applyCatalogMetadataIfPlaceholder,
   updateArtworkIfMissing,
   upsertLibraryEntry,
   type SeriesCatalogLibraryInput,
@@ -55,6 +56,7 @@ interface SeriesLibraryContextValue {
   snapshot: ReturnType<typeof getLibrarySnapshot>;
   syncError: string | null;
   syncState: SyncState;
+  updateCatalogMetadataIfPlaceholder: (entryId: string, input: SeriesCatalogLibraryInput) => void;
   updateArtworkIfMissing: (entryId: string, input: Pick<SeriesCatalogLibraryInput, "displayArtworkRef" | "fallbackVisualSeed">) => void;
 }
 
@@ -248,6 +250,9 @@ export function SeriesLibraryProvider({ children }: { children: ReactNode }) {
       snapshot,
       syncError,
       syncState,
+      updateCatalogMetadataIfPlaceholder(entryId, input) {
+        mutateEntries((current) => replaceEntry(current, entryId, (entry) => applyCatalogMetadataIfPlaceholder(entry, input)));
+      },
       updateArtworkIfMissing(entryId, input) {
         mutateEntries((current) => replaceEntry(current, entryId, (entry) => updateArtworkIfMissing(entry, input.displayArtworkRef, input.fallbackVisualSeed)));
       }

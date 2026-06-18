@@ -63,6 +63,10 @@ web visual audit.
   preview fallback only when the authenticated detail endpoint does not return a
   usable display title for an already-known `seriesId`. It must not rebuild
   detail from free-form text search.
+- When Detail resolves canonical display metadata for an entry that was
+  previously saved with a technical placeholder title, the web library repairs
+  the local title/artwork only for that placeholder case and does not overwrite
+  human-readable existing titles.
 - The Series AV web app supports a Settings theme preference with System,
   Light, and Dark modes, plus Series-specific paper, card, border, and text
   color overrides.

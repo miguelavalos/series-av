@@ -3,7 +3,7 @@ import { useAccountSession, useAccountToken } from "@avalsys/account-av-web";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, CheckCircle2, Plus, RotateCcw, StepBack, StepForward } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { SeriesAppShell } from "@/components/series-app-shell";
 import { SeriesArtwork, StatusButtons, seriesLibraryUiText } from "@/components/series-library-ui";
@@ -50,6 +50,7 @@ function SeriesDetailRoute() {
   const catalog = !isPlaceholderCatalogTitle(detailCatalog?.title, seriesId)
     ? detailCatalog
     : (fallbackCatalog.data?.results.find((result) => (result.seriesId ?? result.id).trim().toLocaleLowerCase() === seriesId.trim().toLocaleLowerCase()) ?? detailCatalog);
+  const hasCatalogTitle = !isPlaceholderCatalogTitle(catalog?.title, seriesId);
   const episodes = useQuery({
     queryFn: () =>
       client.episodes({
@@ -61,6 +62,17 @@ function SeriesDetailRoute() {
   });
   const title = catalog?.title ?? entry?.title ?? decodeURIComponent(seriesId);
   const catalogArtworkRef = catalog?.posterUrl ?? catalog?.displayArtwork?.url ?? null;
+  useEffect(() => {
+    if (!entry || !catalog || !hasCatalogTitle) {
+      return;
+    }
+    library.updateCatalogMetadataIfPlaceholder(entry.entryId, {
+      displayArtworkRef: catalogArtworkRef,
+      fallbackVisualSeed: catalog.title,
+      seriesId,
+      title: catalog.title
+    });
+  }, [catalog, catalogArtworkRef, entry, hasCatalogTitle, library, seriesId]);
   const artwork = entry
     ? {
         ...entry,

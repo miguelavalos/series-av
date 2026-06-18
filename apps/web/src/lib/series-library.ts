@@ -287,6 +287,29 @@ export function updateArtworkIfMissing(
   };
 }
 
+export function updateCatalogMetadataIfPlaceholder(
+  entry: SeriesLibraryEntry,
+  input: SeriesCatalogLibraryInput,
+  at = new Date()
+): SeriesLibraryEntry {
+  const title = normalizeOptionalString(input.title);
+  const shouldUpdateTitle = Boolean(title) && isPlaceholderTitle(entry.title, entry.seriesId);
+  const nextArtwork = entry.displayArtworkRef?.trim() ? entry.displayArtworkRef : normalizeOptionalString(input.displayArtworkRef);
+  const nextFallback = entry.fallbackVisualSeed?.trim() && !isPlaceholderTitle(entry.fallbackVisualSeed, entry.seriesId) ? entry.fallbackVisualSeed : normalizeOptionalString(input.fallbackVisualSeed) ?? title;
+
+  if (!shouldUpdateTitle && nextArtwork === entry.displayArtworkRef && nextFallback === entry.fallbackVisualSeed) {
+    return entry;
+  }
+
+  return {
+    ...entry,
+    displayArtworkRef: nextArtwork,
+    fallbackVisualSeed: nextFallback,
+    title: shouldUpdateTitle && title ? title : entry.title,
+    updatedAt: at.toISOString()
+  };
+}
+
 export function replaceEntry(entries: SeriesLibraryEntry[], entryId: string, update: (entry: SeriesLibraryEntry) => SeriesLibraryEntry): SeriesLibraryEntry[] {
   return entries.map((entry) => (entry.entryId === entryId ? update(entry) : entry));
 }
@@ -376,4 +399,10 @@ function compareEntryRecency(first: SeriesLibraryEntry, second: SeriesLibraryEnt
 function normalizeOptionalString(value?: string | null): string | null {
   const trimmed = value?.trim();
   return trimmed ? trimmed : null;
+}
+
+function isPlaceholderTitle(title: string | null | undefined, seriesId: string): boolean {
+  const normalizedTitle = title?.trim().toLocaleLowerCase();
+  const normalizedSeriesId = seriesId.trim().toLocaleLowerCase();
+  return !normalizedTitle || normalizedTitle === normalizedSeriesId || normalizedTitle === decodeURIComponent(seriesId).trim().toLocaleLowerCase();
 }

@@ -13,6 +13,7 @@ import {
   restoreEntry,
   setPinned,
   setStatus,
+  updateCatalogMetadataIfPlaceholder,
   type SeriesLibraryEntry
 } from "./series-library";
 
@@ -101,6 +102,35 @@ describe("series library model", () => {
       seriesId: "series-1",
       status: "wantToWatch",
       title: "Show"
+    });
+  });
+
+  it("updates placeholder catalog metadata without overwriting human titles", () => {
+    const placeholder = entryFixture({ fallbackVisualSeed: "thetvdb:348545", seriesId: "thetvdb:348545", title: "thetvdb:348545" });
+
+    expect(
+      updateCatalogMetadataIfPlaceholder(
+        placeholder,
+        {
+          displayArtworkRef: "https://poster.test/demon.jpg",
+          fallbackVisualSeed: "Demon Slayer: Kimetsu no Yaiba",
+          seriesId: "thetvdb:348545",
+          title: "Demon Slayer: Kimetsu no Yaiba"
+        },
+        t1
+      )
+    ).toMatchObject({
+      displayArtworkRef: "https://poster.test/demon.jpg",
+      fallbackVisualSeed: "Demon Slayer: Kimetsu no Yaiba",
+      title: "Demon Slayer: Kimetsu no Yaiba",
+      updatedAt: t1.toISOString()
+    });
+
+    const humanTitle = entryFixture({ displayArtworkRef: "https://poster.test/old.jpg", seriesId: "series-1", title: "My Custom Title" });
+    expect(updateCatalogMetadataIfPlaceholder(humanTitle, { seriesId: "series-1", title: "Canonical Title" }, t1)).toMatchObject({
+      displayArtworkRef: "https://poster.test/old.jpg",
+      title: "My Custom Title",
+      updatedAt: t0.toISOString()
     });
   });
 });
