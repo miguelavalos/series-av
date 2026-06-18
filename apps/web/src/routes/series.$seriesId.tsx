@@ -1,4 +1,5 @@
 import { ErrorState, useAppsAvLocale } from "@avalsys/apps-av-web";
+import { useAccountSession, useAccountToken } from "@avalsys/account-av-web";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, CheckCircle2, Plus, RotateCcw, StepBack, StepForward } from "lucide-react";
@@ -24,16 +25,31 @@ function SeriesDetailRoute() {
   const apiLocale = useSeriesApiLocale();
   const text = useSeriesText();
   const library = useSeriesLibrary();
+  const session = useAccountSession();
+  const getToken = useAccountToken();
   const labels = detailLabels[locale];
   const libraryLabels = seriesLibraryUiText(locale);
   const entry = library.findEntryBySeriesId(seriesId);
   const client = useMemo(() => new SeriesApiClient(getSeriesApiBaseUrl()), []);
-  const search = useQuery({
-    enabled: !entry,
-    queryFn: () => client.searchSeries({ query: decodeURIComponent(seriesId), locale: apiLocale, limit: 1 }),
-    queryKey: ["series-av", "detail-search", apiLocale, seriesId]
+  const detail = useQuery({
+    enabled: session.isLoaded && session.isSignedIn,
+    queryFn: async () => {
+      const token = await getToken();
+      return client.series({ locale: apiLocale, seriesId, token });
+    },
+    queryKey: ["series-av", "detail", apiLocale, seriesId, session.userId],
+    retry: false
   });
-  const catalog = search.data?.results[0] ?? null;
+  const detailCatalog = detail.data?.summary ?? null;
+  const fallbackCatalog = useQuery({
+    enabled: !detail.isLoading && isPlaceholderCatalogTitle(detailCatalog?.title, seriesId),
+    queryFn: () => client.popularSeries({ locale: apiLocale, limit: 12, surface: "search" }),
+    queryKey: ["series-av", "detail-fallback-popular", apiLocale, seriesId],
+    retry: false
+  });
+  const catalog = !isPlaceholderCatalogTitle(detailCatalog?.title, seriesId)
+    ? detailCatalog
+    : (fallbackCatalog.data?.results.find((result) => (result.seriesId ?? result.id).trim().toLocaleLowerCase() === seriesId.trim().toLocaleLowerCase()) ?? detailCatalog);
   const episodes = useQuery({
     queryFn: () =>
       client.episodes({
@@ -43,12 +59,20 @@ function SeriesDetailRoute() {
       }),
     queryKey: ["series-av", "episodes", seriesId, entry?.lastWatchedEpisodeCursor?.seasonNumber, entry?.lastWatchedEpisodeCursor?.episodeNumber]
   });
-  const title = entry?.title ?? catalog?.title ?? decodeURIComponent(seriesId);
-  const artwork = entry ?? {
-    displayArtworkRef: catalog?.posterUrl ?? catalog?.displayArtwork?.url ?? null,
-    fallbackVisualSeed: title,
-    title
-  };
+  const title = catalog?.title ?? entry?.title ?? decodeURIComponent(seriesId);
+  const catalogArtworkRef = catalog?.posterUrl ?? catalog?.displayArtwork?.url ?? null;
+  const artwork = entry
+    ? {
+        ...entry,
+        displayArtworkRef: entry.displayArtworkRef ?? catalogArtworkRef,
+        fallbackVisualSeed: catalog?.title ?? entry.fallbackVisualSeed ?? title,
+        title
+      }
+    : {
+        displayArtworkRef: catalogArtworkRef,
+        fallbackVisualSeed: title,
+        title
+      };
 
   return (
     <ProtectedRoute>
@@ -68,6 +92,7 @@ function SeriesDetailRoute() {
                   {catalog?.startYear ?? catalog?.firstAirDate ?? text.search.dateUnknown}
                   {catalog?.genres?.length ? ` · ${catalog.genres.slice(0, 2).join(" · ")}` : ""}
                 </p>
+                {detail.isError ? <p className="mt-3 text-sm font-semibold text-[#b15b22]">{labels.detailUnavailable}</p> : null}
                 <p className="mt-4 max-w-2xl text-base leading-7 text-[#334766]">{catalog?.summary ?? catalog?.overview ?? text.search.noOverview}</p>
                 {entry ? (
                   <div className="mt-5 grid gap-4">
@@ -97,7 +122,7 @@ function SeriesDetailRoute() {
                     disabled={!library.canAddSeries}
                     onClick={() =>
                       library.addCatalogSeries({
-                        displayArtworkRef: catalog?.posterUrl ?? catalog?.displayArtwork?.url,
+                        displayArtworkRef: catalogArtworkRef,
                         fallbackVisualSeed: title,
                         seriesId,
                         title
@@ -146,6 +171,7 @@ function SeriesDetailRoute() {
 const detailLabels = {
   ca: {
     episodeGuide: "Guia d'episodis",
+    detailUnavailable: "Detall de catàleg no disponible",
     episodesUnavailable: "Episodis no disponibles",
     follow: "Seguir",
     limitReached: "Límit assolit",
@@ -155,6 +181,7 @@ const detailLabels = {
   },
   de: {
     episodeGuide: "Folgenübersicht",
+    detailUnavailable: "Katalogdetail nicht verfügbar",
     episodesUnavailable: "Folgen nicht verfügbar",
     follow: "Folgen",
     limitReached: "Limit erreicht",
@@ -164,6 +191,7 @@ const detailLabels = {
   },
   en: {
     episodeGuide: "Episode guide",
+    detailUnavailable: "Catalog detail unavailable",
     episodesUnavailable: "Episodes unavailable",
     follow: "Follow",
     limitReached: "Limit reached",
@@ -173,6 +201,7 @@ const detailLabels = {
   },
   es: {
     episodeGuide: "Guía de episodios",
+    detailUnavailable: "Detalle de catálogo no disponible",
     episodesUnavailable: "Episodios no disponibles",
     follow: "Seguir",
     limitReached: "Límite alcanzado",
@@ -182,6 +211,7 @@ const detailLabels = {
   },
   fr: {
     episodeGuide: "Guide des épisodes",
+    detailUnavailable: "Détail du catalogue indisponible",
     episodesUnavailable: "Épisodes indisponibles",
     follow: "Suivre",
     limitReached: "Limite atteinte",
@@ -190,3 +220,9 @@ const detailLabels = {
     noGuide: "Aucun guide compact pour le moment."
   }
 } as const;
+
+function isPlaceholderCatalogTitle(title: string | null | undefined, seriesId: string) {
+  const normalizedTitle = title?.trim().toLocaleLowerCase();
+  const normalizedSeriesId = seriesId.trim().toLocaleLowerCase();
+  return !normalizedTitle || normalizedTitle === normalizedSeriesId || normalizedTitle === decodeURIComponent(seriesId).trim().toLocaleLowerCase();
+}

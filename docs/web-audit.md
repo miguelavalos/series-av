@@ -32,7 +32,8 @@ web visual audit.
     distinguishes local library matches from catalog results, and follows
     catalog titles into the signed-in library;
   - `/series/$seriesId` is a protected detail route with metadata, artwork,
-    guided tracking actions, compact episode-guide progress buttons, and
+    guided tracking actions, compact episode-guide progress buttons,
+    authenticated `GET /v1/series/{seriesId}` display metadata, and
     `/v1/series/{seriesId}/episodes`;
   - Library shows real active and archived sections, local search, filters,
     status/progress/pin/archive/restore/delete actions;
@@ -58,6 +59,10 @@ web visual audit.
   Progress moves through guided actions: mark next, previous, clear progress,
   status changes, or selecting a real episode from the backend compact episode
   guide.
+- Web Detail may use a backend-curated catalog collection as a non-authoritative
+  preview fallback only when the authenticated detail endpoint does not return a
+  usable display title for an already-known `seriesId`. It must not rebuild
+  detail from free-form text search.
 - The Series AV web app supports a Settings theme preference with System,
   Light, and Dark modes, plus Series-specific paper, card, border, and text
   color overrides.

@@ -25,6 +25,16 @@ export interface SeriesSearchResponse {
   source: "d1" | "provider" | "mixed";
 }
 
+export interface SeriesDetailResponse {
+  episodeGuide?: {
+    generatedAt: string;
+    items: SeriesEpisodeGuideItem[];
+  };
+  generatedAt: string;
+  guideReliability?: "available" | "partial" | "unavailable" | "unknown";
+  summary: SeriesSearchResult;
+}
+
 export interface SearchSeriesInput {
   limit?: number;
   locale?: string;
@@ -89,6 +99,21 @@ export class SeriesApiClient {
     }
 
     return response.json() as Promise<SeriesSearchResponse>;
+  }
+
+  async series({ locale = "en-US", seriesId, token }: { locale?: string; seriesId: string; token?: string | null }): Promise<SeriesDetailResponse> {
+    const url = new URL(`${this.baseUrl}/v1/series/${encodeURIComponent(seriesId)}`);
+    url.searchParams.set("locale", locale);
+
+    const response = await fetch(url, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined
+    });
+    if (!response.ok) {
+      throw new Error(`Series detail failed with ${response.status}.`);
+    }
+
+    const payload = (await response.json()) as unknown;
+    return normalizeSeriesDetailResponse(payload, seriesId);
   }
 
   async episodes({
@@ -163,4 +188,32 @@ export class SeriesApiClient {
       etag: response.headers.get("ETag")
     };
   }
+}
+
+function normalizeSeriesDetailResponse(payload: unknown, seriesId: string): SeriesDetailResponse {
+  if (isSeriesDetailResponse(payload)) {
+    return payload;
+  }
+
+  const summary = payload as Partial<SeriesSearchResult>;
+  return {
+    generatedAt: new Date().toISOString(),
+    summary: {
+      ...summary,
+      id: summary.id || seriesId,
+      seriesId: summary.seriesId ?? seriesId,
+      title: summary.title ?? seriesId
+    }
+  };
+}
+
+function isSeriesDetailResponse(payload: unknown): payload is SeriesDetailResponse {
+  return Boolean(
+    payload &&
+      typeof payload === "object" &&
+      "summary" in payload &&
+      payload.summary &&
+      typeof payload.summary === "object" &&
+      "title" in payload.summary
+  );
 }
