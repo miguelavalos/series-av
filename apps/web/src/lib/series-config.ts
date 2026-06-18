@@ -32,13 +32,6 @@ export const seriesBrandAssets = {
   wordmark: "https://cdn.avalsys.com/apps-av/series-av/web-v3/series-av-wordmark.png"
 } as const;
 
-export const seriesNavLinks = [
-  { href: "/", label: "Home" },
-  { href: "/library", label: "Library" },
-  { href: "/search", label: "Search" },
-  { href: "/avi", label: "Avi" }
-];
-
 export function getSeriesApiBaseUrl() {
   return requiredUrl(import.meta.env.VITE_SERIESAV_API_BASE_URL, "VITE_SERIESAV_API_BASE_URL");
 }

@@ -6,8 +6,8 @@ import type { ReactNode } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { seriesBrandAssets, seriesNavLinks, seriesProductConfig } from "@/lib/series-config";
-import { useSeriesText } from "@/lib/series-i18n";
+import { seriesBrandAssets, seriesProductConfig } from "@/lib/series-config";
+import { useSeriesNavLinks, useSeriesText } from "@/lib/series-i18n";
 
 export const Route = createFileRoute("/avi")({
   component: AviRoute
@@ -15,10 +15,12 @@ export const Route = createFileRoute("/avi")({
 
 function AviRoute() {
   const text = useSeriesText();
+  const navLinks = useSeriesNavLinks();
+  const cardIcons = [<BookOpenCheck className="size-4" />, <CalendarDays className="size-4" />, <Compass className="size-4" />];
 
   return (
     <ProtectedRoute>
-      <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} navLinks={seriesNavLinks} product={seriesProductConfig}>
+      <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} navLinks={navLinks} product={seriesProductConfig}>
         <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
           <Card className="series-paper gap-0 overflow-hidden rounded-[1.5rem] border-[#d7c494] p-0 text-[#112a55] shadow-lg shadow-[#172f5c]/8">
             <div className="grid min-h-[32rem] lg:grid-cols-[0.95fr_1.05fr]">
@@ -28,20 +30,20 @@ function AviRoute() {
                     <Sparkles className="size-4" aria-hidden="true" />
                     Avi
                   </p>
-                  <h1 className="mt-3 text-4xl font-semibold leading-tight">A calm guide for your next episode.</h1>
+                  <h1 className="mt-3 text-4xl font-semibold leading-tight">{text.avi.title}</h1>
                   <p className="mt-4 text-base leading-7 text-[#334766]">
-                    Avi helps turn a messy watch list into a clear next step: continue, save, catch up, or discover something that fits your habits.
+                    {text.avi.body}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-3">
                   <Button asChild className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]">
                     <Link to="/search">
                       <Search className="size-4" aria-hidden="true" />
-                      Find a series
+                      {text.avi.searchCta}
                     </Link>
                   </Button>
                   <Button asChild variant="outline" className="rounded-full border-[#c8ad72] bg-[#fff8df]/76">
-                    <Link to="/library">Open library</Link>
+                    <Link to="/library">{text.avi.libraryCta}</Link>
                   </Button>
                 </div>
               </div>
@@ -53,9 +55,9 @@ function AviRoute() {
           </Card>
 
           <div className="grid gap-4">
-            <AviCard icon={<BookOpenCheck className="size-4" />} title="Prepare the notebook" text="Avi can point out which shows need a saved status, a next episode, or a cleaner progress note." />
-            <AviCard icon={<CalendarDays className="size-4" />} title="Choose what is next" text="Upcoming episodes and active shows stay readable, so the next action does not get buried." />
-            <AviCard icon={<Compass className="size-4" />} title="Discover with context" text="Recommendations can grow from what you actually watch instead of starting from a blank catalog." />
+            {text.avi.cards.map((card, index) => (
+              <AviCard key={card.title} icon={cardIcons[index]} title={card.title} text={card.text} />
+            ))}
           </div>
         </section>
       </AppShell>

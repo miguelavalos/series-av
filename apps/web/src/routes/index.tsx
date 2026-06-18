@@ -6,8 +6,8 @@ import type { ReactNode } from "react";
 import { SeriesLoginPage } from "@/components/series-login-page";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { seriesBrandAssets, seriesNavLinks, seriesProductConfig } from "@/lib/series-config";
-import { useSeriesText } from "@/lib/series-i18n";
+import { seriesBrandAssets, seriesProductConfig } from "@/lib/series-config";
+import { useSeriesNavLinks, useSeriesText } from "@/lib/series-i18n";
 
 export const Route = createFileRoute("/")({
   component: IndexRoute
@@ -15,6 +15,8 @@ export const Route = createFileRoute("/")({
 
 function IndexRoute() {
   const text = useSeriesText();
+  const navLinks = useSeriesNavLinks();
+  const homeIcons = [<Search className="size-4" />, <BookOpenCheck className="size-4" />, <CalendarDays className="size-4" />];
 
   return (
     <>
@@ -22,37 +24,37 @@ function IndexRoute() {
         <SeriesLoginPage />
       </SignedOut>
       <SignedIn>
-        <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} navLinks={seriesNavLinks} product={seriesProductConfig}>
+        <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} navLinks={navLinks} product={seriesProductConfig}>
           <section className="grid gap-6 lg:grid-cols-[1fr_22rem]">
             <Card className="series-paper gap-0 overflow-hidden rounded-[1.5rem] border-[#d7c494] p-6 py-6 shadow-lg shadow-[#172f5c]/8 sm:p-8 sm:py-8">
               <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                  <h1 className="max-w-2xl text-4xl font-semibold leading-tight text-[#112a55]">Pick up your series notebook.</h1>
+                  <h1 className="max-w-2xl text-4xl font-semibold leading-tight text-[#112a55]">{text.home.title}</h1>
                   <p className="mt-4 max-w-2xl text-base leading-7 text-[#334766]">
-                    Search the catalog, save progress, and keep a clear map of what to watch next.
+                    {text.home.body}
                   </p>
                 </div>
                 <Link to="/search">
-                  Search catalog
+                  {text.home.cta}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>
               </div>
               <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                <NotebookItem icon={<Search className="size-4" />} label="Catalog search" value="Find series by title" />
-                <NotebookItem icon={<BookOpenCheck className="size-4" />} label="Library" value="Keep your saved shows together" />
-                <NotebookItem icon={<CalendarDays className="size-4" />} label="Next episodes" value="Return to what is coming up" />
+                {text.home.items.map((item, index) => (
+                  <NotebookItem key={item.label} icon={homeIcons[index]} label={item.label} value={item.value} />
+                ))}
               </div>
             </Card>
             <Card className="gap-0 overflow-hidden rounded-[1.5rem] border-[#d7c494] bg-[#10284f] p-0 text-white shadow-lg shadow-[#172f5c]/14">
               <div className="p-5">
                 <div className="flex items-center gap-2 text-sm font-semibold text-[#b6dd89]">
                   <Sparkles className="size-4" aria-hidden="true" />
-                  Avi keeps watch
+                  {text.home.aviTitle}
                 </div>
                 <ul className="mt-4 flex flex-col gap-3 text-sm leading-6 text-white/74">
-                  <li>Start from your current shows and find the next useful action.</li>
-                  <li>Spot missing progress before the queue becomes hard to read.</li>
-                  <li>Keep recommendations close to your real watching habits.</li>
+                  {text.home.aviBody.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
                 </ul>
               </div>
               <img className="mt-auto h-56 w-full object-cover object-bottom" src={seriesBrandAssets.onboarding} alt="" />
