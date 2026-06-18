@@ -8,6 +8,14 @@
   "scripts": {
     "start": "bun run dev",
     "dev": "bun run ios:build",
+    "web": "bun run --cwd apps/web dev",
+    "web:dev": "bun run --cwd apps/web dev",
+    "web:build": "bun run --cwd apps/web build",
+    "web:deploy:preview": "bun run --cwd apps/web deploy:preview",
+    "web:deploy:production": "bun run --cwd apps/web deploy:production",
+    "web:deploy:preview:dry-run": "bun run --cwd apps/web deploy:preview:dry-run",
+    "web:deploy:production:dry-run": "bun run --cwd apps/web deploy:production:dry-run",
+    "web:typecheck": "bun run --cwd apps/web typecheck",
     "ios": "bun run ios:build",
     "varlock:load": "zsh -lc 'eval \"$(./scripts/resolve-infisical-bootstrap-env.sh local)\" && ./node_modules/.bin/varlock load --path .'",
     "varlock:load:preview": "zsh -lc 'eval \"$(./scripts/resolve-infisical-bootstrap-env.sh preview)\" && ./node_modules/.bin/varlock load --path .'",
@@ -24,7 +32,7 @@
     "ios:archive:check": "./scripts/check-ios-release-archive.sh",
     "ios:release:archive": "./scripts/ios-release-archive-upload.sh",
     "ios:release:upload": "./scripts/ios-release-archive-upload.sh",
-    "typecheck": "bun run ios:build",
+    "typecheck": "bun run ios:build && bun run web:typecheck",
     "check": "bun run typecheck",
     "deps:outdated": "ncu --workspaces --packageManager bun --cooldown 1",
     "deps:audit": "bun audit",
@@ -38,6 +46,7 @@
   },
   "devDependencies": {
     "@varlock/infisical-plugin": "0.0.6",
-    "varlock": "^0.9.1"
+    "varlock": "^0.9.1",
+    "wrangler": "^4.101.0"
   }
 }

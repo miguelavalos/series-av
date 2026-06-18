@@ -1,0 +1,43 @@
+{
+  "name": "@avalsys/series-av-web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "./scripts/run-with-varlock.sh vite dev --host 0.0.0.0 --port 5193",
+    "dev:preview": "./scripts/run-with-varlock.sh --profile preview vite dev --host 0.0.0.0 --port 5193",
+    "build": "./scripts/run-with-varlock.sh vite build",
+    "build:preview": "./scripts/run-with-varlock.sh --profile preview vite build",
+    "build:production": "./scripts/run-with-varlock.sh --profile production vite build",
+    "deploy:preview": "bun run build:preview && bash ../../../../private/avalsys-suite/scripts/wrangler-account.sh deploy --config wrangler.preview.jsonc",
+    "deploy:production": "bun run build:production && bash ../../../../private/avalsys-suite/scripts/wrangler-account.sh deploy --config wrangler.production.jsonc",
+    "deploy:preview:dry-run": "bun run build:preview && bash ../../../../private/avalsys-suite/scripts/wrangler-account.sh deploy --dry-run --config wrangler.preview.jsonc",
+    "deploy:production:dry-run": "bun run build:production && bash ../../../../private/avalsys-suite/scripts/wrangler-account.sh deploy --dry-run --config wrangler.production.jsonc",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@avalsys/account-av-web": "file:../../../account-av/web",
+    "@avalsys/apps-av-web": "file:../../../apps-av/web",
+    "@tailwindcss/vite": "^4.3.1",
+    "@tanstack/react-query": "^5.101.0",
+    "@tanstack/react-router": "^1.170.16",
+    "@tanstack/react-start": "^1.168.26",
+    "@vitejs/plugin-react": "^6.0.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.20.0",
+    "radix-ui": "^1.6.0",
+    "react": "~19.2.3",
+    "react-dom": "~19.2.3",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.3.1",
+    "vite": "^8.0.16"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^6.0.3"
+  }
+}
