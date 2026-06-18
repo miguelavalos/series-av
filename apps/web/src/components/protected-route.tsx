@@ -1,12 +1,13 @@
 import { AuthLoading, SignedIn, SignedOut } from "@avalsys/account-av-web";
-import { AuthSkeleton, AvAppFooter } from "@avalsys/apps-av-web";
-import { Link } from "@tanstack/react-router";
+import { AuthSkeleton, AvAppFooter, useAppsAvLocale } from "@avalsys/apps-av-web";
 import type { ReactNode } from "react";
 import { seriesBrandAssets, seriesProductConfig } from "@/lib/series-config";
 import { useSeriesText } from "@/lib/series-i18n";
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const text = useSeriesText();
+  const locale = useAppsAvLocale();
+  const signInHref = locale === "en" ? "/sign-in" : `/sign-in?lang=${locale}`;
 
   return (
     <>
@@ -23,12 +24,12 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
               <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-[#334766]">
                 {text.protected.body}
               </p>
-              <Link
+              <a
                 className="mt-8 inline-flex h-11 items-center justify-center rounded-full bg-[#112a55] px-5 text-sm font-semibold text-white shadow-lg shadow-[#112a55]/18 transition hover:bg-[#19396f]"
-                to="/sign-in"
+                href={signInHref}
               >
                 {text.protected.cta}
-              </Link>
+              </a>
             </div>
           </main>
           <AvAppFooter className="border-transparent bg-transparent" labels={text.footer} product={seriesProductConfig} />
