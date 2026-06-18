@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useAppsAvLocale, type AppsAvLocale, type AppsAvProductConfig, type AppsAvProductLink } from "@avalsys/apps-av-web";
+import { appsAvLocalizedPath } from "@avalsys/apps-av-web/src/lib/localized-links";
 import { caES } from "@clerk/localizations/ca-ES";
 import { deDE } from "@clerk/localizations/de-DE";
 import { enUS } from "@clerk/localizations/en-US";
@@ -652,8 +653,7 @@ export function localizedSeriesPath(path: string, locale: AppsAvLocale): string 
     return path;
   }
 
-  const separator = path.includes("?") ? "&" : "?";
-  return `${path}${separator}lang=${locale}`;
+  return appsAvLocalizedPath(path, locale);
 }
 
 export function localizedExternalUrl(href: string | undefined, locale: AppsAvLocale): string | undefined {

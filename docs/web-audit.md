@@ -68,6 +68,11 @@ web visual audit.
   help/legal rows, external buttons, and theme preference helpers. Series AV
   supplies product labels, links, access state, and the Series-specific theme
   attribute only.
+- Remaining practical common surfaces were extracted after the Account/Settings
+  pass: protected login-first gate, compact sync status, app surface state, and
+  base language-preserving path helper now live in Apps AV web. Series AV uses
+  them for protected routes, Home empty state, Home/Library sync indicators, and
+  internal localized paths while keeping product copy and behavior local.
 - Authenticated browser QA on 2026-06-18 checked `/settings?lang=es` and
   `/account?lang=es`: expected Spanish content rendered, no guest copy was
   present, own links preserved `lang=es`, Free access did not show Pro-only

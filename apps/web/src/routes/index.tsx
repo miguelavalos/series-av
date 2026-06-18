@@ -1,5 +1,7 @@
 import { SignedIn, SignedOut } from "@avalsys/account-av-web";
 import { useAppsAvLocale } from "@avalsys/apps-av-web";
+import { CompactSyncStatus } from "@avalsys/apps-av-web/src/components/compact-sync-status";
+import { AppSurfaceState } from "@avalsys/apps-av-web/src/components/protected-app-gate";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, BookOpenCheck, Search, Sparkles, StepForward } from "lucide-react";
 import { ProtectedRoute } from "@/components/protected-route";
@@ -76,18 +78,12 @@ function HomeContent() {
               </div>
             </div>
           </div>
-        ) : (
-          <div className="mt-8 rounded-lg border border-dashed border-[#c8ad72] bg-[#fff8df]/70 p-8 text-center">
-            <Search className="mx-auto size-10 text-[#5a8f2f]" aria-hidden="true" />
-            <h2 className="mt-4 text-2xl font-semibold text-[#112a55]">{text.library.emptyTitle}</h2>
-            <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-[#53617a]">{text.library.emptyBody}</p>
-          </div>
-        )}
+        ) : <AppSurfaceState icon={<Search className="size-10" aria-hidden="true" />} title={text.library.emptyTitle} description={text.library.emptyBody} />}
 
         <div className="mt-8 grid gap-3 sm:grid-cols-3">
           <Metric icon={<BookOpenCheck className="size-4" />} label={labels.active} value={String(library.snapshot.activeEntries.length)} />
           <Metric icon={<StepForward className="size-4" />} label={libraryLabels.status.watching} value={String(library.snapshot.watchingEntries.length)} />
-          <Metric icon={<Sparkles className="size-4" />} label="Sync" value={library.syncState} />
+          <Metric icon={<Sparkles className="size-4" />} label={labels.sync} value={<CompactSyncStatus labels={labels.syncStatus} syncState={library.syncState} />} />
         </div>
       </Card>
       <Card className="gap-0 rounded-lg border-[#d7c494] bg-[#10284f] p-5 py-5 text-white shadow-lg shadow-[#172f5c]/14">
@@ -111,7 +107,9 @@ const homeLabels = {
     continueWatching: "Continua mirant",
     markNext: "Marcar següent",
     openDetail: "Obrir detall",
-    ready: (title: string, cursor: string) => `${title} està preparada per ${cursor}.`
+    ready: (title: string, cursor: string) => `${title} està preparada per ${cursor}.`,
+    sync: "Sync",
+    syncStatus: { disabled: "Local", failed: "Error", idle: "Al dia", syncing: "Sincronitzant" }
   },
   de: {
     active: "Aktiv",
@@ -119,7 +117,9 @@ const homeLabels = {
     continueWatching: "Weiterschauen",
     markNext: "Nächste markieren",
     openDetail: "Detail öffnen",
-    ready: (title: string, cursor: string) => `${title} ist bereit für ${cursor}.`
+    ready: (title: string, cursor: string) => `${title} ist bereit für ${cursor}.`,
+    sync: "Sync",
+    syncStatus: { disabled: "Lokal", failed: "Fehler", idle: "Aktuell", syncing: "Sync läuft" }
   },
   en: {
     active: "Active",
@@ -127,7 +127,9 @@ const homeLabels = {
     continueWatching: "Continue watching",
     markNext: "Mark next",
     openDetail: "Open detail",
-    ready: (title: string, cursor: string) => `${title} is ready for ${cursor}.`
+    ready: (title: string, cursor: string) => `${title} is ready for ${cursor}.`,
+    sync: "Sync",
+    syncStatus: { disabled: "Local", failed: "Error", idle: "Current", syncing: "Syncing" }
   },
   es: {
     active: "Activas",
@@ -135,7 +137,9 @@ const homeLabels = {
     continueWatching: "Sigue viendo",
     markNext: "Marcar siguiente",
     openDetail: "Abrir detalle",
-    ready: (title: string, cursor: string) => `${title} está lista para ${cursor}.`
+    ready: (title: string, cursor: string) => `${title} está lista para ${cursor}.`,
+    sync: "Sync",
+    syncStatus: { disabled: "Local", failed: "Error", idle: "Al día", syncing: "Sincronizando" }
   },
   fr: {
     active: "Actives",
@@ -143,18 +147,20 @@ const homeLabels = {
     continueWatching: "Continuer",
     markNext: "Marquer la suite",
     openDetail: "Ouvrir le détail",
-    ready: (title: string, cursor: string) => `${title} est prête pour ${cursor}.`
+    ready: (title: string, cursor: string) => `${title} est prête pour ${cursor}.`,
+    sync: "Sync",
+    syncStatus: { disabled: "Local", failed: "Erreur", idle: "À jour", syncing: "Sync" }
   }
 } as const;
 
-function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
   return (
     <div className="rounded-lg border border-[#d7c494] bg-[#fff8df]/72 p-4 text-[#112a55]">
       <div className="flex items-center gap-2 text-sm font-semibold">
         <span className="text-[#5a8f2f]">{icon}</span>
         {label}
       </div>
-      <p className="mt-2 text-lg font-semibold text-[#112a55]">{value}</p>
+      <div className="mt-2 text-lg font-semibold text-[#112a55]">{value}</div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { EmptyState, useAppsAvLocale } from "@avalsys/apps-av-web";
+import { CompactSyncStatus } from "@avalsys/apps-av-web/src/components/compact-sync-status";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -40,9 +41,10 @@ function LibraryRoute() {
                 <p className="text-sm font-semibold text-[#5a8f2f]">{text.library.kicker}</p>
                 <h1 className="mt-2 text-4xl font-semibold leading-tight text-[#112a55]">{text.library.title}</h1>
                 <p className="mt-4 max-w-2xl text-base leading-7 text-[#334766]">{text.library.body}</p>
-                <p className="mt-3 text-sm font-semibold text-[#53617a]">
-                  {library.limit.activeCount}/{library.limit.activeLimit} {labels.activeLower} · Sync {library.syncState}
-                </p>
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-sm font-semibold text-[#53617a]">
+                  <span>{library.limit.activeCount}/{library.limit.activeLimit} {labels.activeLower}</span>
+                  <CompactSyncStatus labels={labels.syncStatus} syncState={library.syncState} />
+                </div>
               </div>
               <Button asChild className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]">
                 <Link to={localizedSeriesPath("/search", locale)}>
@@ -91,11 +93,11 @@ function LibraryRoute() {
 }
 
 const libraryLabels = {
-  ca: { active: "Actives", activeLower: "actives", searchPlaceholder: "Cerca a la biblioteca" },
-  de: { active: "Aktiv", activeLower: "aktiv", searchPlaceholder: "Bibliothek durchsuchen" },
-  en: { active: "Active", activeLower: "active", searchPlaceholder: "Search your library" },
-  es: { active: "Activas", activeLower: "activas", searchPlaceholder: "Buscar en tu biblioteca" },
-  fr: { active: "Actives", activeLower: "actives", searchPlaceholder: "Rechercher dans la bibliothèque" }
+  ca: { active: "Actives", activeLower: "actives", searchPlaceholder: "Cerca a la biblioteca", syncStatus: { disabled: "Local", failed: "Error", idle: "Al dia", syncing: "Sincronitzant" } },
+  de: { active: "Aktiv", activeLower: "aktiv", searchPlaceholder: "Bibliothek durchsuchen", syncStatus: { disabled: "Lokal", failed: "Fehler", idle: "Aktuell", syncing: "Sync läuft" } },
+  en: { active: "Active", activeLower: "active", searchPlaceholder: "Search your library", syncStatus: { disabled: "Local", failed: "Error", idle: "Current", syncing: "Syncing" } },
+  es: { active: "Activas", activeLower: "activas", searchPlaceholder: "Buscar en tu biblioteca", syncStatus: { disabled: "Local", failed: "Error", idle: "Al día", syncing: "Sincronizando" } },
+  fr: { active: "Actives", activeLower: "actives", searchPlaceholder: "Rechercher dans la bibliothèque", syncStatus: { disabled: "Local", failed: "Erreur", idle: "À jour", syncing: "Sync" } }
 } as const;
 
 const filters: Filter[] = ["all", "watching", "wantToWatch", "watched", "archived"];
