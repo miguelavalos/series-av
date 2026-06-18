@@ -1,4 +1,5 @@
 import { useAppsAvLocale, type AppsAvLocale, type AppsAvProductLink } from "@avalsys/apps-av-web";
+import { caES, deDE, enUS, esES, frFR } from "@clerk/localizations";
 
 const en = {
   account: {
@@ -82,6 +83,7 @@ const en = {
   },
   nav: {
     avi: "Avi",
+    aviLabel: "Open Avi guidance",
     home: "Home",
     homeLabel: "Series AV home",
     library: "Library",
@@ -119,24 +121,24 @@ const en = {
 export const seriesText: Record<AppsAvLocale, typeof en> = {
   ca: {
     account: {
-      signInTitle: "Inicia sessio a Series AV",
-      signInSubtitle: "Torna-hi. Inicia sessio per mantenir connectat el teu quadern de series."
+      signInTitle: "Inicia sessió a Series AV",
+      signInSubtitle: "Torna-hi. Inicia sessió per mantenir connectat el teu quadern de sèries."
     },
     avi: {
-      body: "Avi ajuda a convertir una llista desordenada en un proper pas clar: continuar, desar, posar-te al dia o descobrir alguna cosa que encaixi amb els teus habits.",
+      body: "Avi ajuda a convertir una llista desordenada en un proper pas clar: continuar, desar, posar-te al dia o descobrir alguna cosa que encaixi amb els teus hàbits.",
       cards: [
-        { text: "Avi pot indicar quines series necessiten un estat desat, un proper episodi o una nota de progres mes clara.", title: "Prepara el quadern" },
-        { text: "Els episodis propers i les series actives es mantenen llegibles, perque el proper pas no quedi enterrat.", title: "Tria que ve despres" },
-        { text: "Les recomanacions poden creixer a partir del que realment mires, no d'un cataleg en blanc.", title: "Descobreix amb context" }
+        { text: "Avi pot indicar quines sèries necessiten un estat desat, un proper episodi o una nota de progrés més clara.", title: "Prepara el quadern" },
+        { text: "Els episodis propers i les sèries actives es mantenen llegibles, perquè el proper pas no quedi enterrat.", title: "Tria què ve després" },
+        { text: "Les recomanacions poden créixer a partir del que realment mires, no d'un catàleg en blanc.", title: "Descobreix amb context" }
       ],
       libraryCta: "Obre la biblioteca",
-      searchCta: "Troba una serie",
-      title: "Una guia tranquil-la per al proper episodi."
+      searchCta: "Troba una sèrie",
+      title: "Una guia tranquil·la per al proper episodi."
     },
     config: {
-      body: "Executa la web amb el wrapper de Varlock perque la configuracio d'Account AV estigui disponible. L'acces web sempre requereix iniciar sessio.",
-      eyebrow: "Configuracio necessaria",
-      title: "Series AV Web necessita la configuracio de Clerk."
+      body: "Executa la web amb el wrapper de Varlock perquè la configuració d'Account AV estigui disponible. L'accés web sempre requereix iniciar sessió.",
+      eyebrow: "Configuració necessària",
+      title: "Series AV Web necessita la configuració de Clerk."
     },
     footer: {
       deleteAccount: "Eliminar compte",
@@ -147,105 +149,106 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
     },
     home: {
       aviBody: [
-        "Comenca des de les series actuals i troba el proper pas util.",
-        "Detecta progres pendent abans que la cua sigui dificil de llegir.",
-        "Mantingues les recomanacions a prop dels teus habits reals."
+        "Comença des de les sèries actuals i troba el proper pas útil.",
+        "Detecta progrés pendent abans que la cua sigui difícil de llegir.",
+        "Mantingues les recomanacions a prop dels teus hàbits reals."
       ],
       aviTitle: "Avi vigila",
-      body: "Cerca al cataleg, desa el progres i mante un mapa clar del que toca mirar despres.",
-      cta: "Cerca al cataleg",
+      body: "Cerca al catàleg, desa el progrés i manté un mapa clar del que toca mirar després.",
+      cta: "Cerca al catàleg",
       items: [
-        { label: "Cerca al cataleg", value: "Troba series pel titol" },
-        { label: "Biblioteca", value: "Mantingues juntes les series desades" },
-        { label: "Propers episodis", value: "Torna al que esta per arribar" }
+        { label: "Cerca al catàleg", value: "Troba sèries pel títol" },
+        { label: "Biblioteca", value: "Mantingues juntes les sèries desades" },
+        { label: "Propers episodis", value: "Torna al que està per arribar" }
       ],
-      title: "Repren el teu quadern de series."
+      title: "Reprèn el teu quadern de sèries."
     },
     library: {
-      add: "Afegeix serie",
-      body: "Continua mirant, planifica que ve despres i aparta les series acabades sense perdre-les.",
-      emptyBody: "Cerca al cataleg, tria una serie i Series AV mantindra aqui el proper episodi i les notes de progres.",
-      emptyTitle: "Comenca desant una serie.",
+      add: "Afegeix sèrie",
+      body: "Continua mirant, planifica què ve després i aparta les sèries acabades sense perdre-les.",
+      emptyBody: "Cerca al catàleg, tria una sèrie i Series AV mantindrà aquí el proper episodi i les notes de progrés.",
+      emptyTitle: "Comença desant una sèrie.",
       filters: ["Totes", "Mirant", "Vull mirar", "Vistes", "Arxivades"],
       hints: [
-        { text: "Les series actives queden a dalt per trobar facilment el proper pas.", title: "Mirant" },
-        { text: "Els nous episodis poden aparèixer al costat de les series que ja segueixes.", title: "Properament" },
-        { text: "Les series acabades o pausades continuen disponibles sense omplir la llista principal.", title: "Arxiu" }
+        { text: "Les sèries actives queden a dalt per trobar fàcilment el proper pas.", title: "Mirant" },
+        { text: "Els nous episodis poden aparèixer al costat de les sèries que ja segueixes.", title: "Properament" },
+        { text: "Les sèries acabades o pausades continuen disponibles sense omplir la llista principal.", title: "Arxiu" }
       ],
       kicker: "Biblioteca",
-      title: "Les teves series desades, ordenades pel proper episodi."
+      title: "Les teves sèries desades, ordenades pel proper episodi."
     },
     login: {
       aviGuidance: "Guia d'Avi",
-      cardBody: "Desa el que mires, troba que ve despres i torna al teu progres sense refer la llista.",
+      cardBody: "Desa el que mires, troba què ve després i torna al teu progrés sense refer la llista.",
       cardTitle: "Continua des de la teva llista",
-      cta: "Inicia sessio",
-      heroBody: "Inicia sessio per mantenir la biblioteca, el progres dels episodis i l'ajuda d'Avi connectats alla on miris.",
-      heroTitle: "El teu quadern de series, sempre a punt.",
-      intro: "Segueix cada serie, recorda el proper episodi i tingues la llista a ma des de qualsevol pantalla.",
-      mapBody: "L'experiencia web mante el to de quadern d'iOS: textura de paper, linies de tinta, punts verds i Avi ben a prop.",
-      mapTitle: "Un mapa de progres dibuixat a ma per al proper episodi.",
-      notebook: "Quadern de series",
-      search: "Cerca de series"
+      cta: "Inicia sessió",
+      heroBody: "Inicia sessió per mantenir la biblioteca, el progrés dels episodis i l'ajuda d'Avi connectats allà on miris.",
+      heroTitle: "El teu quadern de sèries, sempre a punt.",
+      intro: "Segueix cada sèrie, recorda el proper episodi i tingues la llista a mà des de qualsevol pantalla.",
+      mapBody: "L'experiència web manté el to de quadern d'iOS: textura de paper, línies de tinta, punts verds i Avi ben a prop.",
+      mapTitle: "Un mapa de progrés dibuixat a mà per al proper episodi.",
+      notebook: "Quadern de sèries",
+      search: "Cerca de sèries"
     },
     nav: {
       avi: "Avi",
+      aviLabel: "Obre la guia d'Avi",
       home: "Inici",
       homeLabel: "Inici de Series AV",
       library: "Biblioteca",
-      mobileNavigation: "Navegacio mobil",
-      openNavigation: "Obre la navegacio",
-      primaryNavigation: "Navegacio principal",
+      mobileNavigation: "Navegació mòbil",
+      openNavigation: "Obre la navegació",
+      primaryNavigation: "Navegació principal",
       search: "Cerca"
     },
     protected: {
-      body: "Inicia sessio per obrir la biblioteca, cercar el cataleg i deixar que Avi t'ajudi a triar que mirar despres.",
-      cta: "Inicia sessio",
-      title: "Porta el teu quadern de series amb tu."
+      body: "Inicia sessió per obrir la biblioteca, cercar el catàleg i deixar que Avi t'ajudi a triar què mirar després.",
+      cta: "Inicia sessió",
+      title: "Porta el teu quadern de sèries amb tu."
     },
     signIn: {
       aviPanelBody: "Un petit impuls quan el proper episodi no queda clar.",
-      body: "Inicia sessio per mantenir les series, els propers episodis i les recomanacions d'Avi connectades amb el teu compte AV.",
+      body: "Inicia sessió per mantenir les sèries, els propers episodis i les recomanacions d'Avi connectades amb el teu compte AV.",
       continue: "Continua",
-      signedIn: "Ja has iniciat sessio.",
+      signedIn: "Ja has iniciat sessió.",
       title: "La teva biblioteca de Series AV t'acompanya."
     },
     search: {
       dateUnknown: "Data desconeguda",
-      description: "Troba un titol, revisa'n l'art i prepara'l per al flux de biblioteca amb sessio iniciada.",
-      emptyBody: "Prova amb un altre titol.",
-      emptyTitle: "No s'han trobat series",
-      errorTitle: "La cerca de series ha fallat",
-      inputLabel: "Cerca series",
+      description: "Troba un títol, revisa'n l'art i prepara'l per al flux de biblioteca amb sessió iniciada.",
+      emptyBody: "Prova amb un altre títol.",
+      emptyTitle: "No s'han trobat sèries",
+      errorTitle: "La cerca de sèries ha fallat",
+      inputLabel: "Cerca sèries",
       noArtwork: "Sense imatge",
       noOverview: "Encara no hi ha cap resum disponible.",
-      placeholder: "Cerca una serie",
-      title: "Cerca al cataleg de Series AV."
+      placeholder: "Cerca una sèrie",
+      title: "Cerca al catàleg de Series AV."
     }
   },
   de: {
     account: {
       signInTitle: "Bei Series AV anmelden",
-      signInSubtitle: "Willkommen zurueck. Melde dich an, damit dein Seriennotizbuch verbunden bleibt."
+      signInSubtitle: "Willkommen zurück. Melde dich an, damit dein Seriennotizbuch verbunden bleibt."
     },
     avi: {
-      body: "Avi macht aus einer unuebersichtlichen Watchlist einen klaren naechsten Schritt: fortsetzen, speichern, aufholen oder etwas Passendes entdecken.",
+      body: "Avi macht aus einer unübersichtlichen Watchlist einen klaren nächsten Schritt: fortsetzen, speichern, aufholen oder etwas Passendes entdecken.",
       cards: [
-        { text: "Avi kann zeigen, welche Serien einen gespeicherten Status, die naechste Folge oder eine klarere Fortschrittsnotiz brauchen.", title: "Notizbuch vorbereiten" },
-        { text: "Kommende Folgen und aktive Serien bleiben lesbar, damit der naechste Schritt nicht untergeht.", title: "Naechstes auswaehlen" },
-        { text: "Empfehlungen koennen aus dem wachsen, was du wirklich schaust, statt bei einem leeren Katalog zu starten.", title: "Mit Kontext entdecken" }
+        { text: "Avi kann zeigen, welche Serien einen gespeicherten Status, die nächste Folge oder eine klarere Fortschrittsnotiz brauchen.", title: "Notizbuch vorbereiten" },
+        { text: "Kommende Folgen und aktive Serien bleiben lesbar, damit der nächste Schritt nicht untergeht.", title: "Nächstes auswählen" },
+        { text: "Empfehlungen können aus dem wachsen, was du wirklich schaust, statt bei einem leeren Katalog zu starten.", title: "Mit Kontext entdecken" }
       ],
-      libraryCta: "Bibliothek oeffnen",
+      libraryCta: "Bibliothek öffnen",
       searchCta: "Serie finden",
-      title: "Eine ruhige Hilfe fuer deine naechste Folge."
+      title: "Eine ruhige Hilfe für deine nächste Folge."
     },
     config: {
-      body: "Starte die Web-App ueber den Varlock-Wrapper, damit die Account AV-Konfiguration verfuegbar ist. Webzugriff ist immer anmeldepflichtig.",
+      body: "Starte die Web-App über den Varlock-Wrapper, damit die Account AV-Konfiguration verfügbar ist. Webzugriff ist immer anmeldepflichtig.",
       eyebrow: "Konfiguration erforderlich",
-      title: "Series AV Web benoetigt die Clerk-Konfiguration."
+      title: "Series AV Web benötigt die Clerk-Konfiguration."
     },
     footer: {
-      deleteAccount: "Konto loeschen",
+      deleteAccount: "Konto löschen",
       language: "Sprache",
       privacy: "Datenschutz",
       support: "Hilfe",
@@ -253,78 +256,79 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
     },
     home: {
       aviBody: [
-        "Beginne mit deinen aktuellen Serien und finde den naechsten sinnvollen Schritt.",
+        "Beginne mit deinen aktuellen Serien und finde den nächsten sinnvollen Schritt.",
         "Erkenne fehlenden Fortschritt, bevor die Liste schwer lesbar wird.",
         "Halte Empfehlungen nah an deinen echten Sehgewohnheiten."
       ],
       aviTitle: "Avi passt auf",
-      body: "Durchsuche den Katalog, speichere Fortschritt und behalte klar im Blick, was als Naechstes dran ist.",
+      body: "Durchsuche den Katalog, speichere Fortschritt und behalte klar im Blick, was als Nächstes dran ist.",
       cta: "Katalog durchsuchen",
       items: [
         { label: "Katalogsuche", value: "Serien nach Titel finden" },
         { label: "Bibliothek", value: "Gespeicherte Serien beisammen halten" },
-        { label: "Naechste Folgen", value: "Zu dem zurueckkehren, was ansteht" }
+        { label: "Nächste Folgen", value: "Zu dem zurückkehren, was ansteht" }
       ],
       title: "Nimm dein Seriennotizbuch wieder auf."
     },
     library: {
-      add: "Serie hinzufuegen",
+      add: "Serie hinzufügen",
       body: "Schaue weiter, plane was kommt und verschiebe beendete Serien, ohne sie zu verlieren.",
-      emptyBody: "Durchsuche den Katalog, waehle eine Serie aus, und Series AV sammelt hier die naechste Folge und Fortschrittsnotizen.",
+      emptyBody: "Durchsuche den Katalog, wähle eine Serie aus, und Series AV sammelt hier die nächste Folge und Fortschrittsnotizen.",
       emptyTitle: "Beginne mit einer gespeicherten Serie.",
       filters: ["Alle", "Aktuell", "Ansehen", "Gesehen", "Archiviert"],
       hints: [
-        { text: "Aktive Serien bleiben oben, damit der naechste Schritt leicht zu finden ist.", title: "Aktuell" },
-        { text: "Neue Folgen koennen neben den Serien erscheinen, denen du schon folgst.", title: "Demnaechst" },
-        { text: "Beendete oder pausierte Serien bleiben verfuegbar, ohne die Hauptliste zu fuellen.", title: "Archiv" }
+        { text: "Aktive Serien bleiben oben, damit der nächste Schritt leicht zu finden ist.", title: "Aktuell" },
+        { text: "Neue Folgen können neben den Serien erscheinen, denen du schon folgst.", title: "Demnächst" },
+        { text: "Beendete oder pausierte Serien bleiben verfügbar, ohne die Hauptliste zu füllen.", title: "Archiv" }
       ],
       kicker: "Bibliothek",
-      title: "Deine gespeicherten Serien, nach der naechsten Folge sortiert."
+      title: "Deine gespeicherten Serien, nach der nächsten Folge sortiert."
     },
     login: {
       aviGuidance: "Avi hilft dir",
-      cardBody: "Speichere, was du schaust, finde die naechste Folge und kehre zu deinem Fortschritt zurueck.",
+      cardBody: "Speichere, was du schaust, finde die nächste Folge und kehre zu deinem Fortschritt zurück.",
       cardTitle: "Mach mit deiner Liste weiter",
       cta: "Anmelden",
-      heroBody: "Melde dich an, damit Bibliothek, Episodenfortschritt und Avi-Hilfe ueberall verbunden bleiben.",
+      heroBody: "Melde dich an, damit Bibliothek, Episodenfortschritt und Avi-Hilfe überall verbunden bleiben.",
       heroTitle: "Dein Seriennotizbuch, immer bereit.",
-      intro: "Behalte jede Serie im Blick, merke dir die naechste Folge und nimm deine Watchlist auf jeden Bildschirm mit.",
-      mapBody: "Die Web-Erfahrung behaelt das Notizbuchgefuehl von iOS: Papierstruktur, Tintenlinien, gruene Markierungen und Avi in der Naehe.",
-      mapTitle: "Eine handgezeichnete Fortschrittskarte fuer deine naechste Folge.",
+      intro: "Behalte jede Serie im Blick, merke dir die nächste Folge und nimm deine Watchlist auf jeden Bildschirm mit.",
+      mapBody: "Die Web-Erfahrung behält das Notizbuchgefühl von iOS: Papierstruktur, Tintenlinien, grüne Markierungen und Avi in der Nähe.",
+      mapTitle: "Eine handgezeichnete Fortschrittskarte für deine nächste Folge.",
       notebook: "Seriennotizbuch",
       search: "Seriensuche"
     },
     nav: {
       avi: "Avi",
+      aviLabel: "Avi-Hilfe öffnen",
       home: "Start",
       homeLabel: "Series AV Start",
       library: "Bibliothek",
       mobileNavigation: "Mobile Navigation",
-      openNavigation: "Navigation oeffnen",
+      openNavigation: "Navigation öffnen",
       primaryNavigation: "Hauptnavigation",
       search: "Suche"
     },
     protected: {
-      body: "Melde dich an, um deine Bibliothek zu oeffnen, den Katalog zu durchsuchen und Avi bei der naechsten Wahl helfen zu lassen.",
+      body: "Melde dich an, um deine Bibliothek zu öffnen, den Katalog zu durchsuchen und Avi bei der nächsten Wahl helfen zu lassen.",
       cta: "Anmelden",
       title: "Nimm dein Seriennotizbuch mit."
     },
     signIn: {
-      aviPanelBody: "Ein ruhiger Hinweis, wenn die naechste Folge unklar ist.",
-      body: "Melde dich an, damit deine Serien, naechsten Folgen und Avi-Empfehlungen mit deinem AV-Konto verbunden bleiben.",
+      aviPanelBody: "Ein ruhiger Hinweis, wenn die nächste Folge unklar ist.",
+      body: "Melde dich an, damit deine Serien, nächsten Folgen und Avi-Empfehlungen mit deinem AV-Konto verbunden bleiben.",
       continue: "Weiter",
       signedIn: "Du bist angemeldet.",
       title: "Deine Series AV Bibliothek begleitet dich."
     },
     search: {
       dateUnknown: "Datum unbekannt",
-      description: "Finde einen Titel, pruefe das Artwork und bereite ihn fuer den angemeldeten Bibliotheksfluss vor.",
+      description: "Finde einen Titel, prüfe das Artwork und bereite ihn für den angemeldeten Bibliotheksfluss vor.",
       emptyBody: "Versuche es mit einem anderen Titel.",
       emptyTitle: "Keine Serien gefunden",
       errorTitle: "Seriensuche fehlgeschlagen",
       inputLabel: "Serien suchen",
       noArtwork: "Kein Artwork",
-      noOverview: "Noch keine Beschreibung verfuegbar.",
+      noOverview: "Noch keine Beschreibung verfügbar.",
       placeholder: "Serie suchen",
       title: "Den Series AV-Katalog durchsuchen."
     }
@@ -389,20 +393,21 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       title: "Tus series guardadas, ordenadas para el próximo episodio."
     },
     login: {
-      aviGuidance: "Guia de Avi",
-      cardBody: "Guarda lo que estas viendo, encuentra que viene despues y vuelve a tu progreso sin reconstruir la lista.",
-      cardTitle: "Continua desde tu lista",
-      cta: "Iniciar sesion",
-      heroBody: "Inicia sesion para mantener tu biblioteca, progreso de episodios y guia de Avi conectados alli donde mires.",
+      aviGuidance: "Guía de Avi",
+      cardBody: "Guarda lo que estás viendo, encuentra qué viene después y vuelve a tu progreso sin reconstruir la lista.",
+      cardTitle: "Continúa desde tu lista",
+      cta: "Iniciar sesión",
+      heroBody: "Inicia sesión para mantener tu biblioteca, progreso de episodios y guía de Avi conectados allí donde mires.",
       heroTitle: "Tu cuaderno de series, siempre listo.",
-      intro: "Sigue cada serie, recuerda el proximo episodio y manten tu lista cerca desde cualquier pantalla.",
-      mapBody: "La experiencia web mantiene el tono de cuaderno de iOS: textura de papel, lineas de tinta, marcas verdes y Avi cerca.",
-      mapTitle: "Un mapa de progreso dibujado a mano para tu proximo episodio.",
+      intro: "Sigue cada serie, recuerda el próximo episodio y mantén tu lista cerca desde cualquier pantalla.",
+      mapBody: "La experiencia web mantiene el tono de cuaderno de iOS: textura de papel, líneas de tinta, marcas verdes y Avi cerca.",
+      mapTitle: "Un mapa de progreso dibujado a mano para tu próximo episodio.",
       notebook: "Cuaderno de series",
-      search: "Busqueda de series"
+      search: "Búsqueda de series"
     },
     nav: {
       avi: "Avi",
+      aviLabel: "Abrir guía de Avi",
       home: "Inicio",
       homeLabel: "Inicio de Series AV",
       library: "Biblioteca",
@@ -412,16 +417,16 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       search: "Buscar"
     },
     protected: {
-      body: "Inicia sesion para abrir tu biblioteca, buscar en el catalogo y dejar que Avi te ayude a elegir que ver despues.",
-      cta: "Iniciar sesion",
+      body: "Inicia sesión para abrir tu biblioteca, buscar en el catálogo y dejar que Avi te ayude a elegir qué ver después.",
+      cta: "Iniciar sesión",
       title: "Lleva tu cuaderno de series contigo."
     },
     signIn: {
-      aviPanelBody: "Un pequeno empujon cuando el proximo episodio no esta claro.",
-      body: "Inicia sesion para mantener tus series, proximos episodios y recomendaciones de Avi conectados con tu cuenta AV.",
+      aviPanelBody: "Un pequeño empujón cuando el próximo episodio no está claro.",
+      body: "Inicia sesión para mantener tus series, próximos episodios y recomendaciones de Avi conectados con tu cuenta AV.",
       continue: "Continuar",
-      signedIn: "Has iniciado sesion.",
-      title: "Tu biblioteca de Series AV te acompana."
+      signedIn: "Has iniciado sesión.",
+      title: "Tu biblioteca de Series AV te acompaña."
     },
     search: {
       dateUnknown: "Fecha desconocida",
@@ -439,106 +444,107 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
   fr: {
     account: {
       signInTitle: "Connectez-vous à Series AV",
-      signInSubtitle: "Bon retour. Connectez-vous pour garder votre carnet de series synchronise."
+      signInSubtitle: "Bon retour. Connectez-vous pour garder votre carnet de séries synchronisé."
     },
     avi: {
-      body: "Avi transforme une liste de visionnage confuse en prochaine etape claire : continuer, enregistrer, rattraper ou decouvrir quelque chose qui correspond a vos habitudes.",
+      body: "Avi transforme une liste de visionnage confuse en prochaine étape claire : continuer, enregistrer, rattraper ou découvrir quelque chose qui correspond à vos habitudes.",
       cards: [
-        { text: "Avi peut signaler les series qui ont besoin d'un statut enregistre, d'un prochain episode ou d'une note de progression plus claire.", title: "Preparer le carnet" },
-        { text: "Les episodes a venir et les series actives restent lisibles, afin que la prochaine action ne soit pas enterree.", title: "Choisir la suite" },
-        { text: "Les recommandations peuvent partir de ce que vous regardez vraiment, plutot que d'un catalogue vide.", title: "Decouvrir avec contexte" }
+        { text: "Avi peut signaler les séries qui ont besoin d'un statut enregistré, d'un prochain épisode ou d'une note de progression plus claire.", title: "Préparer le carnet" },
+        { text: "Les épisodes à venir et les séries actives restent lisibles, afin que la prochaine action ne soit pas enterrée.", title: "Choisir la suite" },
+        { text: "Les recommandations peuvent partir de ce que vous regardez vraiment, plutôt que d'un catalogue vide.", title: "Découvrir avec contexte" }
       ],
-      libraryCta: "Ouvrir la bibliotheque",
-      searchCta: "Trouver une serie",
-      title: "Un guide calme pour votre prochain episode."
+      libraryCta: "Ouvrir la bibliothèque",
+      searchCta: "Trouver une série",
+      title: "Un guide calme pour votre prochain épisode."
     },
     config: {
-      body: "Lancez l'app web avec le wrapper Varlock afin que la configuration Account AV soit disponible. L'acces web requiert toujours une connexion.",
+      body: "Lancez l'app web avec le wrapper Varlock afin que la configuration Account AV soit disponible. L'accès web requiert toujours une connexion.",
       eyebrow: "Configuration requise",
       title: "Series AV Web a besoin de la configuration Clerk."
     },
     footer: {
       deleteAccount: "Supprimer le compte",
       language: "Langue",
-      privacy: "Confidentialite",
+      privacy: "Confidentialité",
       support: "Aide",
       terms: "Conditions"
     },
     home: {
       aviBody: [
-        "Partez de vos series en cours et trouvez la prochaine action utile.",
-        "Reperez les progressions manquantes avant que la file devienne difficile a lire.",
+        "Partez de vos séries en cours et trouvez la prochaine action utile.",
+        "Repérez les progressions manquantes avant que la file devienne difficile à lire.",
         "Gardez les recommandations proches de vos vraies habitudes."
       ],
       aviTitle: "Avi veille",
       body: "Parcourez le catalogue, enregistrez votre progression et gardez une carte claire de la suite.",
       cta: "Chercher dans le catalogue",
       items: [
-        { label: "Recherche catalogue", value: "Trouver des series par titre" },
-        { label: "Bibliotheque", value: "Garder vos series enregistrees ensemble" },
-        { label: "Prochains episodes", value: "Revenir a ce qui arrive bientot" }
+        { label: "Recherche catalogue", value: "Trouver des séries par titre" },
+        { label: "Bibliothèque", value: "Garder vos séries enregistrées ensemble" },
+        { label: "Prochains épisodes", value: "Revenir à ce qui arrive bientôt" }
       ],
-      title: "Reprenez votre carnet de series."
+      title: "Reprenez votre carnet de séries."
     },
     library: {
-      add: "Ajouter une serie",
-      body: "Continuez a regarder, planifiez la suite et rangez les series terminees sans les perdre.",
-      emptyBody: "Cherchez dans le catalogue, choisissez une serie, et Series AV gardera ici le prochain episode et les notes de progression.",
-      emptyTitle: "Commencez par enregistrer une serie.",
-      filters: ["Toutes", "En cours", "A regarder", "Vues", "Archivees"],
+      add: "Ajouter une série",
+      body: "Continuez à regarder, planifiez la suite et rangez les séries terminées sans les perdre.",
+      emptyBody: "Cherchez dans le catalogue, choisissez une série, et Series AV gardera ici le prochain épisode et les notes de progression.",
+      emptyTitle: "Commencez par enregistrer une série.",
+      filters: ["Toutes", "En cours", "À regarder", "Vues", "Archivées"],
       hints: [
-        { text: "Les series actives restent en haut pour retrouver facilement la prochaine etape.", title: "En cours" },
-        { text: "Les nouveaux episodes peuvent apparaitre pres des series que vous suivez deja.", title: "A venir" },
-        { text: "Les series terminees ou en pause restent disponibles sans encombrer la liste principale.", title: "Archive" }
+        { text: "Les séries actives restent en haut pour retrouver facilement la prochaine étape.", title: "En cours" },
+        { text: "Les nouveaux épisodes peuvent apparaître près des séries que vous suivez déjà.", title: "À venir" },
+        { text: "Les séries terminées ou en pause restent disponibles sans encombrer la liste principale.", title: "Archive" }
       ],
-      kicker: "Bibliotheque",
-      title: "Vos series enregistrees, rangees pour le prochain episode."
+      kicker: "Bibliothèque",
+      title: "Vos séries enregistrées, rangées pour le prochain épisode."
     },
     login: {
       aviGuidance: "Conseils d'Avi",
       cardBody: "Enregistrez ce que vous regardez, trouvez la suite et retrouvez votre progression sans refaire la liste.",
       cardTitle: "Reprendre depuis votre liste",
       cta: "Se connecter",
-      heroBody: "Connectez-vous pour garder votre bibliotheque, la progression des episodes et l'aide d'Avi synchronisees partout.",
-      heroTitle: "Votre carnet de series, toujours pret.",
-      intro: "Suivez chaque serie, gardez le prochain episode en memoire et retrouvez votre liste sur tous vos ecrans.",
-      mapBody: "L'experience web garde l'esprit carnet d'iOS : texture papier, traits d'encre, reperes verts et Avi tout pres.",
-      mapTitle: "Une carte de progression dessinee a la main pour votre prochain episode.",
-      notebook: "Carnet de series",
-      search: "Recherche de series"
+      heroBody: "Connectez-vous pour garder votre bibliothèque, la progression des épisodes et l'aide d'Avi synchronisées partout.",
+      heroTitle: "Votre carnet de séries, toujours prêt.",
+      intro: "Suivez chaque série, gardez le prochain épisode en mémoire et retrouvez votre liste sur tous vos écrans.",
+      mapBody: "L'expérience web garde l'esprit carnet d'iOS : texture papier, traits d'encre, repères verts et Avi tout près.",
+      mapTitle: "Une carte de progression dessinée à la main pour votre prochain épisode.",
+      notebook: "Carnet de séries",
+      search: "Recherche de séries"
     },
     nav: {
       avi: "Avi",
+      aviLabel: "Ouvrir les conseils d'Avi",
       home: "Accueil",
       homeLabel: "Accueil Series AV",
-      library: "Bibliotheque",
+      library: "Bibliothèque",
       mobileNavigation: "Navigation mobile",
       openNavigation: "Ouvrir la navigation",
       primaryNavigation: "Navigation principale",
       search: "Recherche"
     },
     protected: {
-      body: "Connectez-vous pour ouvrir votre bibliotheque, parcourir le catalogue et laisser Avi vous aider a choisir la suite.",
+      body: "Connectez-vous pour ouvrir votre bibliothèque, parcourir le catalogue et laisser Avi vous aider à choisir la suite.",
       cta: "Se connecter",
-      title: "Gardez votre carnet de series avec vous."
+      title: "Gardez votre carnet de séries avec vous."
     },
     signIn: {
-      aviPanelBody: "Un petit coup de pouce quand le prochain episode n'est pas clair.",
-      body: "Connectez-vous pour garder vos series, prochains episodes et recommandations d'Avi liees a votre compte AV.",
+      aviPanelBody: "Un petit coup de pouce quand le prochain épisode n'est pas clair.",
+      body: "Connectez-vous pour garder vos séries, prochains épisodes et recommandations d'Avi liées à votre compte AV.",
       continue: "Continuer",
-      signedIn: "Vous etes connecte.",
-      title: "Votre bibliotheque Series AV vous accompagne."
+      signedIn: "Vous êtes connecté.",
+      title: "Votre bibliothèque Series AV vous accompagne."
     },
     search: {
       dateUnknown: "Date inconnue",
-      description: "Trouvez un titre, verifiez son visuel et preparez-le pour le parcours bibliotheque connecte.",
+      description: "Trouvez un titre, vérifiez son visuel et préparez-le pour le parcours bibliothèque connecté.",
       emptyBody: "Essayez un autre titre.",
-      emptyTitle: "Aucune serie trouvee",
-      errorTitle: "La recherche de series a echoue",
-      inputLabel: "Rechercher des series",
+      emptyTitle: "Aucune série trouvée",
+      errorTitle: "La recherche de séries a échoué",
+      inputLabel: "Rechercher des séries",
       noArtwork: "Aucun visuel",
-      noOverview: "Aucun resume n'est encore disponible.",
-      placeholder: "Rechercher une serie",
+      noOverview: "Aucun résumé n'est encore disponible.",
+      placeholder: "Rechercher une série",
       title: "Rechercher dans le catalogue Series AV."
     }
   }
@@ -575,6 +581,7 @@ export function useSeriesShellLabels() {
   const text = useSeriesText();
 
   return {
+    assistant: text.nav.aviLabel,
     home: text.nav.homeLabel,
     mobileNavigation: text.nav.mobileNavigation,
     openNavigation: text.nav.openNavigation,
@@ -584,10 +591,20 @@ export function useSeriesShellLabels() {
 
 export function useSeriesAccountLocalization() {
   const text = useSeriesText();
+  const baseLocalization = {
+    ca: caES,
+    de: deDE,
+    en: enUS,
+    es: esES,
+    fr: frFR
+  }[useAppsAvLocale()];
 
   return {
+    ...baseLocalization,
     signIn: {
+      ...baseLocalization.signIn,
       start: {
+        ...baseLocalization.signIn?.start,
         title: text.account.signInTitle,
         subtitle: text.account.signInSubtitle
       }
