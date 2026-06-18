@@ -40,7 +40,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
           {publishableKey ? (
             <AccountAvProvider
               accountApiBaseUrl={getAccountApiBaseUrl()}
-              afterSignOutUrl="/"
+              afterSignOutUrl="/sign-in"
               appDisplayName="Series AV"
               appId="seriesav"
               localization={localization}
