@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { SeriesAppShell } from "@/components/series-app-shell";
-import { SeriesEntryRow } from "@/components/series-library-ui";
+import { SeriesEntryRow, seriesLibraryUiText } from "@/components/series-library-ui";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
@@ -20,6 +20,8 @@ type Filter = "all" | "watching" | "wantToWatch" | "watched" | "archived";
 function LibraryRoute() {
   const locale = useAppsAvLocale();
   const text = useSeriesText();
+  const labels = libraryLabels[locale];
+  const uiLabels = seriesLibraryUiText(locale);
   const library = useSeriesLibrary();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
@@ -39,7 +41,7 @@ function LibraryRoute() {
                 <h1 className="mt-2 text-4xl font-semibold leading-tight text-[#112a55]">{text.library.title}</h1>
                 <p className="mt-4 max-w-2xl text-base leading-7 text-[#334766]">{text.library.body}</p>
                 <p className="mt-3 text-sm font-semibold text-[#53617a]">
-                  {library.limit.activeCount}/{library.limit.activeLimit} active · Sync {library.syncState}
+                  {library.limit.activeCount}/{library.limit.activeLimit} {labels.activeLower} · Sync {library.syncState}
                 </p>
               </div>
               <Button asChild className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]">
@@ -50,7 +52,7 @@ function LibraryRoute() {
               </Button>
             </div>
             <div className="mt-6 grid gap-3 lg:grid-cols-[1fr_auto]">
-              <input className="h-11 rounded-full border border-[#d7c494] bg-[#fff8df] px-4 text-[#112a55]" placeholder="Search your library" value={query} onChange={(event) => setQuery(event.target.value)} />
+              <input className="h-11 rounded-full border border-[#d7c494] bg-[#fff8df] px-4 text-[#112a55]" placeholder={labels.searchPlaceholder} value={query} onChange={(event) => setQuery(event.target.value)} />
               <div className="flex flex-wrap gap-2">
                 {filters.map((item, index) => (
                   <button key={item} className={filter === item ? "rounded-full bg-[#112a55] px-3 py-2 text-sm font-semibold text-white" : "rounded-full border border-[#d7c494] bg-[#fff8df]/80 px-3 py-2 text-sm font-semibold text-[#334766]"} type="button" onClick={() => setFilter(item)}>
@@ -67,7 +69,7 @@ function LibraryRoute() {
 
           {active.length > 0 ? (
             <section className="grid gap-3">
-              <h2 className="text-sm font-bold uppercase text-[#53617a]">Active</h2>
+              <h2 className="text-sm font-bold uppercase text-[#53617a]">{labels.active}</h2>
               {active.map((entry) => (
                 <SeriesEntryRow key={entry.entryId} entry={entry} locale={locale} />
               ))}
@@ -76,7 +78,7 @@ function LibraryRoute() {
 
           {showArchived && archived.length > 0 ? (
             <section className="grid gap-3">
-              <h2 className="text-sm font-bold uppercase text-[#53617a]">Archived</h2>
+              <h2 className="text-sm font-bold uppercase text-[#53617a]">{uiLabels.archive}</h2>
               {archived.map((entry) => (
                 <SeriesEntryRow key={entry.entryId} entry={entry} locale={locale} showArchive={false} />
               ))}
@@ -87,6 +89,14 @@ function LibraryRoute() {
     </ProtectedRoute>
   );
 }
+
+const libraryLabels = {
+  ca: { active: "Actives", activeLower: "actives", searchPlaceholder: "Cerca a la biblioteca" },
+  de: { active: "Aktiv", activeLower: "aktiv", searchPlaceholder: "Bibliothek durchsuchen" },
+  en: { active: "Active", activeLower: "active", searchPlaceholder: "Search your library" },
+  es: { active: "Activas", activeLower: "activas", searchPlaceholder: "Buscar en tu biblioteca" },
+  fr: { active: "Actives", activeLower: "actives", searchPlaceholder: "Rechercher dans la bibliothèque" }
+} as const;
 
 const filters: Filter[] = ["all", "watching", "wantToWatch", "watched", "archived"];
 

@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Archive, ArrowLeft, Check, Pin, PinOff, RotateCcw, StepBack, StepForward, Trash2 } from "lucide-react";
+import { Archive, ArrowLeft, Check, MoreHorizontal, Pin, PinOff, RotateCcw, StepBack, StepForward, Trash2 } from "lucide-react";
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
@@ -12,6 +13,99 @@ export const statusLabels: Record<SeriesLibraryEntryStatus, string> = {
   watched: "Watched",
   watching: "Watching"
 };
+
+const uiText = {
+  ca: {
+    archive: "Arxiva",
+    clear: "Neteja",
+    episode: "Episodi",
+    more: "Més",
+    next: "Següent",
+    noEpisodeSet: "Cap episodi fixat",
+    notStarted: "No iniciada",
+    pin: "Fixa",
+    pinned: "Fixada",
+    previous: "Anterior",
+    restore: "Restaura",
+    save: "Desa",
+    season: "Temporada",
+    status: { wantToWatch: "Vull mirar", watched: "Vista", watching: "Veient" },
+    trash: "Elimina",
+    unpin: "Desfixa"
+  },
+  de: {
+    archive: "Archivieren",
+    clear: "Leeren",
+    episode: "Folge",
+    more: "Mehr",
+    next: "Weiter",
+    noEpisodeSet: "Keine Folge gesetzt",
+    notStarted: "Nicht begonnen",
+    pin: "Anheften",
+    pinned: "Angeheftet",
+    previous: "Zurück",
+    restore: "Wiederherstellen",
+    save: "Speichern",
+    season: "Staffel",
+    status: { wantToWatch: "Ansehen", watched: "Gesehen", watching: "Aktuell" },
+    trash: "Löschen",
+    unpin: "Lösen"
+  },
+  en: {
+    archive: "Archive",
+    clear: "Clear",
+    episode: "Episode",
+    more: "More",
+    next: "Next",
+    noEpisodeSet: "No episode set",
+    notStarted: "Not started",
+    pin: "Pin",
+    pinned: "Pinned",
+    previous: "Previous",
+    restore: "Restore",
+    save: "Save",
+    season: "Season",
+    status: statusLabels,
+    trash: "Delete",
+    unpin: "Unpin"
+  },
+  es: {
+    archive: "Archivar",
+    clear: "Borrar",
+    episode: "Episodio",
+    more: "Más",
+    next: "Siguiente",
+    noEpisodeSet: "Sin episodio",
+    notStarted: "No iniciada",
+    pin: "Fijar",
+    pinned: "Fijada",
+    previous: "Anterior",
+    restore: "Restaurar",
+    save: "Guardar",
+    season: "Temporada",
+    status: { wantToWatch: "Quiero ver", watched: "Vista", watching: "Viendo" },
+    trash: "Eliminar",
+    unpin: "Quitar"
+  },
+  fr: {
+    archive: "Archiver",
+    clear: "Effacer",
+    episode: "Épisode",
+    more: "Plus",
+    next: "Suivant",
+    noEpisodeSet: "Aucun épisode",
+    notStarted: "Pas commencée",
+    pin: "Épingler",
+    pinned: "Épinglée",
+    previous: "Précédent",
+    restore: "Restaurer",
+    save: "Enregistrer",
+    season: "Saison",
+    status: { wantToWatch: "À regarder", watched: "Vue", watching: "En cours" },
+    trash: "Supprimer",
+    unpin: "Désépingler"
+  }
+} satisfies Record<AppsAvLocale, { archive: string; clear: string; episode: string; more: string; next: string; noEpisodeSet: string; notStarted: string; pin: string; pinned: string; previous: string; restore: string; save: string; season: string; status: Record<SeriesLibraryEntryStatus, string>; trash: string; unpin: string }>;
 
 export function SeriesArtwork({ entry, size = "md" }: { entry: Pick<SeriesLibraryEntry, "displayArtworkRef" | "fallbackVisualSeed" | "title">; size?: "sm" | "md" | "lg" }) {
   const classes = {
@@ -32,6 +126,7 @@ export function SeriesArtwork({ entry, size = "md" }: { entry: Pick<SeriesLibrar
 export function SeriesEntryRow({ entry, locale, showArchive = true }: { entry: SeriesLibraryEntry; locale: AppsAvLocale; showArchive?: boolean }) {
   const library = useSeriesLibrary();
   const next = nextEpisodeCursor(entry.lastWatchedEpisodeCursor);
+  const labels = uiText[locale];
 
   return (
     <Card className="gap-0 rounded-lg border-[#d7c494] bg-[#fff8df]/88 p-4 py-4 shadow-sm shadow-[#172f5c]/6">
@@ -44,36 +139,47 @@ export function SeriesEntryRow({ entry, locale, showArchive = true }: { entry: S
                 {entry.title}
               </Link>
               <p className="mt-1 text-sm text-[#53617a]">
-                {statusLabels[entry.status]} · {progressLabel(entry, "Not started", "No episode set")} · Next {cursorLabel(next)}
+                {labels.status[entry.status]} · {progressLabel(entry, labels.notStarted, labels.noEpisodeSet)} · {labels.next} {cursorLabel(next)}
               </p>
             </div>
-            {entry.isPinnedHomeSeries ? <Pin className="size-4 text-[#5a8f2f]" aria-label="Pinned" /> : null}
+            {entry.isPinnedHomeSeries ? <Pin className="size-4 text-[#5a8f2f]" aria-label={labels.pinned} /> : null}
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <Button size="sm" className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" onClick={() => library.markNextEpisodeWatched(entry.entryId)}>
-              <StepForward className="size-4" /> Next
+              <StepForward className="size-4" /> {labels.next}
             </Button>
-            {entry.lastWatchedEpisodeCursor ? (
-              <Button size="sm" variant="outline" className="rounded-full border-[#c8ad72] bg-white/60" onClick={() => library.markPreviousEpisodeWatched(entry.entryId)}>
-                <StepBack className="size-4" /> Previous
-              </Button>
-            ) : null}
-            <StatusButtons entry={entry} />
-            <Button size="sm" variant="outline" className="rounded-full border-[#c8ad72] bg-white/60" onClick={() => library.setPinned(entry.entryId, entry.isPinnedHomeSeries !== true)}>
-              {entry.isPinnedHomeSeries ? <PinOff className="size-4" /> : <Pin className="size-4" />} {entry.isPinnedHomeSeries ? "Unpin" : "Pin"}
-            </Button>
-            {entry.archivedAt ? (
-              <Button size="sm" variant="outline" className="rounded-full border-[#c8ad72] bg-white/60" onClick={() => library.restore(entry.entryId)}>
-                <RotateCcw className="size-4" /> Restore
-              </Button>
-            ) : showArchive ? (
-              <Button size="sm" variant="outline" className="rounded-full border-[#c8ad72] bg-white/60" onClick={() => library.archive(entry.entryId)}>
-                <Archive className="size-4" /> Archive
-              </Button>
-            ) : null}
-            <Button size="sm" variant="outline" className="rounded-full border-red-200 bg-white/60 text-red-700" onClick={() => library.deleteEntry(entry.entryId)}>
-              <Trash2 className="size-4" /> Delete
-            </Button>
+            <details className="group relative">
+              <summary className="flex h-9 cursor-pointer list-none items-center gap-2 rounded-full border border-[#c8ad72] bg-white/70 px-3 text-sm font-medium text-[#112a55] hover:bg-white [&::-webkit-details-marker]:hidden">
+                <MoreHorizontal className="size-4" /> {labels.more}
+              </summary>
+              <div className="absolute right-0 z-20 mt-2 grid w-56 gap-1 rounded-lg border border-[#d7c494] bg-[#fff8df] p-2 shadow-xl shadow-[#172f5c]/15">
+                {entry.lastWatchedEpisodeCursor ? (
+                  <MenuButton onClick={() => library.markPreviousEpisodeWatched(entry.entryId)}>
+                    <StepBack className="size-4" /> {labels.previous}
+                  </MenuButton>
+                ) : null}
+                {(["wantToWatch", "watching", "watched"] as SeriesLibraryEntryStatus[]).map((status) => (
+                  <MenuButton key={status} onClick={() => library.setStatus(entry.entryId, status)}>
+                    <Check className="size-4" /> {labels.status[status]}
+                  </MenuButton>
+                ))}
+                <MenuButton onClick={() => library.setPinned(entry.entryId, entry.isPinnedHomeSeries !== true)}>
+                  {entry.isPinnedHomeSeries ? <PinOff className="size-4" /> : <Pin className="size-4" />} {entry.isPinnedHomeSeries ? labels.unpin : labels.pin}
+                </MenuButton>
+                {entry.archivedAt ? (
+                  <MenuButton onClick={() => library.restore(entry.entryId)}>
+                    <RotateCcw className="size-4" /> {labels.restore}
+                  </MenuButton>
+                ) : showArchive ? (
+                  <MenuButton onClick={() => library.archive(entry.entryId)}>
+                    <Archive className="size-4" /> {labels.archive}
+                  </MenuButton>
+                ) : null}
+                <MenuButton danger onClick={() => library.deleteEntry(entry.entryId)}>
+                  <Trash2 className="size-4" /> {labels.trash}
+                </MenuButton>
+              </div>
+            </details>
           </div>
         </div>
       </div>
@@ -81,9 +187,10 @@ export function SeriesEntryRow({ entry, locale, showArchive = true }: { entry: S
   );
 }
 
-export function StatusButtons({ entry }: { entry: SeriesLibraryEntry }) {
+export function StatusButtons({ entry, locale = "en" }: { entry: SeriesLibraryEntry; locale?: AppsAvLocale }) {
   const library = useSeriesLibrary();
   const statuses: SeriesLibraryEntryStatus[] = ["wantToWatch", "watching", "watched"];
+  const labels = uiText[locale];
   return (
     <>
       {statuses.map((status) => (
@@ -94,25 +201,41 @@ export function StatusButtons({ entry }: { entry: SeriesLibraryEntry }) {
           className={entry.status === status ? "rounded-full bg-[#5a8f2f] text-white hover:bg-[#4c7d29]" : "rounded-full border-[#c8ad72] bg-white/60"}
           onClick={() => library.setStatus(entry.entryId, status)}
         >
-          <Check className="size-4" /> {statusLabels[status]}
+          <Check className="size-4" /> {labels.status[status]}
         </Button>
       ))}
     </>
   );
 }
 
-export function ProgressEditor({ entry }: { entry: SeriesLibraryEntry }) {
+function MenuButton({ children, danger = false, onClick }: { children: ReactNode; danger?: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium hover:bg-white/70 ${danger ? "text-red-700" : "text-[#112a55]"}`}
+      onClick={(event) => {
+        event.currentTarget.closest("details")?.removeAttribute("open");
+        onClick();
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function ProgressEditor({ entry, locale = "en" }: { entry: SeriesLibraryEntry; locale?: AppsAvLocale }) {
   const library = useSeriesLibrary();
   const current = entry.lastWatchedEpisodeCursor ?? { episodeNumber: 1, seasonNumber: 1 };
+  const labels = uiText[locale];
 
   return (
     <div className="grid gap-3 rounded-lg border border-[#d7c494] bg-[#fff8df]/72 p-4 sm:grid-cols-[1fr_1fr_auto]">
       <label className="text-sm font-semibold text-[#112a55]">
-        Season
+        {labels.season}
         <input className="mt-1 h-10 w-full rounded-md border border-[#c8ad72] bg-white px-3" min={1} type="number" defaultValue={current.seasonNumber} id={`season-${entry.entryId}`} />
       </label>
       <label className="text-sm font-semibold text-[#112a55]">
-        Episode
+        {labels.episode}
         <input className="mt-1 h-10 w-full rounded-md border border-[#c8ad72] bg-white px-3" min={1} type="number" defaultValue={current.episodeNumber} id={`episode-${entry.entryId}`} />
       </label>
       <div className="flex items-end gap-2">
@@ -124,12 +247,16 @@ export function ProgressEditor({ entry }: { entry: SeriesLibraryEntry }) {
             library.markWatchedThrough(entry.entryId, { episodeNumber: episode, seasonNumber: season });
           }}
         >
-          Save
+          {labels.save}
         </Button>
         <Button variant="outline" className="rounded-full border-[#c8ad72] bg-white/60" onClick={() => library.clearProgress(entry.entryId)}>
-          <ArrowLeft className="size-4" /> Clear
+          <ArrowLeft className="size-4" /> {labels.clear}
         </Button>
       </div>
     </div>
   );
+}
+
+export function seriesLibraryUiText(locale: AppsAvLocale) {
+  return uiText[locale];
 }

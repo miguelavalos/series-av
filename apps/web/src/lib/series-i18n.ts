@@ -655,3 +655,19 @@ export function localizedSeriesPath(path: string, locale: AppsAvLocale): string 
   const separator = path.includes("?") ? "&" : "?";
   return `${path}${separator}lang=${locale}`;
 }
+
+export function localizedExternalUrl(href: string | undefined, locale: AppsAvLocale): string | undefined {
+  if (!href || locale === "en") {
+    return href;
+  }
+
+  try {
+    const url = new URL(href);
+    if (!url.pathname.split("/").filter(Boolean).includes(locale)) {
+      url.pathname = `/${locale}${url.pathname === "/" ? "" : url.pathname}`;
+    }
+    return url.toString().replace(/\/$/, "");
+  } catch {
+    return href;
+  }
+}

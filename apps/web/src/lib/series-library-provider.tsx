@@ -3,7 +3,7 @@ import type { AccountAvAppAccess } from "@avalsys/account-av-web";
 import type { ReactNode } from "react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { SeriesApiClient } from "@/lib/series-api-client";
-import { getSeriesApiBaseUrl } from "@/lib/series-config";
+import { getAccountApiBaseUrl } from "@/lib/series-config";
 import {
   activeLibraryLimitPolicy,
   archiveEntry,
@@ -75,21 +75,25 @@ export function SeriesLibraryProvider({ children }: { children: ReactNode }) {
   const debounceRef = useRef<number | null>(null);
   const applyingRemoteRef = useRef(false);
   const latestEntriesRef = useRef<SeriesLibraryEntry[]>([]);
-  const client = useMemo(() => new SeriesApiClient(getSeriesApiBaseUrl()), []);
-  const userStorageKey = accountUser.data?.id ? `${storageKeyPrefix}.${accountUser.data.id}` : null;
+  const client = useMemo(() => new SeriesApiClient(getAccountApiBaseUrl()), []);
+  const internalUserStorageKey = accountUser.data?.id ? `${storageKeyPrefix}.${accountUser.data.id}` : null;
+  const sessionStorageKey = session.userId ? `${storageKeyPrefix}.session.${session.userId}` : null;
+  const userStorageKey = internalUserStorageKey ?? sessionStorageKey;
   const deviceId = useMemo(() => stableDeviceId(), []);
 
   latestEntriesRef.current = entries;
 
   useEffect(() => {
     if (!userStorageKey) {
-      setEntries([]);
-      setIsInitialSyncComplete(false);
-      setSyncState("disabled");
+      if (session.isLoaded && !session.isSignedIn) {
+        setEntries([]);
+        setIsInitialSyncComplete(false);
+        setSyncState("disabled");
+      }
       return;
     }
-    setEntries(loadEntries(userStorageKey));
-  }, [userStorageKey]);
+    setEntries((current) => mergeLibraryEntries(current, loadEntries(userStorageKey)));
+  }, [session.isLoaded, session.isSignedIn, userStorageKey]);
 
   useEffect(() => {
     if (!userStorageKey) {

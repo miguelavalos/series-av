@@ -49,6 +49,29 @@
   --ring: 100 48% 51%;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --background: 220 34% 8%;
+    --foreground: 42 68% 92%;
+    --card: 220 28% 12%;
+    --card-foreground: 42 68% 92%;
+    --muted: 220 22% 16%;
+    --muted-foreground: 42 18% 72%;
+    --border: 218 22% 28%;
+    --input: 218 22% 28%;
+    --primary: 101 48% 58%;
+    --primary-foreground: 220 34% 8%;
+    --secondary: 220 24% 15%;
+    --secondary-foreground: 42 68% 92%;
+    --accent: 101 48% 58%;
+    --accent-foreground: 220 34% 8%;
+    --destructive: 356 70% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --ring: 101 48% 58%;
+  }
+}
+
 * {
   border-color: hsl(var(--border));
 }
@@ -73,6 +96,49 @@ body {
     radial-gradient(circle at 16% 12%, rgb(255 255 255 / 48%), transparent 24rem),
     radial-gradient(circle at 86% 18%, rgb(109 190 69 / 16%), transparent 22rem),
     linear-gradient(135deg, #fff8df 0%, #fff0c7 52%, #f2d99e 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  html,
+  body {
+    background: #07111f;
+  }
+
+  .series-paper {
+    background:
+      radial-gradient(circle at 16% 12%, rgb(255 248 223 / 8%), transparent 24rem),
+      radial-gradient(circle at 86% 18%, rgb(109 190 69 / 18%), transparent 22rem),
+      linear-gradient(135deg, #111f34 0%, #0d1a2d 55%, #07111f 100%);
+  }
+
+  [class*="bg-[#fff8df]"],
+  [class*="bg-[#fff0c7]"],
+  [class*="bg-[#ead6a5]"] {
+    background-color: rgb(21 34 54 / 0.88) !important;
+  }
+
+  [class*="bg-white"] {
+    background-color: rgb(16 31 51 / 0.78) !important;
+  }
+
+  [class*="text-[#112a55]"],
+  [class*="text-[#334766]"] {
+    color: #f5e7bf !important;
+  }
+
+  [class*="text-[#53617a]"] {
+    color: #c8b98d !important;
+  }
+
+  [class*="border-[#d7c494]"],
+  [class*="border-[#c8ad72]"] {
+    border-color: rgb(208 190 137 / 0.38) !important;
+  }
+
+  [class*="bg-[#112a55]"],
+  [class*="bg-[#10284f]"] {
+    background-color: #10284f !important;
+  }
 }
 
 button,

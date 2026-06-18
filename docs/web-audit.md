@@ -47,6 +47,15 @@ web visual audit.
   and public informational surfaces.
 - Web Pro management intentionally links to Account AV management instead of
   inventing web billing or purchase flows.
+- Authenticated QA on 2026-06-18 confirmed that app-data sync must use the
+  Account AV API, not the Series catalog API. `seriesLibrary` remains
+  Account-owned user data at `/v1/apps/seriesav/data/seriesLibrary`; Series API
+  remains catalog/search/episodes only.
+- The signed-in app now keeps iOS-style simplicity on web: primary episode
+  progress actions stay visible, while secondary library actions are grouped in
+  a compact menu instead of exposed as a full row of buttons.
+- The Series AV web app supports system dark mode with Series-specific paper,
+  card, border, and text color overrides.
 - Validation run after implementation:
   - `bun run --cwd apps/web test`
   - `bun run --cwd apps/web typecheck`

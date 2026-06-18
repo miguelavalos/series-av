@@ -16,6 +16,7 @@ export function SeriesSearch() {
   const apiLocale = useSeriesApiLocale();
   const locale = useAppsAvLocale();
   const text = useSeriesText();
+  const labels = searchLabels[locale];
   const library = useSeriesLibrary();
   const [query, setQuery] = useState("");
   const client = useMemo(() => new SeriesApiClient(getSeriesApiBaseUrl()), []);
@@ -44,7 +45,7 @@ export function SeriesSearch() {
           <h1 className="text-3xl font-semibold text-[#112a55]">{text.search.title}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#53617a]">{text.search.description}</p>
           <p className="mt-2 text-sm font-semibold text-[#5a8f2f]">
-            {library.limit.activeCount}/{library.limit.activeLimit} active
+            {library.limit.activeCount}/{library.limit.activeLimit} {labels.activeLower}
           </p>
         </div>
         <label className="relative flex-1">
@@ -61,14 +62,14 @@ export function SeriesSearch() {
 
       {localMatches.length > 0 ? (
         <section>
-          <h2 className="mb-3 text-sm font-bold uppercase text-[#53617a]">In your library</h2>
+          <h2 className="mb-3 text-sm font-bold uppercase text-[#53617a]">{labels.inLibrary}</h2>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {localMatches.map((entry) => (
               <Card key={entry.entryId} className="gap-3 rounded-lg border-[#d7c494] bg-[#fff8df] p-4 py-4">
                 <h3 className="font-semibold text-[#112a55]">{entry.title}</h3>
                 <p className="text-sm text-[#53617a]">{entry.status}</p>
                 <Button asChild size="sm" variant="outline" className="rounded-full border-[#c8ad72] bg-white/60">
-                  <Link to={localizedSeriesPath(`/series/${encodeURIComponent(entry.seriesId)}`, locale)}>Open detail</Link>
+                  <Link to={localizedSeriesPath(`/series/${encodeURIComponent(entry.seriesId)}`, locale)}>{labels.detail}</Link>
                 </Button>
               </Card>
             ))}
@@ -82,7 +83,7 @@ export function SeriesSearch() {
 
       {catalogResults.length > 0 ? (
         <section>
-          <h2 className="mb-3 text-sm font-bold uppercase text-[#53617a]">{trimmedQuery ? "Catalog" : "Popular"}</h2>
+          <h2 className="mb-3 text-sm font-bold uppercase text-[#53617a]">{trimmedQuery ? labels.catalog : labels.popular}</h2>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {catalogResults.map((result) => (
               <SearchResultCard key={seriesIdFor(result)} locale={locale} result={result} />
@@ -96,6 +97,7 @@ export function SeriesSearch() {
 
 function SearchResultCard({ locale, result }: { locale: ReturnType<typeof useAppsAvLocale>; result: SeriesSearchResult }) {
   const text = useSeriesText();
+  const labels = searchLabels[locale];
   const library = useSeriesLibrary();
   const seriesId = seriesIdFor(result);
   const existing = library.findEntryBySeriesId(seriesId);
@@ -130,16 +132,24 @@ function SearchResultCard({ locale, result }: { locale: ReturnType<typeof useApp
             }}
           >
             {existing ? <Check className="size-4" /> : <Plus className="size-4" />}
-            {existing ? "Following" : library.canAddSeries ? "Follow" : "Limit reached"}
+            {existing ? labels.following : library.canAddSeries ? labels.follow : labels.limitReached}
           </Button>
           <Button asChild size="sm" variant="outline" className="rounded-full border-[#c8ad72] bg-white/60">
-            <Link to={localizedSeriesPath(`/series/${encodeURIComponent(seriesId)}`, locale)}>Detail</Link>
+            <Link to={localizedSeriesPath(`/series/${encodeURIComponent(seriesId)}`, locale)}>{labels.detail}</Link>
           </Button>
         </div>
       </CardContent>
     </Card>
   );
 }
+
+const searchLabels = {
+  ca: { activeLower: "actives", catalog: "Catàleg", detail: "Detall", follow: "Seguir", following: "Seguint", inLibrary: "A la biblioteca", limitReached: "Límit assolit", popular: "Popular" },
+  de: { activeLower: "aktiv", catalog: "Katalog", detail: "Detail", follow: "Folgen", following: "Gespeichert", inLibrary: "In deiner Bibliothek", limitReached: "Limit erreicht", popular: "Beliebt" },
+  en: { activeLower: "active", catalog: "Catalog", detail: "Detail", follow: "Follow", following: "Following", inLibrary: "In your library", limitReached: "Limit reached", popular: "Popular" },
+  es: { activeLower: "activas", catalog: "Catálogo", detail: "Detalle", follow: "Seguir", following: "Siguiendo", inLibrary: "En tu biblioteca", limitReached: "Límite alcanzado", popular: "Popular" },
+  fr: { activeLower: "actives", catalog: "Catalogue", detail: "Détail", follow: "Suivre", following: "Suivi", inLibrary: "Dans votre bibliothèque", limitReached: "Limite atteinte", popular: "Populaire" }
+} as const;
 
 function SearchGridSkeleton() {
   return (

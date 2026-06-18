@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { seriesBrandAssets } from "@/lib/series-config";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
+import { seriesLibraryUiText } from "@/components/series-library-ui";
 import { cursorLabel, nextEpisodeCursor, progressLabel } from "@/lib/series-library";
 import { localizedSeriesPath, useSeriesText } from "@/lib/series-i18n";
 
@@ -20,6 +21,8 @@ function AviRoute() {
   const library = useSeriesLibrary();
   const current = library.snapshot.homeEntries[0] ?? null;
   const next = current ? nextEpisodeCursor(current.lastWatchedEpisodeCursor) : null;
+  const labels = aviLabels[locale];
+  const libraryLabels = seriesLibraryUiText(locale);
 
   return (
     <ProtectedRoute>
@@ -33,25 +36,25 @@ function AviRoute() {
                     <Sparkles className="size-4" aria-hidden="true" />
                     Avi
                   </p>
-                  <h1 className="mt-3 text-4xl font-semibold leading-tight">{current ? `Focus on ${current.title}` : text.avi.title}</h1>
+                  <h1 className="mt-3 text-4xl font-semibold leading-tight">{current ? labels.focus(current.title) : text.avi.title}</h1>
                   <p className="mt-4 text-base leading-7 text-[#334766]">
-                    {current ? `${progressLabel(current, "Not started", "No episode set")} saved. The next useful step is ${cursorLabel(next ?? { episodeNumber: 1, seasonNumber: 1 })}.` : text.avi.body}
+                    {current ? labels.body(progressLabel(current, libraryLabels.notStarted, libraryLabels.noEpisodeSet), cursorLabel(next ?? { episodeNumber: 1, seasonNumber: 1 })) : text.avi.body}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-3">
                   {current ? (
                     <>
                       <Button className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" onClick={() => library.markNextEpisodeWatched(current.entryId)}>
-                        <StepForward className="size-4" /> Mark next
+                        <StepForward className="size-4" /> {labels.markNext}
+                      </Button>
+                      <Button variant="outline" className="rounded-full border-[#c8ad72] bg-[#fff8df]/76" onClick={() => library.setPinned(current.entryId, current.isPinnedHomeSeries !== true)}>
+                        <Pin className="size-4" /> {current.isPinnedHomeSeries ? libraryLabels.unpin : libraryLabels.pin}
                       </Button>
                       {current.lastWatchedEpisodeCursor ? (
-                        <Button variant="outline" className="rounded-full border-[#c8ad72] bg-[#fff8df]/76" onClick={() => library.markPreviousEpisodeWatched(current.entryId)}>
-                          <StepBack className="size-4" /> Previous
+                        <Button variant="ghost" className="rounded-full text-[#112a55]" onClick={() => library.markPreviousEpisodeWatched(current.entryId)}>
+                          <StepBack className="size-4" /> {libraryLabels.previous}
                         </Button>
                       ) : null}
-                      <Button variant="outline" className="rounded-full border-[#c8ad72] bg-[#fff8df]/76" onClick={() => library.setPinned(current.entryId, current.isPinnedHomeSeries !== true)}>
-                        <Pin className="size-4" /> {current.isPinnedHomeSeries ? "Unpin" : "Pin"}
-                      </Button>
                     </>
                   ) : (
                     <Button asChild className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]">
@@ -74,15 +77,53 @@ function AviRoute() {
           </Card>
 
           <div className="grid gap-4">
-            <AviMetric title="Watching" value={String(library.snapshot.watchingEntries.length)} icon={<StepForward className="size-4" />} />
-            <AviMetric title="Active" value={String(library.snapshot.activeEntries.length)} icon={<BookOpenCheck className="size-4" />} />
-            <AviMetric title="Archived" value={String(library.snapshot.archivedEntries.length)} icon={<BookOpenCheck className="size-4" />} />
+            <AviMetric title={libraryLabels.status.watching} value={String(library.snapshot.watchingEntries.length)} icon={<StepForward className="size-4" />} />
+            <AviMetric title={labels.active} value={String(library.snapshot.activeEntries.length)} icon={<BookOpenCheck className="size-4" />} />
+            <AviMetric title={labels.archived} value={String(library.snapshot.archivedEntries.length)} icon={<BookOpenCheck className="size-4" />} />
           </div>
         </section>
       </SeriesAppShell>
     </ProtectedRoute>
   );
 }
+
+const aviLabels = {
+  ca: {
+    active: "Actives",
+    archived: "Arxivades",
+    body: (progress: string, next: string) => `${progress} desat. El proper pas útil és ${next}.`,
+    focus: (title: string) => `Focus en ${title}`,
+    markNext: "Marcar següent"
+  },
+  de: {
+    active: "Aktiv",
+    archived: "Archiviert",
+    body: (progress: string, next: string) => `${progress} gespeichert. Der nächste sinnvolle Schritt ist ${next}.`,
+    focus: (title: string) => `Fokus auf ${title}`,
+    markNext: "Nächste markieren"
+  },
+  en: {
+    active: "Active",
+    archived: "Archived",
+    body: (progress: string, next: string) => `${progress} saved. The next useful step is ${next}.`,
+    focus: (title: string) => `Focus on ${title}`,
+    markNext: "Mark next"
+  },
+  es: {
+    active: "Activas",
+    archived: "Archivadas",
+    body: (progress: string, next: string) => `${progress} guardado. El siguiente paso útil es ${next}.`,
+    focus: (title: string) => `Enfocar ${title}`,
+    markNext: "Marcar siguiente"
+  },
+  fr: {
+    active: "Actives",
+    archived: "Archivées",
+    body: (progress: string, next: string) => `${progress} enregistré. La prochaine étape utile est ${next}.`,
+    focus: (title: string) => `Focus sur ${title}`,
+    markNext: "Marquer la suite"
+  }
+} as const;
 
 function AviMetric({ icon, title, value }: { icon: React.ReactNode; title: string; value: string }) {
   return (
