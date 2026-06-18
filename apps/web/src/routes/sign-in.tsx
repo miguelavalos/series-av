@@ -48,6 +48,10 @@ function SignInRoute() {
               Series AV
             </Link>
             <img className="mb-8 h-auto w-64 lg:hidden" src={seriesBrandAssets.logo} alt="Series AV" />
+            <div className="mb-5 flex items-center gap-3 rounded-2xl border border-[#d7c494] bg-[#fff8df]/82 p-3 shadow-sm shadow-[#172f5c]/8 lg:hidden">
+              <img className="h-16 w-16 object-contain" src={seriesBrandAssets.aviFullBody} alt="Avi" />
+              <p className="text-sm font-medium leading-5 text-[#334766]">{text.signIn.aviPanelBody}</p>
+            </div>
             <SignedIn>
               <div className="rounded-2xl border border-[#d7c494] bg-[#fff8df] p-6 text-center shadow-lg shadow-[#172f5c]/10">
                 <p className="text-sm font-semibold text-[#112a55]">{text.signIn.signedIn}</p>
