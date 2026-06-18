@@ -77,6 +77,7 @@ export function SeriesLibraryProvider({ children }: { children: ReactNode }) {
   const debounceRef = useRef<number | null>(null);
   const applyingRemoteRef = useRef(false);
   const latestEntriesRef = useRef<SeriesLibraryEntry[]>([]);
+  const getTokenRef = useRef(getToken);
   const client = useMemo(() => new SeriesApiClient(getAccountApiBaseUrl()), []);
   const internalUserStorageKey = accountUser.data?.id ? `${storageKeyPrefix}.${accountUser.data.id}` : null;
   const sessionStorageKey = session.userId ? `${storageKeyPrefix}.session.${session.userId}` : null;
@@ -84,6 +85,7 @@ export function SeriesLibraryProvider({ children }: { children: ReactNode }) {
   const deviceId = useMemo(() => stableDeviceId(), []);
 
   latestEntriesRef.current = entries;
+  getTokenRef.current = getToken;
 
   useEffect(() => {
     if (!userStorageKey) {
@@ -115,7 +117,7 @@ export function SeriesLibraryProvider({ children }: { children: ReactNode }) {
     setSyncState("syncing");
     setSyncError(null);
     try {
-      const token = await getToken();
+      const token = await getTokenRef.current();
       if (!token) {
         throw new Error("Missing Account AV session token.");
       }
@@ -155,7 +157,7 @@ export function SeriesLibraryProvider({ children }: { children: ReactNode }) {
       setSyncError(error instanceof Error ? error.message : "Series library sync failed.");
       setSyncState("failed");
     }
-  }, [access.data?.capabilities.canUseCloudSync, client, deviceId, getToken, session.isLoaded, session.isSignedIn]);
+  }, [access.data?.capabilities.canUseCloudSync, client, deviceId, session.isLoaded, session.isSignedIn]);
 
   useEffect(() => {
     void refreshSync();
@@ -170,10 +172,10 @@ export function SeriesLibraryProvider({ children }: { children: ReactNode }) {
         window.clearTimeout(debounceRef.current);
       }
       debounceRef.current = window.setTimeout(() => {
-        void pushEntries(client, getToken, deviceId, etagRef, nextEntries, setSyncState, setSyncError);
+        void pushEntries(client, getTokenRef.current, deviceId, etagRef, nextEntries, setSyncState, setSyncError);
       }, 800);
     },
-    [access.data?.capabilities.canUseCloudSync, client, deviceId, getToken, isInitialSyncComplete, session.isLoaded, session.isSignedIn]
+    [access.data?.capabilities.canUseCloudSync, client, deviceId, isInitialSyncComplete, session.isLoaded, session.isSignedIn]
   );
 
   const mutateEntries = useCallback(
