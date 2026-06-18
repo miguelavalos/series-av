@@ -17,6 +17,40 @@ web visual audit.
 
 ## Latest Audit Result
 
+- 2026-06-18 parity implementation ported the signed-in web app from static
+  shells to functional Series AV iOS parity slices:
+  - web library model now matches `SeriesLibraryEntry` fields used by iOS:
+    entry id, series id, title, status, episode cursor, pin, artwork, archive,
+    delete, add/update/interacted timestamps;
+  - web helpers now cover mark next, previous, watched through, clear progress,
+    status changes, pin, archive, restore, soft delete, search, active/archive
+    snapshots, and Free/Pro active limits;
+  - signed-in web library state loads from a per-account local browser cache,
+    then syncs with `/v1/apps/seriesav/data/seriesLibrary` using the Account AV
+    session token, ETag, and iOS pull-merge-push strategy;
+  - Search keeps `/v1/series/search`, uses `/v1/series/popular` when available,
+    distinguishes local library matches from catalog results, and follows
+    catalog titles into the signed-in library;
+  - `/series/$seriesId` is a protected detail route with metadata, artwork,
+    tracking actions, compact progress editor, and
+    `/v1/series/{seriesId}/episodes`;
+  - Library shows real active and archived sections, local search, filters,
+    status/progress/pin/archive/restore/delete actions;
+  - Home shows real continue-watching state, next episode, counts, sync state,
+    and an empty state linked to Search;
+  - Avi uses the current library focus and runs real library actions only;
+  - Account and Settings routes expose account identity, plan/limit, sync
+    status, Account AV plan/account deletion links, sign out, language links,
+    local browser data clearing, legal, and support.
+- Web intentionally does not implement iOS guest product mode. Functional
+  routes remain wrapped in signed-in protection; signed-out users see only login
+  and public informational surfaces.
+- Web Pro management intentionally links to Account AV management instead of
+  inventing web billing or purchase flows.
+- Validation run after implementation:
+  - `bun run --cwd apps/web test`
+  - `bun run --cwd apps/web typecheck`
+  - `bun run --cwd apps/web build`
 - Commercial desktop and mobile browser QA passed.
 - Web app desktop and mobile browser QA passed.
 - Protected app routes require sign-in and keep `?lang` on redirects.
