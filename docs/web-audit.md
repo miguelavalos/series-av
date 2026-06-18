@@ -67,6 +67,10 @@ web visual audit.
   previously saved with a technical placeholder title, the web library repairs
   the local title/artwork only for that placeholder case and does not overwrite
   human-readable existing titles.
+- Authenticated mobile dark-mode QA on 2026-06-18 covered Detail, Library,
+  Search, and Settings at a narrow viewport with Spanish locale. Checks passed
+  for no horizontal overflow, no manual episode inputs, no guest copy, no
+  visible `avalsys` app UI text, and internal links preserving `?lang`.
 - The Series AV web app supports a Settings theme preference with System,
   Light, and Dark modes, plus Series-specific paper, card, border, and text
   color overrides.
