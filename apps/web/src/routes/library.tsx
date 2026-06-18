@@ -7,7 +7,7 @@ import { ProtectedRoute } from "@/components/protected-route";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { seriesProductConfig } from "@/lib/series-config";
-import { useSeriesNavLinks, useSeriesText } from "@/lib/series-i18n";
+import { useSeriesNavLinks, useSeriesShellLabels, useSeriesText } from "@/lib/series-i18n";
 
 export const Route = createFileRoute("/library")({
   component: LibraryRoute
@@ -16,11 +16,12 @@ export const Route = createFileRoute("/library")({
 function LibraryRoute() {
   const text = useSeriesText();
   const navLinks = useSeriesNavLinks();
+  const shellLabels = useSeriesShellLabels();
   const hintIcons = [<ListChecks className="size-4" />, <CalendarDays className="size-4" />, <Archive className="size-4" />];
 
   return (
     <ProtectedRoute>
-      <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} navLinks={navLinks} product={seriesProductConfig}>
+      <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} labels={shellLabels} navLinks={navLinks} product={seriesProductConfig}>
         <section className="grid gap-6 lg:grid-cols-[1fr_22rem]">
           <Card className="series-paper gap-0 rounded-[1.5rem] border-[#d7c494] p-6 py-6 shadow-lg shadow-[#172f5c]/8 sm:p-8 sm:py-8">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">

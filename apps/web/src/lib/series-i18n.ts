@@ -83,7 +83,11 @@ const en = {
   nav: {
     avi: "Avi",
     home: "Home",
+    homeLabel: "Series AV home",
     library: "Library",
+    mobileNavigation: "Mobile navigation",
+    openNavigation: "Open navigation",
+    primaryNavigation: "Primary navigation",
     search: "Search"
   },
   protected: {
@@ -187,7 +191,11 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
     nav: {
       avi: "Avi",
       home: "Inici",
+      homeLabel: "Inici de Series AV",
       library: "Biblioteca",
+      mobileNavigation: "Navegacio mobil",
+      openNavigation: "Obre la navegacio",
+      primaryNavigation: "Navegacio principal",
       search: "Cerca"
     },
     protected: {
@@ -289,7 +297,11 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
     nav: {
       avi: "Avi",
       home: "Start",
+      homeLabel: "Series AV Start",
       library: "Bibliothek",
+      mobileNavigation: "Mobile Navigation",
+      openNavigation: "Navigation oeffnen",
+      primaryNavigation: "Hauptnavigation",
       search: "Suche"
     },
     protected: {
@@ -392,7 +404,11 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
     nav: {
       avi: "Avi",
       home: "Inicio",
+      homeLabel: "Inicio de Series AV",
       library: "Biblioteca",
+      mobileNavigation: "Navegación móvil",
+      openNavigation: "Abrir navegación",
+      primaryNavigation: "Navegación principal",
       search: "Buscar"
     },
     protected: {
@@ -494,7 +510,11 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
     nav: {
       avi: "Avi",
       home: "Accueil",
+      homeLabel: "Accueil Series AV",
       library: "Bibliotheque",
+      mobileNavigation: "Navigation mobile",
+      openNavigation: "Ouvrir la navigation",
+      primaryNavigation: "Navigation principale",
       search: "Recherche"
     },
     protected: {
@@ -549,6 +569,17 @@ export function useSeriesApiLocale() {
     es: "es-ES",
     fr: "fr-FR"
   }[locale];
+}
+
+export function useSeriesShellLabels() {
+  const text = useSeriesText();
+
+  return {
+    home: text.nav.homeLabel,
+    mobileNavigation: text.nav.mobileNavigation,
+    openNavigation: text.nav.openNavigation,
+    primaryNavigation: text.nav.primaryNavigation
+  };
 }
 
 export function useSeriesAccountLocalization() {
