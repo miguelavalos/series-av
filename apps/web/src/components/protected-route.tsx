@@ -3,8 +3,11 @@ import { AuthSkeleton, AvAppFooter } from "@avalsys/apps-av-web";
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { seriesBrandAssets, seriesProductConfig } from "@/lib/series-config";
+import { useSeriesText } from "@/lib/series-i18n";
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
+  const text = useSeriesText();
+
   return (
     <>
       <AuthLoading>
@@ -16,19 +19,19 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
           <main className="flex flex-1 items-center justify-center px-6 py-10 text-center">
             <div className="max-w-3xl rounded-[1.75rem] border border-[#d7c494] bg-[#fff8df]/88 p-8 shadow-2xl shadow-[#172f5c]/12 sm:p-10">
               <img className="mx-auto h-auto w-64" src={seriesBrandAssets.logo} alt="Series AV" />
-              <h1 className="mt-8 text-4xl font-semibold text-[#112a55]">Keep your series notebook with you.</h1>
+              <h1 className="mt-8 text-4xl font-semibold text-[#112a55]">{text.protected.title}</h1>
               <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-[#334766]">
-                Sign in to open your library, search the catalog, and let Avi help you choose what to watch next.
+                {text.protected.body}
               </p>
               <Link
                 className="mt-8 inline-flex h-11 items-center justify-center rounded-full bg-[#112a55] px-5 text-sm font-semibold text-white shadow-lg shadow-[#112a55]/18 transition hover:bg-[#19396f]"
                 to="/sign-in"
               >
-                Sign in
+                {text.protected.cta}
               </Link>
             </div>
           </main>
-          <AvAppFooter className="border-transparent bg-transparent" product={seriesProductConfig} />
+          <AvAppFooter className="border-transparent bg-transparent" labels={text.footer} product={seriesProductConfig} />
         </div>
       </SignedOut>
     </>

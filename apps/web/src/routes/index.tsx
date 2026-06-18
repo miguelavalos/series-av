@@ -7,19 +7,22 @@ import { SeriesLoginPage } from "@/components/series-login-page";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { seriesBrandAssets, seriesNavLinks, seriesProductConfig } from "@/lib/series-config";
+import { useSeriesText } from "@/lib/series-i18n";
 
 export const Route = createFileRoute("/")({
   component: IndexRoute
 });
 
 function IndexRoute() {
+  const text = useSeriesText();
+
   return (
     <>
       <SignedOut>
         <SeriesLoginPage />
       </SignedOut>
       <SignedIn>
-        <AppShell accountArea={<AccountUserButton />} navLinks={seriesNavLinks} product={seriesProductConfig}>
+        <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} navLinks={seriesNavLinks} product={seriesProductConfig}>
           <section className="grid gap-6 lg:grid-cols-[1fr_22rem]">
             <Card className="series-paper gap-0 overflow-hidden rounded-[1.5rem] border-[#d7c494] p-6 py-6 shadow-lg shadow-[#172f5c]/8 sm:p-8 sm:py-8">
               <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">

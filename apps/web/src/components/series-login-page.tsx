@@ -5,8 +5,11 @@ import { AvAppFooter } from "@avalsys/apps-av-web";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { seriesBrandAssets, seriesProductConfig } from "@/lib/series-config";
+import { useSeriesText } from "@/lib/series-i18n";
 
 export function SeriesLoginPage() {
+  const text = useSeriesText();
+
   return (
     <div className="series-paper min-h-screen overflow-hidden px-5 pt-5 sm:px-8">
       <main className="mx-auto grid min-h-[calc(100vh-6rem)] max-w-6xl overflow-hidden rounded-[1.75rem] border border-[#d7c494] bg-[#fff6da]/88 shadow-2xl shadow-[#172f5c]/16 backdrop-blur md:grid-cols-[0.95fr_1.05fr]">
@@ -14,21 +17,21 @@ export function SeriesLoginPage() {
           <div>
             <img className="h-auto w-56 sm:w-64" src={seriesBrandAssets.logo} alt="Series AV" />
             <p className="mt-4 max-w-sm text-sm leading-6 text-[#314568]">
-              Follow every show, remember the next episode, and keep your watch list close from any screen.
+              {text.login.intro}
             </p>
           </div>
 
           <div className="max-w-xl">
             <h1 className="text-5xl font-semibold leading-[1.02] text-[#112a55] sm:text-6xl">
-              Your series notebook, always ready.
+              {text.login.heroTitle}
             </h1>
             <p className="mt-6 max-w-lg text-base leading-7 text-[#334766]">
-              Sign in to keep your library, episode progress, and Avi guidance connected wherever you watch.
+              {text.login.heroBody}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild className="h-12 rounded-full bg-[#112a55] px-5 text-white shadow-lg shadow-[#112a55]/18 hover:bg-[#19396f]">
                 <Link to="/sign-in">
-                  Sign in
+                  {text.login.cta}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>
               </Button>
@@ -36,9 +39,9 @@ export function SeriesLoginPage() {
           </div>
 
           <div className="grid gap-3 text-sm text-[#334766] sm:grid-cols-3">
-            <LoginMetric icon={<Search className="size-4" aria-hidden="true" />} label="Series search" />
-            <LoginMetric icon={<Sparkles className="size-4" aria-hidden="true" />} label="Avi guidance" />
-            <LoginMetric icon={<BookOpenCheck className="size-4" aria-hidden="true" />} label="Series notebook" />
+            <LoginMetric icon={<Search className="size-4" aria-hidden="true" />} label={text.login.search} />
+            <LoginMetric icon={<Sparkles className="size-4" aria-hidden="true" />} label={text.login.aviGuidance} />
+            <LoginMetric icon={<BookOpenCheck className="size-4" aria-hidden="true" />} label={text.login.notebook} />
           </div>
         </section>
 
@@ -47,18 +50,18 @@ export function SeriesLoginPage() {
           <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-[1.4rem] border border-white/14 bg-[#fff0c7] p-5 text-[#112a55] shadow-2xl shadow-black/24">
             <img className="absolute inset-y-0 right-0 h-full w-[58%] object-cover object-bottom opacity-95 sm:w-[56%]" src={seriesBrandAssets.onboarding} alt="" />
             <div className="relative max-w-xs">
-              <p className="font-serif text-3xl leading-tight text-[#112a55]">A hand-drawn progress map for your next episode.</p>
+              <p className="font-serif text-3xl leading-tight text-[#112a55]">{text.login.mapTitle}</p>
               <p className="mt-4 text-sm leading-6 text-[#3d4e68]">
-                The web experience keeps the notebook feeling from iOS: paper texture, ink lines, green checkpoints, and Avi close at hand.
+                {text.login.mapBody}
               </p>
             </div>
             <Card className="relative mt-auto max-w-sm gap-2 rounded-2xl border-[#d4bf88] bg-[#fff8df]/88 p-5 py-5 text-[#112a55] shadow-xl shadow-[#112a55]/12">
               <p className="flex items-center gap-2 text-sm font-semibold">
                 <ListChecks className="size-4 text-[#6DBE45]" aria-hidden="true" />
-                Continue from your list
+                {text.login.cardTitle}
               </p>
               <p className="mt-2 text-sm leading-6 text-[#47566f]">
-                Save what you are watching, find what is next, and return to your progress without rebuilding the list.
+                {text.login.cardBody}
               </p>
             </Card>
             <img
@@ -69,7 +72,7 @@ export function SeriesLoginPage() {
           </div>
         </section>
       </main>
-      <AvAppFooter className="mt-4 border-transparent bg-transparent px-0 pb-4 pt-2" product={seriesProductConfig} />
+      <AvAppFooter className="mt-4 border-transparent bg-transparent px-0 pb-4 pt-2" labels={text.footer} product={seriesProductConfig} />
     </div>
   );
 }
