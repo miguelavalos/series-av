@@ -1,9 +1,9 @@
 import { AccountAvProvider } from "@avalsys/account-av-web";
-import { AppsAvWebProvider, useAppsAvLocale } from "@avalsys/apps-av-web";
-import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
+import { AppsAvWebProvider, getAppsAvLocaleFromSearch, useAppsAvLocale } from "@avalsys/apps-av-web";
+import { HeadContent, Outlet, Scripts, createRootRoute, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { getAccountApiBaseUrl, getAccountPublishableKey } from "@/lib/series-config";
-import { useSeriesAccountLocalization, useSeriesText } from "@/lib/series-i18n";
+import { localizedSeriesPath, useSeriesAccountLocalization, useSeriesText } from "@/lib/series-i18n";
 import "../styles.css";
 
 export const Route = createRootRoute({
@@ -26,37 +26,46 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
-  const publishableKey = getAccountPublishableKey();
-  const locale = useAppsAvLocale();
-  const localization = useSeriesAccountLocalization();
+  const search = useRouterState({ select: (state) => state.location.searchStr });
+  const initialLocale = getAppsAvLocaleFromSearch(search);
 
   return (
-    <html lang={locale}>
+    <html lang={initialLocale}>
       <head>
         <HeadContent />
       </head>
       <body>
-        <AppsAvWebProvider>
-          {publishableKey ? (
-            <AccountAvProvider
-              accountApiBaseUrl={getAccountApiBaseUrl()}
-              afterSignOutUrl="/sign-in"
-              appDisplayName="Series AV"
-              appId="seriesav"
-              localization={localization}
-              publishableKey={publishableKey}
-              signInUrl="/sign-in"
-              signUpUrl="/sign-in"
-            >
-              {children}
-            </AccountAvProvider>
-          ) : (
-            <MissingAuthConfiguration />
-          )}
+        <AppsAvWebProvider initialLocale={initialLocale}>
+          <AccountBoundary>{children}</AccountBoundary>
         </AppsAvWebProvider>
         <Scripts />
       </body>
     </html>
+  );
+}
+
+function AccountBoundary({ children }: Readonly<{ children: ReactNode }>) {
+  const publishableKey = getAccountPublishableKey();
+  const locale = useAppsAvLocale();
+  const localization = useSeriesAccountLocalization();
+
+  if (!publishableKey) {
+    return <MissingAuthConfiguration />;
+  }
+
+  return (
+    <AccountAvProvider
+      accountApiBaseUrl={getAccountApiBaseUrl()}
+      afterSignOutUrl={localizedSeriesPath("/sign-in", locale)}
+      appDisplayName="Series AV"
+      appId="seriesav"
+      localization={localization}
+      publishableKey={publishableKey}
+      signInUrl={localizedSeriesPath("/sign-in", locale)}
+      signUpUrl={localizedSeriesPath("/sign-in", locale)}
+    >
+      {children}
+    </AccountAvProvider>
   );
 }
 

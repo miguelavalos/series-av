@@ -555,13 +555,14 @@ export function useSeriesText() {
 }
 
 export function useSeriesNavLinks(): AppsAvProductLink[] {
+  const locale = useAppsAvLocale();
   const text = useSeriesText();
 
   return [
-    { href: "/", label: text.nav.home },
-    { href: "/library", label: text.nav.library },
-    { href: "/search", label: text.nav.search },
-    { href: "/avi", label: text.nav.avi }
+    { href: localizedSeriesPath("/", locale), label: text.nav.home },
+    { href: localizedSeriesPath("/library", locale), label: text.nav.library },
+    { href: localizedSeriesPath("/search", locale), label: text.nav.search },
+    { href: localizedSeriesPath("/avi", locale), label: text.nav.avi }
   ];
 }
 
@@ -610,4 +611,13 @@ export function useSeriesAccountLocalization() {
       }
     }
   };
+}
+
+export function localizedSeriesPath(path: string, locale: AppsAvLocale): string {
+  if (locale === "en") {
+    return path;
+  }
+
+  const separator = path.includes("?") ? "&" : "?";
+  return `${path}${separator}lang=${locale}`;
 }
