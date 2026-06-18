@@ -51,6 +51,7 @@ export_from_varlock "SERIESAV_CONVEX_URL" "VITE_SERIESAV_CONVEX_URL" optional
 export_from_varlock "SERIESAV_TERMS_URL" "VITE_SERIESAV_TERMS_URL" optional
 export_from_varlock "SERIESAV_PRIVACY_URL" "VITE_SERIESAV_PRIVACY_URL" optional
 export_from_varlock "ACCOUNTAV_MANAGEMENT_URL" "VITE_ACCOUNTAV_MANAGEMENT_URL" optional
+export_from_varlock "SUPPORTAV_BASE_URL" "VITE_SUPPORTAV_BASE_URL" optional
 export_from_varlock "SERIESAV_SUPPORT_EMAIL" "VITE_SERIESAV_SUPPORT_EMAIL" optional
 export_from_varlock "SERIESAV_OPEN_SOURCE_URL" "VITE_SERIESAV_OPEN_SOURCE_URL" optional
 

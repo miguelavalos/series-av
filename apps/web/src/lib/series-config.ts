@@ -65,8 +65,13 @@ function accountManagementUrl(path: string) {
 }
 
 function supportUrl() {
-  const email = import.meta.env.VITE_SERIESAV_SUPPORT_EMAIL?.trim();
-  return email ? `mailto:${email}` : undefined;
+  return trimTrailingSlash(import.meta.env.VITE_SUPPORTAV_BASE_URL) || commercialSiteUrl("/support");
+}
+
+function commercialSiteUrl(path: string) {
+  const privacyUrl = trimTrailingSlash(import.meta.env.VITE_SERIESAV_PRIVACY_URL);
+  const url = privacyUrl ? new URL(privacyUrl) : new URL("https://series-av.avalsys.com");
+  return `${url.origin}${path}`;
 }
 
 function externalLink(href: string | undefined, label: string) {
