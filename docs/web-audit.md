@@ -57,6 +57,16 @@ web visual audit.
 - The Series AV web app supports a Settings theme preference with System,
   Light, and Dark modes, plus Series-specific paper, card, border, and text
   color overrides.
+- Account and Settings now use a shared Apps AV settings/profile component set
+  prepared for reuse across web apps. Series AV is the first app aligned to the
+  iOS `AVSettingsProfileScreenScaffold` content model: account, Pro, optional
+  cloud sync, account safety, app preferences, tracking, local device data, and
+  help/legal sections. Web copy intentionally omits iOS guest product-mode
+  references.
+- Authenticated browser QA on 2026-06-18 checked `/settings?lang=es` and
+  `/account?lang=es`: expected Spanish content rendered, no guest copy was
+  present, own links preserved `lang=es`, Free access did not show Pro-only
+  cloud sync, and the dark theme selector applied `data-series-theme="dark"`.
 - Validation run after implementation:
   - `bun run --cwd apps/web test`
   - `bun run --cwd apps/web typecheck`
