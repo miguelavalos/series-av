@@ -82,10 +82,16 @@ web visual audit.
   `/account?lang=es`: expected Spanish content rendered, no guest copy was
   present, own links preserved `lang=es`, Free access did not show Pro-only
   cloud sync, and the dark theme selector applied `data-series-theme="dark"`.
+- Series AV now includes a shared web smoke QA script for the signed-out
+  contract across `en`, `es`, `fr`, `de`, and `ca`: `bun run --cwd apps/web
+  qa:shared`. It checks public `/`, protected route gates, locale preservation
+  on product-owned links, HTML language, runtime-error markers, and guest-copy
+  absence against `SERIESAV_WEB_QA_BASE_URL` or `http://localhost:5193`.
 - Validation run after implementation:
   - `bun run --cwd apps/web test`
   - `bun run --cwd apps/web typecheck`
   - `bun run --cwd apps/web build`
+  - `bun run --cwd apps/web qa:shared`
 - Commercial desktop and mobile browser QA passed.
 - Web app desktop and mobile browser QA passed.
 - Protected app routes require sign-in and keep `?lang` on redirects.
