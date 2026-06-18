@@ -32,7 +32,7 @@ web visual audit.
     distinguishes local library matches from catalog results, and follows
     catalog titles into the signed-in library;
   - `/series/$seriesId` is a protected detail route with metadata, artwork,
-    tracking actions, compact progress editor, and
+    guided tracking actions, compact episode-guide progress buttons, and
     `/v1/series/{seriesId}/episodes`;
   - Library shows real active and archived sections, local search, filters,
     status/progress/pin/archive/restore/delete actions;
@@ -54,6 +54,10 @@ web visual audit.
 - The signed-in app now keeps iOS-style simplicity on web: primary episode
   progress actions stay visible, while secondary library actions are grouped in
   a compact menu instead of exposed as a full row of buttons.
+- Web progress UI must not expose free-form manual season/episode inputs.
+  Progress moves through guided actions: mark next, previous, clear progress,
+  status changes, or selecting a real episode from the backend compact episode
+  guide.
 - The Series AV web app supports a Settings theme preference with System,
   Light, and Dark modes, plus Series-specific paper, card, border, and text
   color overrides.
@@ -95,6 +99,10 @@ web visual audit.
   preservation on product-owned links, HTML language, runtime-error markers, and
   guest-copy absence against `SERIESAV_WEB_QA_BASE_URL` or
   `http://localhost:5193`.
+- Functional QA on 2026-06-18 found Preview `/v1/series/popular?surface=search`
+  returns one item even when the web requests `limit=12`. The web therefore
+  renders one Popular result because the backend curated preview set currently
+  has one enriched public series, not because the frontend grid is capped.
 - Validation run after implementation:
   - `bun run --cwd apps/web test`
   - `bun run --cwd apps/web typecheck`

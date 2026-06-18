@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Archive, ArrowLeft, Check, MoreHorizontal, Pin, PinOff, RotateCcw, StepBack, StepForward, Trash2 } from "lucide-react";
+import { Archive, Check, MoreHorizontal, Pin, PinOff, RotateCcw, StepBack, StepForward, Trash2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -27,8 +27,6 @@ const uiText = {
     pinned: "Fixada",
     previous: "Anterior",
     restore: "Restaura",
-    save: "Desa",
-    season: "Temporada",
     status: { wantToWatch: "Vull mirar", watched: "Vista", watching: "Veient" },
     trash: "Elimina",
     unpin: "Desfixa"
@@ -45,8 +43,6 @@ const uiText = {
     pinned: "Angeheftet",
     previous: "Zurück",
     restore: "Wiederherstellen",
-    save: "Speichern",
-    season: "Staffel",
     status: { wantToWatch: "Ansehen", watched: "Gesehen", watching: "Aktuell" },
     trash: "Löschen",
     unpin: "Lösen"
@@ -63,8 +59,6 @@ const uiText = {
     pinned: "Pinned",
     previous: "Previous",
     restore: "Restore",
-    save: "Save",
-    season: "Season",
     status: statusLabels,
     trash: "Delete",
     unpin: "Unpin"
@@ -81,8 +75,6 @@ const uiText = {
     pinned: "Fijada",
     previous: "Anterior",
     restore: "Restaurar",
-    save: "Guardar",
-    season: "Temporada",
     status: { wantToWatch: "Quiero ver", watched: "Vista", watching: "Viendo" },
     trash: "Eliminar",
     unpin: "Quitar"
@@ -99,13 +91,11 @@ const uiText = {
     pinned: "Épinglée",
     previous: "Précédent",
     restore: "Restaurer",
-    save: "Enregistrer",
-    season: "Saison",
     status: { wantToWatch: "À regarder", watched: "Vue", watching: "En cours" },
     trash: "Supprimer",
     unpin: "Désépingler"
   }
-} satisfies Record<AppsAvLocale, { archive: string; clear: string; episode: string; more: string; next: string; noEpisodeSet: string; notStarted: string; pin: string; pinned: string; previous: string; restore: string; save: string; season: string; status: Record<SeriesLibraryEntryStatus, string>; trash: string; unpin: string }>;
+} satisfies Record<AppsAvLocale, { archive: string; clear: string; episode: string; more: string; next: string; noEpisodeSet: string; notStarted: string; pin: string; pinned: string; previous: string; restore: string; status: Record<SeriesLibraryEntryStatus, string>; trash: string; unpin: string }>;
 
 export function SeriesArtwork({ entry, size = "md" }: { entry: Pick<SeriesLibraryEntry, "displayArtworkRef" | "fallbackVisualSeed" | "title">; size?: "sm" | "md" | "lg" }) {
   const classes = {
@@ -220,40 +210,6 @@ function MenuButton({ children, danger = false, onClick }: { children: ReactNode
     >
       {children}
     </button>
-  );
-}
-
-export function ProgressEditor({ entry, locale = "en" }: { entry: SeriesLibraryEntry; locale?: AppsAvLocale }) {
-  const library = useSeriesLibrary();
-  const current = entry.lastWatchedEpisodeCursor ?? { episodeNumber: 1, seasonNumber: 1 };
-  const labels = uiText[locale];
-
-  return (
-    <div className="grid gap-3 rounded-lg border border-[#d7c494] bg-[#fff8df]/72 p-4 sm:grid-cols-[1fr_1fr_auto]">
-      <label className="text-sm font-semibold text-[#112a55]">
-        {labels.season}
-        <input className="mt-1 h-10 w-full rounded-md border border-[#c8ad72] bg-white px-3" min={1} type="number" defaultValue={current.seasonNumber} id={`season-${entry.entryId}`} />
-      </label>
-      <label className="text-sm font-semibold text-[#112a55]">
-        {labels.episode}
-        <input className="mt-1 h-10 w-full rounded-md border border-[#c8ad72] bg-white px-3" min={1} type="number" defaultValue={current.episodeNumber} id={`episode-${entry.entryId}`} />
-      </label>
-      <div className="flex items-end gap-2">
-        <Button
-          className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]"
-          onClick={() => {
-            const season = Number((document.getElementById(`season-${entry.entryId}`) as HTMLInputElement | null)?.value ?? 1);
-            const episode = Number((document.getElementById(`episode-${entry.entryId}`) as HTMLInputElement | null)?.value ?? 1);
-            library.markWatchedThrough(entry.entryId, { episodeNumber: episode, seasonNumber: season });
-          }}
-        >
-          {labels.save}
-        </Button>
-        <Button variant="outline" className="rounded-full border-[#c8ad72] bg-white/60" onClick={() => library.clearProgress(entry.entryId)}>
-          <ArrowLeft className="size-4" /> {labels.clear}
-        </Button>
-      </div>
-    </div>
   );
 }
 

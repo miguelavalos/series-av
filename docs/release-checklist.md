@@ -52,7 +52,7 @@ xcodebuild test \
 ```
 
 The suite covers local library behavior, account/access policy, sync merge
-behavior, follow-from-search smoke, populated-library smoke, progress-editor
+behavior, follow-from-search smoke, populated-library smoke, guided progress
 smoke, and guest/free/pro paywall/account smoke states. Manual QA still must
 cover real signed sessions, App Store purchase dialogs, provider callbacks, and
 device-specific Apple auth behavior.
@@ -111,12 +111,12 @@ but it must not replace a real store purchase/restore validation.
    follow a catalog result, change progress, archive/delete where applicable,
    relaunch, and verify sync status updates.
 4. Confirm Search/resolve returns canonical backend `seriesId` values.
-5. Confirm resolved series load the compact episode guide and the
-   season/episode selector uses real backend data instead of the generic
-   fallback.
+5. Confirm resolved series load the compact episode guide. Web must not expose
+   free-form manual season/episode inputs; progress changes come from guided
+   actions or selecting real backend episode-guide rows.
 6. Run light mode, dark mode, Dynamic Type, five-locale, and long-string checks
    across Home, Library, Search, Detail, Profile, Account, Settings, Avi,
-   progress editor, and Paywall.
+   guided progress actions, and Paywall.
 7. If a temporary internal grant is used for QA, revoke or allow it to expire
    after QA. It is smoke/QA evidence only and must not replace purchase/restore
    validation.
@@ -137,7 +137,7 @@ Additional local simulator evidence, 2026-06-17:
 - production RevenueCat offer loading returned `seriesav_pro_monthly` with
   display price `$2.99`;
 - dark mode and Dynamic Type checks passed visually across Home, Search,
-  Library, Account, Settings, Onboarding/Auth, Avi, progress editor, and
+  Library, Account, Settings, Onboarding/Auth, Avi, guided progress actions, and
   Paywall;
 - no purchase was initiated.
 

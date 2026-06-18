@@ -1,11 +1,11 @@
 import { ErrorState, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, Plus, StepForward } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Plus, RotateCcw, StepBack, StepForward } from "lucide-react";
 import { useMemo } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { SeriesAppShell } from "@/components/series-app-shell";
-import { ProgressEditor, SeriesArtwork, StatusButtons, seriesLibraryUiText } from "@/components/series-library-ui";
+import { SeriesArtwork, StatusButtons, seriesLibraryUiText } from "@/components/series-library-ui";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SeriesApiClient } from "@/lib/series-api-client";
@@ -78,9 +78,18 @@ function SeriesDetailRoute() {
                       <Button className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" onClick={() => library.markNextEpisodeWatched(entry.entryId)}>
                         <StepForward className="size-4" /> {labels.markNext}
                       </Button>
+                      {entry.lastWatchedEpisodeCursor ? (
+                        <>
+                          <Button variant="outline" className="rounded-full border-[#c8ad72] bg-white/60" onClick={() => library.markPreviousEpisodeWatched(entry.entryId)}>
+                            <StepBack className="size-4" /> {libraryLabels.previous}
+                          </Button>
+                          <Button variant="ghost" className="rounded-full text-[#112a55]" onClick={() => library.clearProgress(entry.entryId)}>
+                            <RotateCcw className="size-4" /> {libraryLabels.clear}
+                          </Button>
+                        </>
+                      ) : null}
                       <StatusButtons entry={entry} locale={locale} />
                     </div>
-                    <ProgressEditor entry={entry} locale={locale} />
                   </div>
                 ) : (
                   <Button
@@ -114,6 +123,16 @@ function SeriesDetailRoute() {
                     {cursorLabel({ episodeNumber: episode.episodeNumber, seasonNumber: episode.seasonNumber })} · {episode.title ?? libraryLabels.episode}
                   </p>
                   <p className="mt-1 text-xs text-[#53617a]">{episode.airDate ?? episode.relativeState}</p>
+                  {entry ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="mt-3 rounded-full border-[#c8ad72] bg-[#fff8df]/80 text-[#112a55]"
+                      onClick={() => library.markWatchedThrough(entry.entryId, { episodeNumber: episode.episodeNumber, seasonNumber: episode.seasonNumber })}
+                    >
+                      <CheckCircle2 className="size-4" /> {labels.markWatchedThrough} {cursorLabel({ episodeNumber: episode.episodeNumber, seasonNumber: episode.seasonNumber })}
+                    </Button>
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -131,6 +150,7 @@ const detailLabels = {
     follow: "Seguir",
     limitReached: "Límit assolit",
     markNext: "Marcar següent",
+    markWatchedThrough: "Marcar fins a",
     noGuide: "Encara no hi ha guia compacta."
   },
   de: {
@@ -139,6 +159,7 @@ const detailLabels = {
     follow: "Folgen",
     limitReached: "Limit erreicht",
     markNext: "Nächste markieren",
+    markWatchedThrough: "Gesehen bis",
     noGuide: "Noch keine kompakte Übersicht verfügbar."
   },
   en: {
@@ -147,6 +168,7 @@ const detailLabels = {
     follow: "Follow",
     limitReached: "Limit reached",
     markNext: "Mark next",
+    markWatchedThrough: "Watched through",
     noGuide: "No compact guide is available yet."
   },
   es: {
@@ -155,6 +177,7 @@ const detailLabels = {
     follow: "Seguir",
     limitReached: "Límite alcanzado",
     markNext: "Marcar siguiente",
+    markWatchedThrough: "Visto hasta",
     noGuide: "Todavía no hay guía compacta."
   },
   fr: {
@@ -163,6 +186,7 @@ const detailLabels = {
     follow: "Suivre",
     limitReached: "Limite atteinte",
     markNext: "Marquer la suite",
+    markWatchedThrough: "Vu jusqu'à",
     noGuide: "Aucun guide compact pour le moment."
   }
 } as const;

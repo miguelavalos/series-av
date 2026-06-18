@@ -89,7 +89,7 @@ xcodebuild test \
 ```
 
 The UI test target uses `SERIESAV_UI_TESTS` launch-environment hooks for
-deterministic guest/free/pro, populated-library, paywall, and progress-editor
+deterministic guest/free/pro, populated-library, paywall, and guided-progress
 states. These hooks must stay test-only and must not be used as evidence for
 real signed Account AV, RevenueCat purchase, or backend provider validation.
 
