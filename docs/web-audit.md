@@ -117,11 +117,23 @@ web visual audit.
   returns one item even when the web requests `limit=12`. The web therefore
   renders one Popular result because the backend curated preview set currently
   has one enriched public series, not because the frontend grid is capped.
+- Follow-up QA on 2026-06-18 confirmed Production
+  `/v1/series/popular?surface=search&locale=es-ES&limit=12` returns 12 results;
+  the one-result Popular grid remains preview-data-only.
+- Preview app deploy on 2026-06-18 published the current web parity build to
+  `https://app.series-av-preview.avalsys.com`. The shared web smoke passed
+  there for `en`, `es`, `fr`, `de`, and `ca` across public `/`, public
+  `/sign-in`, protected functional routes, and Detail.
+- Production web smoke on 2026-06-18 still sees an older deployment at
+  `https://app.series-av.avalsys.com`: `/account`, `/settings`, and
+  `/series/thetvdb%3A348545` return 404. Production web deploy is therefore the
+  remaining release action, and must wait for explicit production approval.
 - Validation run after implementation:
   - `bun run --cwd apps/web test`
   - `bun run --cwd apps/web typecheck`
   - `bun run --cwd apps/web build`
   - `bun run --cwd apps/web qa:shared`
+  - `SERIESAV_WEB_QA_BASE_URL=https://app.series-av-preview.avalsys.com bun run --cwd apps/web qa:shared`
 - Commercial desktop and mobile browser QA passed.
 - Web app desktop and mobile browser QA passed.
 - Protected app routes require sign-in and keep `?lang` on redirects.
