@@ -1,25 +1,18 @@
-import { AccountUserButton } from "@avalsys/account-av-web";
-import { AppShell } from "@avalsys/apps-av-web";
 import { createFileRoute } from "@tanstack/react-router";
 import { ProtectedRoute } from "@/components/protected-route";
+import { SeriesAppShell } from "@/components/series-app-shell";
 import { SeriesSearch } from "@/components/series-search";
-import { useSeriesNavLinks, useSeriesProductConfig, useSeriesShellLabels, useSeriesText } from "@/lib/series-i18n";
 
 export const Route = createFileRoute("/search")({
   component: SearchRoute
 });
 
 function SearchRoute() {
-  const text = useSeriesText();
-  const navLinks = useSeriesNavLinks();
-  const productConfig = useSeriesProductConfig();
-  const shellLabels = useSeriesShellLabels();
-
   return (
     <ProtectedRoute>
-      <AppShell accountArea={<AccountUserButton />} footerLabels={text.footer} labels={shellLabels} navLinks={navLinks} product={productConfig}>
+      <SeriesAppShell>
         <SeriesSearch />
-      </AppShell>
+      </SeriesAppShell>
     </ProtectedRoute>
   );
 }

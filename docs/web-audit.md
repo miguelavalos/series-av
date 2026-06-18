@@ -82,6 +82,13 @@ web visual audit.
   `/account?lang=es`: expected Spanish content rendered, no guest copy was
   present, own links preserved `lang=es`, Free access did not show Pro-only
   cloud sync, and the dark theme selector applied `data-series-theme="dark"`.
+- Authenticated browser QA on 2026-06-18 also checked desktop and mobile
+  `/library`, `/search`, `/avi`, `/account`, and `/settings` in Spanish:
+  active navigation is marked with `aria-current="page"`, own links keep
+  `lang=es`, no guest copy is visible, no lowercase `avalsys` is visible in app
+  UI, mobile has no horizontal overflow, and the dark theme persists after
+  navigation. This exposed and fixed Search using the shared AppShell without
+  the current route path.
 - Series AV now configures the shared Apps AV web smoke QA runner for the
   signed-out contract across `en`, `es`, `fr`, `de`, and `ca`: `bun run --cwd
   apps/web qa:shared`. It checks public `/`, protected route gates, locale
