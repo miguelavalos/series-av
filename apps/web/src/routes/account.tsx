@@ -1,7 +1,8 @@
 import { AccountSignOutButton, useAccountUser } from "@avalsys/account-av-web";
 import { SettingsButton, SettingsInfoRow, SettingsProfileScaffold, SettingsSectionCard, useAppsAvLocale } from "@avalsys/apps-av-web";
+import { AccountSafetySection, CloudSyncSection, PlanFeatureSection } from "@avalsys/apps-av-web/src/components/account-settings-sections";
 import { createFileRoute } from "@tanstack/react-router";
-import { BadgeCheck, Cloud, CloudOff, Cloudy, LibraryBig, Mail, ShieldAlert, Sparkles, UserCircle, XCircle } from "lucide-react";
+import { Mail, Sparkles, UserCircle } from "lucide-react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { SeriesAppShell } from "@/components/series-app-shell";
 import { seriesProductConfig } from "@/lib/series-config";
@@ -27,23 +28,10 @@ function AccountRoute() {
     <ProtectedRoute>
       <SeriesAppShell>
         <SettingsProfileScaffold title={labels.accountTitle} subtitle={labels.accountSubtitle} heroClassName="series-paper">
-          <SettingsSectionCard title={labels.pro.title} subtitle={isPro ? labels.pro.subtitlePro : labels.pro.subtitleFree}>
-            <SettingsInfoRow icon={<BadgeCheck className="size-5" />} title={labels.pro.accountTitle} detail={labels.pro.accountDetail} />
-            <SettingsInfoRow icon={<LibraryBig className="size-5" />} title={labels.pro.libraryTitle} detail={labels.pro.libraryDetail} />
-            <SettingsInfoRow icon={<Sparkles className="size-5" />} title={labels.pro.aviTitle} detail={labels.pro.aviDetail} />
-            <ExternalButton href={localizedExternalUrl(seriesProductConfig.links.suite?.href, locale)} tone="primary">
-              {isPro ? labels.pro.manage : labels.pro.upgrade}
-            </ExternalButton>
-          </SettingsSectionCard>
+          <PlanFeatureSection isPro={isPro} labels={labels.pro} manageHref={localizedExternalUrl(seriesProductConfig.links.suite?.href, locale)} />
 
           {canUseCloudSync ? (
-            <SettingsSectionCard title={labels.sync.title} subtitle={labels.sync.subtitle}>
-              <SettingsInfoRow icon={syncIcon(library.syncState)} title={syncHeadline(labels, library.syncState)} detail={syncDetail(labels, library.syncState)} />
-              <SettingsButton disabled={library.syncState === "syncing"} loading={library.syncState === "syncing"} onClick={() => void library.refreshSync()}>
-                {library.syncState === "syncing" ? labels.sync.retrySyncing : labels.sync.retry}
-              </SettingsButton>
-              {library.syncError ? <p className="text-sm font-semibold text-red-700">{library.syncError}</p> : null}
-            </SettingsSectionCard>
+            <CloudSyncSection labels={labels.sync} syncState={library.syncState} error={library.syncError} onRetry={() => void library.refreshSync()} />
           ) : null}
 
           <SettingsSectionCard title={labels.account.title} subtitle={email ?? labels.account.connected}>
@@ -55,69 +43,11 @@ function AccountRoute() {
             </AccountSignOutButton>
           </SettingsSectionCard>
 
-          <SettingsSectionCard title={labels.safety.title} subtitle={labels.safety.subtitle} spacing="compact">
-            <SettingsInfoRow
-              icon={<ShieldAlert className="size-5" />}
-              title={labels.safety.deleteTitle}
-              detail={labels.safety.deleteDetail}
-              action={
-                <ExternalButton href={localizedExternalUrl(seriesProductConfig.links.deleteAccount?.href, locale)} tone="danger">
-                  {labels.safety.deleteTitle}
-                </ExternalButton>
-              }
-            />
-          </SettingsSectionCard>
+          <AccountSafetySection labels={labels.safety} deleteHref={localizedExternalUrl(seriesProductConfig.links.deleteAccount?.href, locale)} />
         </SettingsProfileScaffold>
       </SeriesAppShell>
     </ProtectedRoute>
   );
-}
-
-function ExternalButton({ children, href, tone = "secondary" }: { children: string; href: string | undefined; tone?: "primary" | "secondary" | "danger" }) {
-  if (!href) {
-    return null;
-  }
-  return (
-    <a
-      className={
-        tone === "primary"
-          ? "inline-flex h-10 items-center justify-center rounded-full bg-[#112a55] px-4 text-sm font-semibold text-white hover:bg-[#19396f]"
-          : tone === "danger"
-            ? "inline-flex h-10 items-center justify-center rounded-full border border-red-200 bg-white/60 px-4 text-sm font-semibold text-red-700 hover:bg-red-50"
-            : "inline-flex h-10 items-center justify-center rounded-full border border-[#c8ad72] bg-white/60 px-4 text-sm font-semibold text-[#112a55] hover:bg-white"
-      }
-      href={href}
-    >
-      {children}
-    </a>
-  );
-}
-
-function syncIcon(syncState: string) {
-  if (syncState === "syncing") {
-    return <Cloudy className="size-5" />;
-  }
-  if (syncState === "failed" || syncState === "error") {
-    return <XCircle className="size-5" />;
-  }
-  if (syncState === "disabled") {
-    return <CloudOff className="size-5" />;
-  }
-  return <Cloud className="size-5" />;
-}
-
-function syncHeadline(labels: ProfileLabels, syncState: string) {
-  if (syncState === "syncing") return labels.sync.headlineSyncing;
-  if (syncState === "failed" || syncState === "error") return labels.sync.headlineFailed;
-  if (syncState === "disabled") return labels.sync.headlineDisabled;
-  return labels.sync.headlineSynced;
-}
-
-function syncDetail(labels: ProfileLabels, syncState: string) {
-  if (syncState === "syncing") return labels.sync.detailSyncing;
-  if (syncState === "failed" || syncState === "error") return labels.sync.detailFailed;
-  if (syncState === "disabled") return labels.sync.detailDisabled;
-  return labels.sync.detailSynced;
 }
 
 const syncLabels = {
@@ -154,6 +84,10 @@ interface ProfileLabels {
     headlineFailed: string;
     headlineSynced: string;
     headlineSyncing: string;
+    retry: string;
+    retrySyncing: string;
+    subtitle: string;
+    title: string;
   };
 }
 
@@ -164,8 +98,8 @@ const profileLabels = {
     pro: {
       accountDetail: "Mantén l'accés Pro vinculat al teu compte d'Apps AV.",
       accountTitle: "Compte Pro",
-      aviDetail: "Mantingues la guia de seguiment al costat de la sèrie actual.",
-      aviTitle: "Avi a Home",
+      assistantDetail: "Mantingues la guia de seguiment al costat de la sèrie actual.",
+      assistantTitle: "Avi a Home",
       libraryDetail: "Segueix fins a 1000 sèries actives.",
       libraryTitle: "Biblioteca més gran",
       manage: "Gestionar subscripció",
@@ -184,8 +118,8 @@ const profileLabels = {
     pro: {
       accountDetail: "Halte Pro-Zugriff mit deinem Apps AV-Konto verknüpft.",
       accountTitle: "Pro-Konto",
-      aviDetail: "Behalte die Serienhilfe direkt bei deiner aktuellen Serie.",
-      aviTitle: "Avi auf Home",
+      assistantDetail: "Behalte die Serienhilfe direkt bei deiner aktuellen Serie.",
+      assistantTitle: "Avi auf Home",
       libraryDetail: "Verfolge bis zu 1000 aktive Serien.",
       libraryTitle: "Größere Bibliothek",
       manage: "Abo verwalten",
@@ -204,8 +138,8 @@ const profileLabels = {
     pro: {
       accountDetail: "Keep Pro access linked to your Apps AV account.",
       accountTitle: "Pro account",
-      aviDetail: "Keep tracking guidance next to your current series.",
-      aviTitle: "Avi on Home",
+      assistantDetail: "Keep tracking guidance next to your current series.",
+      assistantTitle: "Avi on Home",
       libraryDetail: "Track up to 1000 active series.",
       libraryTitle: "Larger library",
       manage: "Manage subscription",
@@ -224,8 +158,8 @@ const profileLabels = {
     pro: {
       accountDetail: "Mantén el acceso Pro vinculado a tu cuenta de Apps AV.",
       accountTitle: "Cuenta Pro",
-      aviDetail: "Mantén la guía de seguimiento junto a tu serie actual.",
-      aviTitle: "Avi en Home",
+      assistantDetail: "Mantén la guía de seguimiento junto a tu serie actual.",
+      assistantTitle: "Avi en Home",
       libraryDetail: "Sigue hasta 1000 series activas.",
       libraryTitle: "Biblioteca mayor",
       manage: "Gestionar suscripción",
@@ -244,8 +178,8 @@ const profileLabels = {
     pro: {
       accountDetail: "Gardez l'accès Pro lié à votre compte Apps AV.",
       accountTitle: "Compte Pro",
-      aviDetail: "Garde la guidance de suivi près de ta série actuelle.",
-      aviTitle: "Avi sur Home",
+      assistantDetail: "Garde la guidance de suivi près de ta série actuelle.",
+      assistantTitle: "Avi sur Home",
       libraryDetail: "Suivez jusqu'à 1000 séries actives.",
       libraryTitle: "Bibliothèque plus grande",
       manage: "Gérer l'abonnement",

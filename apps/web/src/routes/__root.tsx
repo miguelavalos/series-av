@@ -1,5 +1,6 @@
 import { AccountAvProvider } from "@avalsys/account-av-web";
 import { AppsAvWebProvider, getAppsAvLocaleFromSearch, useAppsAvLocale } from "@avalsys/apps-av-web";
+import { applyAppsAvThemePreference, normalizeAppsAvThemePreference, readAppsAvThemePreference } from "@avalsys/apps-av-web/src/lib/theme-preference";
 import { HeadContent, Outlet, Scripts, createRootRoute, useRouterState } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { getAccountApiBaseUrl, getAccountPublishableKey } from "@/lib/series-config";
@@ -31,12 +32,11 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const initialLocale = getAppsAvLocaleFromSearch(search);
 
   useEffect(() => {
-    const storedTheme = readStoredTheme();
-    if (storedTheme === "light" || storedTheme === "dark") {
-      document.documentElement.dataset.seriesTheme = storedTheme;
-      return;
-    }
-    delete document.documentElement.dataset.seriesTheme;
+    applyAppsAvThemePreference({
+      attributeName: "seriesTheme",
+      storageKey: seriesThemeStorageKey,
+      theme: normalizeAppsAvThemePreference(readAppsAvThemePreference(seriesThemeStorageKey))
+    });
   }, []);
 
   return (
@@ -54,13 +54,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   );
 }
 
-function readStoredTheme() {
-  try {
-    return window.localStorage?.getItem("series-av.theme");
-  } catch {
-    return null;
-  }
-}
+const seriesThemeStorageKey = "series-av.theme";
 
 function AccountBoundary({ children }: Readonly<{ children: ReactNode }>) {
   const publishableKey = getAccountPublishableKey();

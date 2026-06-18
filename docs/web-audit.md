@@ -63,6 +63,11 @@ web visual audit.
   cloud sync, account safety, app preferences, tracking, local device data, and
   help/legal sections. Web copy intentionally omits iOS guest product-mode
   references.
+- The shared Apps AV web package now also owns reusable Account/Settings
+  section primitives for Pro feature rows, cloud sync status, account safety,
+  help/legal rows, external buttons, and theme preference helpers. Series AV
+  supplies product labels, links, access state, and the Series-specific theme
+  attribute only.
 - Authenticated browser QA on 2026-06-18 checked `/settings?lang=es` and
   `/account?lang=es`: expected Spanish content rendered, no guest copy was
   present, own links preserved `lang=es`, Free access did not show Pro-only

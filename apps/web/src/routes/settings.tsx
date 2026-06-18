@@ -8,8 +8,10 @@ import {
   appsAvLocaleNames,
   type AppsAvLocale
 } from "@avalsys/apps-av-web";
+import { HelpLegalSection } from "@avalsys/apps-av-web/src/components/account-settings-sections";
+import { applyAppsAvThemePreference, normalizeAppsAvThemePreference, readAppsAvThemePreference, type AppsAvThemePreference } from "@avalsys/apps-av-web/src/lib/theme-preference";
 import { createFileRoute } from "@tanstack/react-router";
-import { Code2, Contrast, Database, GitBranch, Globe, HardDrive, HelpCircle, Languages, ListChecks, Moon, RotateCcw, ShieldAlert, Smartphone, Sun, Trash2 } from "lucide-react";
+import { Contrast, Globe, HardDrive, Languages, ListChecks, Moon, RotateCcw, Smartphone, Sun, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { SeriesAppShell } from "@/components/series-app-shell";
@@ -25,14 +27,17 @@ function SettingsRoute() {
   const locale = useAppsAvLocale();
   const library = useSeriesLibrary();
   const labels = profileLabels[locale];
-  const [theme, setThemeState] = useState<SeriesTheme>(() => normalizeTheme(readThemePreference()));
+  const [theme, setThemeState] = useState<AppsAvThemePreference>("system");
 
   useEffect(() => {
-    applyTheme(theme);
-  }, [theme]);
+    const storedTheme = normalizeAppsAvThemePreference(readAppsAvThemePreference(themeStorageKey));
+    setThemeState(storedTheme);
+    applyTheme(storedTheme);
+  }, []);
 
-  const setTheme = (nextTheme: SeriesTheme) => {
+  const setTheme = (nextTheme: AppsAvThemePreference) => {
     setThemeState(nextTheme);
+    applyTheme(nextTheme);
   };
 
   const clearLocalData = () => {
@@ -62,7 +67,7 @@ function SettingsRoute() {
             <SettingsInfoRow icon={<Contrast className="size-5" />} title={labels.preferences.themeTitle} detail={labels.preferences.themeDetail} />
             <SettingsOptionButtonGroup
               selectedId={theme}
-              onSelect={(id) => setTheme(id as SeriesTheme)}
+              onSelect={(id) => setTheme(id as AppsAvThemePreference)}
               options={themeOptions.map((item) => ({
                 id: item,
                 icon: themeIcon(item),
@@ -88,43 +93,18 @@ function SettingsRoute() {
             />
           </SettingsSectionCard>
 
-          <SettingsSectionCard title={labels.help.title} subtitle={labels.help.subtitle}>
-            <SettingsInfoRow
-              icon={<GitBranch className="size-5" />}
-              title={labels.help.openSourceTitle}
-              detail={labels.help.openSourceDetail}
-              action={<ExternalRowLink href={localizedExternalUrl(openSourceUrl(), locale)} label={labels.help.sourceCodeTitle} />}
-            />
-            <SettingsInfoRow icon={<Code2 className="size-5" />} title={labels.help.sourceCodeTitle} detail={labels.help.sourceCodeDetail} action={<ExternalRowLink href={localizedExternalUrl(openSourceUrl(), locale)} label={labels.help.sourceCodeTitle} />} />
-            <SettingsInfoRow icon={<HelpCircle className="size-5" />} title={labels.help.supportTitle} detail={labels.help.supportDetail} action={<ExternalRowLink href={localizedExternalUrl(seriesProductConfig.links.support?.href, locale)} label={labels.help.supportTitle} />} />
-            <SettingsInfoRow icon={<Database className="size-5" />} title={labels.help.privacyTitle} detail={labels.help.privacyDetail} action={<ExternalRowLink href={localizedExternalUrl(seriesProductConfig.links.privacy?.href, locale)} label={labels.help.privacyTitle} />} />
-            <SettingsInfoRow icon={<ShieldAlert className="size-5" />} title={labels.help.termsTitle} detail={labels.help.termsDetail} action={<ExternalRowLink href={localizedExternalUrl(seriesProductConfig.links.terms?.href, locale)} label={labels.help.termsTitle} />} />
-            <SettingsInfoRow icon={<Trash2 className="size-5" />} title={labels.safety.deleteTitle} detail={labels.safety.deleteDetail} action={<ExternalRowLink href={localizedExternalUrl(seriesProductConfig.links.deleteAccount?.href, locale)} label={labels.safety.deleteTitle} />} />
-          </SettingsSectionCard>
+          <HelpLegalSection labels={{ ...labels.help, deleteTitle: labels.safety.deleteTitle, deleteDetail: labels.safety.deleteDetail }} links={helpLegalLinks(locale)} />
         </SettingsProfileScaffold>
       </SeriesAppShell>
     </ProtectedRoute>
   );
 }
 
-function ExternalRowLink({ href, label }: { href: string | undefined; label: string }) {
-  if (!href) {
-    return null;
-  }
-  return (
-    <a className="text-sm font-semibold text-[#112a55] underline" href={href}>
-      {label}
-    </a>
-  );
-}
-
-type SeriesTheme = "system" | "light" | "dark";
-
 const locales: AppsAvLocale[] = ["en", "es", "fr", "de", "ca"];
 const themeStorageKey = "series-av.theme";
-const themeOptions: SeriesTheme[] = ["system", "light", "dark"];
+const themeOptions: AppsAvThemePreference[] = ["system", "light", "dark"];
 
-function themeIcon(theme: SeriesTheme) {
+function themeIcon(theme: AppsAvThemePreference) {
   if (theme === "light") {
     return <Sun className="size-4" />;
   }
@@ -138,42 +118,18 @@ function openSourceUrl() {
   return import.meta.env.VITE_SERIESAV_OPEN_SOURCE_URL || "https://github.com/avalsys/series-av";
 }
 
-function applyTheme(theme: SeriesTheme) {
-  if (theme === "system") {
-    removeThemePreference();
-    delete document.documentElement.dataset.seriesTheme;
-    return;
-  }
-  writeThemePreference(theme);
-  document.documentElement.dataset.seriesTheme = theme;
+function helpLegalLinks(locale: AppsAvLocale) {
+  return {
+    deleteAccount: localizedExternalUrl(seriesProductConfig.links.deleteAccount?.href, locale),
+    openSource: localizedExternalUrl(openSourceUrl(), locale),
+    privacy: localizedExternalUrl(seriesProductConfig.links.privacy?.href, locale),
+    support: localizedExternalUrl(seriesProductConfig.links.support?.href, locale),
+    terms: localizedExternalUrl(seriesProductConfig.links.terms?.href, locale)
+  };
 }
 
-function readThemePreference() {
-  try {
-    return window.localStorage?.getItem(themeStorageKey);
-  } catch {
-    return null;
-  }
-}
-
-function normalizeTheme(theme: string | null | undefined): SeriesTheme {
-  return theme === "light" || theme === "dark" ? theme : "system";
-}
-
-function writeThemePreference(theme: Exclude<SeriesTheme, "system">) {
-  try {
-    window.localStorage?.setItem(themeStorageKey, theme);
-  } catch {
-    // Theme still applies for the current page when browser storage is unavailable.
-  }
-}
-
-function removeThemePreference() {
-  try {
-    window.localStorage?.removeItem(themeStorageKey);
-  } catch {
-    // Theme still returns to system for the current page when browser storage is unavailable.
-  }
+function applyTheme(theme: AppsAvThemePreference) {
+  applyAppsAvThemePreference({ attributeName: "seriesTheme", storageKey: themeStorageKey, theme });
 }
 
 const languageDisplayNames: Record<AppsAvLocale, Record<AppsAvLocale, string>> = {
