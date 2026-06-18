@@ -73,6 +73,11 @@ web visual audit.
   base language-preserving path helper now live in Apps AV web. Series AV uses
   them for protected routes, Home empty state, Home/Library sync indicators, and
   internal localized paths while keeping product copy and behavior local.
+- The shared AppShell now supports active-route state for desktop and mobile
+  navigation. Series AV passes the TanStack current pathname to the shell.
+- The internal Apps AV web QA runbook now defines the common route protection,
+  language, theme, app shell, Account/Settings, sync, and product-boundary
+  checks for Series AV and future product web apps.
 - Authenticated browser QA on 2026-06-18 checked `/settings?lang=es` and
   `/account?lang=es`: expected Spanish content rendered, no guest copy was
   present, own links preserved `lang=es`, Free access did not show Pro-only
