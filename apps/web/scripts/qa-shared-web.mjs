@@ -34,7 +34,7 @@ const result = await runSharedWebSmokeQa({
   name: "Series AV",
   ownRoutePrefixes: ["/", "/library", "/search", "/avi", "/account", "/settings", "/sign-in", "/series/"],
   productIdentity: "Series AV",
-  routes: ["/", "/library", "/search", "/avi", "/account", "/settings"]
+  routes: ["/", "/library", "/search", "/avi", "/account", "/settings", "/series/thetvdb%3A348545"]
 });
 
 if (!result.passed) {

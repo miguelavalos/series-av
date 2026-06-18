@@ -108,9 +108,10 @@ web visual audit.
   the current route path.
 - Series AV now configures the shared Apps AV web smoke QA runner for the
   signed-out contract across `en`, `es`, `fr`, `de`, and `ca`: `bun run --cwd
-  apps/web qa:shared`. It checks public `/`, protected route gates, locale
-  preservation on product-owned links, HTML language, runtime-error markers, and
-  guest-copy absence against `SERIESAV_WEB_QA_BASE_URL` or
+  apps/web qa:shared`. It checks public `/`, protected route gates including a
+  concrete Detail route, locale preservation on product-owned links, HTML
+  language, runtime-error markers, and guest-copy absence against
+  `SERIESAV_WEB_QA_BASE_URL` or
   `http://localhost:5193`.
 - Functional QA on 2026-06-18 found Preview `/v1/series/popular?surface=search`
   returns one item even when the web requests `limit=12`. The web therefore
