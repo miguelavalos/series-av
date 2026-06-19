@@ -1,3 +1,5 @@
+import { isPlaceholderSeriesTitle } from "@/lib/series-display";
+
 export type SeriesLibraryEntryStatus = "wantToWatch" | "watching" | "watched";
 
 export interface SeriesEpisodeCursor {
@@ -293,9 +295,9 @@ export function updateCatalogMetadataIfPlaceholder(
   at = new Date()
 ): SeriesLibraryEntry {
   const title = normalizeOptionalString(input.title);
-  const shouldUpdateTitle = Boolean(title) && isPlaceholderTitle(entry.title, entry.seriesId);
+  const shouldUpdateTitle = Boolean(title) && isPlaceholderSeriesTitle(entry.title, entry.seriesId);
   const nextArtwork = entry.displayArtworkRef?.trim() ? entry.displayArtworkRef : normalizeOptionalString(input.displayArtworkRef);
-  const nextFallback = entry.fallbackVisualSeed?.trim() && !isPlaceholderTitle(entry.fallbackVisualSeed, entry.seriesId) ? entry.fallbackVisualSeed : normalizeOptionalString(input.fallbackVisualSeed) ?? title;
+  const nextFallback = entry.fallbackVisualSeed?.trim() && !isPlaceholderSeriesTitle(entry.fallbackVisualSeed, entry.seriesId) ? entry.fallbackVisualSeed : normalizeOptionalString(input.fallbackVisualSeed) ?? title;
 
   if (!shouldUpdateTitle && nextArtwork === entry.displayArtworkRef && nextFallback === entry.fallbackVisualSeed) {
     return entry;
@@ -399,10 +401,4 @@ function compareEntryRecency(first: SeriesLibraryEntry, second: SeriesLibraryEnt
 function normalizeOptionalString(value?: string | null): string | null {
   const trimmed = value?.trim();
   return trimmed ? trimmed : null;
-}
-
-function isPlaceholderTitle(title: string | null | undefined, seriesId: string): boolean {
-  const normalizedTitle = title?.trim().toLocaleLowerCase();
-  const normalizedSeriesId = seriesId.trim().toLocaleLowerCase();
-  return !normalizedTitle || normalizedTitle === normalizedSeriesId || normalizedTitle === decodeURIComponent(seriesId).trim().toLocaleLowerCase();
 }

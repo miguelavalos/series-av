@@ -30,6 +30,7 @@ function LibraryRoute() {
   const active = useMemo(() => filterEntries(library.snapshot.activeEntries, filter, normalizedQuery), [filter, library.snapshot.activeEntries, normalizedQuery]);
   const archived = useMemo(() => filterEntries(library.snapshot.archivedEntries, filter, normalizedQuery), [filter, library.snapshot.archivedEntries, normalizedQuery]);
   const showArchived = filter === "all" || filter === "archived";
+  const isInitialSyncing = library.syncState === "syncing" && !library.isInitialSyncComplete;
 
   return (
     <ProtectedRoute>
@@ -65,11 +66,13 @@ function LibraryRoute() {
             </div>
           </Card>
 
-          {active.length === 0 && archived.length === 0 ? (
+          {isInitialSyncing ? <LibraryRowsSkeleton /> : null}
+
+          {!isInitialSyncing && active.length === 0 && archived.length === 0 ? (
             <EmptyState className="border-[#d7c494] bg-[#fff8df]" description={text.library.emptyBody} title={text.library.emptyTitle} />
           ) : null}
 
-          {active.length > 0 ? (
+          {!isInitialSyncing && active.length > 0 ? (
             <section className="grid gap-3">
               <h2 className="text-sm font-bold uppercase text-[#53617a]">{labels.active}</h2>
               {active.map((entry) => (
@@ -78,7 +81,7 @@ function LibraryRoute() {
             </section>
           ) : null}
 
-          {showArchived && archived.length > 0 ? (
+          {!isInitialSyncing && showArchived && archived.length > 0 ? (
             <section className="grid gap-3">
               <h2 className="text-sm font-bold uppercase text-[#53617a]">{uiLabels.archive}</h2>
               {archived.map((entry) => (
@@ -101,6 +104,29 @@ const libraryLabels = {
 } as const;
 
 const filters: Filter[] = ["all", "watching", "wantToWatch", "watched", "archived"];
+
+function LibraryRowsSkeleton() {
+  return (
+    <section className="grid gap-3" aria-hidden="true">
+      <div className="h-4 w-20 animate-pulse rounded-full bg-[#d8c27d]/70" />
+      {Array.from({ length: 3 }).map((_, index) => (
+        <div key={index} className="rounded-lg border border-[#d7c494] bg-[#fff8df]/88 p-4 shadow-sm shadow-[#172f5c]/6">
+          <div className="flex gap-4">
+            <div className="h-20 w-14 shrink-0 animate-pulse rounded-lg border border-[#d7c494] bg-[#ead6a5]" />
+            <div className="min-w-0 flex-1">
+              <div className="h-5 w-48 max-w-full animate-pulse rounded-full bg-[#ead6a5]" />
+              <div className="mt-3 h-4 w-72 max-w-full animate-pulse rounded-full bg-[#ead6a5]/70" />
+              <div className="mt-4 flex gap-2">
+                <div className="h-9 w-24 animate-pulse rounded-full bg-[#112a55]/25" />
+                <div className="h-9 w-20 animate-pulse rounded-full bg-white/45" />
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </section>
+  );
+}
 
 function filterEntries(entries: SeriesLibraryEntry[], filter: Filter, normalizedQuery: string) {
   return entries.filter((entry) => {

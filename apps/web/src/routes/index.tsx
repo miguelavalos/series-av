@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SeriesApiClient, rememberSeriesCatalogItem, type SeriesSearchResult } from "@/lib/series-api-client";
 import { getSeriesApiBaseUrl } from "@/lib/series-config";
+import { visibleSeriesTitle } from "@/lib/series-display";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
 import { cursorLabel, nextEpisodeCursor, progressLabel } from "@/lib/series-library";
 import { localizedSeriesPath, useSeriesApiLocale, useSeriesText } from "@/lib/series-i18n";
@@ -45,6 +46,8 @@ function HomeContent() {
   const text = useSeriesText();
   const library = useSeriesLibrary();
   const current = library.snapshot.homeEntries[0] ?? null;
+  const currentTitle = current ? visibleSeriesTitle(current.title, current.seriesId) : null;
+  const shouldShowCurrentSkeleton = Boolean(current && !currentTitle && !library.isInitialSyncComplete && library.syncState === "syncing");
   const next = current ? nextEpisodeCursor(current.lastWatchedEpisodeCursor) : null;
   const labels = homeLabels[locale];
   const libraryLabels = seriesLibraryUiText(locale);
@@ -71,8 +74,8 @@ function HomeContent() {
         <Card className="series-paper gap-0 rounded-lg border-[#d7c494] p-6 py-6 shadow-lg shadow-[#172f5c]/8 sm:p-8 sm:py-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <h1 className="max-w-2xl text-4xl font-semibold leading-tight text-[#112a55]">{current ? labels.continueWatching : text.home.title}</h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-[#334766]">{current ? labels.ready(current.title, cursorLabel(next ?? { episodeNumber: 1, seasonNumber: 1 })) : text.home.body}</p>
+              <h1 className="max-w-2xl text-4xl font-semibold leading-tight text-[#112a55]">{current && !shouldShowCurrentSkeleton ? labels.continueWatching : text.home.title}</h1>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-[#334766]">{current && currentTitle && !shouldShowCurrentSkeleton ? labels.ready(currentTitle, cursorLabel(next ?? { episodeNumber: 1, seasonNumber: 1 })) : text.home.body}</p>
             </div>
             <Button asChild className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]">
               <Link to={localizedSeriesPath(current ? `/series/${encodeURIComponent(current.seriesId)}` : "/search", locale)}>
@@ -82,11 +85,13 @@ function HomeContent() {
             </Button>
           </div>
 
-          {current ? (
+          {shouldShowCurrentSkeleton ? (
+            <HomeCurrentSkeleton />
+          ) : current ? (
             <div className="mt-8 flex flex-col gap-5 rounded-lg border border-[#d7c494] bg-[#fff8df]/78 p-4 sm:flex-row">
               <SeriesArtwork entry={current} size="md" />
               <div className="flex-1">
-                <h2 className="text-2xl font-semibold text-[#112a55]">{current.title}</h2>
+                <h2 className="text-2xl font-semibold text-[#112a55]">{currentTitle ?? labels.loadingTitle}</h2>
                 <p className="mt-2 text-sm text-[#53617a]">
                   {progressLabel(current, libraryLabels.notStarted, libraryLabels.noEpisodeSet)} · {libraryLabels.next} {cursorLabel(next ?? { episodeNumber: 1, seasonNumber: 1 })}
                 </p>
@@ -113,7 +118,7 @@ function HomeContent() {
             <Sparkles className="size-4" aria-hidden="true" />
             {text.home.aviTitle}
           </div>
-          <p className="mt-4 text-sm leading-6 text-white/74">{current ? labels.avi(current.title) : text.home.aviBody[0]}</p>
+          <p className="mt-4 text-sm leading-6 text-white/74">{current && currentTitle && !shouldShowCurrentSkeleton ? labels.avi(currentTitle) : text.home.aviBody[0]}</p>
           <Button asChild className="mt-5 rounded-full bg-white text-[#10284f] hover:bg-white/90">
             <Link to={localizedSeriesPath("/avi", locale)}>{text.nav.avi}</Link>
           </Button>
@@ -137,6 +142,7 @@ const homeLabels = {
     follow: "Seguir",
     following: "Seguint",
     limitReached: "Límit assolit",
+    loadingTitle: "Carregant sèrie",
     markNext: "Marcar següent",
     noArtwork: "Sense imatge",
     openDetail: "Obrir detall",
@@ -155,6 +161,7 @@ const homeLabels = {
     follow: "Folgen",
     following: "Gespeichert",
     limitReached: "Limit erreicht",
+    loadingTitle: "Serie wird geladen",
     markNext: "Nächste markieren",
     noArtwork: "Kein Bild",
     openDetail: "Detail öffnen",
@@ -173,6 +180,7 @@ const homeLabels = {
     follow: "Follow",
     following: "Following",
     limitReached: "Limit reached",
+    loadingTitle: "Loading series",
     markNext: "Mark next",
     noArtwork: "No artwork",
     openDetail: "Open detail",
@@ -191,6 +199,7 @@ const homeLabels = {
     follow: "Seguir",
     following: "Siguiendo",
     limitReached: "Límite alcanzado",
+    loadingTitle: "Cargando serie",
     markNext: "Marcar siguiente",
     noArtwork: "Sin imagen",
     openDetail: "Abrir detalle",
@@ -209,6 +218,7 @@ const homeLabels = {
     follow: "Suivre",
     following: "Suivi",
     limitReached: "Limite atteinte",
+    loadingTitle: "Chargement de la série",
     markNext: "Marquer la suite",
     noArtwork: "Sans image",
     openDetail: "Ouvrir le détail",
@@ -228,6 +238,22 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
         {label}
       </div>
       <div className="mt-2 text-lg font-semibold text-[#112a55]">{value}</div>
+    </div>
+  );
+}
+
+function HomeCurrentSkeleton() {
+  return (
+    <div className="mt-8 flex flex-col gap-5 rounded-lg border border-[#d7c494] bg-[#fff8df]/78 p-4 sm:flex-row" aria-hidden="true">
+      <div className="h-28 w-20 shrink-0 animate-pulse rounded-lg border border-[#d7c494] bg-[#ead6a5]" />
+      <div className="flex-1">
+        <div className="h-8 w-56 max-w-full animate-pulse rounded-full bg-[#ead6a5]" />
+        <div className="mt-3 h-4 w-72 max-w-full animate-pulse rounded-full bg-[#ead6a5]/70" />
+        <div className="mt-4 flex flex-wrap gap-2">
+          <div className="h-10 w-36 animate-pulse rounded-full bg-[#112a55]/25" />
+          <div className="h-10 w-28 animate-pulse rounded-full bg-white/45" />
+        </div>
+      </div>
     </div>
   );
 }

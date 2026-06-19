@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SeriesApiClient, readRememberedSeriesCatalogItem, type SeriesEpisodeGuideItem } from "@/lib/series-api-client";
 import { getSeriesApiBaseUrl } from "@/lib/series-config";
+import { isPlaceholderSeriesTitle, normalizeSeriesId } from "@/lib/series-display";
 import { readSeriesExternalSearchEngine } from "@/lib/series-external-preferences";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
 import { compareEpisodeCursors, cursorLabel, nextEpisodeCursor, progressLabel, type SeriesEpisodeCursor, type SeriesLibraryEntry } from "@/lib/series-library";
@@ -101,6 +102,7 @@ function SeriesDetailRoute() {
     : {
         displayArtworkRef: catalogArtworkRef,
         fallbackVisualSeed: title,
+        seriesId,
         title
       };
 
@@ -384,11 +386,7 @@ function SeriesDetailHeroSkeleton() {
 }
 
 function normalizeRouteSeriesId(seriesId: string) {
-  try {
-    return decodeURIComponent(seriesId).trim();
-  } catch {
-    return seriesId.trim();
-  }
+  return normalizeSeriesId(seriesId);
 }
 
 function normalizeEpisodeGuide(items: SeriesEpisodeGuideItem[]) {
@@ -574,7 +572,5 @@ const detailLabels = {
 } as const;
 
 function isPlaceholderCatalogTitle(title: string | null | undefined, seriesId: string) {
-  const normalizedTitle = title?.trim().toLocaleLowerCase();
-  const normalizedSeriesId = seriesId.trim().toLocaleLowerCase();
-  return !normalizedTitle || normalizedTitle === normalizedSeriesId || normalizedTitle === decodeURIComponent(seriesId).trim().toLocaleLowerCase();
+  return isPlaceholderSeriesTitle(title, seriesId);
 }

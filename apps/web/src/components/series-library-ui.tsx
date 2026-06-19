@@ -3,6 +3,7 @@ import { Archive, Check, MoreHorizontal, Pin, PinOff, RotateCcw, StepBack, StepF
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { isPlaceholderSeriesTitle, visibleSeriesTitle } from "@/lib/series-display";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
 import { cursorLabel, nextEpisodeCursor, progressLabel, type SeriesLibraryEntry, type SeriesLibraryEntryStatus } from "@/lib/series-library";
 import { localizedSeriesPath } from "@/lib/series-i18n";
@@ -19,6 +20,7 @@ const uiText = {
     archive: "Arxiva",
     clear: "Neteja",
     episode: "Episodi",
+    loadingTitle: "Carregant sèrie",
     more: "Més",
     next: "Següent",
     noEpisodeSet: "Cap episodi fixat",
@@ -35,6 +37,7 @@ const uiText = {
     archive: "Archivieren",
     clear: "Leeren",
     episode: "Folge",
+    loadingTitle: "Serie wird geladen",
     more: "Mehr",
     next: "Weiter",
     noEpisodeSet: "Keine Folge gesetzt",
@@ -51,6 +54,7 @@ const uiText = {
     archive: "Archive",
     clear: "Clear",
     episode: "Episode",
+    loadingTitle: "Loading series",
     more: "More",
     next: "Next",
     noEpisodeSet: "No episode set",
@@ -67,6 +71,7 @@ const uiText = {
     archive: "Archivar",
     clear: "Borrar",
     episode: "Episodio",
+    loadingTitle: "Cargando serie",
     more: "Más",
     next: "Siguiente",
     noEpisodeSet: "Sin episodio",
@@ -83,6 +88,7 @@ const uiText = {
     archive: "Archiver",
     clear: "Effacer",
     episode: "Épisode",
+    loadingTitle: "Chargement de la série",
     more: "Plus",
     next: "Suivant",
     noEpisodeSet: "Aucun épisode",
@@ -95,9 +101,9 @@ const uiText = {
     trash: "Supprimer",
     unpin: "Désépingler"
   }
-} satisfies Record<AppsAvLocale, { archive: string; clear: string; episode: string; more: string; next: string; noEpisodeSet: string; notStarted: string; pin: string; pinned: string; previous: string; restore: string; status: Record<SeriesLibraryEntryStatus, string>; trash: string; unpin: string }>;
+} satisfies Record<AppsAvLocale, { archive: string; clear: string; episode: string; loadingTitle: string; more: string; next: string; noEpisodeSet: string; notStarted: string; pin: string; pinned: string; previous: string; restore: string; status: Record<SeriesLibraryEntryStatus, string>; trash: string; unpin: string }>;
 
-export function SeriesArtwork({ entry, size = "md" }: { entry: Pick<SeriesLibraryEntry, "displayArtworkRef" | "fallbackVisualSeed" | "title">; size?: "sm" | "md" | "lg" | "xl" }) {
+export function SeriesArtwork({ entry, size = "md" }: { entry: Pick<SeriesLibraryEntry, "displayArtworkRef" | "fallbackVisualSeed" | "title"> & { seriesId?: string }; size?: "sm" | "md" | "lg" | "xl" }) {
   const classes = {
     lg: "h-48 w-34",
     md: "h-28 w-20",
@@ -105,11 +111,14 @@ export function SeriesArtwork({ entry, size = "md" }: { entry: Pick<SeriesLibrar
     xl: "h-72 w-48"
   }[size];
 
+  const fallbackSeed = entry.fallbackVisualSeed ?? entry.title;
+  const shouldHideFallbackText = isPlaceholderSeriesTitle(fallbackSeed, entry.seriesId ?? entry.title);
+
   return entry.displayArtworkRef ? (
     <img alt="" className={`${classes} shrink-0 rounded-lg border border-[#d7c494] object-cover`} src={entry.displayArtworkRef} />
   ) : (
     <div className={`${classes} flex shrink-0 items-center justify-center rounded-lg border border-[#d7c494] bg-[#ead6a5] px-2 text-center text-xs font-semibold text-[#112a55]`}>
-      {(entry.fallbackVisualSeed ?? entry.title).slice(0, 18)}
+      {shouldHideFallbackText ? <span className="h-3 w-10 animate-pulse rounded-full bg-[#d8c27d]" /> : fallbackSeed.slice(0, 18)}
     </div>
   );
 }
@@ -118,6 +127,7 @@ export function SeriesEntryRow({ entry, locale, showArchive = true }: { entry: S
   const library = useSeriesLibrary();
   const next = nextEpisodeCursor(entry.lastWatchedEpisodeCursor);
   const labels = uiText[locale];
+  const title = visibleSeriesTitle(entry.title, entry.seriesId);
 
   return (
     <Card className="gap-0 rounded-lg border-[#d7c494] bg-[#fff8df]/88 p-4 py-4 shadow-sm shadow-[#172f5c]/6">
@@ -127,7 +137,7 @@ export function SeriesEntryRow({ entry, locale, showArchive = true }: { entry: S
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <Link className="line-clamp-2 text-base font-semibold text-[#112a55] hover:underline" to={localizedSeriesPath(`/series/${encodeURIComponent(entry.seriesId)}`, locale)}>
-                {entry.title}
+                {title ?? <span className="inline-block h-5 w-40 animate-pulse rounded-full bg-[#ead6a5] align-middle" aria-label={labels.loadingTitle} />}
               </Link>
               <p className="mt-1 text-sm text-[#53617a]">
                 {labels.status[entry.status]} · {progressLabel(entry, labels.notStarted, labels.noEpisodeSet)} · {labels.next} {cursorLabel(next)}
