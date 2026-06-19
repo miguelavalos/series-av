@@ -1,5 +1,5 @@
 import { appsAvExternalSearchUrl, appsAvImdbSearchUrl, ErrorState, useAppsAvLocale } from "@avalsys/apps-av-web";
-import { useAccountToken } from "@avalsys/account-av-web";
+import { useAccountSession, useAccountToken } from "@avalsys/account-av-web";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight, Database, ExternalLink, Plus, RotateCcw, Search, StepBack, StepForward } from "lucide-react";
@@ -26,6 +26,7 @@ function SeriesDetailRoute() {
   const locale = useAppsAvLocale();
   const apiLocale = useSeriesApiLocale();
   const text = useSeriesText();
+  const accountSession = useAccountSession();
   const getToken = useAccountToken();
   const library = useSeriesLibrary();
   const labels = detailLabels[locale];
@@ -35,8 +36,15 @@ function SeriesDetailRoute() {
   const rememberedCatalog = useMemo(() => readRememberedSeriesCatalogItem(seriesId), [seriesId]);
   const [externalSearchEngine, setExternalSearchEngine] = useState(readSeriesExternalSearchEngine);
   const detail = useQuery({
-    queryFn: async () => client.series({ locale: apiLocale, seriesId, token: await getToken() }),
-    queryKey: ["series-av", "detail", apiLocale, seriesId],
+    enabled: accountSession.isLoaded && Boolean(accountSession.isSignedIn),
+    queryFn: async () => {
+      const token = await getToken();
+      if (!token) {
+        throw new Error("Series detail token is not available.");
+      }
+      return client.series({ locale: apiLocale, seriesId, token });
+    },
+    queryKey: ["series-av", "detail", apiLocale, seriesId, accountSession.userId],
     retry: false
   });
   const detailCatalog = detail.data?.summary ?? null;
