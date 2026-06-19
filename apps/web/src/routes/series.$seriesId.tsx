@@ -157,11 +157,6 @@ function SeriesDetailRoute() {
           <Card className="gap-4 rounded-lg border-[#d7c494] bg-[#fff8df]/88 p-5 py-5 text-[#112a55] shadow-sm shadow-[#172f5c]/6 sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-lg font-semibold">{labels.episodeGuide}</h2>
-              {entry ? (
-                <p className="text-sm font-semibold text-[#53617a]">
-                  {labels.watchedThrough}: {entry.lastWatchedEpisodeCursor ? cursorLabel(entry.lastWatchedEpisodeCursor) : libraryLabels.notStarted}
-                </p>
-              ) : null}
             </div>
             {episodes.isLoading ? <div className="h-40 animate-pulse rounded-lg bg-[#ead6a5]" /> : null}
             {episodes.isError ? <ErrorState className="border-[#d7c494] bg-white/70" description={episodes.error.message} title={labels.episodesUnavailable} /> : null}
