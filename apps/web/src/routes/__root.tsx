@@ -8,6 +8,9 @@ import { localizedSeriesPath, useSeriesAccountLocalization, useSeriesText } from
 import { SeriesLibraryProvider } from "@/lib/series-library-provider";
 import "../styles.css";
 
+const faviconUrl = "https://cdn.avalsys.com/apps-av/series-av/web-v3/favicon-32x32.png?v=20260619";
+const appleTouchIconUrl = "https://cdn.avalsys.com/apps-av/series-av/web-v3/apple-touch-icon.png?v=20260619";
+
 export const Route = createRootRoute({
   component: RootComponent,
   head: () => ({
@@ -15,6 +18,10 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Series AV" }
+    ],
+    links: [
+      { rel: "icon", type: "image/png", sizes: "32x32", href: faviconUrl },
+      { rel: "apple-touch-icon", href: appleTouchIconUrl }
     ]
   })
 });
