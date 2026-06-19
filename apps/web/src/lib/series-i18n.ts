@@ -14,7 +14,7 @@ const en = {
     signInSubtitle: "Welcome back. Sign in to keep your series notebook connected."
   },
   avi: {
-    body: "Avi helps turn a messy watch list into a clear next step: continue, save, catch up, or discover something that fits your habits.",
+    body: "Avi helps turn a messy watch list into a clear next step: continue, save, catch up, or keep the library easier to read.",
     cards: [
       {
         text: "Avi can point out which shows need a saved status, a next episode, or a cleaner progress note.",
@@ -25,8 +25,8 @@ const en = {
         title: "Choose what is next"
       },
       {
-        text: "Recommendations can grow from what you actually watch instead of starting from a blank catalog.",
-        title: "Discover with context"
+        text: "Library guidance starts from the series you already saved and the next episode you can act on.",
+        title: "Use real context"
       }
     ],
     libraryCta: "Open library",
@@ -49,7 +49,7 @@ const en = {
     aviBody: [
       "Start from your current shows and find the next useful action.",
       "Spot missing progress before the queue becomes hard to read.",
-      "Keep recommendations close to your real watching habits."
+      "Keep guidance close to your real watching habits."
     ],
     aviTitle: "Avi keeps watch",
     body: "Search the catalog, save progress, and keep a clear map of what to watch next.",
@@ -80,9 +80,9 @@ const en = {
     cardBody: "Save what you are watching, find what is next, and return to your progress without rebuilding the list.",
     cardTitle: "Continue from your list",
     cta: "Sign in",
-    heroBody: "Sign in to keep your library, episode progress, and Avi guidance connected wherever you watch.",
+    heroBody: "Sign in to keep your library, episode progress, and Avi guidance connected with your AV account.",
     heroTitle: "Your series notebook, always ready.",
-    intro: "Follow every show, remember the next episode, and keep your watch list close from any screen.",
+    intro: "Follow every show, remember the next episode, and keep your watch list close in Series AV.",
     mapBody: "The web experience keeps the notebook feeling from iOS: paper texture, ink lines, green checkpoints, and Avi close at hand.",
     mapTitle: "A hand-drawn progress map for your next episode.",
     notebook: "Series notebook",
@@ -108,7 +108,7 @@ const en = {
   },
   signIn: {
     aviPanelBody: "A quiet nudge when the next episode is unclear.",
-    body: "Sign in to keep your shows, next episodes, and Avi recommendations connected with your AV account.",
+    body: "Sign in to keep your shows, next episodes, and Avi guidance connected with your AV account.",
     continue: "Continue",
     signedIn: "You are signed in.",
     title: "Your Series AV library follows you."
@@ -134,11 +134,11 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       signInSubtitle: "Torna-hi. Inicia sessió per mantenir connectat el teu quadern de sèries."
     },
     avi: {
-      body: "Avi ajuda a convertir una llista desordenada en un proper pas clar: continuar, desar, posar-te al dia o descobrir alguna cosa que encaixi amb els teus hàbits.",
+      body: "Avi ajuda a convertir una llista desordenada en un proper pas clar: continuar, desar, posar-te al dia o mantenir la biblioteca més fàcil de llegir.",
       cards: [
         { text: "Avi pot indicar quines sèries necessiten un estat desat, un proper episodi o una nota de progrés més clara.", title: "Prepara el quadern" },
         { text: "Els episodis propers i les sèries actives es mantenen llegibles, perquè el proper pas no quedi enterrat.", title: "Tria què ve després" },
-        { text: "Les recomanacions poden créixer a partir del que realment mires, no d'un catàleg en blanc.", title: "Descobreix amb context" }
+        { text: "La guia de la biblioteca parteix de les sèries que ja has desat i del proper episodi que pots fer avançar.", title: "Fes servir context real" }
       ],
       libraryCta: "Obre la biblioteca",
       searchCta: "Troba una sèrie",
@@ -160,7 +160,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       aviBody: [
         "Comença des de les sèries actuals i troba el proper pas útil.",
         "Detecta progrés pendent abans que la cua sigui difícil de llegir.",
-        "Mantingues les recomanacions a prop dels teus hàbits reals."
+        "Mantingues la guia a prop dels teus hàbits reals."
       ],
       aviTitle: "Avi vigila",
       body: "Cerca al catàleg, desa el progrés i manté un mapa clar del que toca mirar després.",
@@ -191,9 +191,9 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       cardBody: "Desa el que mires, troba què ve després i torna al teu progrés sense refer la llista.",
       cardTitle: "Continua des de la teva llista",
       cta: "Inicia sessió",
-      heroBody: "Inicia sessió per mantenir la biblioteca, el progrés dels episodis i l'ajuda d'Avi connectats allà on miris.",
+      heroBody: "Inicia sessió per mantenir la biblioteca, el progrés dels episodis i l'ajuda d'Avi connectats amb el teu compte AV.",
       heroTitle: "El teu quadern de sèries, sempre a punt.",
-      intro: "Segueix cada sèrie, recorda el proper episodi i tingues la llista a mà des de qualsevol pantalla.",
+      intro: "Segueix cada sèrie, recorda el proper episodi i tingues la llista a mà a Series AV.",
       mapBody: "L'experiència web manté el to de quadern d'iOS: textura de paper, línies de tinta, punts verds i Avi ben a prop.",
       mapTitle: "Un mapa de progrés dibuixat a mà per al proper episodi.",
       notebook: "Quadern de sèries",
@@ -219,7 +219,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
     },
     signIn: {
       aviPanelBody: "Un petit impuls quan el proper episodi no queda clar.",
-      body: "Inicia sessió per mantenir les sèries, els propers episodis i les recomanacions d'Avi connectades amb el teu compte AV.",
+      body: "Inicia sessió per mantenir les sèries, els propers episodis i la guia d'Avi connectats amb el teu compte AV.",
       continue: "Continua",
       signedIn: "Ja has iniciat sessió.",
       title: "La teva biblioteca de Series AV t'acompanya."
@@ -243,11 +243,11 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       signInSubtitle: "Willkommen zurück. Melde dich an, damit dein Seriennotizbuch verbunden bleibt."
     },
     avi: {
-      body: "Avi macht aus einer unübersichtlichen Watchlist einen klaren nächsten Schritt: fortsetzen, speichern, aufholen oder etwas Passendes entdecken.",
+      body: "Avi macht aus einer unübersichtlichen Watchlist einen klaren nächsten Schritt: fortsetzen, speichern, aufholen oder die Bibliothek leichter lesbar halten.",
       cards: [
         { text: "Avi kann zeigen, welche Serien einen gespeicherten Status, die nächste Folge oder eine klarere Fortschrittsnotiz brauchen.", title: "Notizbuch vorbereiten" },
         { text: "Kommende Folgen und aktive Serien bleiben lesbar, damit der nächste Schritt nicht untergeht.", title: "Nächstes auswählen" },
-        { text: "Empfehlungen können aus dem wachsen, was du wirklich schaust, statt bei einem leeren Katalog zu starten.", title: "Mit Kontext entdecken" }
+        { text: "Bibliotheksführung beginnt bei den Serien, die du bereits gespeichert hast, und der nächsten Folge, die du angehen kannst.", title: "Echten Kontext nutzen" }
       ],
       libraryCta: "Bibliothek öffnen",
       searchCta: "Serie finden",
@@ -269,7 +269,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       aviBody: [
         "Beginne mit deinen aktuellen Serien und finde den nächsten sinnvollen Schritt.",
         "Erkenne fehlenden Fortschritt, bevor die Liste schwer lesbar wird.",
-        "Halte Empfehlungen nah an deinen echten Sehgewohnheiten."
+        "Halte die Führung nah an deinen echten Sehgewohnheiten."
       ],
       aviTitle: "Avi passt auf",
       body: "Durchsuche den Katalog, speichere Fortschritt und behalte klar im Blick, was als Nächstes dran ist.",
@@ -300,9 +300,9 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       cardBody: "Speichere, was du schaust, finde die nächste Folge und kehre zu deinem Fortschritt zurück.",
       cardTitle: "Mach mit deiner Liste weiter",
       cta: "Anmelden",
-      heroBody: "Melde dich an, damit Bibliothek, Episodenfortschritt und Avi-Hilfe überall verbunden bleiben.",
+      heroBody: "Melde dich an, damit Bibliothek, Episodenfortschritt und Avi-Hilfe mit deinem AV-Konto verbunden bleiben.",
       heroTitle: "Dein Seriennotizbuch, immer bereit.",
-      intro: "Behalte jede Serie im Blick, merke dir die nächste Folge und nimm deine Watchlist auf jeden Bildschirm mit.",
+      intro: "Behalte jede Serie im Blick, merke dir die nächste Folge und halte deine Watchlist in Series AV griffbereit.",
       mapBody: "Die Web-Erfahrung behält das Notizbuchgefühl von iOS: Papierstruktur, Tintenlinien, grüne Markierungen und Avi in der Nähe.",
       mapTitle: "Eine handgezeichnete Fortschrittskarte für deine nächste Folge.",
       notebook: "Seriennotizbuch",
@@ -328,7 +328,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
     },
     signIn: {
       aviPanelBody: "Ein ruhiger Hinweis, wenn die nächste Folge unklar ist.",
-      body: "Melde dich an, damit deine Serien, nächsten Folgen und Avi-Empfehlungen mit deinem AV-Konto verbunden bleiben.",
+      body: "Melde dich an, damit deine Serien, nächsten Folgen und Avi-Hilfe mit deinem AV-Konto verbunden bleiben.",
       continue: "Weiter",
       signedIn: "Du bist angemeldet.",
       title: "Deine Series AV Bibliothek begleitet dich."
@@ -353,11 +353,11 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       signInSubtitle: "Bienvenido de nuevo. Inicia sesión para mantener conectado tu cuaderno de series."
     },
     avi: {
-      body: "Avi convierte una lista desordenada en un siguiente paso claro: continuar, guardar, ponerte al día o descubrir algo que encaje con tus hábitos.",
+      body: "Avi convierte una lista desordenada en un siguiente paso claro: continuar, guardar, ponerte al día o mantener la biblioteca más fácil de leer.",
       cards: [
         { text: "Avi puede señalar qué series necesitan un estado guardado, un próximo episodio o una nota de progreso más clara.", title: "Prepara el cuaderno" },
         { text: "Los episodios próximos y las series activas se mantienen legibles para que el siguiente paso no quede enterrado.", title: "Elige qué va después" },
-        { text: "Las recomendaciones pueden crecer desde lo que realmente ves, no desde un catálogo en blanco.", title: "Descubre con contexto" }
+        { text: "La guía de biblioteca parte de las series que ya guardaste y del próximo episodio sobre el que puedes actuar.", title: "Usa contexto real" }
       ],
       libraryCta: "Abrir biblioteca",
       searchCta: "Encontrar una serie",
@@ -379,7 +379,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       aviBody: [
         "Empieza por tus series actuales y encuentra el siguiente paso útil.",
         "Detecta progreso pendiente antes de que la cola sea difícil de leer.",
-        "Mantén las recomendaciones cerca de tus hábitos reales."
+        "Mantén la guía cerca de tus hábitos reales."
       ],
       aviTitle: "Avi está atento",
       body: "Busca en el catálogo, guarda progreso y mantén un mapa claro de qué ver después.",
@@ -410,9 +410,9 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       cardBody: "Guarda lo que estás viendo, encuentra qué viene después y vuelve a tu progreso sin reconstruir la lista.",
       cardTitle: "Continúa desde tu lista",
       cta: "Iniciar sesión",
-      heroBody: "Inicia sesión para mantener tu biblioteca, progreso de episodios y guía de Avi conectados allí donde mires.",
+      heroBody: "Inicia sesión para mantener tu biblioteca, progreso de episodios y guía de Avi conectados con tu cuenta AV.",
       heroTitle: "Tu cuaderno de series, siempre listo.",
-      intro: "Sigue cada serie, recuerda el próximo episodio y mantén tu lista cerca desde cualquier pantalla.",
+      intro: "Sigue cada serie, recuerda el próximo episodio y mantén tu lista cerca en Series AV.",
       mapBody: "La experiencia web mantiene el tono de cuaderno de iOS: textura de papel, líneas de tinta, marcas verdes y Avi cerca.",
       mapTitle: "Un mapa de progreso dibujado a mano para tu próximo episodio.",
       notebook: "Cuaderno de series",
@@ -438,7 +438,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
     },
     signIn: {
       aviPanelBody: "Un pequeño empujón cuando el próximo episodio no está claro.",
-      body: "Inicia sesión para mantener tus series, próximos episodios y recomendaciones de Avi conectados con tu cuenta AV.",
+      body: "Inicia sesión para mantener tus series, próximos episodios y guía de Avi conectados con tu cuenta AV.",
       continue: "Continuar",
       signedIn: "Has iniciado sesión.",
       title: "Tu biblioteca de Series AV te acompaña."
@@ -462,11 +462,11 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       signInSubtitle: "Bon retour. Connectez-vous pour garder votre carnet de séries synchronisé."
     },
     avi: {
-      body: "Avi transforme une liste de visionnage confuse en prochaine étape claire : continuer, enregistrer, rattraper ou découvrir quelque chose qui correspond à vos habitudes.",
+      body: "Avi transforme une liste de visionnage confuse en prochaine étape claire : continuer, enregistrer, rattraper ou garder la bibliothèque plus lisible.",
       cards: [
         { text: "Avi peut signaler les séries qui ont besoin d'un statut enregistré, d'un prochain épisode ou d'une note de progression plus claire.", title: "Préparer le carnet" },
         { text: "Les épisodes à venir et les séries actives restent lisibles, afin que la prochaine action ne soit pas enterrée.", title: "Choisir la suite" },
-        { text: "Les recommandations peuvent partir de ce que vous regardez vraiment, plutôt que d'un catalogue vide.", title: "Découvrir avec contexte" }
+        { text: "Les conseils de bibliothèque partent des séries déjà enregistrées et du prochain épisode sur lequel agir.", title: "Utiliser le vrai contexte" }
       ],
       libraryCta: "Ouvrir la bibliothèque",
       searchCta: "Trouver une série",
@@ -488,7 +488,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       aviBody: [
         "Partez de vos séries en cours et trouvez la prochaine action utile.",
         "Repérez les progressions manquantes avant que la file devienne difficile à lire.",
-        "Gardez les recommandations proches de vos vraies habitudes."
+        "Gardez les conseils proches de vos vraies habitudes."
       ],
       aviTitle: "Avi veille",
       body: "Parcourez le catalogue, enregistrez votre progression et gardez une carte claire de la suite.",
@@ -519,9 +519,9 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       cardBody: "Enregistrez ce que vous regardez, trouvez la suite et retrouvez votre progression sans refaire la liste.",
       cardTitle: "Reprendre depuis votre liste",
       cta: "Se connecter",
-      heroBody: "Connectez-vous pour garder votre bibliothèque, la progression des épisodes et l'aide d'Avi synchronisées partout.",
+      heroBody: "Connectez-vous pour garder votre bibliothèque, la progression des épisodes et l'aide d'Avi liées à votre compte AV.",
       heroTitle: "Votre carnet de séries, toujours prêt.",
-      intro: "Suivez chaque série, gardez le prochain épisode en mémoire et retrouvez votre liste sur tous vos écrans.",
+      intro: "Suivez chaque série, gardez le prochain épisode en mémoire et retrouvez votre liste dans Series AV.",
       mapBody: "L'expérience web garde l'esprit carnet d'iOS : texture papier, traits d'encre, repères verts et Avi tout près.",
       mapTitle: "Une carte de progression dessinée à la main pour votre prochain épisode.",
       notebook: "Carnet de séries",
@@ -547,7 +547,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
     },
     signIn: {
       aviPanelBody: "Un petit coup de pouce quand le prochain épisode n'est pas clair.",
-      body: "Connectez-vous pour garder vos séries, prochains épisodes et recommandations d'Avi liées à votre compte AV.",
+      body: "Connectez-vous pour garder vos séries, prochains épisodes et conseils d'Avi liés à votre compte AV.",
       continue: "Continuer",
       signedIn: "Vous êtes connecté.",
       title: "Votre bibliothèque Series AV vous accompagne."

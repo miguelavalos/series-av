@@ -1,7 +1,7 @@
 "app.splash.tagline" = "Suivez ce que vous regardez.";
-"app.splash.status" = "Preparation de vos series.";
-"app.onboarding.title" = "Suivez vos series et restez a jour";
-"app.onboarding.subtitle" = "Gardez un seul point de suivi et reprenez chaque serie au bon episode.";
+"app.splash.status" = "Préparation de vos séries.";
+"app.onboarding.title" = "Suivez vos séries et restez à jour";
+"app.onboarding.subtitle" = "Gardez un seul point de suivi et reprenez chaque série au bon épisode.";
 "app.onboarding.signIn" = "SE CONNECTER";
 "app.onboarding.skip" = "PASSER POUR L'INSTANT";
 "access.apple" = "Continuer avec Apple";
@@ -9,8 +9,8 @@
 "access.connect.title" = "Connecter votre compte";
 "access.error.title" = "Impossible de continuer";
 "access.google" = "Continuer avec Google";
-"access.legal.fallback" = "En continuant, vous acceptez les Conditions et la Politique de confidentialite de Series AV.";
-"access.legal.markdown" = "En continuant, vous acceptez les [Conditions](%@) et la [Politique de confidentialite](%@) de Series AV.";
+"access.legal.fallback" = "En continuant, vous acceptez les Conditions et la Politique de confidentialité de Series AV.";
+"access.legal.markdown" = "En continuant, vous acceptez les [Conditions](%@) et la [Politique de confidentialité](%@) de Series AV.";
 "access.skip" = "Passer pour l'instant";
 "access.unavailable" = "Les services de compte ne sont pas disponibles pour le moment.";
 "common.cancel" = "Annuler";
@@ -21,117 +21,117 @@
 "language.german" = "Allemand";
 "language.spanish" = "Espagnol";
 "shell.account" = "Compte";
-"shell.settings" = "Reglages";
+"shell.settings" = "Réglages";
 "shell.mode.free" = "Free";
 "shell.mode.guest" = "Guest";
 "shell.mode.pro" = "Pro";
 "shell.watch.next" = "Suivant";
 "shell.watching" = "En cours";
 "home.current.title" = "En cours";
-"home.current.progress" = "Vu jusqu'a %@";
+"home.current.progress" = "Vu jusqu'à %@";
 "home.current.nextEpisode" = "%@ suivant";
-"home.current.wantToWatch.title" = "Pret a demarrer";
-"home.current.wantToWatch.progress" = "Aucun episode vu";
+"home.current.wantToWatch.title" = "Prêt à démarrer";
+"home.current.wantToWatch.progress" = "Aucun épisode vu";
 "home.previous" = "Retour";
 "home.next" = "Vu";
-"home.start" = "Demarrer";
-"home.adjust" = "Ajuster l'episode";
-"home.chooseEpisode" = "Choisir l'episode";
-"home.notStarted" = "Pas commence";
-"home.noEpisodeSet" = "Aucun episode";
-"home.actions" = "Actions de serie";
-"home.pin" = "Epingler en haut";
-"home.unpin" = "Retirer l'epinglage";
+"home.start" = "Démarrer";
+"home.adjust" = "Ajuster l'épisode";
+"home.chooseEpisode" = "Choisir l'épisode";
+"home.notStarted" = "Pas commencé";
+"home.noEpisodeSet" = "Aucun épisode";
+"home.actions" = "Actions de série";
+"home.pin" = "Épingler en haut";
+"home.unpin" = "Retirer l'épinglage";
 "home.archive" = "Archiver";
 "home.delete" = "Supprimer";
 "home.undo" = "Annuler";
 "home.undo.added" = "\"%@\" suivie";
-"home.undo.archived" = "\"%@\" archivee";
-"home.undo.deleted" = "\"%@\" supprimee";
-"home.undo.progress" = "Progression de \"%@\" modifiee";
-"home.undo.restored" = "\"%@\" restauree";
-"home.undo.status" = "Statut de \"%@\" modifie";
-"detail.title" = "Info serie";
+"home.undo.archived" = "\"%@\" archivée";
+"home.undo.deleted" = "\"%@\" supprimée";
+"home.undo.progress" = "Progression de \"%@\" modifiée";
+"home.undo.restored" = "\"%@\" restaurée";
+"home.undo.status" = "Statut de \"%@\" modifié";
+"detail.title" = "Info série";
 "detail.open" = "Voir info";
-"detail.summary.unavailable" = "Series AV affiche seulement les informations utiles pour decider et suivre cette serie.";
+"detail.summary.unavailable" = "Series AV affiche seulement les informations utiles pour décider et suivre cette série.";
 "detail.tracking.title" = "Suivi";
-"detail.tracking.notFollowed" = "Cette serie n'est pas encore dans votre bibliotheque.";
-"detail.episodes.title" = "Episodes";
+"detail.tracking.notFollowed" = "Cette série n'est pas encore dans votre bibliothèque.";
+"detail.episodes.title" = "Épisodes";
 "detail.episodes.unavailable" = "Guide indisponible";
-"detail.episodes.unavailable.detail" = "Cette serie n'a pas encore de guide fiable.";
-"detail.episodes.retryLater" = "Le guide n'a pas pu etre charge pour le moment.";
-"detail.episodes.untitled" = "Episode";
-"detail.episodes.more" = "%d episodes de plus";
+"detail.episodes.unavailable.detail" = "Cette série n'a pas encore de guide fiable.";
+"detail.episodes.retryLater" = "Le guide n'a pas pu être chargé pour le moment.";
+"detail.episodes.untitled" = "Épisode";
+"detail.episodes.more" = "%d épisodes de plus";
 "detail.sources.title" = "Sources";
 "detail.sources.imdb" = "IMDb";
 "detail.sources.wikipedia" = "Wikipédia";
 "detail.sources.web" = "Recherche web";
 "home.queue.title" = "Aussi en cours";
 "home.queue.progress" = "%@ vu, %@ suivant";
-"home.queue.wantToWatch.title" = "Pretes a demarrer";
-"home.queue.wantToWatch.progress" = "Demarrer avec %@";
+"home.queue.wantToWatch.title" = "Prêtes à démarrer";
+"home.queue.wantToWatch.progress" = "Démarrer avec %@";
 "home.rail.popular" = "Populaires";
-"home.rail.recommended" = "Recommandees";
+"home.rail.recommended" = "Plus à suivre";
 "home.editor.season" = "Saison %d";
 "home.editor.season.short" = "Saison";
-"home.editor.episode" = "Episode %d";
-"home.editor.episode.short" = "Episode";
-"home.editor.footer" = "Definir ce point marque les episodes precedents comme vus et les suivants en attente.";
-"home.editor.footer.realGuide" = "Choisis le dernier episode vu. Les precedents sont vus et les suivants restent en attente.";
-"home.editor.footer.loadingGuide" = "Preparation des episodes.";
-"home.editor.confirm" = "Definir le point vu";
-"home.editor.confirmThrough" = "Definir jusqu'a %@";
-"home.editor.watchedThrough" = "Vu jusqu'a %@";
-"home.editor.startPrompt" = "Dernier episode vu";
-"home.editor.confirmFirstPoint" = "Marquer cet episode comme vu";
-"home.editor.confirmStart" = "Demarrer depuis ce point";
+"home.editor.episode" = "Épisode %d";
+"home.editor.episode.short" = "Épisode";
+"home.editor.footer" = "Définir ce point marque les épisodes précédents comme vus et les suivants en attente.";
+"home.editor.footer.realGuide" = "Choisis le dernier épisode vu. Les précédents sont vus et les suivants restent en attente.";
+"home.editor.footer.loadingGuide" = "Préparation des épisodes.";
+"home.editor.confirm" = "Définir le point vu";
+"home.editor.confirmThrough" = "Définir jusqu'à %@";
+"home.editor.watchedThrough" = "Vu jusqu'à %@";
+"home.editor.startPrompt" = "Dernier épisode vu";
+"home.editor.confirmFirstPoint" = "Marquer cet épisode comme vu";
+"home.editor.confirmStart" = "Démarrer depuis ce point";
 "home.editor.moreSeasons" = "Plus de saisons";
-"home.editor.moreEpisodes" = "Plus d'episodes";
-"home.editor.previousEpisode" = "Precedent";
+"home.editor.moreEpisodes" = "Plus d'épisodes";
+"home.editor.previousEpisode" = "Précédent";
 "home.editor.nextEpisode" = "Suivant";
-"home.editor.extendedRange" = "Plage etendue";
-"home.quickProgress.title" = "Dernier episode vu";
+"home.editor.extendedRange" = "Plage étendue";
+"home.quickProgress.title" = "Dernier épisode vu";
 "home.quickProgress.save" = "Enregistrer %@";
-"home.empty.title" = "Suivez votre premiere serie";
-"home.empty.subtitle" = "Choisissez la serie, fixez le dernier episode vu, puis continuez depuis Home.";
-"home.add" = "Rechercher une serie";
-"library.title" = "Bibliotheque";
+"home.empty.title" = "Suivez votre première série";
+"home.empty.subtitle" = "Choisissez la série, fixez le dernier épisode vu, puis continuez depuis Home.";
+"home.add" = "Rechercher une série";
+"library.title" = "Bibliothèque";
 "library.active.title" = "Actives";
-"library.archived.title" = "Archivees";
-"library.archived.detail" = "Archivee";
+"library.archived.title" = "Archivées";
+"library.archived.detail" = "Archivée";
 "library.restore" = "Restaurer";
-"library.empty.title" = "Aucune serie pour l'instant";
-"library.empty.subtitle" = "Suivez une serie depuis Recherche et elle apparaitra ici.";
-"library.search.placeholder" = "Rechercher dans la bibliotheque";
-"library.search.empty.title" = "Aucun resultat";
+"library.empty.title" = "Aucune série pour l'instant";
+"library.empty.subtitle" = "Suivez une série depuis Recherche et elle apparaîtra ici.";
+"library.search.placeholder" = "Rechercher dans la bibliothèque";
+"library.search.empty.title" = "Aucun résultat";
 "library.search.empty.subtitle" = "Essayez un autre titre.";
 "library.filter.title" = "Filtre";
 "library.filter.all" = "Tout";
 "library.filter.wantToWatch" = "A regarder";
 "library.filter.watching" = "En cours";
 "library.filter.watched" = "Vues";
-"library.filter.archived" = "Archivees";
+"library.filter.archived" = "Archivées";
 "library.filter.archived.short" = "Archive";
 "library.status.wantToWatch" = "A regarder";
 "library.status.watching" = "En cours";
 "library.status.watched" = "Vue";
 "upcoming.title" = "A venir";
-"upcoming.subtitle" = "Les prochains episodes dates de vos series enregistrees.";
-"upcoming.loading" = "Recherche des prochains episodes";
+"upcoming.subtitle" = "Les prochains épisodes datés de vos séries enregistrées.";
+"upcoming.loading" = "Recherche des prochains épisodes";
 "upcoming.adjustProgress" = "Ajuster la progression";
-"upcoming.home.title" = "Bientot";
+"upcoming.home.title" = "Bientôt";
 "upcoming.home.openLibrary" = "Tout voir";
-"add.footer.pro" = "Choisis une serie et marque le point exact par saison et episode.";
+"add.footer.pro" = "Choisis une série et marque le point exact par saison et épisode.";
 "add.footer.remaining" = "%d emplacements actifs restants.";
-"add.footer.hint" = "Si tu la suis deja, la recherche ouvre l'ajustement rapide de progression.";
-"add.footer.limitReached" = "Votre limite de bibliotheque active est atteinte.";
+"add.footer.hint" = "Si tu la suis déjà, la recherche ouvre l'ajustement rapide de progression.";
+"add.footer.limitReached" = "Votre limite de bibliothèque active est atteinte.";
 "add.footer.connectAccount" = "Connecter un compte";
 "add.footer.upgrade" = "Voir Pro";
-"profile.alert.signOutFailed.title" = "Probleme de deconnexion";
-"profile.settingsScreen.title" = "Reglages";
+"profile.alert.signOutFailed.title" = "Problème de déconnexion";
+"profile.settingsScreen.title" = "Réglages";
 "profile.accountScreen.title" = "Mon compte";
-"profile.settingsScreen.subtitle" = "Ajustez l'app, gerez cet appareil et ouvrez les liens d'aide.";
-"profile.accountScreen.subtitle" = "Gerez connexion, acces, facturation et securite du compte.";
+"profile.settingsScreen.subtitle" = "Ajustez l'app, gérez cet appareil et ouvrez les liens d'aide.";
+"profile.accountScreen.subtitle" = "Gérez connexion, accès, facturation et sécurité du compte.";
 "profile.preferences.title" = "Préférences de l'app";
 "profile.preferences.subtitle" = "Choisissez comment Series AV s'affiche sur cet appareil.";
 "profile.preferences.language.title" = "Langue de l'app";
@@ -157,17 +157,17 @@
 "profile.preferences.webOpenMode.detail" = "Choisissez si les liens de sources s'ouvrent dans Series AV ou dans le navigateur par défaut.";
 "profile.preferences.webOpenMode.inApp" = "Dans l'app";
 "profile.preferences.webOpenMode.system" = "Navigateur";
-"profile.series.title" = "Suivi des series";
-"profile.series.subtitle" = "Un seul point clair par serie.";
+"profile.series.title" = "Suivi des séries";
+"profile.series.subtitle" = "Un seul point clair par série.";
 "profile.series.cursor.title" = "Point de progression unique";
-"profile.series.cursor.detail" = "Marquez un episode et Series AV garde les precedents vus et les suivants en attente.";
+"profile.series.cursor.detail" = "Marquez un épisode et Series AV garde les précédents vus et les suivants en attente.";
 "profile.series.reversible.title" = "Corrections rapides";
-"profile.series.reversible.detail" = "Deplacez le point en arriere ou en avant si vous touchez le mauvais episode.";
+"profile.series.reversible.detail" = "Déplacez le point en arrière ou en avant si vous touchez le mauvais épisode.";
 "profile.local.title" = "Sur cet appareil";
-"profile.local.subtitle" = "Le mode local reste simple et prive.";
-"profile.local.library.title" = "Bibliotheque locale";
+"profile.local.subtitle" = "Le mode local reste simple et privé.";
+"profile.local.library.title" = "Bibliothèque locale";
 "profile.local.library.detail" = "Guest et Free gardent le suivi sur cet appareil.";
-"profile.local.sync.title" = "Donnees locales";
+"profile.local.sync.title" = "Données locales";
 "profile.local.sync.detail" = "La progression reste sur cet appareil tant que vous utilisez le mode local.";
 "profile.local.delete.title" = "Supprimer les données locales";
 "profile.local.delete.detail" = "Supprime %d séries de cet appareil.";
@@ -188,15 +188,15 @@
 "profile.help.terms.title" = "Conditions d'utilisation";
 "profile.help.terms.detail" = "Consultez les conditions applicables à Series AV.";
 "profile.sync.title" = "Sync cloud";
-"profile.sync.subtitle" = "Votre bibliotheque Pro suit votre compte Apps AV.";
+"profile.sync.subtitle" = "Votre bibliothèque Pro suit votre compte Apps AV.";
 "profile.sync.headline.disabled" = "Sync indisponible";
-"profile.sync.headline.synced" = "Bibliotheque synchronisee";
-"profile.sync.headline.syncing" = "Synchronisation de la bibliotheque";
+"profile.sync.headline.synced" = "Bibliothèque synchronisée";
+"profile.sync.headline.syncing" = "Synchronisation de la bibliothèque";
 "profile.sync.headline.failed" = "La sync demande votre attention";
 "profile.sync.detail.disabled" = "La sync cloud s'active avec Series AV Pro.";
-"profile.sync.detail.synced" = "Series, etat et progression des episodes sont a jour.";
-"profile.sync.detail.syncing" = "Series AV met a jour la bibliotheque de votre compte.";
-"profile.sync.detail.failed" = "Series AV n'a pas pu mettre a jour la bibliotheque de votre compte. Reessayez quand vous etes en ligne.";
+"profile.sync.detail.synced" = "Séries, état et progression des épisodes sont à jour.";
+"profile.sync.detail.syncing" = "Series AV met à jour la bibliothèque de votre compte.";
+"profile.sync.detail.failed" = "Series AV n'a pas pu mettre à jour la bibliothèque de votre compte. Réessayez quand vous êtes en ligne.";
 "profile.sync.retry" = "Synchroniser maintenant";
 "profile.sync.retry.syncing" = "Synchronisation...";
 "profile.account.title" = "Compte";
@@ -206,10 +206,10 @@
 "profile.pro.title" = "Series AV Pro";
 "profile.pro.account.title" = "Compte Pro";
 "profile.pro.account.detail" = "Gardez l'accès Pro lié à votre compte Apps AV.";
-"profile.pro.library.title" = "Bibliotheque plus grande";
+"profile.pro.library.title" = "Bibliothèque plus grande";
 "profile.pro.library.detail" = "Suivez jusqu'à 1000 séries actives.";
 "profile.pro.avi.title" = "Avi sur Home";
-"profile.pro.avi.detail" = "Garde la guidance de suivi pres de ta serie actuelle.";
+"profile.pro.avi.detail" = "Garde la guidance de suivi près de ta série actuelle.";
 "profile.safety.title" = "Sécurité du compte";
 "profile.safety.subtitle" = "Les actions sensibles utilisent Account AV sans vous renvoyer vers une nouvelle connexion web.";
 "profile.safety.delete.title" = "Supprimer le compte Apps AV";
@@ -226,36 +226,36 @@
 "profile.summary.plan.detail.free" = "Compte connecté";
 "profile.summary.plan.detail.pro" = "Pro";
 "profile.pro.subtitle.guest" = "Connectez-vous pour voir Series AV Pro.";
-"profile.pro.subtitle.free" = "Passez a Pro pour suivre plus de series actives et garder l'acces Pro lie au compte.";
-"profile.pro.subtitle.pro" = "Votre acces Pro est actif. Gerez la facturation dans votre compte App Store.";
+"profile.pro.subtitle.free" = "Passez à Pro pour suivre plus de séries actives et garder l'accès Pro lié au compte.";
+"profile.pro.subtitle.pro" = "Votre accès Pro est actif. Gérez la facturation dans votre compte App Store.";
 "profile.pro.signIn" = "Se connecter";
 "profile.pro.upgrade" = "Voir Pro";
-"profile.pro.manage" = "Gerer l'abonnement";
+"profile.pro.manage" = "Gérer l'abonnement";
 "profile.pro.active.title" = "Pro actif";
 "profile.pro.active.detail" = "Les limites Pro sont actives sur votre compte.";
 "paywall.navigationTitle" = "Series AV Pro";
 "paywall.close" = "Fermer";
 "paywall.eyebrow" = "Series AV Pro";
-"paywall.title" = "Suivez plus de series";
-"paywall.subtitle" = "Passez Series AV a Pro quand vous avez besoin de plus de place pour les series actives.";
+"paywall.title" = "Suivez plus de séries";
+"paywall.subtitle" = "Passez Series AV à Pro quand vous avez besoin de plus de place pour les séries actives.";
 "paywall.scene.title" = "Pro mensuel";
-"paywall.scene.detail" = "Plus de place pour les series actives.";
-"paywall.subscriptionTerms" = "Series AV Pro est un abonnement mensuel auto-renouvelable. Vous serez facture %@ pour chaque periode d'un mois jusqu'a annulation dans les reglages de l'App Store.";
+"paywall.scene.detail" = "Plus de place pour les séries actives.";
+"paywall.subscriptionTerms" = "Series AV Pro est un abonnement mensuel auto-renouvelable. Vous serez facturé %@ pour chaque période d'un mois jusqu'à annulation dans les réglages de l'App Store.";
 "paywall.purchase.loading" = "Traitement…";
 "paywall.purchase.loadingOffer" = "Chargement du prix…";
 "paywall.purchase.price" = "Continuer pour %@";
 "paywall.restore" = "Restaurer les achats";
 "paywall.restore.loading" = "Restauration…";
-"paywall.status.purchasePending" = "Achat recu. Series AV debloquera Pro apres confirmation de votre acces par Apps AV.";
-"paywall.status.restorePending" = "Restauration terminee. Si votre compte App Store a un abonnement actif, Series AV debloquera Pro apres confirmation de l'acces par Apps AV.";
-"paywall.benefit.sync.title" = "Acces du compte";
+"paywall.status.purchasePending" = "Achat reçu. Series AV débloquera Pro après confirmation de votre accès par Apps AV.";
+"paywall.status.restorePending" = "Restauration terminee. Si votre compte App Store à un abonnement actif, Series AV débloquera Pro après confirmation de l'accès par Apps AV.";
+"paywall.benefit.sync.title" = "Accès du compte";
 "paywall.benefit.sync" = "Gardez l'accès Pro lié à votre compte Apps AV.";
-"paywall.benefit.library.title" = "Bibliotheque plus grande";
+"paywall.benefit.library.title" = "Bibliothèque plus grande";
 "paywall.benefit.library" = "Suivez jusqu'à 1000 séries actives.";
 "paywall.benefit.avi.title" = "Avi sur Home";
-"paywall.benefit.avi" = "Guidance contextuelle pour suivre la serie actuelle sans perdre le fil.";
+"paywall.benefit.avi" = "Guidance contextuelle pour suivre la série actuelle sans perdre le fil.";
 "paywall.terms" = "Conditions";
-"paywall.privacy" = "Confidentialite";
+"paywall.privacy" = "Confidentialité";
 "subscription.error.signInRequired" = "Connecte-toi avant de démarrer un abonnement.";
 "subscription.error.configuration" = "Les abonnements ne sont pas configurés dans cette build.";
 "subscription.error.offerUnavailable" = "L'offre Pro n'est pas disponible pour le moment.";
@@ -263,24 +263,24 @@
 "subscription.error.cancelled" = "Achat annulé.";
 "subscription.error.unknown" = "L'abonnement n'a pas pu être finalisé.";
 "tab.home" = "Accueil";
-"tab.library" = "Bibliotheque";
+"tab.library" = "Bibliothèque";
 "tab.search" = "Recherche";
 "tab.avi" = "Avi";
 "home.header.title" = "En cours";
-"home.header.subtitle" = "Un point clair pour les series que tu suis.";
+"home.header.subtitle" = "Un point clair pour les séries que tu suis.";
 "home.aviBrief.action" = "Ouvrir Avi";
-"home.aviBrief.watching" = "%@ · %@. Avi t'aide a continuer.";
-"home.aviBrief.library" = "%d en cours · %d pretes a demarrer.";
-"home.aviBrief.empty" = "Cherche une serie, fixe le dernier episode vu et garde Home prete pour continuer.";
-"search.title" = "Rechercher des series";
-"search.empty.subtitle" = "Explorez les series populaires ou cherchez par titre pour les suivre.";
+"home.aviBrief.watching" = "%@ · %@. Avi t'aide à continuer.";
+"home.aviBrief.library" = "%d en cours · %d prêtes à démarrer.";
+"home.aviBrief.empty" = "Cherche une série, fixe le dernier épisode vu et garde Home prête pour continuer.";
+"search.title" = "Rechercher des séries";
+"search.empty.subtitle" = "Explorez les séries populaires ou cherchez par titre pour les suivre.";
 "search.placeholder" = "Rechercher par titre";
 "avi.empty.subtitle" = "Avi garde la série actuelle, le prochain épisode et les actions rapides à portée.";
 "avi.summary" = "Aide rapide pour suivre les séries sans perdre le fil.";
 "avi.landing.title" = "Suivre les séries avec Avi";
-"avi.hero.detail" = "Cherche une série, fixe le point exact et avance ou recule sans compliquer la bibliothèque.";
-"avi.status.empty" = "Aucune serie en focus";
-"avi.action.start" = "Demarrer";
+"avi.hero.detail" = "Cherche une série, fixe le point exact et avance ou reçule sans compliquer la bibliothèque.";
+"avi.status.empty" = "Aucune série en focus";
+"avi.action.start" = "Démarrer";
 "avi.action.next" = "Vu";
 "avi.action.previous" = "Revenir d'un";
 "avi.action.pin" = "Garder premiere";
@@ -288,45 +288,45 @@
 "avi.prepare.title" = "Chercher et suivre";
 "avi.prepare.detail" = "Avi reste centré sur ce que Series AV peut faire maintenant.";
 "avi.prepare.search.title" = "Chercher par titre";
-"avi.prepare.search.detail" = "Trouve une serie et suis-la dans ta bibliotheque.";
+"avi.prepare.search.detail" = "Trouve une série et suis-la dans ta bibliothèque.";
 "avi.prepare.progress.title" = "Fixer un seul point";
 "avi.prepare.progress.detail" = "Le dernier épisode vu décide ce qui reste en attente.";
-"avi.prepare.action.title" = "Chercher une serie";
+"avi.prepare.action.title" = "Chercher une série";
 "avi.prepare.action.detail" = "Ouvre Recherche pour commencer depuis une vraie série.";
 "avi.prepare.action.button" = "Chercher des séries";
 "avi.current.title" = "Focus actuel";
-"avi.current.empty.title" = "Choisis une serie a suivre";
-"avi.current.empty.detail" = "Suis une serie depuis Recherche et Avi gardera le prochain episode visible.";
+"avi.current.empty.title" = "Choisis une série à suivre";
+"avi.current.empty.detail" = "Suis une série depuis Recherche et Avi gardera le prochain épisode visible.";
 "avi.current.next.detail" = "Suivant %@";
 "avi.library.detail" = "Un résumé compact de ce qui est actif, vu et archivé.";
 "avi.help.title" = "Suivi rapide";
-"avi.help.detail" = "Chaque action de progression est reversible, donc les changements rapides restent peu risques.";
+"avi.help.detail" = "Chaque action de progression est réversible, donc les changements rapides restent peu risqués.";
 "avi.help.next.title" = "Marquer vu";
-"avi.help.next.detail" = "Avance le point de progression unique et considere les episodes precedents comme vus.";
+"avi.help.next.detail" = "Avance le point de progression unique et considère les épisodes précédents comme vus.";
 "avi.help.previous.title" = "Reculer";
-"avi.help.previous.detail" = "Recule le point de progression et laisse les episodes suivants en attente.";
+"avi.help.previous.detail" = "Recule le point de progression et laisse les épisodes suivants en attente.";
 "avi.help.pin.title" = "Garder premiere";
-"avi.help.pin.detail" = "Priorise une serie dans Home quand elle compte plus que le reste.";
+"avi.help.pin.detail" = "Priorise une série dans Home quand elle compte plus que le reste.";
 
 "common.done" = "OK";
 
 "accountDeletion.accountWebsiteLink" = "Gérer sur le site du compte Apps AV";
 
-"accountDeletion.blocked.detail" = "Apps AV ne peut pas terminer la suppression ici car une dependance requise est indisponible. Vous pouvez gerer la suppression complete sur le site du compte Apps AV.";
+"accountDeletion.blocked.detail" = "Apps AV ne peut pas terminer la suppression ici car une dependance requise est indisponible. Vous pouvez gèrer la suppression complète sur le site du compte Apps AV.";
 
 "accountDeletion.blocked.title" = "Suppression bloquée";
 
 "accountDeletion.blocker.job.title" = "Suppression déjà en cours";
 
-"accountDeletion.blocker.linkedApp.detail" = "Supprimer ce compte Apps AV partage supprime aussi ce lien d'app et ses donnees de la suite.";
+"accountDeletion.blocker.linkedApp.detail" = "Supprimer ce compte Apps AV partagé supprime aussi ce lien d'app et ses données de la suite.";
 
 "accountDeletion.blocker.linkedApp.title" = "App Apps AV liée";
 
-"accountDeletion.blocker.pro.detail" = "Cet acces Pro sera retire des enregistrements Apps AV. La facturation peut continuer chez le fournisseur jusqu'a annulation ou expiration.";
+"accountDeletion.blocker.pro.detail" = "Cet accès Pro sera retiré des enregistrements Apps AV. La facturation peut continuer chez le fournisseur jusqu'à annulation ou expiration.";
 
 "accountDeletion.blocker.pro.title" = "Accès Pro actif";
 
-"accountDeletion.blocker.subscription.detail" = "La facturation peut continuer chez le fournisseur jusqu'a annulation ou expiration de l'abonnement.";
+"accountDeletion.blocker.subscription.detail" = "La facturation peut continuer chez le fournisseur jusqu'à annulation ou expiration de l'abonnement.";
 
 "accountDeletion.blocker.subscription.title" = "Abonnement actif";
 
@@ -340,13 +340,13 @@
 
 "accountDeletion.deleting" = "Suppression du compte...";
 
-"accountDeletion.eligible.detail" = "Consultez les avertissements, puis confirmez pour demander la suppression du compte Apps AV partage.";
+"accountDeletion.eligible.detail" = "Consultez les avertissements, puis confirmez pour demander la suppression du compte Apps AV partagé.";
 
 "accountDeletion.eligible.title" = "Prêt à demander la suppression";
 
 "accountDeletion.error.finalize" = "Cette app n'a pas pu finaliser la suppression. Réessayez dans un instant.";
 
-"accountDeletion.error.load" = "Nous n'avons pas pu verifier le compte depuis l'app. Vous pouvez reessayer ou supprimer le compte sur le site Account AV.";
+"accountDeletion.error.load" = "Nous n'avons pas pu vérifier le compte depuis l'app. Vous pouvez réessayer ou supprimer le compte sur le site Account AV.";
 
 "accountDeletion.error.request" = "Cette app n'a pas pu demander la suppression. Aucun changement n'a été apporté au compte.";
 
@@ -358,13 +358,13 @@
 
 "accountDeletion.finalizing" = "Finalisation...";
 
-"accountDeletion.impact.high.detail" = "La suppression de ce compte est definitive. Vous pouvez perdre l'acces Pro, les abonnements geres par un autre fournisseur, les credits inutilises, les credits reserves, le contenu genere et les donnees de toutes les apps Apps AV. Cette action est irreversible. La suppression reste disponible si vous choisissez de continuer.";
+"accountDeletion.impact.high.detail" = "La suppression de ce compte est définitive. Vous pouvez perdre l'accès Pro, les abonnements gères par un autre fournisseur, les crédits inutilises, les crédits reserves, le contenu généré et les données de toutes les apps Apps AV. Cette action est irréversible. La suppression reste disponible si vous choisissez de continuer.";
 
-"accountDeletion.impact.high.title" = "Perte definitive de Pro, credits et donnees";
+"accountDeletion.impact.high.title" = "Perte définitive de Pro, crédits et données";
 
-"accountDeletion.impact.linkedApps.detail" = "Supprimer ce compte Apps AV partage supprime aussi les donnees de compte de vos autres apps Apps AV. Cette action est irreversible.";
+"accountDeletion.impact.linkedApps.detail" = "Supprimer ce compte Apps AV partagé supprime aussi les données de compte de vos autres apps Apps AV. Cette action est irréversible.";
 
-"accountDeletion.impact.linkedApps.title" = "Les donnees d'autres apps Apps AV seront supprimees";
+"accountDeletion.impact.linkedApps.title" = "Les données d'autres apps Apps AV seront supprimées";
 
 "accountDeletion.inProgress.detail" = "Apps AV traite la demande de suppression. Finalisez seulement quand Apps AV indique que la suppression d'identité est prête.";
 
@@ -378,15 +378,15 @@
 
 "accountDeletion.shared.title" = "Compte Apps AV partagé";
 
-"accountDeletion.subtitle" = "Vous pouvez supprimer votre compte Apps AV partage depuis ici.";
+"accountDeletion.subtitle" = "Vous pouvez supprimer votre compte Apps AV partagé depuis ici.";
 
 "accountDeletion.title" = "Supprimer le compte Apps AV";
 
-"accountDeletion.unavailable.detail" = "Nous n'avons pas pu verifier le compte depuis l'app pour le moment. Pour ne pas vous bloquer, continuez dans Account AV et terminez la suppression la-bas.";
+"accountDeletion.unavailable.detail" = "Nous n'avons pas pu vérifier le compte depuis l'app pour le moment. Pour ne pas vous bloquer, continuez dans Account AV et terminez la suppression la-bas.";
 
 "accountDeletion.unavailable.title" = "Supprimer le compte dans Account AV";
 
-"accountDeletion.unlinked.detail" = "Cette app a été dissociée d'Apps AV. Votre compte Apps AV partagé existe toujours, car d'autres apps Apps AV restent liées.";
+"accountDeletion.unlinked.detail" = "Cette app à été dissociée d'Apps AV. Votre compte Apps AV partagé existe toujours, car d'autres apps Apps AV restent liées.";
 
 "accountDeletion.unlinked.title" = "App dissociée";
 
@@ -400,21 +400,21 @@
 
 "accountAPI.error.missingBaseURL" = "URL de base de l'API Apps AV manquante.";
 
-"accountAPI.error.requestFailed" = "La requête vers l'API Apps AV a échoué avec le statut %d.";
+"accountAPI.error.requestFailed" = "La requête vers l'API Apps AV à échoué avec le statut %d.";
 
 "common.clear" = "Effacer";
 "search.addTyped" = "Suivre \"%@\"";
 "search.collection.anime" = "Anime";
 "search.collection.animation" = "Animation";
-"search.collection.comedy" = "Comedie";
+"search.collection.comedy" = "Comédie";
 "search.collection.drama" = "Drame";
 "search.collection.popular" = "Populaires";
 "search.collection.scifi" = "Sci-Fi";
-"search.follow" = "Suivre la serie";
-"search.resultsFor" = "Resultats pour \"%@\"";
+"search.follow" = "Suivre la série";
+"search.resultsFor" = "Résultats pour \"%@\"";
 "search.loading" = "Recherche";
-"search.collection.count.one" = "%d serie prete a suivre.";
-"search.collection.count.other" = "%d series pretes a suivre.";
-"search.collection.updating" = "Mise a jour du catalogue";
-"search.results.count.one" = "%d resultat";
-"search.results.count.other" = "%d resultats";
+"search.collection.count.one" = "%d série prête à suivre.";
+"search.collection.count.other" = "%d séries prêtes à suivre.";
+"search.collection.updating" = "Mise à jour du catalogue";
+"search.results.count.one" = "%d résultat";
+"search.results.count.other" = "%d résultats";

@@ -71,7 +71,7 @@
 "home.queue.wantToWatch.title" = "Listas para empezar";
 "home.queue.wantToWatch.progress" = "Empezar por %@";
 "home.rail.popular" = "Populares";
-"home.rail.recommended" = "Recomendadas";
+"home.rail.recommended" = "Más para seguir";
 "home.editor.season" = "Temporada %d";
 "home.editor.season.short" = "Temporada";
 "home.editor.episode" = "Episodio %d";

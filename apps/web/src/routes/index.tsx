@@ -148,7 +148,7 @@ const homeLabels = {
     openDetail: "Obrir detall",
     popular: "Popular",
     ready: (title: string, cursor: string) => `${title} està preparada per ${cursor}.`,
-    recommended: "Recomanades",
+    recommended: "Més per seguir",
     sync: "Sync",
     syncStatus: { disabled: "Local", failed: "Error", idle: "Al dia", syncing: "Sincronitzant" }
   },
@@ -167,7 +167,7 @@ const homeLabels = {
     openDetail: "Detail öffnen",
     popular: "Beliebt",
     ready: (title: string, cursor: string) => `${title} ist bereit für ${cursor}.`,
-    recommended: "Empfohlen",
+    recommended: "Mehr zum Verfolgen",
     sync: "Sync",
     syncStatus: { disabled: "Lokal", failed: "Fehler", idle: "Aktuell", syncing: "Sync läuft" }
   },
@@ -186,7 +186,7 @@ const homeLabels = {
     openDetail: "Open detail",
     popular: "Popular",
     ready: (title: string, cursor: string) => `${title} is ready for ${cursor}.`,
-    recommended: "Recommended",
+    recommended: "More to track",
     sync: "Sync",
     syncStatus: { disabled: "Local", failed: "Error", idle: "Current", syncing: "Syncing" }
   },
@@ -205,7 +205,7 @@ const homeLabels = {
     openDetail: "Abrir detalle",
     popular: "Populares",
     ready: (title: string, cursor: string) => `${title} está lista para ${cursor}.`,
-    recommended: "Recomendadas",
+    recommended: "Más para seguir",
     sync: "Sync",
     syncStatus: { disabled: "Local", failed: "Error", idle: "Al día", syncing: "Sincronizando" }
   },
@@ -224,7 +224,7 @@ const homeLabels = {
     openDetail: "Ouvrir le détail",
     popular: "Populaire",
     ready: (title: string, cursor: string) => `${title} est prête pour ${cursor}.`,
-    recommended: "Recommandées",
+    recommended: "Plus à suivre",
     sync: "Sync",
     syncStatus: { disabled: "Local", failed: "Erreur", idle: "À jour", syncing: "Sync" }
   }

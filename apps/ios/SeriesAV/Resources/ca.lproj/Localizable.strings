@@ -1,23 +1,23 @@
-"app.splash.tagline" = "Segueix el que estas veient.";
-"app.splash.status" = "Preparant les teves series.";
-"app.onboarding.title" = "Segueix series i posa't al dia";
-"app.onboarding.subtitle" = "Mantingues un unic punt de seguiment i continua cada serie des de l'episodi correcte.";
-"app.onboarding.signIn" = "INICIAR SESSIO";
+"app.splash.tagline" = "Segueix el que estàs veient.";
+"app.splash.status" = "Preparant les teves sèries.";
+"app.onboarding.title" = "Segueix sèries i posa't al dia";
+"app.onboarding.subtitle" = "Mantingues un únic punt de seguiment i continua cada sèrie des de l'episodi correcte.";
+"app.onboarding.signIn" = "INICIAR SESSIÓ";
 "app.onboarding.skip" = "OMETRE PER ARA";
 "access.apple" = "Continuar amb Apple";
 "access.connect.subtitle" = "Usa el teu compte AV per gestionar l'accés Pro.";
 "access.connect.title" = "Connecta el teu compte";
 "access.error.title" = "No es pot continuar";
 "access.google" = "Continuar amb Google";
-"access.legal.fallback" = "En continuar, acceptes els Termes i la Politica de privacitat de Series AV.";
-"access.legal.markdown" = "En continuar, acceptes els [Termes](%@) i la [Politica de privacitat](%@) de Series AV.";
+"access.legal.fallback" = "En continuar, acceptes els Termes i la Política de privacitat de Series AV.";
+"access.legal.markdown" = "En continuar, acceptes els [Termes](%@) i la [Política de privacitat](%@) de Series AV.";
 "access.skip" = "Ometre per ara";
 "access.unavailable" = "Els serveis del compte no estan disponibles ara mateix.";
-"common.cancel" = "Cancelar";
+"common.cancel" = "Cancel·lar";
 "common.close" = "Tancar";
-"language.catalan" = "Catala";
-"language.english" = "Angles";
-"language.french" = "Frances";
+"language.catalan" = "Català";
+"language.english" = "Anglès";
+"language.french" = "Francès";
 "language.german" = "Alemany";
 "language.spanish" = "Espanyol";
 "shell.account" = "Compte";
@@ -25,21 +25,21 @@
 "shell.mode.free" = "Free";
 "shell.mode.guest" = "Guest";
 "shell.mode.pro" = "Pro";
-"shell.watch.next" = "Seguent";
+"shell.watch.next" = "Següent";
 "shell.watching" = "Mirant";
 "home.current.title" = "Veient ara";
 "home.current.progress" = "Vist fins a %@";
-"home.current.nextEpisode" = "Seguent %@";
-"home.current.wantToWatch.title" = "A punt per comencar";
+"home.current.nextEpisode" = "Següent %@";
+"home.current.wantToWatch.title" = "A punt per començar";
 "home.current.wantToWatch.progress" = "Cap episodi vist";
 "home.previous" = "Enrere";
 "home.next" = "Vist";
-"home.start" = "Comencar";
+"home.start" = "Començar";
 "home.adjust" = "Ajustar episodi";
 "home.chooseEpisode" = "Triar episodi";
-"home.notStarted" = "Sense comencar";
+"home.notStarted" = "Sense començar";
 "home.noEpisodeSet" = "Sense episodi";
-"home.actions" = "Accions de serie";
+"home.actions" = "Accions de sèrie";
 "home.pin" = "Fixar a dalt";
 "home.unpin" = "Treure fixat";
 "home.archive" = "Arxivar";
@@ -48,63 +48,63 @@
 "home.undo.added" = "\"%@\" seguida";
 "home.undo.archived" = "\"%@\" arxivada";
 "home.undo.deleted" = "\"%@\" eliminada";
-"home.undo.progress" = "Progres de \"%@\" canviat";
+"home.undo.progress" = "Progrés de \"%@\" canviat";
 "home.undo.restored" = "\"%@\" restaurada";
 "home.undo.status" = "Estat de \"%@\" canviat";
-"detail.title" = "Info de serie";
+"detail.title" = "Info de sèrie";
 "detail.open" = "Veure info";
-"detail.summary.unavailable" = "Series AV nomes mostra la informacio necessaria per decidir i seguir la serie.";
+"detail.summary.unavailable" = "Series AV només mostra la informació necessària per decidir i seguir la sèrie.";
 "detail.tracking.title" = "Seguiment";
 "detail.tracking.notFollowed" = "Encara no es a la teva biblioteca.";
 "detail.episodes.title" = "Episodis";
 "detail.episodes.unavailable" = "Guia no disponible";
-"detail.episodes.unavailable.detail" = "Aquesta serie encara no te una guia fiable.";
+"detail.episodes.unavailable.detail" = "Aquesta sèrie encara no té una guia fiable.";
 "detail.episodes.retryLater" = "No s'ha pogut carregar la guia ara mateix.";
 "detail.episodes.untitled" = "Episodi";
-"detail.episodes.more" = "%d episodis mes";
+"detail.episodes.more" = "%d episodis més";
 "detail.sources.title" = "Fonts";
 "detail.sources.imdb" = "IMDb";
 "detail.sources.wikipedia" = "Viquipèdia";
 "detail.sources.web" = "Cerca web";
-"home.queue.title" = "Tambe veient";
-"home.queue.progress" = "%@ vist, %@ seguent";
-"home.queue.wantToWatch.title" = "A punt per comencar";
-"home.queue.wantToWatch.progress" = "Comencar per %@";
+"home.queue.title" = "També veient";
+"home.queue.progress" = "%@ vist, %@ següent";
+"home.queue.wantToWatch.title" = "A punt per començar";
+"home.queue.wantToWatch.progress" = "Començar per %@";
 "home.rail.popular" = "Populars";
-"home.rail.recommended" = "Recomanades";
+"home.rail.recommended" = "Més per seguir";
 "home.editor.season" = "Temporada %d";
 "home.editor.season.short" = "Temporada";
 "home.editor.episode" = "Episodi %d";
 "home.editor.episode.short" = "Episodi";
 "home.editor.footer" = "En fixar aquest punt, els episodis anteriors queden vistos i els posteriors pendents.";
-"home.editor.footer.realGuide" = "Tria l'ultim episodi vist. Els anteriors queden vistos i els posteriors pendents.";
+"home.editor.footer.realGuide" = "Tria l'últim episodi vist. Els anteriors queden vistos i els posteriors pendents.";
 "home.editor.footer.loadingGuide" = "Preparant episodis.";
 "home.editor.confirm" = "Fixar punt vist";
 "home.editor.confirmThrough" = "Fixar fins a %@";
-"home.editor.watchedThrough" = "Quedara vist fins a %@";
-"home.editor.startPrompt" = "Ultim episodi vist";
+"home.editor.watchedThrough" = "Quedarà vist fins a %@";
+"home.editor.startPrompt" = "Últim episodi vist";
 "home.editor.confirmFirstPoint" = "Marcar aquest episodi vist";
-"home.editor.confirmStart" = "Comencar des d'aquest punt";
-"home.editor.moreSeasons" = "Mes temporades";
-"home.editor.moreEpisodes" = "Mes episodis";
+"home.editor.confirmStart" = "Començar des d'aquest punt";
+"home.editor.moreSeasons" = "Més temporades";
+"home.editor.moreEpisodes" = "Més episodis";
 "home.editor.previousEpisode" = "Anterior";
-"home.editor.nextEpisode" = "Seguent";
+"home.editor.nextEpisode" = "Següent";
 "home.editor.extendedRange" = "Rang ampli";
-"home.quickProgress.title" = "Ultim episodi vist";
+"home.quickProgress.title" = "Últim episodi vist";
 "home.quickProgress.save" = "Desar %@";
-"home.empty.title" = "Segueix la primera serie";
-"home.empty.subtitle" = "Tria la serie, fixa l'ultim episodi vist i continua des de Home.";
-"home.add" = "Cercar serie";
+"home.empty.title" = "Segueix la primera sèrie";
+"home.empty.subtitle" = "Tria la sèrie, fixa l'últim episodi vist i continua des de Home.";
+"home.add" = "Cercar sèrie";
 "library.title" = "Biblioteca";
 "library.active.title" = "Actives";
 "library.archived.title" = "Arxivades";
 "library.archived.detail" = "Arxivada";
 "library.restore" = "Restaurar";
-"library.empty.title" = "Encara no hi ha series";
-"library.empty.subtitle" = "Segueix una serie des de Cerca i apareixera aqui.";
+"library.empty.title" = "Encara no hi ha sèries";
+"library.empty.subtitle" = "Segueix una sèrie des de Cerca i apareixerà aquí.";
 "library.search.placeholder" = "Buscar a la biblioteca";
 "library.search.empty.title" = "Sense resultats";
-"library.search.empty.subtitle" = "Prova amb un altre titol.";
+"library.search.empty.subtitle" = "Prova amb un altre títol.";
 "library.filter.title" = "Filtre";
 "library.filter.all" = "Tot";
 "library.filter.wantToWatch" = "Per veure";
@@ -121,17 +121,17 @@
 "upcoming.adjustProgress" = "Ajustar progrés";
 "upcoming.home.title" = "Pròximament";
 "upcoming.home.openLibrary" = "Veure-ho tot";
-"add.footer.pro" = "Tria una serie i marca el punt exacte per temporada i episodi.";
+"add.footer.pro" = "Tria una sèrie i marca el punt exacte per temporada i episodi.";
 "add.footer.remaining" = "Queden %d espais actius.";
-"add.footer.hint" = "Si ja la segueixes, la cerca obre l'ajust rapid de progres.";
-"add.footer.limitReached" = "El limit de biblioteca activa esta ple.";
+"add.footer.hint" = "Si ja la segueixes, la cerca obre l'ajust ràpid de progrés.";
+"add.footer.limitReached" = "El límit de biblioteca activa està ple.";
 "add.footer.connectAccount" = "Connectar compte";
 "add.footer.upgrade" = "Veure Pro";
 "profile.alert.signOutFailed.title" = "Problema en sortir";
 "profile.settingsScreen.title" = "Ajustos";
 "profile.accountScreen.title" = "El meu compte";
-"profile.settingsScreen.subtitle" = "Ajusta l'app, gestiona aquest dispositiu i obre enllacos d'ajuda.";
-"profile.accountScreen.subtitle" = "Gestiona inici de sessio, acces, facturacio i seguretat del compte.";
+"profile.settingsScreen.subtitle" = "Ajusta l'app, gestiona aquest dispositiu i obre enllaços d'ajuda.";
+"profile.accountScreen.subtitle" = "Gestiona inici de sessió, accés, facturació i seguretat del compte.";
 "profile.preferences.title" = "Preferències de l'app";
 "profile.preferences.subtitle" = "Tria com es mostra Series AV en aquest dispositiu.";
 "profile.preferences.language.title" = "Idioma de l'app";
@@ -157,18 +157,18 @@
 "profile.preferences.webOpenMode.detail" = "Tria si els enllaços de fonts s'obren dins de Series AV o al navegador per defecte.";
 "profile.preferences.webOpenMode.inApp" = "A l'app";
 "profile.preferences.webOpenMode.system" = "Navegador";
-"profile.series.title" = "Seguiment de series";
-"profile.series.subtitle" = "Un unic punt clar per serie.";
-"profile.series.cursor.title" = "Punt unic de progres";
+"profile.series.title" = "Seguiment de sèries";
+"profile.series.subtitle" = "Un únic punt clar per sèrie.";
+"profile.series.cursor.title" = "Punt únic de progrés";
 "profile.series.cursor.detail" = "Marca un episodi i Series AV deixa anteriors com vistos i posteriors com pendents.";
-"profile.series.reversible.title" = "Correccions rapides";
+"profile.series.reversible.title" = "Correccions ràpides";
 "profile.series.reversible.detail" = "Mou el punt enrere o endavant si toques l'episodi incorrecte.";
 "profile.local.title" = "En aquest dispositiu";
-"profile.local.subtitle" = "El mode local es mante simple i privat.";
+"profile.local.subtitle" = "El mode local es manté simple i privat.";
 "profile.local.library.title" = "Biblioteca local";
 "profile.local.library.detail" = "Guest i Free guarden el seguiment en aquest dispositiu.";
 "profile.local.sync.title" = "Dades locals";
-"profile.local.sync.detail" = "El progres es guarda en aquest dispositiu mentre facis servir el mode local.";
+"profile.local.sync.detail" = "El progrés es guarda en aquest dispositiu mentre facis servir el mode local.";
 "profile.local.delete.title" = "Esborrar dades locals";
 "profile.local.delete.detail" = "Esborra %d sèries d'aquest dispositiu.";
 "profile.local.delete.empty" = "No hi ha dades locals per esborrar.";
@@ -187,16 +187,16 @@
 "profile.help.privacy.detail" = "Consulta com Series AV gestiona les teves dades.";
 "profile.help.terms.title" = "Termes del servei";
 "profile.help.terms.detail" = "Revisa els termes aplicables a Series AV.";
-"profile.sync.title" = "Sincronitzacio cloud";
+"profile.sync.title" = "Sincronització cloud";
 "profile.sync.subtitle" = "La teva biblioteca Pro segueix el teu compte d'Apps AV.";
 "profile.sync.headline.disabled" = "Sync no disponible";
 "profile.sync.headline.synced" = "Biblioteca sincronitzada";
 "profile.sync.headline.syncing" = "Sincronitzant biblioteca";
-"profile.sync.headline.failed" = "La sync necessita atencio";
-"profile.sync.detail.disabled" = "La sincronitzacio cloud s'activa amb Series AV Pro.";
-"profile.sync.detail.synced" = "Series, estat i progres d'episodis estan al dia.";
-"profile.sync.detail.syncing" = "Series AV esta actualitzant la biblioteca del teu compte.";
-"profile.sync.detail.failed" = "Series AV no ha pogut actualitzar la biblioteca del teu compte. Torna-ho a provar quan tinguis connexio.";
+"profile.sync.headline.failed" = "La sync necessita atenció";
+"profile.sync.detail.disabled" = "La sincronització cloud s'activa amb Series AV Pro.";
+"profile.sync.detail.synced" = "Sèries, estat i progrés d'episodis estan al dia.";
+"profile.sync.detail.syncing" = "Series AV està actualitzant la biblioteca del teu compte.";
+"profile.sync.detail.failed" = "Series AV no ha pogut actualitzar la biblioteca del teu compte. Torna-ho a provar quan tinguis connexió.";
 "profile.sync.retry" = "Sincronitzar ara";
 "profile.sync.retry.syncing" = "Sincronitzant...";
 "profile.account.title" = "Compte";
@@ -206,10 +206,10 @@
 "profile.pro.title" = "Series AV Pro";
 "profile.pro.account.title" = "Compte Pro";
 "profile.pro.account.detail" = "Mantén l'accés Pro vinculat al teu compte d'Apps AV.";
-"profile.pro.library.title" = "Biblioteca mes gran";
+"profile.pro.library.title" = "Biblioteca més gran";
 "profile.pro.library.detail" = "Segueix fins a 1000 sèries actives.";
 "profile.pro.avi.title" = "Avi a Home";
-"profile.pro.avi.detail" = "Mantingues la guia de seguiment al costat de la serie actual.";
+"profile.pro.avi.detail" = "Mantingues la guia de seguiment al costat de la sèrie actual.";
 "profile.safety.title" = "Seguretat del compte";
 "profile.safety.subtitle" = "Les accions sensibles usen Account AV sense enviar-te a iniciar sessió de nou al web.";
 "profile.safety.delete.title" = "Eliminar el compte d'Apps AV";
@@ -225,39 +225,39 @@
 "profile.summary.plan.detail.guest" = "Mode local";
 "profile.summary.plan.detail.free" = "Compte connectat";
 "profile.summary.plan.detail.pro" = "Pro";
-"profile.pro.subtitle.guest" = "Inicia sessio per veure Series AV Pro.";
-"profile.pro.subtitle.free" = "Millora per seguir mes series actives i mantenir l'acces Pro vinculat al compte.";
-"profile.pro.subtitle.pro" = "El teu acces Pro esta actiu. Gestiona la facturacio al teu compte de l'App Store.";
+"profile.pro.subtitle.guest" = "Inicia sessió per veure Series AV Pro.";
+"profile.pro.subtitle.free" = "Millora per seguir més sèries actives i mantenir l'accés Pro vinculat al compte.";
+"profile.pro.subtitle.pro" = "El teu accés Pro està actiu. Gestiona la facturació al teu compte de l'App Store.";
 "profile.pro.signIn" = "Iniciar sessió";
 "profile.pro.upgrade" = "Veure Pro";
-"profile.pro.manage" = "Gestionar subscripcio";
+"profile.pro.manage" = "Gestionar subscripció";
 "profile.pro.active.title" = "Pro actiu";
 "profile.pro.active.detail" = "El teu compte té actius els límits Pro.";
 "paywall.navigationTitle" = "Series AV Pro";
 "paywall.close" = "Tancar";
 "paywall.eyebrow" = "Series AV Pro";
-"paywall.title" = "Segueix mes series";
-"paywall.subtitle" = "Millora Series AV quan necessitis mes espai per a series actives.";
+"paywall.title" = "Segueix més sèries";
+"paywall.subtitle" = "Millora Series AV quan necessitis més espai per a sèries actives.";
 "paywall.scene.title" = "Pro mensual";
-"paywall.scene.detail" = "Mes espai per a series actives.";
-"paywall.subscriptionTerms" = "Series AV Pro es una subscripcio mensual amb renovacio automatica. Se't cobrara %@ per cada periode d'1 mes fins que cancel.lis als ajustos de l'App Store.";
+"paywall.scene.detail" = "Més espai per a sèries actives.";
+"paywall.subscriptionTerms" = "Series AV Pro es una subscripció mensual amb renovació automàtica. Se't cobrarà %@ per cada període d'1 més fins que cancel·lis als ajustos de l'App Store.";
 "paywall.purchase.loading" = "Processant…";
 "paywall.purchase.loadingOffer" = "Carregant preu…";
 "paywall.purchase.price" = "Continuar per %@";
 "paywall.restore" = "Restaurar compres";
-"paywall.restore.loading" = "Restaurant…";
-"paywall.status.purchasePending" = "Compra rebuda. Series AV desbloquejara Pro quan Apps AV confirmi l'acces del compte.";
-"paywall.status.restorePending" = "Restauracio completada. Si l'App Store te una subscripcio activa, Series AV desbloquejara Pro quan Apps AV confirmi l'acces.";
-"paywall.benefit.sync.title" = "Acces de compte";
+"paywall.restore.loading" = "Restàurant…";
+"paywall.status.purchasePending" = "Compra rebuda. Series AV desbloquejarà Pro quan Apps AV confirmi l'accés del compte.";
+"paywall.status.restorePending" = "Restàuracio completada. Si l'App Store té una subscripció activa, Series AV desbloquejarà Pro quan Apps AV confirmi l'accés.";
+"paywall.benefit.sync.title" = "Accés de compte";
 "paywall.benefit.sync" = "Mantén l'accés Pro vinculat al teu compte d'Apps AV.";
-"paywall.benefit.library.title" = "Biblioteca mes gran";
+"paywall.benefit.library.title" = "Biblioteca més gran";
 "paywall.benefit.library" = "Segueix fins a 1000 sèries actives.";
 "paywall.benefit.avi.title" = "Avi a Home";
-"paywall.benefit.avi" = "Guia contextual per seguir la serie actual sense perdre el punt.";
+"paywall.benefit.avi" = "Guia contextual per seguir la sèrie actual sense perdre el punt.";
 "paywall.terms" = "Termes";
 "paywall.privacy" = "Privacitat";
 "subscription.error.signInRequired" = "Inicia sessió abans de començar una subscripció.";
-"subscription.error.configuration" = "Les subscripcions no estan configurades en aquesta build.";
+"subscription.error.configuration" = "Les subscripcións no estan configurades en aquestà build.";
 "subscription.error.offerUnavailable" = "L'oferta Pro no està disponible ara mateix.";
 "subscription.error.productUnavailable" = "La subscripció mensual Pro no està disponible ara mateix.";
 "subscription.error.cancelled" = "Compra cancel·lada.";
@@ -267,20 +267,20 @@
 "tab.search" = "Cerca";
 "tab.avi" = "Avi";
 "home.header.title" = "Veient ara";
-"home.header.subtitle" = "Un punt clar per a les series que estas seguint.";
+"home.header.subtitle" = "Un punt clar per a les sèries que estàs seguint.";
 "home.aviBrief.action" = "Obrir Avi";
 "home.aviBrief.watching" = "%@ · %@. Avi t'ajuda a seguir.";
-"home.aviBrief.library" = "%d veient · %d per comencar.";
-"home.aviBrief.empty" = "Busca una serie, fixa l'ultim episodi vist i deixa Home a punt per seguir.";
-"search.title" = "Cercar series";
-"search.empty.subtitle" = "Explora series populars o cerca per titol per comencar a seguir-les.";
-"search.placeholder" = "Cercar per titol";
+"home.aviBrief.library" = "%d veient · %d per començar.";
+"home.aviBrief.empty" = "Busca una sèrie, fixa l'últim episodi vist i deixa Home a punt per seguir.";
+"search.title" = "Cercar sèries";
+"search.empty.subtitle" = "Explora sèries populars o cerca per títol per començar a seguir-les.";
+"search.placeholder" = "Cercar per títol";
 "avi.empty.subtitle" = "Avi manté a mà la sèrie actual, el següent episodi i les accions ràpides.";
 "avi.summary" = "Ajuda ràpida per seguir sèries sense perdre el punt.";
 "avi.landing.title" = "Segueix sèries amb Avi";
 "avi.hero.detail" = "Busca una sèrie, fixa el punt exacte i avança o retrocedeix sense complicar la biblioteca.";
-"avi.status.empty" = "Cap serie en focus";
-"avi.action.start" = "Comencar";
+"avi.status.empty" = "Cap sèrie en focus";
+"avi.action.start" = "Començar";
 "avi.action.next" = "Vist";
 "avi.action.previous" = "Tornar un";
 "avi.action.pin" = "Mantenir primera";
@@ -288,45 +288,45 @@
 "avi.prepare.title" = "Cercar i seguir";
 "avi.prepare.detail" = "Avi se centra en el que Series AV pot fer ara.";
 "avi.prepare.search.title" = "Busca per títol";
-"avi.prepare.search.detail" = "Troba una serie i segueix-la a la biblioteca.";
+"avi.prepare.search.detail" = "Troba una sèrie i segueix-la a la biblioteca.";
 "avi.prepare.progress.title" = "Fixa un sol punt";
 "avi.prepare.progress.detail" = "L'últim episodi vist decideix què queda pendent.";
-"avi.prepare.action.title" = "Cercar una serie";
+"avi.prepare.action.title" = "Cercar una sèrie";
 "avi.prepare.action.detail" = "Obre Cerca per començar des d'una sèrie real.";
 "avi.prepare.action.button" = "Buscar sèries";
 "avi.current.title" = "Focus actual";
-"avi.current.empty.title" = "Tria una serie per seguir";
-"avi.current.empty.detail" = "Segueix una serie des de Cerca i Avi mantindra visible el seguent episodi.";
-"avi.current.next.detail" = "Seguent %@";
+"avi.current.empty.title" = "Tria una sèrie per seguir";
+"avi.current.empty.detail" = "Segueix una sèrie des de Cerca i Avi mantindrà visible el següent episodi.";
+"avi.current.next.detail" = "Següent %@";
 "avi.library.detail" = "Un resum compacte del que tens actiu, vist i arxivat.";
-"avi.help.title" = "Seguiment rapid";
-"avi.help.detail" = "Cada accio de progres es reversible, aixi els canvis rapids tenen poc risc.";
+"avi.help.title" = "Seguiment ràpid";
+"avi.help.detail" = "Cada acció de progrés es reversible, així els canvis ràpids tenen poc risc.";
 "avi.help.next.title" = "Marcar vist";
-"avi.help.next.detail" = "Mou l'unic punt de progres endavant i deixa l'anterior com a vist.";
+"avi.help.next.detail" = "Mou l'únic punt de progrés endavant i deixa l'anterior com a vist.";
 "avi.help.previous.title" = "Retrocedir";
-"avi.help.previous.detail" = "Mou el punt de progres enrere i deixa el posterior pendent.";
+"avi.help.previous.detail" = "Mou el punt de progrés enrere i deixa el posterior pendent.";
 "avi.help.pin.title" = "Mantenir primera";
-"avi.help.pin.detail" = "Prioritza una serie a Home quan importa mes que la resta.";
+"avi.help.pin.detail" = "Prioritza una sèrie a Home quan importa més que la restà.";
 
 "common.done" = "Fet";
 
 "accountDeletion.accountWebsiteLink" = "Gestionar al web del compte Apps AV";
 
-"accountDeletion.blocked.detail" = "Apps AV no pot completar l'eliminacio aqui perque falta una dependencia necessaria. Pots gestionar l'eliminacio completa al web del compte d'Apps AV.";
+"accountDeletion.blocked.detail" = "Apps AV no pot completar l'eliminació aquí perquè falta una dependència necessària. Pots gestionar l'eliminació completa al web del compte d'Apps AV.";
 
 "accountDeletion.blocked.title" = "L'eliminació està bloquejada";
 
 "accountDeletion.blocker.job.title" = "Ja hi ha una eliminació en curs";
 
-"accountDeletion.blocker.linkedApp.detail" = "Eliminar aquest compte compartit d'Apps AV tambe elimina aquest vincle d'app i les seves dades de la suite.";
+"accountDeletion.blocker.linkedApp.detail" = "Eliminar aquest compte compartit d'Apps AV també elimina aquest vincle d'app i les seves dades de la suite.";
 
 "accountDeletion.blocker.linkedApp.title" = "App Apps AV vinculada";
 
-"accountDeletion.blocker.pro.detail" = "Aquest acces Pro es retirara dels registres d'Apps AV. La facturacio pot continuar al proveidor fins que es cancel·li o expiri.";
+"accountDeletion.blocker.pro.detail" = "Aquest accés Pro es retirara dels registres d'Apps AV. La facturació pot continuar al proveïdor fins que es cancel·li o expiri.";
 
-"accountDeletion.blocker.pro.title" = "Acces Pro actiu";
+"accountDeletion.blocker.pro.title" = "Accés Pro actiu";
 
-"accountDeletion.blocker.subscription.detail" = "La facturacio pot continuar al proveidor fins que la subscripcio es cancel·li o expiri.";
+"accountDeletion.blocker.subscription.detail" = "La facturació pot continuar al proveïdor fins que la subscripció es cancel·li o expiri.";
 
 "accountDeletion.blocker.subscription.title" = "Subscripció activa";
 
@@ -340,7 +340,7 @@
 
 "accountDeletion.deleting" = "Eliminant el compte...";
 
-"accountDeletion.eligible.detail" = "Revisa les advertencies i confirma per sol·licitar l'eliminacio del compte compartit d'Apps AV.";
+"accountDeletion.eligible.detail" = "Revisa les advertències i confirma per sol·licitar l'eliminació del compte compartit d'Apps AV.";
 
 "accountDeletion.eligible.title" = "Preparat per sol·licitar l'eliminació";
 
@@ -358,15 +358,15 @@
 
 "accountDeletion.finalizing" = "Finalitzant...";
 
-"accountDeletion.impact.high.detail" = "Eliminar aquest compte es permanent. Pots perdre acces Pro, subscripcions gestionades per un altre proveidor, credits sense usar, credits reservats, contingut generat i dades de totes les apps Apps AV. Aixo no es pot desfer. L'eliminacio continua disponible si decideixes continuar.";
+"accountDeletion.impact.high.detail" = "Eliminar aquest compte és permanent. Pots perdre accés Pro, subscripcións gestionades per un altre proveïdor, crèdits sense usar, crèdits reservats, contingut generat i dades de totes les apps Apps AV. Això no es pot desfer. L'eliminació continua disponible si decideixes continuar.";
 
-"accountDeletion.impact.high.title" = "Perdua permanent de Pro, credits i dades";
+"accountDeletion.impact.high.title" = "Perdua permanent de Pro, crèdits i dades";
 
-"accountDeletion.impact.linkedApps.detail" = "Eliminar aquest compte compartit d'Apps AV tambe elimina dades de compte de les altres apps Apps AV. Aixo no es pot desfer.";
+"accountDeletion.impact.linkedApps.detail" = "Eliminar aquest compte compartit d'Apps AV també elimina dades de compte de les altres apps Apps AV. Això no es pot desfer.";
 
 "accountDeletion.impact.linkedApps.title" = "S'eliminaran dades d'altres apps Apps AV";
 
-"accountDeletion.inProgress.detail" = "Apps AV esta processant la sol·licitud d'eliminacio. Finalitza nomes quan Apps AV indiqui que l'eliminacio de la identitat ha acabat.";
+"accountDeletion.inProgress.detail" = "Apps AV està processant la sol·licitud d'eliminació. Finalitza només quan Apps AV indiqui que l'eliminació de la identitat ha acabat.";
 
 "accountDeletion.inProgress.title" = "Eliminació en curs";
 
@@ -374,23 +374,23 @@
 
 "accountDeletion.manageLink" = "Gestionar";
 
-"accountDeletion.shared.detail" = "Aixo elimina el compte Apps AV compartit entre apps Apps AV. Les dades locals d'aquest dispositiu son independents de l'eliminacio remota.";
+"accountDeletion.shared.detail" = "Això elimina el compte Apps AV compartit entre apps Apps AV. Les dades locals d'aquest dispositiu són independents de l'eliminació remota.";
 
 "accountDeletion.shared.title" = "Compte compartit d'Apps AV";
 
-"accountDeletion.subtitle" = "Pots eliminar el teu compte compartit d'Apps AV des d'aqui.";
+"accountDeletion.subtitle" = "Pots eliminar el teu compte compartit d'Apps AV des d'aquí.";
 
 "accountDeletion.title" = "Eliminar el compte d'Apps AV";
 
-"accountDeletion.unavailable.detail" = "No hem pogut comprovar el compte des de l'app ara mateix. Per no bloquejar-te, continua a Account AV i completa l'eliminacio alla.";
+"accountDeletion.unavailable.detail" = "No hem pogut comprovar el compte des de l'app ara mateix. Per no bloquejar-te, continua a Account AV i completa l'eliminació allà.";
 
 "accountDeletion.unavailable.title" = "Elimina el compte a Account AV";
 
-"accountDeletion.unlinked.detail" = "Aquesta app s'ha desvinculat d'Apps AV. El compte compartit d'Apps AV encara existeix perque queden altres apps Apps AV vinculades.";
+"accountDeletion.unlinked.detail" = "Aquesta app s'ha desvinculat d'Apps AV. El compte compartit d'Apps AV encara existeix perquè queden altres apps Apps AV vinculades.";
 
 "accountDeletion.unlinked.title" = "App desvinculada";
 
-"accountDeletion.unlinkButton" = "Desvincular aquesta app";
+"accountDeletion.unlinkButton" = "Desvincular aquestà app";
 
 "accountDeletion.unlinking" = "Desvinculant...";
 
@@ -400,21 +400,21 @@
 
 "accountAPI.error.missingBaseURL" = "Falta l'URL base de l'API d'Apps AV.";
 
-"accountAPI.error.requestFailed" = "La sol·licitud a l'API d'Apps AV ha fallat amb l'estat %d.";
+"accountAPI.error.requestFailed" = "La sol·licitud a l'API d'Apps AV ha fallàt amb l'estat %d.";
 
 "common.clear" = "Esborrar";
 "search.addTyped" = "Seguir \"%@\"";
 "search.collection.anime" = "Anime";
-"search.collection.animation" = "Animacio";
+"search.collection.animation" = "Animació";
 "search.collection.comedy" = "Comedia";
 "search.collection.drama" = "Drama";
 "search.collection.popular" = "Populars";
 "search.collection.scifi" = "Sci-Fi";
-"search.follow" = "Seguir serie";
+"search.follow" = "Seguir sèrie";
 "search.resultsFor" = "Resultats per a \"%@\"";
 "search.loading" = "Cercant";
-"search.collection.count.one" = "%d serie a punt per seguir.";
-"search.collection.count.other" = "%d series a punt per seguir.";
+"search.collection.count.one" = "%d sèrie a punt per seguir.";
+"search.collection.count.other" = "%d sèries a punt per seguir.";
 "search.collection.updating" = "Actualitzant el cataleg";
 "search.results.count.one" = "%d resultat";
 "search.results.count.other" = "%d resultats";
