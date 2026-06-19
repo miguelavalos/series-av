@@ -85,31 +85,39 @@ function SeriesDetailRoute() {
   return (
     <ProtectedRoute>
       <SeriesAppShell>
-        <section className="grid gap-6 lg:grid-cols-[1fr_22rem]">
-          <Card className="series-paper gap-0 rounded-lg border-[#d7c494] p-6 py-6 shadow-lg shadow-[#172f5c]/8 sm:p-8 sm:py-8">
-            <Button asChild variant="ghost" className="mb-5 w-fit rounded-full">
-              <Link to={localizedSeriesPath("/library", locale)}>
-                <ArrowLeft className="size-4" /> {text.nav.library}
-              </Link>
-            </Button>
-            <div className="flex flex-col gap-5 sm:flex-row">
-              <SeriesArtwork entry={artwork} size="lg" />
-              <div className="min-w-0 flex-1">
-                <h1 className="text-4xl font-semibold leading-tight text-[#112a55]">{title}</h1>
-                <p className="mt-3 text-sm font-semibold text-[#5a8f2f]">
-                  {catalog?.startYear ?? catalog?.firstAirDate ?? text.search.dateUnknown}
-                  {catalog?.genres?.length ? ` · ${catalog.genres.slice(0, 2).join(" · ")}` : ""}
+        <section className="grid gap-6">
+          <Card className="series-paper gap-0 rounded-lg border-[#d7c494] p-5 py-5 shadow-lg shadow-[#172f5c]/8 sm:p-8 sm:py-8">
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+              <Button asChild variant="ghost" className="w-fit rounded-full">
+                <Link to={localizedSeriesPath("/library", locale)}>
+                  <ArrowLeft className="size-4" /> {text.nav.library}
+                </Link>
+              </Button>
+              {entry ? (
+                <p className="rounded-full border border-[#d7c494] bg-white/55 px-4 py-2 text-sm font-semibold text-[#53617a]">
+                  {libraryLabels.status[entry.status]} · {progressLabel(entry, libraryLabels.notStarted, libraryLabels.noEpisodeSet)}
                 </p>
-                {detail.isError ? <p className="mt-3 text-sm font-semibold text-[#b15b22]">{labels.detailUnavailable}</p> : null}
-                <p className="mt-4 max-w-2xl text-base leading-7 text-[#334766]">{catalog?.summary ?? catalog?.overview ?? text.search.noOverview}</p>
-                {entry ? (
-                  <div className="mt-5 grid gap-4">
-                    <p className="text-sm font-semibold text-[#53617a]">
-                      {libraryLabels.status[entry.status]} · {progressLabel(entry, libraryLabels.notStarted, libraryLabels.noEpisodeSet)} · {libraryLabels.next} {cursorLabel(nextEpisodeCursor(entry.lastWatchedEpisodeCursor))}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
+              ) : null}
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[13.5rem_minmax(0,1fr)]">
+              <SeriesArtwork entry={artwork} size="xl" />
+              <div className="min-w-0">
+                <div className="max-w-4xl">
+                  <h1 className="text-3xl font-semibold leading-tight text-[#112a55] sm:text-4xl">{title}</h1>
+                  <p className="mt-3 text-sm font-semibold text-[#5a8f2f]">
+                    {catalog?.startYear ?? catalog?.firstAirDate ?? text.search.dateUnknown}
+                    {catalog?.genres?.length ? ` · ${catalog.genres.slice(0, 3).join(" · ")}` : ""}
+                  </p>
+                  {detail.isError ? <p className="mt-3 text-sm font-semibold text-[#b15b22]">{labels.detailUnavailable}</p> : null}
+                  <p className="mt-4 text-base leading-7 text-[#334766]">{catalog?.summary ?? catalog?.overview ?? text.search.noOverview}</p>
+                </div>
+
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {entry ? (
+                    <>
                       <Button className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" onClick={() => library.markNextEpisodeWatched(entry.entryId)}>
-                        <StepForward className="size-4" /> {labels.markNext}
+                        <StepForward className="size-4" /> {labels.markNext} {cursorLabel(nextEpisodeCursor(entry.lastWatchedEpisodeCursor))}
                       </Button>
                       {entry.lastWatchedEpisodeCursor ? (
                         <>
@@ -122,30 +130,37 @@ function SeriesDetailRoute() {
                         </>
                       ) : null}
                       <StatusButtons entry={entry} locale={locale} />
-                    </div>
-                  </div>
-                ) : (
-                  <Button
-                    className="mt-5 rounded-full bg-[#112a55] text-white hover:bg-[#19396f]"
-                    disabled={!library.canAddSeries}
-                    onClick={() =>
-                      library.addCatalogSeries({
-                        displayArtworkRef: catalogArtworkRef,
-                        fallbackVisualSeed: title,
-                        seriesId,
-                        title
-                      })
-                    }
-                  >
-                    <Plus className="size-4" /> {library.canAddSeries ? labels.follow : labels.limitReached}
-                  </Button>
-                )}
+                    </>
+                  ) : (
+                    <Button
+                      className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]"
+                      disabled={!library.canAddSeries}
+                      onClick={() =>
+                        library.addCatalogSeries({
+                          displayArtworkRef: catalogArtworkRef,
+                          fallbackVisualSeed: title,
+                          seriesId,
+                          title
+                        })
+                      }
+                    >
+                      <Plus className="size-4" /> {library.canAddSeries ? labels.follow : labels.limitReached}
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           </Card>
 
-          <Card className="gap-3 rounded-lg border-[#d7c494] bg-[#fff8df]/88 p-5 py-5 text-[#112a55] shadow-sm shadow-[#172f5c]/6">
-            <h2 className="text-lg font-semibold">{labels.episodeGuide}</h2>
+          <Card className="gap-4 rounded-lg border-[#d7c494] bg-[#fff8df]/88 p-5 py-5 text-[#112a55] shadow-sm shadow-[#172f5c]/6 sm:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-lg font-semibold">{labels.episodeGuide}</h2>
+              {entry ? (
+                <p className="text-sm font-semibold text-[#53617a]">
+                  {labels.watchedThrough}: {entry.lastWatchedEpisodeCursor ? cursorLabel(entry.lastWatchedEpisodeCursor) : libraryLabels.notStarted}
+                </p>
+              ) : null}
+            </div>
             {episodes.isLoading ? <div className="h-40 animate-pulse rounded-lg bg-[#ead6a5]" /> : null}
             {episodes.isError ? <ErrorState className="border-[#d7c494] bg-white/70" description={episodes.error.message} title={labels.episodesUnavailable} /> : null}
             {episodes.data ? <EpisodeGuide labels={labels} libraryLabels={libraryLabels} entry={entry} items={episodes.data.items} markWatchedThrough={library.markWatchedThrough} /> : null}
@@ -216,7 +231,7 @@ function EpisodeGuide({
         <p className="text-sm font-semibold text-[#53617a]">{labels.followToTrack}</p>
       )}
 
-      <div className="grid gap-2">
+      <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
         {selectedEpisodes.map((episode) => {
           const cursor = { episodeNumber: episode.episodeNumber, seasonNumber: episode.seasonNumber };
           const isWatched = progress ? compareEpisodeCursors(cursor, progress) <= 0 : false;

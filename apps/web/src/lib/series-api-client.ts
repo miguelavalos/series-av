@@ -246,6 +246,14 @@ function normalizeSeriesDetailResponse(payload: unknown, seriesId: string): Seri
     return payload;
   }
 
+  if (isLegacySeriesCatalogRecord(payload)) {
+    return {
+      generatedAt: new Date().toISOString(),
+      guideReliability: payload.episodes.length > 0 ? "available" : "partial",
+      summary: catalogItemFromLegacyRecord(payload)
+    };
+  }
+
   const summary = payload as Partial<SeriesSearchResult>;
   return {
     generatedAt: new Date().toISOString(),
@@ -267,4 +275,51 @@ function isSeriesDetailResponse(payload: unknown): payload is SeriesDetailRespon
       typeof payload.summary === "object" &&
       "title" in payload.summary
   );
+}
+
+type LegacySeriesCatalogRecord = {
+  episodes: unknown[];
+  series: {
+    backdropUrl?: string | null;
+    genres?: string[];
+    id: string;
+    posterUrl?: string | null;
+    providerRefs?: unknown[];
+    status?: string | null;
+    summary?: string | null;
+    title: string;
+    updatedAt?: string;
+    year?: number | null;
+  };
+};
+
+function isLegacySeriesCatalogRecord(payload: unknown): payload is LegacySeriesCatalogRecord {
+  return Boolean(
+    payload &&
+      typeof payload === "object" &&
+      "series" in payload &&
+      "episodes" in payload &&
+      Array.isArray((payload as { episodes?: unknown }).episodes) &&
+      (payload as { series?: unknown }).series &&
+      typeof (payload as { series: { title?: unknown } }).series.title === "string"
+  );
+}
+
+function catalogItemFromLegacyRecord(record: LegacySeriesCatalogRecord): SeriesSearchResult {
+  const posterUrl = record.series.posterUrl ?? undefined;
+  return {
+    displayArtwork: {
+      fallbackSeed: posterUrl ? undefined : record.series.title,
+      kind: posterUrl ? "poster" : "initialsFallback",
+      url: posterUrl
+    },
+    genres: record.series.genres ?? [],
+    id: record.series.id,
+    posterUrl,
+    seriesId: record.series.id,
+    startYear: record.series.year ?? undefined,
+    statusText: record.series.status ?? undefined,
+    summary: record.series.summary ?? undefined,
+    title: record.series.title
+  };
 }

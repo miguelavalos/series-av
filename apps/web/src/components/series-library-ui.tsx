@@ -97,11 +97,12 @@ const uiText = {
   }
 } satisfies Record<AppsAvLocale, { archive: string; clear: string; episode: string; more: string; next: string; noEpisodeSet: string; notStarted: string; pin: string; pinned: string; previous: string; restore: string; status: Record<SeriesLibraryEntryStatus, string>; trash: string; unpin: string }>;
 
-export function SeriesArtwork({ entry, size = "md" }: { entry: Pick<SeriesLibraryEntry, "displayArtworkRef" | "fallbackVisualSeed" | "title">; size?: "sm" | "md" | "lg" }) {
+export function SeriesArtwork({ entry, size = "md" }: { entry: Pick<SeriesLibraryEntry, "displayArtworkRef" | "fallbackVisualSeed" | "title">; size?: "sm" | "md" | "lg" | "xl" }) {
   const classes = {
     lg: "h-48 w-34",
     md: "h-28 w-20",
-    sm: "h-20 w-14"
+    sm: "h-20 w-14",
+    xl: "h-72 w-48"
   }[size];
 
   return entry.displayArtworkRef ? (
