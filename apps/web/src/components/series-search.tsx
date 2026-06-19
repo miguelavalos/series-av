@@ -105,7 +105,7 @@ function SearchResultCard({ locale, result }: { locale: ReturnType<typeof useApp
         className="block aspect-[16/10] bg-[#ead6a5]"
         onClick={() => rememberSeriesCatalogItem(result)}
       >
-        {artwork ? <img alt="" className="h-full w-full object-cover" loading="lazy" src={artwork} /> : <div className="flex h-full items-center justify-center text-sm font-medium text-[#748098]">{text.search.noArtwork}</div>}
+        {artwork ? <img alt="" className="h-full w-full object-cover" loading="lazy" src={artwork} /> : <SearchArtworkFallback title={result.title} />}
       </Link>
       <CardContent className="flex min-h-56 flex-col gap-3 p-4">
         <div>
@@ -141,6 +141,19 @@ function SearchResultCard({ locale, result }: { locale: ReturnType<typeof useApp
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function SearchArtworkFallback({ title }: { title: string }) {
+  return (
+    <div className="relative flex h-full w-full overflow-hidden bg-[#ead6a5]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_24%,rgba(255,248,223,0.92),transparent_30%),linear-gradient(135deg,#fff8df_0%,#ead6a5_48%,#d7c494_100%)]" />
+      <div className="absolute -right-8 top-5 h-24 w-24 rotate-12 rounded-lg border border-[#c8ad72] bg-[#fff8df]/45" />
+      <div className="absolute bottom-4 left-5 right-5 rounded-lg border border-[#c8ad72] bg-[#fff8df]/80 p-3 shadow-sm shadow-[#172f5c]/10">
+        <p className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-[#5a8f2f]">Series AV</p>
+        <p className="mt-1 line-clamp-2 text-sm font-bold leading-5 text-[#112a55]">{title}</p>
+      </div>
+    </div>
   );
 }
 
