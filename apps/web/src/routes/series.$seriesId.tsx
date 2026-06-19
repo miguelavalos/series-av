@@ -1,4 +1,5 @@
 import { ErrorState, useAppsAvLocale } from "@avalsys/apps-av-web";
+import { useAccountToken } from "@avalsys/account-av-web";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, CheckCircle2, Plus, RotateCcw, StepBack, StepForward } from "lucide-react";
@@ -23,6 +24,7 @@ function SeriesDetailRoute() {
   const locale = useAppsAvLocale();
   const apiLocale = useSeriesApiLocale();
   const text = useSeriesText();
+  const getToken = useAccountToken();
   const library = useSeriesLibrary();
   const labels = detailLabels[locale];
   const libraryLabels = seriesLibraryUiText(locale);
@@ -30,7 +32,7 @@ function SeriesDetailRoute() {
   const client = useMemo(() => new SeriesApiClient(getSeriesApiBaseUrl()), []);
   const rememberedCatalog = useMemo(() => readRememberedSeriesCatalogItem(seriesId), [seriesId]);
   const detail = useQuery({
-    queryFn: () => client.series({ locale: apiLocale, seriesId }),
+    queryFn: async () => client.series({ locale: apiLocale, seriesId, token: await getToken() }),
     queryKey: ["series-av", "detail", apiLocale, seriesId],
     retry: false
   });
