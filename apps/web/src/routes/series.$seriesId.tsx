@@ -22,7 +22,8 @@ export const Route = createFileRoute("/series/$seriesId")({
 });
 
 function SeriesDetailRoute() {
-  const { seriesId } = Route.useParams();
+  const params = Route.useParams();
+  const seriesId = normalizeRouteSeriesId(params.seriesId);
   const locale = useAppsAvLocale();
   const apiLocale = useSeriesApiLocale();
   const text = useSeriesText();
@@ -341,6 +342,14 @@ function EpisodeGuide({
       </div>
     </div>
   );
+}
+
+function normalizeRouteSeriesId(seriesId: string) {
+  try {
+    return decodeURIComponent(seriesId).trim();
+  } catch {
+    return seriesId.trim();
+  }
 }
 
 function normalizeEpisodeGuide(items: SeriesEpisodeGuideItem[]) {
