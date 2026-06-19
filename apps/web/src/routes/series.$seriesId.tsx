@@ -1,8 +1,9 @@
-import { ErrorState, useAppsAvLocale } from "@avalsys/apps-av-web";
+import { appsAvExternalSearchUrl, appsAvImdbSearchUrl, ErrorState, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { useAccountToken } from "@avalsys/account-av-web";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight, Plus, RotateCcw, StepBack, StepForward } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight, Database, ExternalLink, Plus, RotateCcw, Search, StepBack, StepForward } from "lucide-react";
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { SeriesAppShell } from "@/components/series-app-shell";
@@ -11,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SeriesApiClient, readRememberedSeriesCatalogItem, type SeriesEpisodeGuideItem } from "@/lib/series-api-client";
 import { getSeriesApiBaseUrl } from "@/lib/series-config";
+import { readSeriesExternalSearchEngine } from "@/lib/series-external-preferences";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
 import { compareEpisodeCursors, cursorLabel, nextEpisodeCursor, progressLabel, type SeriesEpisodeCursor, type SeriesLibraryEntry } from "@/lib/series-library";
 import { localizedSeriesPath, useSeriesApiLocale, useSeriesText } from "@/lib/series-i18n";
@@ -31,6 +33,7 @@ function SeriesDetailRoute() {
   const entry = library.findEntryBySeriesId(seriesId);
   const client = useMemo(() => new SeriesApiClient(getSeriesApiBaseUrl()), []);
   const rememberedCatalog = useMemo(() => readRememberedSeriesCatalogItem(seriesId), [seriesId]);
+  const [externalSearchEngine, setExternalSearchEngine] = useState(readSeriesExternalSearchEngine);
   const detail = useQuery({
     queryFn: async () => client.series({ locale: apiLocale, seriesId, token: await getToken() }),
     queryKey: ["series-av", "detail", apiLocale, seriesId],
@@ -60,6 +63,13 @@ function SeriesDetailRoute() {
   });
   const title = catalog?.title ?? entry?.title ?? decodeURIComponent(seriesId);
   const catalogArtworkRef = catalog?.posterUrl ?? catalog?.displayArtwork?.url ?? null;
+  const externalQuery = [title, catalog?.startYear ?? catalog?.firstAirDate].filter(Boolean).join(" ");
+  const sourceLinks = sourceLinksForSeries({ engine: externalSearchEngine, labels, query: externalQuery, seriesId });
+
+  useEffect(() => {
+    setExternalSearchEngine(readSeriesExternalSearchEngine());
+  }, [seriesId]);
+
   useEffect(() => {
     if (!entry || !catalog || !hasCatalogTitle) {
       return;
@@ -114,6 +124,27 @@ function SeriesDetailRoute() {
                   {detail.isError ? <p className="mt-3 text-sm font-semibold text-[#b15b22]">{labels.detailUnavailable}</p> : null}
                   <p className="mt-4 text-base leading-7 text-[#334766]">{catalog?.summary ?? catalog?.overview ?? text.search.noOverview}</p>
                 </div>
+
+                {sourceLinks.length > 0 ? (
+                  <div className="mt-5 rounded-lg border border-[#d7c494] bg-white/45 p-4">
+                    <p className="text-sm font-bold text-[#112a55]">{labels.sourcesTitle}</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {sourceLinks.map((source) => (
+                        <a
+                          key={source.href}
+                          className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[#c8ad72] bg-[#fff8df]/80 px-4 text-sm font-bold text-[#112a55] hover:bg-white"
+                          href={source.href}
+                          rel="noreferrer"
+                          target="_blank"
+                        >
+                          {source.icon}
+                          {source.label}
+                          <ExternalLink className="size-3.5" aria-hidden="true" />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
 
                 <div className="mt-6 flex flex-wrap gap-2">
                   {entry ? (
@@ -321,6 +352,53 @@ function normalizeEpisodeGuide(items: SeriesEpisodeGuideItem[]) {
   };
 }
 
+function sourceLinksForSeries({
+  engine,
+  labels,
+  query,
+  seriesId
+}: {
+  engine: string;
+  labels: (typeof detailLabels)[keyof typeof detailLabels];
+  query: string;
+  seriesId: string;
+}): Array<{ href: string; icon: ReactNode; label: string }> {
+  const links: Array<{ href: string; icon: ReactNode; label: string }> = [];
+  const theTvdbId = theTvdbIdFromSeriesId(seriesId);
+  if (theTvdbId) {
+    links.push({
+      href: `https://thetvdb.com/series/${encodeURIComponent(theTvdbId)}`,
+      icon: <Database className="size-4" aria-hidden="true" />,
+      label: labels.sourceTheTvdb
+    });
+  }
+
+  const imdbUrl = appsAvImdbSearchUrl(query);
+  if (imdbUrl) {
+    links.push({
+      href: imdbUrl,
+      icon: <Search className="size-4" aria-hidden="true" />,
+      label: labels.sourceImdb
+    });
+  }
+
+  const webUrl = appsAvExternalSearchUrl({ engine, query: `${query} series` });
+  if (webUrl) {
+    links.push({
+      href: webUrl,
+      icon: <Search className="size-4" aria-hidden="true" />,
+      label: labels.sourceWeb
+    });
+  }
+
+  return links;
+}
+
+function theTvdbIdFromSeriesId(seriesId: string) {
+  const normalizedSeriesId = decodeURIComponent(seriesId).trim();
+  return normalizedSeriesId.toLocaleLowerCase().startsWith("thetvdb:") ? normalizedSeriesId.slice("thetvdb:".length) : null;
+}
+
 const detailLabels = {
   ca: {
     episodeGuide: "Guia d'episodis",
@@ -339,6 +417,10 @@ const detailLabels = {
     previousSeason: "Temporada anterior",
     season: "Temporada",
     seasonShort: "T",
+    sourceImdb: "IMDb",
+    sourceTheTvdb: "TheTVDB",
+    sourceWeb: "Cerca web",
+    sourcesTitle: "Fonts",
     watchedThrough: "Vist fins a"
   },
   de: {
@@ -358,6 +440,10 @@ const detailLabels = {
     previousSeason: "Vorherige Staffel",
     season: "Staffel",
     seasonShort: "S",
+    sourceImdb: "IMDb",
+    sourceTheTvdb: "TheTVDB",
+    sourceWeb: "Websuche",
+    sourcesTitle: "Quellen",
     watchedThrough: "Gesehen bis"
   },
   en: {
@@ -377,6 +463,10 @@ const detailLabels = {
     previousSeason: "Previous season",
     season: "Season",
     seasonShort: "S",
+    sourceImdb: "IMDb",
+    sourceTheTvdb: "TheTVDB",
+    sourceWeb: "Web search",
+    sourcesTitle: "Sources",
     watchedThrough: "Watched through"
   },
   es: {
@@ -396,6 +486,10 @@ const detailLabels = {
     previousSeason: "Temporada anterior",
     season: "Temporada",
     seasonShort: "T",
+    sourceImdb: "IMDb",
+    sourceTheTvdb: "TheTVDB",
+    sourceWeb: "Buscar en web",
+    sourcesTitle: "Fuentes",
     watchedThrough: "Visto hasta"
   },
   fr: {
@@ -415,6 +509,10 @@ const detailLabels = {
     previousSeason: "Saison précédente",
     season: "Saison",
     seasonShort: "S",
+    sourceImdb: "IMDb",
+    sourceTheTvdb: "TheTVDB",
+    sourceWeb: "Recherche web",
+    sourcesTitle: "Sources",
     watchedThrough: "Vu jusqu'à"
   }
 } as const;

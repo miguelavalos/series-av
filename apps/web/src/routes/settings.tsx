@@ -6,16 +6,19 @@ import {
   SettingsSectionCard,
   useAppsAvLocale,
   appsAvLocaleNames,
+  appsAvExternalSearchEngines,
+  type AppsAvExternalSearchEngine,
   type AppsAvLocale
 } from "@avalsys/apps-av-web";
 import { HelpLegalSection } from "@avalsys/apps-av-web/src/components/account-settings-sections";
 import { applyAppsAvThemePreference, normalizeAppsAvThemePreference, readAppsAvThemePreference, type AppsAvThemePreference } from "@avalsys/apps-av-web/src/lib/theme-preference";
 import { createFileRoute } from "@tanstack/react-router";
-import { Contrast, Globe, HardDrive, Languages, ListChecks, Moon, RotateCcw, Smartphone, Sun, Trash2 } from "lucide-react";
+import { Contrast, Globe, HardDrive, Languages, ListChecks, Moon, RotateCcw, Search, Smartphone, Sun, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { SeriesAppShell } from "@/components/series-app-shell";
 import { seriesProductConfig } from "@/lib/series-config";
+import { readSeriesExternalSearchEngine, writeSeriesExternalSearchEngine } from "@/lib/series-external-preferences";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
 import { localizedExternalUrl, localizedSeriesPath } from "@/lib/series-i18n";
 
@@ -28,16 +31,23 @@ function SettingsRoute() {
   const library = useSeriesLibrary();
   const labels = profileLabels[locale];
   const [theme, setThemeState] = useState<AppsAvThemePreference>("system");
+  const [searchEngine, setSearchEngineState] = useState<AppsAvExternalSearchEngine>("google");
 
   useEffect(() => {
     const storedTheme = normalizeAppsAvThemePreference(readAppsAvThemePreference(themeStorageKey));
     setThemeState(storedTheme);
     applyTheme(storedTheme);
+    setSearchEngineState(readSeriesExternalSearchEngine());
   }, []);
 
   const setTheme = (nextTheme: AppsAvThemePreference) => {
     setThemeState(nextTheme);
     applyTheme(nextTheme);
+  };
+
+  const setSearchEngine = (nextSearchEngine: AppsAvExternalSearchEngine) => {
+    setSearchEngineState(nextSearchEngine);
+    writeSeriesExternalSearchEngine(nextSearchEngine);
   };
 
   const clearLocalData = () => {
@@ -72,6 +82,15 @@ function SettingsRoute() {
                 id: item,
                 icon: themeIcon(item),
                 label: labels.preferences.themeOptions[item]
+              }))}
+            />
+            <SettingsInfoRow icon={<Search className="size-5" />} title={labels.preferences.searchEngineTitle} detail={labels.preferences.searchEngineDetail} />
+            <SettingsOptionButtonGroup
+              selectedId={searchEngine}
+              onSelect={(id) => setSearchEngine(id as AppsAvExternalSearchEngine)}
+              options={appsAvExternalSearchEngines.map((item) => ({
+                id: item,
+                label: labels.preferences.searchEngineOptions[item]
               }))}
             />
           </SettingsSectionCard>
@@ -151,6 +170,9 @@ const profileLabels = {
       themeDetail: "Tria si Series AV segueix l'aparença del sistema o si sempre fa servir un tema fix en aquest dispositiu.",
       themeOptions: { dark: "Fosc", light: "Clar", system: "Sistema" },
       themeTitle: "Aparença",
+      searchEngineDetail: "Tria el cercador que s'obre des dels enllaços de fonts.",
+      searchEngineOptions: { bing: "Bing", duckduckgo: "DuckDuckGo", google: "Google" },
+      searchEngineTitle: "Cercador",
       title: "Preferències de l'app"
     },
     series: {
@@ -202,6 +224,9 @@ const profileLabels = {
       themeDetail: "Wähle, ob Series AV dem Systemdesign folgt oder auf diesem Gerät immer ein festes Theme verwendet.",
       themeOptions: { dark: "Dunkel", light: "Hell", system: "System" },
       themeTitle: "Darstellung",
+      searchEngineDetail: "Wähle die Suchmaschine für Quellen-Links.",
+      searchEngineOptions: { bing: "Bing", duckduckgo: "DuckDuckGo", google: "Google" },
+      searchEngineTitle: "Suchmaschine",
       title: "App-Einstellungen"
     },
     series: {
@@ -253,6 +278,9 @@ const profileLabels = {
       themeDetail: "Choose whether Series AV follows the system appearance or always uses a fixed theme on this device.",
       themeOptions: { dark: "Dark", light: "Light", system: "System" },
       themeTitle: "Appearance",
+      searchEngineDetail: "Choose the search engine opened by source links.",
+      searchEngineOptions: { bing: "Bing", duckduckgo: "DuckDuckGo", google: "Google" },
+      searchEngineTitle: "Search engine",
       title: "App preferences"
     },
     series: {
@@ -304,6 +332,9 @@ const profileLabels = {
       themeDetail: "Elige si Series AV sigue la apariencia del sistema o usa siempre un tema fijo en este dispositivo.",
       themeOptions: { dark: "Oscuro", light: "Claro", system: "Sistema" },
       themeTitle: "Apariencia",
+      searchEngineDetail: "Elige el buscador que se abre desde los enlaces de fuentes.",
+      searchEngineOptions: { bing: "Bing", duckduckgo: "DuckDuckGo", google: "Google" },
+      searchEngineTitle: "Buscador",
       title: "Preferencias de la app"
     },
     series: {
@@ -355,6 +386,9 @@ const profileLabels = {
       themeDetail: "Choisissez si Series AV suit l'apparence du système ou utilise toujours un thème fixe sur cet appareil.",
       themeOptions: { dark: "Sombre", light: "Clair", system: "Système" },
       themeTitle: "Apparence",
+      searchEngineDetail: "Choisissez le moteur utilisé par les liens de sources.",
+      searchEngineOptions: { bing: "Bing", duckduckgo: "DuckDuckGo", google: "Google" },
+      searchEngineTitle: "Moteur de recherche",
       title: "Préférences de l'app"
     },
     series: {
