@@ -62,6 +62,10 @@
 "detail.episodes.retryLater" = "The guide could not be loaded right now.";
 "detail.episodes.untitled" = "Episode";
 "detail.episodes.more" = "%d more episodes";
+"detail.sources.title" = "Sources";
+"detail.sources.thetvdb" = "TheTVDB";
+"detail.sources.imdb" = "IMDb";
+"detail.sources.web" = "Web search";
 "home.queue.title" = "Also watching";
 "home.queue.progress" = "%@ watched, %@ next";
 "home.queue.wantToWatch.title" = "Ready to start";
@@ -137,6 +141,15 @@
 "profile.preferences.theme.system" = "System";
 "profile.preferences.theme.light" = "Light";
 "profile.preferences.theme.dark" = "Dark";
+"profile.preferences.searchEngine.title" = "Search engine";
+"profile.preferences.searchEngine.detail" = "Choose the search engine opened by source links.";
+"profile.preferences.searchEngine.google" = "Google";
+"profile.preferences.searchEngine.duckduckgo" = "DuckDuckGo";
+"profile.preferences.searchEngine.bing" = "Bing";
+"profile.preferences.webOpenMode.title" = "Open links";
+"profile.preferences.webOpenMode.detail" = "Choose whether source links open inside Series AV or in the default browser.";
+"profile.preferences.webOpenMode.inApp" = "In app";
+"profile.preferences.webOpenMode.system" = "Browser";
 "profile.series.title" = "Series tracking";
 "profile.series.subtitle" = "One clear watching point per series.";
 "profile.series.cursor.title" = "Single progress point";

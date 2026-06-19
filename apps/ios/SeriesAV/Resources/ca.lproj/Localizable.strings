@@ -62,6 +62,10 @@
 "detail.episodes.retryLater" = "No s'ha pogut carregar la guia ara mateix.";
 "detail.episodes.untitled" = "Episodi";
 "detail.episodes.more" = "%d episodis mes";
+"detail.sources.title" = "Fonts";
+"detail.sources.thetvdb" = "TheTVDB";
+"detail.sources.imdb" = "IMDb";
+"detail.sources.web" = "Cerca web";
 "home.queue.title" = "Tambe veient";
 "home.queue.progress" = "%@ vist, %@ seguent";
 "home.queue.wantToWatch.title" = "A punt per comencar";
@@ -137,6 +141,15 @@
 "profile.preferences.theme.system" = "Sistema";
 "profile.preferences.theme.light" = "Clar";
 "profile.preferences.theme.dark" = "Fosc";
+"profile.preferences.searchEngine.title" = "Cercador";
+"profile.preferences.searchEngine.detail" = "Tria el cercador que s'obre des dels enllaços de fonts.";
+"profile.preferences.searchEngine.google" = "Google";
+"profile.preferences.searchEngine.duckduckgo" = "DuckDuckGo";
+"profile.preferences.searchEngine.bing" = "Bing";
+"profile.preferences.webOpenMode.title" = "Obrir enllaços";
+"profile.preferences.webOpenMode.detail" = "Tria si els enllaços de fonts s'obren dins de Series AV o al navegador per defecte.";
+"profile.preferences.webOpenMode.inApp" = "A l'app";
+"profile.preferences.webOpenMode.system" = "Navegador";
 "profile.series.title" = "Seguiment de series";
 "profile.series.subtitle" = "Un unic punt clar per serie.";
 "profile.series.cursor.title" = "Punt unic de progres";

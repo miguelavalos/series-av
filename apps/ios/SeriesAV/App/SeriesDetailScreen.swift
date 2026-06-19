@@ -1,9 +1,13 @@
 import AVAppShellFoundation
 import AVBrandFoundation
+import AVExternalLinkFoundation
+import SafariServices
 import SwiftUI
 
 struct SeriesDetailScreen: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    @EnvironmentObject private var externalLinkPreferences: AppExternalLinkPreferencesController
 
     let catalogItem: SeriesCatalogItem?
     let entry: SeriesLibraryEntry?
@@ -19,6 +23,7 @@ struct SeriesDetailScreen: View {
     @State private var guideState: SeriesDetailGuideState = .loading
     @State private var resolvedCatalogItem: SeriesCatalogItem?
     @State private var isShowingProgressEditor = false
+    @State private var inAppBrowserDestination: SeriesInAppBrowserDestination?
 
     init(
         catalogItem: SeriesCatalogItem? = nil,
@@ -47,6 +52,7 @@ struct SeriesDetailScreen: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     header
+                    sourcesSection
                     trackingSection
                     guideSection
                 }
@@ -82,6 +88,10 @@ struct SeriesDetailScreen: View {
                     )
                     .presentationDetents([.large])
                 }
+            }
+            .sheet(item: $inAppBrowserDestination) { destination in
+                SeriesInAppBrowserView(url: destination.url)
+                    .ignoresSafeArea()
             }
         }
     }
@@ -177,6 +187,27 @@ struct SeriesDetailScreen: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
+                }
+            }
+        }
+    }
+
+    private var sourcesSection: some View {
+        AVAppShellCard {
+            VStack(alignment: .leading, spacing: 12) {
+                sectionTitle(L10n.string("detail.sources.title"))
+
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 130), spacing: 10)], spacing: 10) {
+                    ForEach(sourceLinks) { source in
+                        Button {
+                            openSource(source.url)
+                        } label: {
+                            Label(source.title, systemImage: source.systemImage)
+                                .font(.system(size: 13, weight: .bold))
+                                .frame(maxWidth: .infinity, minHeight: 42)
+                        }
+                        .buttonStyle(.bordered)
+                    }
                 }
             }
         }
@@ -282,6 +313,52 @@ struct SeriesDetailScreen: View {
         catalogItem ?? resolvedCatalogItem
     }
 
+    private var externalSearchQuery: String {
+        [title, effectiveCatalogItem?.startYear.map(String.init)]
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { $0.isEmpty == false }
+            .joined(separator: " ")
+    }
+
+    private var sourceLinks: [SeriesExternalSourceLink] {
+        var links: [SeriesExternalSourceLink] = []
+
+        if let theTvdbId, let url = URL(string: "https://thetvdb.com/series/\(theTvdbId)") {
+            links.append(SeriesExternalSourceLink(
+                title: L10n.string("detail.sources.thetvdb"),
+                systemImage: "server.rack",
+                url: url
+            ))
+        }
+
+        if let imdbURL = AVExternalSearchURL.imdbSearch(query: externalSearchQuery) {
+            links.append(SeriesExternalSourceLink(
+                title: L10n.string("detail.sources.imdb"),
+                systemImage: "magnifyingglass",
+                url: imdbURL
+            ))
+        }
+
+        if let webURL = AVExternalSearchURL.webSearch(
+            query: "\(externalSearchQuery) series",
+            engine: externalLinkPreferences.searchEngine
+        ) {
+            links.append(SeriesExternalSourceLink(
+                title: L10n.string("detail.sources.web"),
+                systemImage: "safari",
+                url: webURL
+            ))
+        }
+
+        return links
+    }
+
+    private var theTvdbId: String? {
+        let normalizedSeriesId = seriesId.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard normalizedSeriesId.lowercased().hasPrefix("thetvdb:") else { return nil }
+        return String(normalizedSeriesId.dropFirst("thetvdb:".count))
+    }
+
     private var detailEntry: SeriesLibraryEntry? {
         guard var entry else {
             return nil
@@ -320,6 +397,15 @@ struct SeriesDetailScreen: View {
         }
     }
 
+    private func openSource(_ url: URL) {
+        switch externalLinkPreferences.webOpenMode {
+        case .inApp:
+            inAppBrowserDestination = SeriesInAppBrowserDestination(url: url)
+        case .system:
+            openURL(url)
+        }
+    }
+
     private func loadEpisodeGuide() async {
         guard seriesId.isEmpty == false else {
             guideState = .failed
@@ -350,6 +436,30 @@ struct SeriesDetailScreen: View {
             resolvedCatalogItem = nil
         }
     }
+}
+
+private struct SeriesExternalSourceLink: Identifiable {
+    let title: String
+    let systemImage: String
+    let url: URL
+
+    var id: URL { url }
+}
+
+private struct SeriesInAppBrowserDestination: Identifiable {
+    let url: URL
+
+    var id: URL { url }
+}
+
+private struct SeriesInAppBrowserView: UIViewControllerRepresentable {
+    let url: URL
+
+    func makeUIViewController(context: Context) -> SFSafariViewController {
+        SFSafariViewController(url: url)
+    }
+
+    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
 }
 
 private enum SeriesDetailGuideState {

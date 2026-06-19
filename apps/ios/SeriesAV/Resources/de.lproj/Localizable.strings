@@ -62,6 +62,10 @@
 "detail.episodes.retryLater" = "Der Guide konnte gerade nicht geladen werden.";
 "detail.episodes.untitled" = "Folge";
 "detail.episodes.more" = "%d weitere Folgen";
+"detail.sources.title" = "Quellen";
+"detail.sources.thetvdb" = "TheTVDB";
+"detail.sources.imdb" = "IMDb";
+"detail.sources.web" = "Websuche";
 "home.queue.title" = "Auch aktuell";
 "home.queue.progress" = "%@ gesehen, %@ als naechstes";
 "home.queue.wantToWatch.title" = "Bereit zum Start";
@@ -137,6 +141,15 @@
 "profile.preferences.theme.system" = "System";
 "profile.preferences.theme.light" = "Hell";
 "profile.preferences.theme.dark" = "Dunkel";
+"profile.preferences.searchEngine.title" = "Suchmaschine";
+"profile.preferences.searchEngine.detail" = "Wähle die Suchmaschine für Quellen-Links.";
+"profile.preferences.searchEngine.google" = "Google";
+"profile.preferences.searchEngine.duckduckgo" = "DuckDuckGo";
+"profile.preferences.searchEngine.bing" = "Bing";
+"profile.preferences.webOpenMode.title" = "Links öffnen";
+"profile.preferences.webOpenMode.detail" = "Wähle, ob Quellen-Links in Series AV oder im Standardbrowser geöffnet werden.";
+"profile.preferences.webOpenMode.inApp" = "In App";
+"profile.preferences.webOpenMode.system" = "Browser";
 "profile.series.title" = "Serien-Tracking";
 "profile.series.subtitle" = "Ein klarer Fortschrittspunkt pro Serie.";
 "profile.series.cursor.title" = "Ein Fortschrittspunkt";

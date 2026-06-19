@@ -1,4 +1,5 @@
 import Foundation
+import AVExternalLinkFoundation
 import SwiftUI
 
 enum AppLanguage: String, CaseIterable, Identifiable {
@@ -146,5 +147,40 @@ final class AppThemeController: ObservableObject {
         guard currentTheme != theme else { return }
         currentTheme = theme
         userDefaults.set(theme.rawValue, forKey: userDefaultsKey)
+    }
+}
+
+final class AppExternalLinkPreferencesController: ObservableObject {
+    @Published private(set) var searchEngine: AVExternalSearchEngine
+    @Published private(set) var webOpenMode: AVExternalWebOpenMode
+
+    private let userDefaults: UserDefaults
+    private let searchEngineKey = "seriesav.externalSearchEngine"
+    private let webOpenModeKey = "seriesav.externalWebOpenMode"
+
+    init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
+        searchEngine = AVExternalSearchEngine.resolved(from: userDefaults.string(forKey: searchEngineKey))
+        webOpenMode = AVExternalWebOpenMode.resolved(from: userDefaults.string(forKey: webOpenModeKey))
+    }
+
+    func selectSearchEngine(_ engine: AVExternalSearchEngine) {
+        guard searchEngine != engine else { return }
+        searchEngine = engine
+        if engine == .google {
+            userDefaults.removeObject(forKey: searchEngineKey)
+        } else {
+            userDefaults.set(engine.rawValue, forKey: searchEngineKey)
+        }
+    }
+
+    func selectWebOpenMode(_ mode: AVExternalWebOpenMode) {
+        guard webOpenMode != mode else { return }
+        webOpenMode = mode
+        if mode == .inApp {
+            userDefaults.removeObject(forKey: webOpenModeKey)
+        } else {
+            userDefaults.set(mode.rawValue, forKey: webOpenModeKey)
+        }
     }
 }

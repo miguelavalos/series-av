@@ -59,6 +59,8 @@ targets:
       - package: AppsAV
         product: AVSettingsFoundation
       - package: AppsAV
+        product: AVExternalLinkFoundation
+      - package: AppsAV
         product: AVPaywallFoundation
       - package: AppsAV
         product: AVProductAccountFoundation

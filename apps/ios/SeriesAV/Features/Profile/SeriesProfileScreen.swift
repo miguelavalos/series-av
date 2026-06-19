@@ -1,5 +1,6 @@
 import AVAppShellFoundation
 import AVBrandFoundation
+import AVExternalLinkFoundation
 import AVSettingsFoundation
 import SwiftUI
 
@@ -15,6 +16,7 @@ struct SeriesProfileScreen: View {
 
     @EnvironmentObject private var languageController: AppLanguageController
     @EnvironmentObject private var themeController: AppThemeController
+    @EnvironmentObject private var externalLinkPreferences: AppExternalLinkPreferencesController
     @Environment(\.avCommonAppExperience) private var appExperience
     @Environment(\.openURL) private var openURL
     @State private var isSigningOut = false
@@ -127,6 +129,22 @@ struct SeriesProfileScreen: View {
             )
 
             themeSelector
+
+            AVSettingsInfoRow(
+                systemImage: "magnifyingglass",
+                title: L10n.string("profile.preferences.searchEngine.title"),
+                detail: L10n.string("profile.preferences.searchEngine.detail")
+            )
+
+            searchEngineSelector
+
+            AVSettingsInfoRow(
+                systemImage: "safari",
+                title: L10n.string("profile.preferences.webOpenMode.title"),
+                detail: L10n.string("profile.preferences.webOpenMode.detail")
+            )
+
+            webOpenModeSelector
         }
     }
 
@@ -423,6 +441,32 @@ struct SeriesProfileScreen: View {
         }
     }
 
+    private var searchEngineSelector: some View {
+        HStack(spacing: 10) {
+            ForEach(AVExternalSearchEngine.allCases) { engine in
+                AVSettingsOptionButton(
+                    title: searchEngineLabel(for: engine),
+                    systemImage: searchEngineSymbol(for: engine),
+                    isSelected: externalLinkPreferences.searchEngine == engine,
+                    action: { externalLinkPreferences.selectSearchEngine(engine) }
+                )
+            }
+        }
+    }
+
+    private var webOpenModeSelector: some View {
+        HStack(spacing: 10) {
+            ForEach(AVExternalWebOpenMode.allCases) { mode in
+                AVSettingsOptionButton(
+                    title: webOpenModeLabel(for: mode),
+                    systemImage: webOpenModeSymbol(for: mode),
+                    isSelected: externalLinkPreferences.webOpenMode == mode,
+                    action: { externalLinkPreferences.selectWebOpenMode(mode) }
+                )
+            }
+        }
+    }
+
     private var accountIdentityDetail: String {
         if accessController.isSignedIn {
             return accessController.accountUser?.emailAddress
@@ -531,6 +575,36 @@ struct SeriesProfileScreen: View {
         case .system: "iphone"
         case .light: "sun.max"
         case .dark: "moon"
+        }
+    }
+
+    private func searchEngineLabel(for engine: AVExternalSearchEngine) -> String {
+        switch engine {
+        case .google: L10n.string("profile.preferences.searchEngine.google")
+        case .duckDuckGo: L10n.string("profile.preferences.searchEngine.duckduckgo")
+        case .bing: L10n.string("profile.preferences.searchEngine.bing")
+        }
+    }
+
+    private func searchEngineSymbol(for engine: AVExternalSearchEngine) -> String {
+        switch engine {
+        case .google: "g.circle"
+        case .duckDuckGo: "magnifyingglass.circle"
+        case .bing: "b.circle"
+        }
+    }
+
+    private func webOpenModeLabel(for mode: AVExternalWebOpenMode) -> String {
+        switch mode {
+        case .inApp: L10n.string("profile.preferences.webOpenMode.inApp")
+        case .system: L10n.string("profile.preferences.webOpenMode.system")
+        }
+    }
+
+    private func webOpenModeSymbol(for mode: AVExternalWebOpenMode) -> String {
+        switch mode {
+        case .inApp: "app"
+        case .system: "safari"
         }
     }
 
