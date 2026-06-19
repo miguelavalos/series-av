@@ -61,6 +61,7 @@ function SeriesDetailRoute() {
     ? detailCatalog
     : (fallbackCatalog.data?.results.find((result) => (result.seriesId ?? result.id).trim().toLocaleLowerCase() === seriesId.trim().toLocaleLowerCase()) ?? detailCatalog);
   const hasCatalogTitle = !isPlaceholderCatalogTitle(catalog?.title, seriesId);
+  const isCatalogResolving = !hasCatalogTitle && (!accountSession.isLoaded || detail.isLoading || fallbackCatalog.isLoading);
   const episodes = useQuery({
     queryFn: () =>
       client.episodes({
@@ -121,77 +122,81 @@ function SeriesDetailRoute() {
               ) : null}
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[13.5rem_minmax(0,1fr)]">
-              <SeriesArtwork entry={artwork} size="xl" />
-              <div className="min-w-0">
-                <div className="max-w-4xl">
-                  <h1 className="text-3xl font-semibold leading-tight text-[#112a55] sm:text-4xl">{title}</h1>
-                  <p className="mt-3 text-sm font-semibold text-[#5a8f2f]">
-                    {catalog?.startYear ?? catalog?.firstAirDate ?? text.search.dateUnknown}
-                    {catalog?.genres?.length ? ` · ${catalog.genres.slice(0, 3).join(" · ")}` : ""}
-                  </p>
-                  {detail.isError ? <p className="mt-3 text-sm font-semibold text-[#b15b22]">{labels.detailUnavailable}</p> : null}
-                  <p className="mt-4 text-base leading-7 text-[#334766]">{catalog?.summary ?? catalog?.overview ?? text.search.noOverview}</p>
-                </div>
-
-                {sourceLinks.length > 0 ? (
-                  <div className="mt-5 rounded-lg border border-[#d7c494] bg-white/45 p-4">
-                    <p className="text-sm font-bold text-[#112a55]">{labels.sourcesTitle}</p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {sourceLinks.map((source) => (
-                        <a
-                          key={source.href}
-                          className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[#c8ad72] bg-[#fff8df]/80 px-4 text-sm font-bold text-[#112a55] hover:bg-white"
-                          href={source.href}
-                          rel="noreferrer"
-                          target="_blank"
-                        >
-                          {source.icon}
-                          {source.label}
-                          <ExternalLink className="size-3.5" aria-hidden="true" />
-                        </a>
-                      ))}
-                    </div>
+            {isCatalogResolving ? (
+              <SeriesDetailHeroSkeleton />
+            ) : (
+              <div className="grid gap-6 lg:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[13.5rem_minmax(0,1fr)]">
+                <SeriesArtwork entry={artwork} size="xl" />
+                <div className="min-w-0">
+                  <div className="max-w-4xl">
+                    <h1 className="text-3xl font-semibold leading-tight text-[#112a55] sm:text-4xl">{title}</h1>
+                    <p className="mt-3 text-sm font-semibold text-[#5a8f2f]">
+                      {catalog?.startYear ?? catalog?.firstAirDate ?? text.search.dateUnknown}
+                      {catalog?.genres?.length ? ` · ${catalog.genres.slice(0, 3).join(" · ")}` : ""}
+                    </p>
+                    {detail.isError ? <p className="mt-3 text-sm font-semibold text-[#b15b22]">{labels.detailUnavailable}</p> : null}
+                    <p className="mt-4 text-base leading-7 text-[#334766]">{catalog?.summary ?? catalog?.overview ?? text.search.noOverview}</p>
                   </div>
-                ) : null}
 
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {entry ? (
-                    <>
-                      <Button className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" onClick={() => library.markNextEpisodeWatched(entry.entryId)}>
-                        <StepForward className="size-4" /> {labels.markNext} {cursorLabel(nextEpisodeCursor(entry.lastWatchedEpisodeCursor))}
+                  {sourceLinks.length > 0 ? (
+                    <div className="mt-5 rounded-lg border border-[#d7c494] bg-white/45 p-4">
+                      <p className="text-sm font-bold text-[#112a55]">{labels.sourcesTitle}</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {sourceLinks.map((source) => (
+                          <a
+                            key={source.href}
+                            className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[#c8ad72] bg-[#fff8df]/80 px-4 text-sm font-bold text-[#112a55] hover:bg-white"
+                            href={source.href}
+                            rel="noreferrer"
+                            target="_blank"
+                          >
+                            {source.icon}
+                            {source.label}
+                            <ExternalLink className="size-3.5" aria-hidden="true" />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {entry ? (
+                      <>
+                        <Button className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" onClick={() => library.markNextEpisodeWatched(entry.entryId)}>
+                          <StepForward className="size-4" /> {labels.markNext} {cursorLabel(nextEpisodeCursor(entry.lastWatchedEpisodeCursor))}
+                        </Button>
+                        {entry.lastWatchedEpisodeCursor ? (
+                          <>
+                            <Button variant="outline" className="rounded-full border-[#c8ad72] bg-white/60" onClick={() => library.markPreviousEpisodeWatched(entry.entryId)}>
+                              <StepBack className="size-4" /> {libraryLabels.previous}
+                            </Button>
+                            <Button variant="ghost" className="rounded-full text-[#112a55]" onClick={() => library.clearProgress(entry.entryId)}>
+                              <RotateCcw className="size-4" /> {libraryLabels.clear}
+                            </Button>
+                          </>
+                        ) : null}
+                        <StatusButtons entry={entry} locale={locale} />
+                      </>
+                    ) : (
+                      <Button
+                        className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]"
+                        disabled={!library.canAddSeries}
+                        onClick={() =>
+                          library.addCatalogSeries({
+                            displayArtworkRef: catalogArtworkRef,
+                            fallbackVisualSeed: title,
+                            seriesId,
+                            title
+                          })
+                        }
+                      >
+                        <Plus className="size-4" /> {library.canAddSeries ? labels.follow : labels.limitReached}
                       </Button>
-                      {entry.lastWatchedEpisodeCursor ? (
-                        <>
-                          <Button variant="outline" className="rounded-full border-[#c8ad72] bg-white/60" onClick={() => library.markPreviousEpisodeWatched(entry.entryId)}>
-                            <StepBack className="size-4" /> {libraryLabels.previous}
-                          </Button>
-                          <Button variant="ghost" className="rounded-full text-[#112a55]" onClick={() => library.clearProgress(entry.entryId)}>
-                            <RotateCcw className="size-4" /> {libraryLabels.clear}
-                          </Button>
-                        </>
-                      ) : null}
-                      <StatusButtons entry={entry} locale={locale} />
-                    </>
-                  ) : (
-                    <Button
-                      className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]"
-                      disabled={!library.canAddSeries}
-                      onClick={() =>
-                        library.addCatalogSeries({
-                          displayArtworkRef: catalogArtworkRef,
-                          fallbackVisualSeed: title,
-                          seriesId,
-                          title
-                        })
-                      }
-                    >
-                      <Plus className="size-4" /> {library.canAddSeries ? labels.follow : labels.limitReached}
-                    </Button>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </Card>
 
           <Card className="gap-4 rounded-lg border-[#d7c494] bg-[#fff8df]/88 p-5 py-5 text-[#112a55] shadow-sm shadow-[#172f5c]/6 sm:p-6">
@@ -339,6 +344,40 @@ function EpisodeGuide({
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+function SeriesDetailHeroSkeleton() {
+  return (
+    <div className="grid gap-6 lg:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[13.5rem_minmax(0,1fr)]" aria-hidden="true">
+      <div className="h-[18rem] w-full max-w-48 animate-pulse rounded-lg bg-[#ead6a5]/80 lg:max-w-none" />
+      <div className="min-w-0">
+        <div className="max-w-4xl">
+          <div className="h-10 w-72 max-w-full animate-pulse rounded-full bg-[#ead6a5]/80 sm:h-11 sm:w-96" />
+          <div className="mt-4 h-4 w-36 animate-pulse rounded-full bg-[#d8c27d]/70" />
+          <div className="mt-6 grid gap-3">
+            <div className="h-4 w-full max-w-3xl animate-pulse rounded-full bg-[#ead6a5]/70" />
+            <div className="h-4 w-full max-w-2xl animate-pulse rounded-full bg-[#ead6a5]/60" />
+            <div className="h-4 w-3/5 max-w-xl animate-pulse rounded-full bg-[#ead6a5]/50" />
+          </div>
+        </div>
+
+        <div className="mt-5 rounded-lg border border-[#d7c494] bg-white/35 p-4">
+          <div className="h-4 w-20 animate-pulse rounded-full bg-[#d8c27d]/70" />
+          <div className="mt-3 flex flex-wrap gap-2">
+            <div className="h-10 w-28 animate-pulse rounded-full bg-[#ead6a5]/70" />
+            <div className="h-10 w-24 animate-pulse rounded-full bg-[#ead6a5]/60" />
+            <div className="h-10 w-36 animate-pulse rounded-full bg-[#ead6a5]/50" />
+          </div>
+        </div>
+
+        <div className="mt-6 flex flex-wrap gap-2">
+          <div className="h-10 w-36 animate-pulse rounded-full bg-[#112a55]/25" />
+          <div className="h-10 w-28 animate-pulse rounded-full bg-white/45" />
+          <div className="h-10 w-24 animate-pulse rounded-full bg-white/35" />
+        </div>
       </div>
     </div>
   );
