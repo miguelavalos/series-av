@@ -2,7 +2,7 @@ import { ErrorState, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { useAccountToken } from "@avalsys/account-av-web";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, CheckCircle2, Plus, RotateCcw, StepBack, StepForward } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight, Plus, RotateCcw, StepBack, StepForward } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { SeriesAppShell } from "@/components/series-app-shell";
@@ -205,33 +205,70 @@ function EpisodeGuide({
 
   const selectedEpisodes = guide.itemsBySeason.get(selectedSeason) ?? [];
   const progress = entry?.lastWatchedEpisodeCursor ?? null;
+  const selectedSeasonIndex = guide.seasons.indexOf(selectedSeason);
+  const previousSeason = selectedSeasonIndex > 0 ? guide.seasons[selectedSeasonIndex - 1] : null;
+  const nextSeason = selectedSeasonIndex >= 0 && selectedSeasonIndex < guide.seasons.length - 1 ? guide.seasons[selectedSeasonIndex + 1] : null;
+  const episodeCount = selectedEpisodes.length;
 
   return (
     <div className="grid gap-4">
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {guide.seasons.map((season) => (
-          <button
-            key={season}
-            type="button"
-            className={
-              selectedSeason === season
-                ? "min-h-10 shrink-0 rounded-lg bg-[#112a55] px-4 text-sm font-bold text-white"
-                : "min-h-10 shrink-0 rounded-lg border border-[#d7c494] bg-white/60 px-4 text-sm font-bold text-[#112a55]"
-            }
-            onClick={() => setSelectedSeason(season)}
-          >
-            {labels.seasonShort} {season}
-          </button>
-        ))}
-      </div>
+      <div className="rounded-lg border border-[#d7c494] bg-white/55 p-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-base font-bold text-[#112a55]">
+              {labels.season} {selectedSeason}
+              <span className="ml-2 text-sm font-semibold text-[#53617a]">
+                · {episodeCount} {episodeCount === 1 ? labels.episodeSingular : labels.episodePlural}
+              </span>
+            </p>
+            <p className="mt-1 text-sm font-semibold text-[#53617a]">
+              {entry ? `${labels.watchedThrough}: ${progress ? cursorLabel(progress) : libraryLabels.notStarted}` : labels.followToTrack}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              className="rounded-full border-[#c8ad72] bg-[#fff8df]/80"
+              disabled={!previousSeason}
+              aria-label={labels.previousSeason}
+              onClick={() => previousSeason && setSelectedSeason(previousSeason)}
+            >
+              <ChevronLeft className="size-4" />
+            </Button>
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              className="rounded-full border-[#c8ad72] bg-[#fff8df]/80"
+              disabled={!nextSeason}
+              aria-label={labels.nextSeason}
+              onClick={() => nextSeason && setSelectedSeason(nextSeason)}
+            >
+              <ChevronRight className="size-4" />
+            </Button>
+          </div>
+        </div>
 
-      {entry ? (
-        <p className="text-sm font-semibold text-[#53617a]">
-          {labels.watchedThrough}: {progress ? cursorLabel(progress) : libraryLabels.notStarted}
-        </p>
-      ) : (
-        <p className="text-sm font-semibold text-[#53617a]">{labels.followToTrack}</p>
-      )}
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] sm:flex-wrap sm:overflow-visible [&::-webkit-scrollbar]:hidden">
+          {guide.seasons.map((season) => (
+            <button
+              key={season}
+              type="button"
+              aria-current={selectedSeason === season ? "true" : undefined}
+              className={
+                selectedSeason === season
+                  ? "min-h-10 shrink-0 rounded-lg bg-[#112a55] px-4 text-sm font-bold text-white shadow-sm shadow-[#172f5c]/15"
+                  : "min-h-10 shrink-0 rounded-lg border border-[#d7c494] bg-white/70 px-4 text-sm font-bold text-[#112a55] hover:bg-white"
+              }
+              onClick={() => setSelectedSeason(season)}
+            >
+              {labels.seasonShort} {season}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
         {selectedEpisodes.map((episode) => {
@@ -293,6 +330,8 @@ const detailLabels = {
   ca: {
     episodeGuide: "Guia d'episodis",
     detailUnavailable: "Detall de catàleg no disponible",
+    episodePlural: "episodis",
+    episodeSingular: "episodi",
     episodesUnavailable: "Episodis no disponibles",
     followToTrack: "Segueix la sèrie per marcar progrés per episodi.",
     follow: "Seguir",
@@ -300,13 +339,18 @@ const detailLabels = {
     markNext: "Marcar següent",
     markWatchedThrough: "Marcar fins a",
     nextEpisode: "Següent",
+    nextSeason: "Temporada següent",
     noGuide: "Encara no hi ha guia compacta.",
+    previousSeason: "Temporada anterior",
+    season: "Temporada",
     seasonShort: "T",
     watchedThrough: "Vist fins a"
   },
   de: {
     episodeGuide: "Folgenübersicht",
     detailUnavailable: "Katalogdetail nicht verfügbar",
+    episodePlural: "Folgen",
+    episodeSingular: "Folge",
     episodesUnavailable: "Folgen nicht verfügbar",
     followToTrack: "Folge der Serie, um den Fortschritt pro Folge zu markieren.",
     follow: "Folgen",
@@ -314,13 +358,18 @@ const detailLabels = {
     markNext: "Nächste markieren",
     markWatchedThrough: "Gesehen bis",
     nextEpisode: "Nächste",
+    nextSeason: "Nächste Staffel",
     noGuide: "Noch keine kompakte Übersicht verfügbar.",
+    previousSeason: "Vorherige Staffel",
+    season: "Staffel",
     seasonShort: "S",
     watchedThrough: "Gesehen bis"
   },
   en: {
     episodeGuide: "Episode guide",
     detailUnavailable: "Catalog detail unavailable",
+    episodePlural: "episodes",
+    episodeSingular: "episode",
     episodesUnavailable: "Episodes unavailable",
     followToTrack: "Follow this series to mark episode progress.",
     follow: "Follow",
@@ -328,13 +377,18 @@ const detailLabels = {
     markNext: "Mark next",
     markWatchedThrough: "Watched through",
     nextEpisode: "Next",
+    nextSeason: "Next season",
     noGuide: "No compact guide is available yet.",
+    previousSeason: "Previous season",
+    season: "Season",
     seasonShort: "S",
     watchedThrough: "Watched through"
   },
   es: {
     episodeGuide: "Guía de episodios",
     detailUnavailable: "Detalle de catálogo no disponible",
+    episodePlural: "episodios",
+    episodeSingular: "episodio",
     episodesUnavailable: "Episodios no disponibles",
     followToTrack: "Sigue esta serie para marcar el progreso por episodio.",
     follow: "Seguir",
@@ -342,13 +396,18 @@ const detailLabels = {
     markNext: "Marcar siguiente",
     markWatchedThrough: "Visto hasta",
     nextEpisode: "Siguiente",
+    nextSeason: "Temporada siguiente",
     noGuide: "Todavía no hay guía compacta.",
+    previousSeason: "Temporada anterior",
+    season: "Temporada",
     seasonShort: "T",
     watchedThrough: "Visto hasta"
   },
   fr: {
     episodeGuide: "Guide des épisodes",
     detailUnavailable: "Détail du catalogue indisponible",
+    episodePlural: "épisodes",
+    episodeSingular: "épisode",
     episodesUnavailable: "Épisodes indisponibles",
     followToTrack: "Suivez cette série pour marquer la progression par épisode.",
     follow: "Suivre",
@@ -356,7 +415,10 @@ const detailLabels = {
     markNext: "Marquer la suite",
     markWatchedThrough: "Vu jusqu'à",
     nextEpisode: "Suivant",
+    nextSeason: "Saison suivante",
     noGuide: "Aucun guide compact pour le moment.",
+    previousSeason: "Saison précédente",
+    season: "Saison",
     seasonShort: "S",
     watchedThrough: "Vu jusqu'à"
   }

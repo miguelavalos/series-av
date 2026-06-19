@@ -5,6 +5,7 @@ import { Calendar, Check, Plus, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { SeriesEntryRow } from "@/components/series-library-ui";
 import { SeriesApiClient, rememberSeriesCatalogItem, type SeriesSearchResult } from "@/lib/series-api-client";
 import { getSeriesApiBaseUrl } from "@/lib/series-config";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
@@ -65,13 +66,7 @@ export function SeriesSearch() {
           <h2 className="mb-3 text-sm font-bold uppercase text-[#53617a]">{labels.inLibrary}</h2>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {localMatches.map((entry) => (
-              <Card key={entry.entryId} className="gap-3 rounded-lg border-[#d7c494] bg-[#fff8df] p-4 py-4">
-                <h3 className="font-semibold text-[#112a55]">{entry.title}</h3>
-                <p className="text-sm text-[#53617a]">{entry.status}</p>
-                <Button asChild size="sm" variant="outline" className="rounded-full border-[#c8ad72] bg-white/60">
-                  <Link to={localizedSeriesPath(`/series/${encodeURIComponent(entry.seriesId)}`, locale)}>{labels.detail}</Link>
-                </Button>
-              </Card>
+              <SeriesEntryRow key={entry.entryId} entry={entry} locale={locale} showArchive={false} />
             ))}
           </div>
         </section>
