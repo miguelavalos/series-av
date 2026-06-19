@@ -323,19 +323,19 @@ struct SeriesDetailScreen: View {
     private var sourceLinks: [SeriesExternalSourceLink] {
         var links: [SeriesExternalSourceLink] = []
 
-        if let theTvdbId, let url = URL(string: "https://thetvdb.com/series/\(theTvdbId)") {
-            links.append(SeriesExternalSourceLink(
-                title: L10n.string("detail.sources.thetvdb"),
-                systemImage: "server.rack",
-                url: url
-            ))
-        }
-
-        if let imdbURL = AVExternalSearchURL.imdbSearch(query: externalSearchQuery) {
+        if let imdbURL = enrichedExternalLinkURL(kind: "imdb") ?? AVExternalSearchURL.imdbSearch(query: externalSearchQuery) {
             links.append(SeriesExternalSourceLink(
                 title: L10n.string("detail.sources.imdb"),
                 systemImage: "magnifyingglass",
                 url: imdbURL
+            ))
+        }
+
+        if let wikipediaURL = enrichedExternalLinkURL(kind: "wikipedia") ?? wikipediaSearchURL(query: externalSearchQuery) {
+            links.append(SeriesExternalSourceLink(
+                title: L10n.string("detail.sources.wikipedia"),
+                systemImage: "book",
+                url: wikipediaURL
             ))
         }
 
@@ -353,10 +353,18 @@ struct SeriesDetailScreen: View {
         return links
     }
 
-    private var theTvdbId: String? {
-        let normalizedSeriesId = seriesId.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard normalizedSeriesId.lowercased().hasPrefix("thetvdb:") else { return nil }
-        return String(normalizedSeriesId.dropFirst("thetvdb:".count))
+    private func enrichedExternalLinkURL(kind: String) -> URL? {
+        effectiveCatalogItem?.externalLinks?.first { link in
+            link.kind.caseInsensitiveCompare(kind) == .orderedSame
+        }?.url
+    }
+
+    private func wikipediaSearchURL(query: String) -> URL? {
+        let normalizedQuery = AVExternalSearchURL.normalizedQuery(query)
+        guard normalizedQuery.isEmpty == false else { return nil }
+        var components = URLComponents(string: "https://www.wikipedia.org/search-redirect.php")
+        components?.queryItems = [URLQueryItem(name: "search", value: normalizedQuery)]
+        return components?.url
     }
 
     private var detailEntry: SeriesLibraryEntry? {

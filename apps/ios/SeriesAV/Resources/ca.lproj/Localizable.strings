@@ -65,6 +65,7 @@
 "detail.sources.title" = "Fonts";
 "detail.sources.thetvdb" = "TheTVDB";
 "detail.sources.imdb" = "IMDb";
+"detail.sources.wikipedia" = "Viquipèdia";
 "detail.sources.web" = "Cerca web";
 "home.queue.title" = "Tambe veient";
 "home.queue.progress" = "%@ vist, %@ seguent";
@@ -146,6 +147,13 @@
 "profile.preferences.searchEngine.google" = "Google";
 "profile.preferences.searchEngine.duckduckgo" = "DuckDuckGo";
 "profile.preferences.searchEngine.bing" = "Bing";
+"profile.preferences.searchEngine.yahoo" = "Yahoo";
+"profile.preferences.searchEngine.yandex" = "Yandex";
+"profile.preferences.searchEngine.baidu" = "Baidu";
+"profile.preferences.searchEngine.brave" = "Brave Search";
+"profile.preferences.searchEngine.ecosia" = "Ecosia";
+"profile.preferences.searchEngine.startpage" = "Startpage";
+"profile.preferences.searchEngine.qwant" = "Qwant";
 "profile.preferences.webOpenMode.title" = "Obrir enllaços";
 "profile.preferences.webOpenMode.detail" = "Tria si els enllaços de fonts s'obren dins de Series AV o al navegador per defecte.";
 "profile.preferences.webOpenMode.inApp" = "A l'app";

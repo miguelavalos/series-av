@@ -13,6 +13,12 @@ struct SeriesProviderRef: Codable, Equatable, Hashable, Sendable {
     var isPrimary: Bool?
 }
 
+struct SeriesExternalLink: Codable, Equatable, Hashable, Sendable {
+    var kind: String
+    var label: String
+    var url: URL
+}
+
 struct SeriesEpisodeCursor: Codable, Equatable, Hashable, Comparable, Sendable {
     var seasonNumber: Int
     var episodeNumber: Int
@@ -160,6 +166,7 @@ struct SeriesCatalogItem: Codable, Identifiable, Equatable, Sendable {
     var visibility: String
     var enrichmentStatus: String
     var artworkStatus: String
+    var externalLinks: [SeriesExternalLink]?
     var metadataUpdatedAt: Date?
 
     var id: String { seriesId }

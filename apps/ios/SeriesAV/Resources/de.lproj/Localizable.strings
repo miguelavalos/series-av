@@ -65,6 +65,7 @@
 "detail.sources.title" = "Quellen";
 "detail.sources.thetvdb" = "TheTVDB";
 "detail.sources.imdb" = "IMDb";
+"detail.sources.wikipedia" = "Wikipedia";
 "detail.sources.web" = "Websuche";
 "home.queue.title" = "Auch aktuell";
 "home.queue.progress" = "%@ gesehen, %@ als naechstes";
@@ -146,6 +147,13 @@
 "profile.preferences.searchEngine.google" = "Google";
 "profile.preferences.searchEngine.duckduckgo" = "DuckDuckGo";
 "profile.preferences.searchEngine.bing" = "Bing";
+"profile.preferences.searchEngine.yahoo" = "Yahoo";
+"profile.preferences.searchEngine.yandex" = "Yandex";
+"profile.preferences.searchEngine.baidu" = "Baidu";
+"profile.preferences.searchEngine.brave" = "Brave Search";
+"profile.preferences.searchEngine.ecosia" = "Ecosia";
+"profile.preferences.searchEngine.startpage" = "Startpage";
+"profile.preferences.searchEngine.qwant" = "Qwant";
 "profile.preferences.webOpenMode.title" = "Links öffnen";
 "profile.preferences.webOpenMode.detail" = "Wähle, ob Quellen-Links in Series AV oder im Standardbrowser geöffnet werden.";
 "profile.preferences.webOpenMode.inApp" = "In App";

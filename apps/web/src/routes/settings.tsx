@@ -6,6 +6,7 @@ import {
   SettingsSectionCard,
   useAppsAvLocale,
   appsAvLocaleNames,
+  appsAvExternalSearchEngines,
   type AppsAvExternalSearchEngine,
   type AppsAvLocale
 } from "@avalsys/apps-av-web";
@@ -84,14 +85,20 @@ function SettingsRoute() {
               }))}
             />
             <SettingsInfoRow icon={<Search className="size-5" />} title={labels.preferences.searchEngineTitle} detail={labels.preferences.searchEngineDetail} />
-            <SettingsOptionButtonGroup
-              selectedId={searchEngine}
-              onSelect={(id) => setSearchEngine(id as AppsAvExternalSearchEngine)}
-              options={seriesSearchEngines.map((item) => ({
-                id: item,
-                label: labels.preferences.searchEngineOptions[item]
-              }))}
-            />
+            <label className="grid gap-2">
+              <span className="sr-only">{labels.preferences.searchEngineTitle}</span>
+              <select
+                className="h-12 w-full rounded-lg border border-[#d7c494] bg-[#fff8df]/80 px-4 text-sm font-semibold text-[#112a55] outline-none transition focus:border-[#112a55] focus:ring-2 focus:ring-[#112a55]/20"
+                value={searchEngine}
+                onChange={(event) => setSearchEngine(event.target.value as AppsAvExternalSearchEngine)}
+              >
+                {appsAvExternalSearchEngines.map((engine) => (
+                  <option key={engine} value={engine}>
+                    {labels.preferences.searchEngineOptions[engine]}
+                  </option>
+                ))}
+              </select>
+            </label>
           </SettingsSectionCard>
 
           <SettingsSectionCard title={labels.series.title} subtitle={labels.series.subtitle}>
@@ -121,7 +128,19 @@ function SettingsRoute() {
 const locales: AppsAvLocale[] = ["en", "es", "fr", "de", "ca"];
 const themeStorageKey = "series-av.theme";
 const themeOptions: AppsAvThemePreference[] = ["system", "light", "dark"];
-const seriesSearchEngines = ["google", "duckduckgo", "bing"] as const satisfies readonly AppsAvExternalSearchEngine[];
+
+const externalSearchEngineLabels: Record<AppsAvExternalSearchEngine, string> = {
+  baidu: "Baidu",
+  bing: "Bing",
+  brave: "Brave Search",
+  duckduckgo: "DuckDuckGo",
+  ecosia: "Ecosia",
+  google: "Google",
+  qwant: "Qwant",
+  startpage: "Startpage",
+  yahoo: "Yahoo",
+  yandex: "Yandex"
+};
 
 function themeIcon(theme: AppsAvThemePreference) {
   if (theme === "light") {
@@ -171,7 +190,7 @@ const profileLabels = {
       themeOptions: { dark: "Fosc", light: "Clar", system: "Sistema" },
       themeTitle: "Aparença",
       searchEngineDetail: "Tria el cercador que s'obre des dels enllaços de fonts.",
-      searchEngineOptions: { bing: "Bing", duckduckgo: "DuckDuckGo", google: "Google" },
+      searchEngineOptions: externalSearchEngineLabels,
       searchEngineTitle: "Cercador",
       title: "Preferències de l'app"
     },
@@ -225,7 +244,7 @@ const profileLabels = {
       themeOptions: { dark: "Dunkel", light: "Hell", system: "System" },
       themeTitle: "Darstellung",
       searchEngineDetail: "Wähle die Suchmaschine für Quellen-Links.",
-      searchEngineOptions: { bing: "Bing", duckduckgo: "DuckDuckGo", google: "Google" },
+      searchEngineOptions: externalSearchEngineLabels,
       searchEngineTitle: "Suchmaschine",
       title: "App-Einstellungen"
     },
@@ -279,7 +298,7 @@ const profileLabels = {
       themeOptions: { dark: "Dark", light: "Light", system: "System" },
       themeTitle: "Appearance",
       searchEngineDetail: "Choose the search engine opened by source links.",
-      searchEngineOptions: { bing: "Bing", duckduckgo: "DuckDuckGo", google: "Google" },
+      searchEngineOptions: externalSearchEngineLabels,
       searchEngineTitle: "Search engine",
       title: "App preferences"
     },
@@ -333,7 +352,7 @@ const profileLabels = {
       themeOptions: { dark: "Oscuro", light: "Claro", system: "Sistema" },
       themeTitle: "Apariencia",
       searchEngineDetail: "Elige el buscador que se abre desde los enlaces de fuentes.",
-      searchEngineOptions: { bing: "Bing", duckduckgo: "DuckDuckGo", google: "Google" },
+      searchEngineOptions: externalSearchEngineLabels,
       searchEngineTitle: "Buscador",
       title: "Preferencias de la app"
     },
@@ -387,7 +406,7 @@ const profileLabels = {
       themeOptions: { dark: "Sombre", light: "Clair", system: "Système" },
       themeTitle: "Apparence",
       searchEngineDetail: "Choisissez le moteur utilisé par les liens de sources.",
-      searchEngineOptions: { bing: "Bing", duckduckgo: "DuckDuckGo", google: "Google" },
+      searchEngineOptions: externalSearchEngineLabels,
       searchEngineTitle: "Moteur de recherche",
       title: "Préférences de l'app"
     },

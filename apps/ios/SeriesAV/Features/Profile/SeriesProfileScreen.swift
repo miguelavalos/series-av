@@ -442,14 +442,47 @@ struct SeriesProfileScreen: View {
     }
 
     private var searchEngineSelector: some View {
-        HStack(spacing: 10) {
+        Menu {
             ForEach(AVExternalSearchEngine.allCases) { engine in
-                AVSettingsOptionButton(
-                    title: searchEngineLabel(for: engine),
-                    systemImage: searchEngineSymbol(for: engine),
-                    isSelected: externalLinkPreferences.searchEngine == engine,
-                    action: { externalLinkPreferences.selectSearchEngine(engine) }
-                )
+                Button {
+                    externalLinkPreferences.selectSearchEngine(engine)
+                } label: {
+                    if externalLinkPreferences.searchEngine == engine {
+                        Label {
+                            Text(searchEngineLabel(for: engine))
+                        } icon: {
+                            Image(systemName: "checkmark")
+                        }
+                    } else {
+                        Text(searchEngineLabel(for: engine))
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(AVBrandColor.accent)
+
+                Text(searchEngineLabel(for: externalLinkPreferences.searchEngine))
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(AVBrandColor.textPrimary)
+
+                Spacer()
+
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(AVBrandColor.accent)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(AVBrandColor.mutedSurface)
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(AVBrandColor.borderSubtle, lineWidth: 1)
             }
         }
     }
@@ -583,14 +616,13 @@ struct SeriesProfileScreen: View {
         case .google: L10n.string("profile.preferences.searchEngine.google")
         case .duckDuckGo: L10n.string("profile.preferences.searchEngine.duckduckgo")
         case .bing: L10n.string("profile.preferences.searchEngine.bing")
-        }
-    }
-
-    private func searchEngineSymbol(for engine: AVExternalSearchEngine) -> String {
-        switch engine {
-        case .google: "g.circle"
-        case .duckDuckGo: "magnifyingglass.circle"
-        case .bing: "b.circle"
+        case .yahoo: L10n.string("profile.preferences.searchEngine.yahoo")
+        case .yandex: L10n.string("profile.preferences.searchEngine.yandex")
+        case .baidu: L10n.string("profile.preferences.searchEngine.baidu")
+        case .brave: L10n.string("profile.preferences.searchEngine.brave")
+        case .ecosia: L10n.string("profile.preferences.searchEngine.ecosia")
+        case .startpage: L10n.string("profile.preferences.searchEngine.startpage")
+        case .qwant: L10n.string("profile.preferences.searchEngine.qwant")
         }
     }
 
