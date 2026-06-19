@@ -1,6 +1,6 @@
 # Series AV Web Audit
 
-Status: current as of 2026-06-18.
+Status: current as of 2026-06-19.
 
 Series AV commercial web and Series AV web app were checked as part of the AV
 web visual audit.
@@ -159,3 +159,8 @@ web visual audit.
   Production QA exposed app-owned CTAs and Avi/footer links that dropped
   non-English `?lang`; the app now localizes those links before shell, footer,
   sign-in, and product CTAs render.
+- Follow-up production QA on 2026-06-19 aligned external links with Tune AV:
+  Settings exposes the shared Apps AV search-engine list (Google, Bing, Yahoo,
+  DuckDuckGo, Yandex, Baidu, Brave Search, Ecosia, Startpage, Qwant), Detail
+  shows familiar IMDb, Wikipedia, and web-search shortcuts, and the web-search
+  shortcut uses the user's selected search engine.

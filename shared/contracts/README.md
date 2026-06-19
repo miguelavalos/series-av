@@ -8,6 +8,10 @@ Use it only when a rule or data shape must be shared beyond Apple Swift code: iO
 
 - `access-policy.json`: canonical Series AV access modes, plan tiers, capabilities, and per-mode limits. iOS validates its `SeriesAccessLimits` and `SeriesAccessCapabilities` adapter against this file.
 
+The shared Apps AV packages own cross-product external-link preferences and
+search-engine URL construction. Keep Series AV-specific contract files here only
+when the API/client shape is not already covered by Apps AV shared code.
+
 ## Entry Criteria
 
 Add files here when at least one of these is true:

@@ -56,6 +56,18 @@ final class SeriesAVAPIClientTests: XCTestCase {
               "visibility": "public",
               "enrichmentStatus": "enriched",
               "artworkStatus": "provider",
+              "externalLinks": [
+                {
+                  "kind": "imdb",
+                  "label": "Open IMDb",
+                  "url": "https://www.imdb.com/find/?q=Demon+Slayer+2019"
+                },
+                {
+                  "kind": "wikipedia",
+                  "label": "Open Wikipedia",
+                  "url": "https://www.wikipedia.org/search-redirect.php?search=Demon+Slayer+2019"
+                }
+              ],
               "metadataUpdatedAt": "2026-06-15T15:02:03.789Z"
             }
           ],
@@ -101,6 +113,8 @@ final class SeriesAVAPIClientTests: XCTestCase {
         XCTAssertEqual(result.results.first?.displayBackdrop?.url?.absoluteString, "https://artwork.example/demon-slayer-backdrop.jpg")
         XCTAssertEqual(result.results.first?.displayBackdrop?.policy.displayState, "fallbackOnly")
         XCTAssertEqual(result.results.first?.displayBackdrop?.policy.reasonCode, "availableNotPromoted")
+        XCTAssertEqual(result.results.first?.externalLinks?.map(\.kind), ["imdb", "wikipedia"])
+        XCTAssertEqual(result.results.first?.externalLinks?.last?.url.absoluteString, "https://www.wikipedia.org/search-redirect.php?search=Demon+Slayer+2019")
         let metadataUpdatedAt = try XCTUnwrap(result.results.first?.metadataUpdatedAt)
         XCTAssertEqual(metadataUpdatedAt.timeIntervalSince1970, 1_781_535_723.789, accuracy: 0.001)
         XCTAssertEqual(result.generatedAt.timeIntervalSince1970, 1_781_535_724.123, accuracy: 0.001)

@@ -1,8 +1,8 @@
 # Series AV
 
-Open-source iOS app for Series AV.
+Open-source iOS and web clients for Series AV.
 
-This repository contains the iOS client app, local watch-list and progress flows, Account AV UI, backend-aware access handling, and TV metadata integration used by the product.
+This repository contains the iOS and web client apps, local watch-list and progress flows, Account AV UI, backend-aware access handling, and Series AV catalog integration used by the product.
 
 Before validating signed account, backend access, library sync, catalog,
 or deletion workflows, read [AGENTS.md](AGENTS.md). Those workflows are governed
@@ -18,6 +18,7 @@ This repository is released under the MIT license. See [LICENSE](LICENSE).
 ```text
 apps/
   ios/      SwiftUI iOS app
+  web/      TanStack Start web app
 docs/
   ios-animation-performance.md
   install-ios.md
@@ -29,7 +30,8 @@ docs/
 - watch progress and on-device settings
 - Account AV UI surfaces
 - native SwiftUI iOS app structure
-- public TV metadata integration via TVMaze
+- signed-in web app structure
+- Series AV catalog, detail, episode-guide, artwork, and external-link integration
 - backend-backed access and app-data sync through private Account AV infrastructure
 
 ## Docs
@@ -38,10 +40,14 @@ docs/
 - [iOS animation and media performance guide](docs/ios-animation-performance.md)
 - [Release checklist](docs/release-checklist.md)
 
-## Third-Party Data Sources
+## Catalog And External Links
 
-- TV metadata currently comes from `TVmaze`.
-- TVmaze's API licensing requires attribution. The app now exposes a visible attribution path in `Settings`, and the repo/docs should continue to keep that dependency explicit.
+- Series metadata, artwork policy, episode guides, and enriched external links
+  are read from the Series AV API.
+- User-facing source shortcuts should stay familiar and product-oriented:
+  IMDb, Wikipedia, and the user's chosen web search engine.
+- Provider/source identifiers such as `thetvdb:*` may exist in API payloads and
+  route IDs, but should not be promoted as primary user-facing source links.
 - TV/movie posters from approved catalog providers may be used as
   title-reference artwork in normal app UI by default; Series AV does not
   require manual poster approval one title at a time.
@@ -60,7 +66,7 @@ docs/
 
 ## Current Structure Notes
 
-- All active app code lives under `apps/ios`.
+- Active client app code lives under `apps/ios` and `apps/web`.
 - There is no separate public backend in this repository.
 - Backend-backed features used by Series AV come from private Account AV infrastructure.
 - When `ACCOUNTAV_API_BASE_URL` is configured, backend capabilities are authoritative for signed-in access.
@@ -82,7 +88,7 @@ If both the Account AV publishable key and `ACCOUNTAV_API_BASE_URL` are configur
 
 - hydrate signed-in access from `GET /v1/me/access`
 - sync `seriesLibrary` through `/v1/apps/seriesav/data/seriesLibrary`
-- use backend-backed Series AV catalog routes when those V1 routes are wired
+- use backend-backed Series AV catalog, detail, episode-guide, and external-link routes
 - reflect guest, signed-in Free, and Pro account states in the iOS profile
 - sell, restore, and manage the Pro entitlement through the Tune AV-style paywall and Account AV access refresh flow
 

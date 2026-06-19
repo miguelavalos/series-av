@@ -63,7 +63,6 @@
 "detail.episodes.untitled" = "Folge";
 "detail.episodes.more" = "%d weitere Folgen";
 "detail.sources.title" = "Quellen";
-"detail.sources.thetvdb" = "TheTVDB";
 "detail.sources.imdb" = "IMDb";
 "detail.sources.wikipedia" = "Wikipedia";
 "detail.sources.web" = "Websuche";

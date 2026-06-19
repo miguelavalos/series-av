@@ -65,7 +65,7 @@ device-specific Apple auth behavior.
 4. Search for at least one known show and open detail.
 5. Follow a catalog result and confirm it appears in `Biblioteca`.
 6. Open `Próximos` and verify next-up content renders.
-7. Open `Perfil` and confirm privacy, terms, support, source code, and TVMaze data-source attribution are visible.
+7. Open `Perfil` and confirm privacy, terms, support, source code, search-engine preferences, and link-opening preferences are visible.
 
 ### Signed-In Free
 
@@ -167,10 +167,12 @@ Additional local simulator evidence, 2026-06-17:
 5. Confirm store metadata does not promise cloud sync, standalone Avi action
    limits, social features, or purchase flows that are not active in the
    submitted build.
-6. Confirm TVMaze attribution remains visible in-product.
-7. Confirm visible TV/movie posters come from approved catalog providers or
+6. Confirm visible TV/movie posters come from approved catalog providers or
    Series AV-owned/generated artwork, and that screenshot/release mode is using
    the intended artwork policy.
+7. Confirm visible series source shortcuts use familiar user-facing destinations
+   such as IMDb, Wikipedia, and the selected web search engine rather than
+   provider-internal identifiers.
 8. Confirm no company/platform/provider logos, availability badges, deep links,
    trailers, or embedded provider pages are visible without separate
    documented rights/terms evidence.
