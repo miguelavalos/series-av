@@ -2,16 +2,16 @@ import { ErrorState, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, CheckCircle2, Plus, RotateCcw, StepBack, StepForward } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { SeriesAppShell } from "@/components/series-app-shell";
 import { SeriesArtwork, StatusButtons, seriesLibraryUiText } from "@/components/series-library-ui";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { SeriesApiClient, readRememberedSeriesCatalogItem } from "@/lib/series-api-client";
+import { SeriesApiClient, readRememberedSeriesCatalogItem, type SeriesEpisodeGuideItem } from "@/lib/series-api-client";
 import { getSeriesApiBaseUrl } from "@/lib/series-config";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
-import { cursorLabel, nextEpisodeCursor, progressLabel } from "@/lib/series-library";
+import { compareEpisodeCursors, cursorLabel, nextEpisodeCursor, progressLabel, type SeriesEpisodeCursor, type SeriesLibraryEntry } from "@/lib/series-library";
 import { localizedSeriesPath, useSeriesApiLocale, useSeriesText } from "@/lib/series-i18n";
 
 export const Route = createFileRoute("/series/$seriesId")({
@@ -148,27 +148,7 @@ function SeriesDetailRoute() {
             <h2 className="text-lg font-semibold">{labels.episodeGuide}</h2>
             {episodes.isLoading ? <div className="h-40 animate-pulse rounded-lg bg-[#ead6a5]" /> : null}
             {episodes.isError ? <ErrorState className="border-[#d7c494] bg-white/70" description={episodes.error.message} title={labels.episodesUnavailable} /> : null}
-            {episodes.data?.items.length === 0 ? <p className="text-sm text-[#53617a]">{labels.noGuide}</p> : null}
-            <div className="grid gap-2">
-              {episodes.data?.items.slice(0, 12).map((episode) => (
-                <div key={`${episode.seasonNumber}-${episode.episodeNumber}`} className="rounded-lg border border-[#d7c494] bg-white/60 p-3">
-                  <p className="text-sm font-bold text-[#112a55]">
-                    {cursorLabel({ episodeNumber: episode.episodeNumber, seasonNumber: episode.seasonNumber })} · {episode.title ?? libraryLabels.episode}
-                  </p>
-                  <p className="mt-1 text-xs text-[#53617a]">{episode.airDate ?? episode.relativeState}</p>
-                  {entry ? (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="mt-3 rounded-full border-[#c8ad72] bg-[#fff8df]/80 text-[#112a55]"
-                      onClick={() => library.markWatchedThrough(entry.entryId, { episodeNumber: episode.episodeNumber, seasonNumber: episode.seasonNumber })}
-                    >
-                      <CheckCircle2 className="size-4" /> {labels.markWatchedThrough} {cursorLabel({ episodeNumber: episode.episodeNumber, seasonNumber: episode.seasonNumber })}
-                    </Button>
-                  ) : null}
-                </div>
-              ))}
-            </div>
+            {episodes.data ? <EpisodeGuide labels={labels} libraryLabels={libraryLabels} entry={entry} items={episodes.data.items} markWatchedThrough={library.markWatchedThrough} /> : null}
           </Card>
         </section>
       </SeriesAppShell>
@@ -176,56 +156,192 @@ function SeriesDetailRoute() {
   );
 }
 
+function EpisodeGuide({
+  entry,
+  items,
+  labels,
+  libraryLabels,
+  markWatchedThrough
+}: {
+  entry: SeriesLibraryEntry | null;
+  items: SeriesEpisodeGuideItem[];
+  labels: (typeof detailLabels)[keyof typeof detailLabels];
+  libraryLabels: ReturnType<typeof seriesLibraryUiText>;
+  markWatchedThrough: (entryId: string, cursor: SeriesEpisodeCursor) => void;
+}) {
+  const guide = useMemo(() => normalizeEpisodeGuide(items), [items]);
+  const initialSeason = entry?.lastWatchedEpisodeCursor?.seasonNumber ?? guide.seasons[0] ?? 1;
+  const [selectedSeason, setSelectedSeason] = useState(initialSeason);
+
+  useEffect(() => {
+    if (guide.seasons.length === 0) {
+      return;
+    }
+    if (!guide.seasons.includes(selectedSeason)) {
+      setSelectedSeason(entry?.lastWatchedEpisodeCursor?.seasonNumber && guide.seasons.includes(entry.lastWatchedEpisodeCursor.seasonNumber) ? entry.lastWatchedEpisodeCursor.seasonNumber : (guide.seasons[0] ?? 1));
+    }
+  }, [entry?.lastWatchedEpisodeCursor?.seasonNumber, guide.seasons, selectedSeason]);
+
+  if (guide.items.length === 0) {
+    return <p className="text-sm text-[#53617a]">{labels.noGuide}</p>;
+  }
+
+  const selectedEpisodes = guide.itemsBySeason.get(selectedSeason) ?? [];
+  const progress = entry?.lastWatchedEpisodeCursor ?? null;
+
+  return (
+    <div className="grid gap-4">
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {guide.seasons.map((season) => (
+          <button
+            key={season}
+            type="button"
+            className={
+              selectedSeason === season
+                ? "min-h-10 shrink-0 rounded-lg bg-[#112a55] px-4 text-sm font-bold text-white"
+                : "min-h-10 shrink-0 rounded-lg border border-[#d7c494] bg-white/60 px-4 text-sm font-bold text-[#112a55]"
+            }
+            onClick={() => setSelectedSeason(season)}
+          >
+            {labels.seasonShort} {season}
+          </button>
+        ))}
+      </div>
+
+      {entry ? (
+        <p className="text-sm font-semibold text-[#53617a]">
+          {labels.watchedThrough}: {progress ? cursorLabel(progress) : libraryLabels.notStarted}
+        </p>
+      ) : (
+        <p className="text-sm font-semibold text-[#53617a]">{labels.followToTrack}</p>
+      )}
+
+      <div className="grid gap-2">
+        {selectedEpisodes.map((episode) => {
+          const cursor = { episodeNumber: episode.episodeNumber, seasonNumber: episode.seasonNumber };
+          const isWatched = progress ? compareEpisodeCursors(cursor, progress) <= 0 : false;
+          const isCurrent = progress ? compareEpisodeCursors(cursor, nextEpisodeCursor(progress)) === 0 : episode.seasonNumber === 1 && episode.episodeNumber === 1;
+          return (
+            <div key={`${episode.seasonNumber}-${episode.episodeNumber}`} className={isWatched ? "rounded-lg border border-[#9ac76f] bg-[#f2fadf] p-3" : "rounded-lg border border-[#d7c494] bg-white/60 p-3"}>
+              <div className="flex items-start gap-3">
+                <div className={isWatched ? "flex h-10 w-12 shrink-0 items-center justify-center rounded-lg bg-[#5a8f2f] text-sm font-black text-white" : "flex h-10 w-12 shrink-0 items-center justify-center rounded-lg bg-[#ead6a5] text-sm font-black text-[#112a55]"}>
+                  E{episode.episodeNumber}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold text-[#112a55]">
+                    {cursorLabel(cursor)} · {episode.title?.trim() || libraryLabels.episode}
+                  </p>
+                  <p className="mt-1 text-xs font-medium text-[#53617a]">
+                    {episode.airDate ?? episode.relativeState}
+                    {isCurrent ? ` · ${labels.nextEpisode}` : ""}
+                  </p>
+                  {entry ? (
+                    <Button
+                      size="sm"
+                      variant={isWatched ? "ghost" : "outline"}
+                      className="mt-3 rounded-full border-[#c8ad72] bg-[#fff8df]/80 text-[#112a55]"
+                      onClick={() => markWatchedThrough(entry.entryId, cursor)}
+                    >
+                      <CheckCircle2 className="size-4" /> {labels.markWatchedThrough} {cursorLabel(cursor)}
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function normalizeEpisodeGuide(items: SeriesEpisodeGuideItem[]) {
+  const normalizedItems = items
+    .filter((item) => item.seasonNumber > 0 && item.episodeNumber > 0)
+    .sort((first, second) => first.seasonNumber - second.seasonNumber || first.episodeNumber - second.episodeNumber);
+  const itemsBySeason = new Map<number, SeriesEpisodeGuideItem[]>();
+  for (const item of normalizedItems) {
+    const seasonItems = itemsBySeason.get(item.seasonNumber) ?? [];
+    seasonItems.push(item);
+    itemsBySeason.set(item.seasonNumber, seasonItems);
+  }
+  return {
+    items: normalizedItems,
+    itemsBySeason,
+    seasons: Array.from(itemsBySeason.keys()).sort((first, second) => first - second)
+  };
+}
+
 const detailLabels = {
   ca: {
     episodeGuide: "Guia d'episodis",
     detailUnavailable: "Detall de catàleg no disponible",
     episodesUnavailable: "Episodis no disponibles",
+    followToTrack: "Segueix la sèrie per marcar progrés per episodi.",
     follow: "Seguir",
     limitReached: "Límit assolit",
     markNext: "Marcar següent",
     markWatchedThrough: "Marcar fins a",
-    noGuide: "Encara no hi ha guia compacta."
+    nextEpisode: "Següent",
+    noGuide: "Encara no hi ha guia compacta.",
+    seasonShort: "T",
+    watchedThrough: "Vist fins a"
   },
   de: {
     episodeGuide: "Folgenübersicht",
     detailUnavailable: "Katalogdetail nicht verfügbar",
     episodesUnavailable: "Folgen nicht verfügbar",
+    followToTrack: "Folge der Serie, um den Fortschritt pro Folge zu markieren.",
     follow: "Folgen",
     limitReached: "Limit erreicht",
     markNext: "Nächste markieren",
     markWatchedThrough: "Gesehen bis",
-    noGuide: "Noch keine kompakte Übersicht verfügbar."
+    nextEpisode: "Nächste",
+    noGuide: "Noch keine kompakte Übersicht verfügbar.",
+    seasonShort: "S",
+    watchedThrough: "Gesehen bis"
   },
   en: {
     episodeGuide: "Episode guide",
     detailUnavailable: "Catalog detail unavailable",
     episodesUnavailable: "Episodes unavailable",
+    followToTrack: "Follow this series to mark episode progress.",
     follow: "Follow",
     limitReached: "Limit reached",
     markNext: "Mark next",
     markWatchedThrough: "Watched through",
-    noGuide: "No compact guide is available yet."
+    nextEpisode: "Next",
+    noGuide: "No compact guide is available yet.",
+    seasonShort: "S",
+    watchedThrough: "Watched through"
   },
   es: {
     episodeGuide: "Guía de episodios",
     detailUnavailable: "Detalle de catálogo no disponible",
     episodesUnavailable: "Episodios no disponibles",
+    followToTrack: "Sigue esta serie para marcar el progreso por episodio.",
     follow: "Seguir",
     limitReached: "Límite alcanzado",
     markNext: "Marcar siguiente",
     markWatchedThrough: "Visto hasta",
-    noGuide: "Todavía no hay guía compacta."
+    nextEpisode: "Siguiente",
+    noGuide: "Todavía no hay guía compacta.",
+    seasonShort: "T",
+    watchedThrough: "Visto hasta"
   },
   fr: {
     episodeGuide: "Guide des épisodes",
     detailUnavailable: "Détail du catalogue indisponible",
     episodesUnavailable: "Épisodes indisponibles",
+    followToTrack: "Suivez cette série pour marquer la progression par épisode.",
     follow: "Suivre",
     limitReached: "Limite atteinte",
     markNext: "Marquer la suite",
     markWatchedThrough: "Vu jusqu'à",
-    noGuide: "Aucun guide compact pour le moment."
+    nextEpisode: "Suivant",
+    noGuide: "Aucun guide compact pour le moment.",
+    seasonShort: "S",
+    watchedThrough: "Vu jusqu'à"
   }
 } as const;
 
