@@ -128,14 +128,19 @@ fi
 
 if [ "$use_existing_archive" -eq 0 ]; then
   run_step "Archive signed iOS release"
-  xcodebuild archive \
+  archive_command=(
+    xcodebuild archive
     -project "$repo_root/apps/ios/SeriesAV.xcodeproj" \
     -scheme SeriesAV \
     -configuration Release \
     -destination "generic/platform=iOS" \
     -archivePath "$archive_path" \
-    -allowProvisioningUpdates \
-    "${team_build_settings[@]}"
+    -allowProvisioningUpdates
+  )
+  if [ "${#team_build_settings[@]}" -gt 0 ]; then
+    archive_command+=("${team_build_settings[@]}")
+  fi
+  "${archive_command[@]}"
 else
   run_step "Use existing iOS archive"
   echo "$archive_path"

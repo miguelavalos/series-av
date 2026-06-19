@@ -4,16 +4,14 @@
 <dict>
 	<key>ACCOUNTAV_API_BASE_URL</key>
 	<string>$(ACCOUNTAV_API_BASE_URL)</string>
-	<key>ACCOUNTAV_KEYCHAIN_SERVICE</key>
-	<string>$(ACCOUNTAV_KEYCHAIN_SERVICE)</string>
 	<key>ACCOUNTAV_KEYCHAIN_ACCESS_GROUP</key>
 	<string>$(ACCOUNTAV_KEYCHAIN_ACCESS_GROUP)</string>
+	<key>ACCOUNTAV_KEYCHAIN_SERVICE</key>
+	<string>$(ACCOUNTAV_KEYCHAIN_SERVICE)</string>
 	<key>ACCOUNTAV_MANAGEMENT_URL</key>
 	<string>$(ACCOUNTAV_MANAGEMENT_URL)</string>
 	<key>ACCOUNTAV_PUBLISHABLE_KEY</key>
 	<string>$(ACCOUNTAV_PUBLISHABLE_KEY)</string>
-	<key>SERIESAV_API_BASE_URL</key>
-	<string>$(SERIESAV_API_BASE_URL)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -44,9 +42,11 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>2</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>SERIESAV_API_BASE_URL</key>
+	<string>$(SERIESAV_API_BASE_URL)</string>
 	<key>SERIESAV_CONFIG_ENVIRONMENT</key>
 	<string>$(SERIESAV_CONFIG_ENVIRONMENT)</string>
 	<key>SERIESAV_CONVEX_URL</key>
