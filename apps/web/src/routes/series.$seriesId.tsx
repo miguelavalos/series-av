@@ -10,7 +10,7 @@ import { SeriesAppShell } from "@/components/series-app-shell";
 import { SeriesArtwork, StatusButtons, seriesLibraryUiText } from "@/components/series-library-ui";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { SeriesApiClient, readRememberedSeriesCatalogItem, type SeriesEpisodeGuideItem } from "@/lib/series-api-client";
+import { SeriesApiClient, readRememberedSeriesCatalogItem, type SeriesEpisodeGuideItem, type SeriesSearchResult } from "@/lib/series-api-client";
 import { getSeriesApiBaseUrl } from "@/lib/series-config";
 import { isPlaceholderSeriesTitle, normalizeSeriesId } from "@/lib/series-display";
 import { readSeriesExternalSearchEngine } from "@/lib/series-external-preferences";
@@ -75,7 +75,7 @@ function SeriesDetailRoute() {
   const title = catalog?.title ?? entry?.title ?? decodeURIComponent(seriesId);
   const catalogArtworkRef = catalog?.posterUrl ?? catalog?.displayArtwork?.url ?? null;
   const externalQuery = [title, catalog?.startYear ?? catalog?.firstAirDate].filter(Boolean).join(" ");
-  const sourceLinks = sourceLinksForSeries({ engine: externalSearchEngine, labels, query: externalQuery });
+  const sourceLinks = sourceLinksForSeries({ catalog, engine: externalSearchEngine, labels, query: externalQuery });
 
   useEffect(() => {
     setExternalSearchEngine(readSeriesExternalSearchEngine());
@@ -407,16 +407,18 @@ function normalizeEpisodeGuide(items: SeriesEpisodeGuideItem[]) {
 }
 
 function sourceLinksForSeries({
+  catalog,
   engine,
   labels,
   query
 }: {
+  catalog: SeriesSearchResult | null | undefined;
   engine: string;
   labels: (typeof detailLabels)[keyof typeof detailLabels];
   query: string;
 }): Array<{ href: string; icon: ReactNode; label: string }> {
   const links: Array<{ href: string; icon: ReactNode; label: string }> = [];
-  const imdbUrl = appsAvImdbSearchUrl(query);
+  const imdbUrl = externalLinkByKind(catalog, "imdb")?.url ?? appsAvImdbSearchUrl(query);
   if (imdbUrl) {
     links.push({
       href: imdbUrl,
@@ -425,7 +427,7 @@ function sourceLinksForSeries({
     });
   }
 
-  const wikipediaUrl = wikipediaSearchUrl(query);
+  const wikipediaUrl = externalLinkByKind(catalog, "wikipedia")?.url ?? wikipediaSearchUrl(query);
   if (wikipediaUrl) {
     links.push({
       href: wikipediaUrl,
@@ -444,6 +446,10 @@ function sourceLinksForSeries({
   }
 
   return links;
+}
+
+function externalLinkByKind(catalog: SeriesSearchResult | null | undefined, kind: "imdb" | "wikipedia") {
+  return catalog?.externalLinks?.find((link) => link.kind === kind && link.url.trim());
 }
 
 function wikipediaSearchUrl(query: string) {

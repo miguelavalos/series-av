@@ -14,6 +14,7 @@ export interface SeriesSearchResult {
   providerRef?: SeriesProviderRef | null;
   providerId?: string | null;
   providerRefs?: SeriesProviderRef[];
+  externalLinks?: SeriesExternalLink[];
   seriesId?: string;
   startYear?: number | null;
   statusText?: string | null;
@@ -25,6 +26,12 @@ export interface SeriesProviderRef {
   provider: string;
   providerSeriesId: string;
   providerUrl?: string | null;
+}
+
+export interface SeriesExternalLink {
+  kind: "source" | "imdb" | "wikipedia" | "web";
+  label: string;
+  url: string;
 }
 
 export interface SeriesSearchResponse {
