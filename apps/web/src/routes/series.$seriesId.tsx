@@ -1,5 +1,4 @@
 import { ErrorState, useAppsAvLocale } from "@avalsys/apps-av-web";
-import { useAccountSession, useAccountToken } from "@avalsys/account-av-web";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, CheckCircle2, Plus, RotateCcw, StepBack, StepForward } from "lucide-react";
@@ -9,7 +8,7 @@ import { SeriesAppShell } from "@/components/series-app-shell";
 import { SeriesArtwork, StatusButtons, seriesLibraryUiText } from "@/components/series-library-ui";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { SeriesApiClient } from "@/lib/series-api-client";
+import { SeriesApiClient, readRememberedSeriesCatalogItem } from "@/lib/series-api-client";
 import { getSeriesApiBaseUrl } from "@/lib/series-config";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
 import { cursorLabel, nextEpisodeCursor, progressLabel } from "@/lib/series-library";
@@ -25,19 +24,14 @@ function SeriesDetailRoute() {
   const apiLocale = useSeriesApiLocale();
   const text = useSeriesText();
   const library = useSeriesLibrary();
-  const session = useAccountSession();
-  const getToken = useAccountToken();
   const labels = detailLabels[locale];
   const libraryLabels = seriesLibraryUiText(locale);
   const entry = library.findEntryBySeriesId(seriesId);
   const client = useMemo(() => new SeriesApiClient(getSeriesApiBaseUrl()), []);
+  const rememberedCatalog = useMemo(() => readRememberedSeriesCatalogItem(seriesId), [seriesId]);
   const detail = useQuery({
-    enabled: session.isLoaded && session.isSignedIn,
-    queryFn: async () => {
-      const token = await getToken();
-      return client.series({ locale: apiLocale, seriesId, token });
-    },
-    queryKey: ["series-av", "detail", apiLocale, seriesId, session.userId],
+    queryFn: () => client.series({ locale: apiLocale, seriesId }),
+    queryKey: ["series-av", "detail", apiLocale, seriesId],
     retry: false
   });
   const detailCatalog = detail.data?.summary ?? null;
@@ -47,7 +41,9 @@ function SeriesDetailRoute() {
     queryKey: ["series-av", "detail-fallback-popular", apiLocale, seriesId],
     retry: false
   });
-  const catalog = !isPlaceholderCatalogTitle(detailCatalog?.title, seriesId)
+  const catalog = rememberedCatalog && isPlaceholderCatalogTitle(detailCatalog?.title, seriesId)
+    ? rememberedCatalog
+    : !isPlaceholderCatalogTitle(detailCatalog?.title, seriesId)
     ? detailCatalog
     : (fallbackCatalog.data?.results.find((result) => (result.seriesId ?? result.id).trim().toLocaleLowerCase() === seriesId.trim().toLocaleLowerCase()) ?? detailCatalog);
   const hasCatalogTitle = !isPlaceholderCatalogTitle(catalog?.title, seriesId);

@@ -190,6 +190,57 @@ export class SeriesApiClient {
   }
 }
 
+const rememberedSeriesCatalogKey = "seriesav.web.rememberedCatalog.v1";
+
+export function rememberSeriesCatalogItem(item: SeriesSearchResult) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const seriesId = (item.seriesId ?? item.id).trim();
+  if (!seriesId) {
+    return;
+  }
+
+  try {
+    const current = readRememberedSeriesCatalogMap();
+    current[seriesId.toLocaleLowerCase()] = item;
+    window.sessionStorage.setItem(rememberedSeriesCatalogKey, JSON.stringify(current));
+  } catch {
+    // Detail hydration is best-effort; storage failures should not block navigation.
+  }
+}
+
+export function readRememberedSeriesCatalogItem(seriesId: string): SeriesSearchResult | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const normalizedSeriesId = seriesId.trim().toLocaleLowerCase();
+  if (!normalizedSeriesId) {
+    return null;
+  }
+
+  try {
+    return readRememberedSeriesCatalogMap()[normalizedSeriesId] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function readRememberedSeriesCatalogMap(): Record<string, SeriesSearchResult> {
+  const raw = window.sessionStorage.getItem(rememberedSeriesCatalogKey);
+  if (!raw) {
+    return {};
+  }
+
+  const parsed = JSON.parse(raw) as unknown;
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    return {};
+  }
+  return parsed as Record<string, SeriesSearchResult>;
+}
+
 function normalizeSeriesDetailResponse(payload: unknown, seriesId: string): SeriesDetailResponse {
   if (isSeriesDetailResponse(payload)) {
     return payload;

@@ -5,7 +5,7 @@ import { Calendar, Check, Plus, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { SeriesApiClient, type SeriesSearchResult } from "@/lib/series-api-client";
+import { SeriesApiClient, rememberSeriesCatalogItem, type SeriesSearchResult } from "@/lib/series-api-client";
 import { getSeriesApiBaseUrl } from "@/lib/series-config";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
 import { normalizeSearchText } from "@/lib/series-library";
@@ -105,7 +105,11 @@ function SearchResultCard({ locale, result }: { locale: ReturnType<typeof useApp
 
   return (
     <Card className="gap-0 overflow-hidden rounded-lg border-[#d7c494] bg-[#fff8df] py-0 shadow-sm shadow-[#172f5c]/8">
-      <Link to={localizedSeriesPath(`/series/${encodeURIComponent(seriesId)}`, locale)} className="block aspect-[16/10] bg-[#ead6a5]">
+      <Link
+        to={localizedSeriesPath(`/series/${encodeURIComponent(seriesId)}`, locale)}
+        className="block aspect-[16/10] bg-[#ead6a5]"
+        onClick={() => rememberSeriesCatalogItem(result)}
+      >
         {artwork ? <img alt="" className="h-full w-full object-cover" loading="lazy" src={artwork} /> : <div className="flex h-full items-center justify-center text-sm font-medium text-[#748098]">{text.search.noArtwork}</div>}
       </Link>
       <CardContent className="flex min-h-56 flex-col gap-3 p-4">
@@ -135,7 +139,9 @@ function SearchResultCard({ locale, result }: { locale: ReturnType<typeof useApp
             {existing ? labels.following : library.canAddSeries ? labels.follow : labels.limitReached}
           </Button>
           <Button asChild size="sm" variant="outline" className="rounded-full border-[#c8ad72] bg-white/60">
-            <Link to={localizedSeriesPath(`/series/${encodeURIComponent(seriesId)}`, locale)}>{labels.detail}</Link>
+            <Link to={localizedSeriesPath(`/series/${encodeURIComponent(seriesId)}`, locale)} onClick={() => rememberSeriesCatalogItem(result)}>
+              {labels.detail}
+            </Link>
           </Button>
         </div>
       </CardContent>

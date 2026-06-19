@@ -137,6 +137,28 @@ struct SeriesCatalogSearchResponse: Codable, Equatable, Sendable {
     var generatedAt: Date
 }
 
+struct SeriesDetailResponse: Codable, Equatable, Sendable {
+    var summary: SeriesCatalogItem
+    var generatedAt: Date
+
+    init(summary: SeriesCatalogItem, generatedAt: Date) {
+        self.summary = summary
+        self.generatedAt = generatedAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if let summary = try container.decodeIfPresent(SeriesCatalogItem.self, forKey: .summary) {
+            self.summary = summary
+            self.generatedAt = try container.decodeIfPresent(Date.self, forKey: .generatedAt) ?? Date()
+            return
+        }
+
+        self.summary = try SeriesCatalogItem(from: decoder)
+        self.generatedAt = Date()
+    }
+}
+
 struct SeriesCatalogSearchClient: Sendable {
     var apiClient: SeriesAVAPIClient
     var decoder: JSONDecoder
@@ -175,6 +197,34 @@ struct SeriesCatalogSearchClient: Sendable {
         let resolvedPath = components.string ?? path
         let (data, _) = try await apiClient.requestData(path: resolvedPath, requiresAuth: false)
         return try decoder.decode(SeriesCatalogSearchResponse.self, from: data)
+    }
+
+    private static func makeDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .seriesAVISO8601
+        return decoder
+    }
+}
+
+struct SeriesDetailClient: Sendable {
+    var apiClient: SeriesAVAPIClient
+    var decoder: JSONDecoder
+
+    init(apiClient: SeriesAVAPIClient = SeriesAVAPIClient(), decoder: JSONDecoder = SeriesDetailClient.makeDecoder()) {
+        self.apiClient = apiClient
+        self.decoder = decoder
+    }
+
+    func series(_ seriesId: String, locale: String? = nil) async throws -> SeriesDetailResponse {
+        let encodedSeriesId = seriesId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? seriesId
+        var components = URLComponents()
+        components.path = "/v1/series/\(encodedSeriesId)"
+        if let locale, locale.isEmpty == false {
+            components.queryItems = [URLQueryItem(name: "locale", value: locale)]
+        }
+        let resolvedPath = components.string ?? "/v1/series/\(encodedSeriesId)"
+        let (data, _) = try await apiClient.requestData(path: resolvedPath, requiresAuth: false)
+        return try decoder.decode(SeriesDetailResponse.self, from: data)
     }
 
     private static func makeDecoder() -> JSONDecoder {

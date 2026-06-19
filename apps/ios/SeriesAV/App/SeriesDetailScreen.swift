@@ -14,8 +14,10 @@ struct SeriesDetailScreen: View {
     let clearProgress: ((SeriesLibraryEntry) -> Void)?
 
     private let episodeGuideClient: SeriesEpisodeGuideClient
+    private let detailClient: SeriesDetailClient
 
     @State private var guideState: SeriesDetailGuideState = .loading
+    @State private var resolvedCatalogItem: SeriesCatalogItem?
     @State private var isShowingProgressEditor = false
 
     init(
@@ -26,7 +28,8 @@ struct SeriesDetailScreen: View {
         markNext: ((SeriesLibraryEntry) -> Void)? = nil,
         markWatchedThrough: ((SeriesLibraryEntry, SeriesEpisodeCursor) -> Void)? = nil,
         clearProgress: ((SeriesLibraryEntry) -> Void)? = nil,
-        episodeGuideClient: SeriesEpisodeGuideClient = SeriesEpisodeGuideClient(apiClient: SeriesAVAPIClient())
+        episodeGuideClient: SeriesEpisodeGuideClient = SeriesEpisodeGuideClient(apiClient: SeriesAVAPIClient()),
+        detailClient: SeriesDetailClient = SeriesDetailClient()
     ) {
         self.catalogItem = catalogItem
         self.entry = entry
@@ -36,6 +39,7 @@ struct SeriesDetailScreen: View {
         self.markWatchedThrough = markWatchedThrough
         self.clearProgress = clearProgress
         self.episodeGuideClient = episodeGuideClient
+        self.detailClient = detailClient
     }
 
     var body: some View {
@@ -59,7 +63,9 @@ struct SeriesDetailScreen: View {
                 }
             }
             .task(id: seriesId) {
-                await loadEpisodeGuide()
+                async let detailTask: Void = loadCatalogDetailIfNeeded()
+                async let guideTask: Void = loadEpisodeGuide()
+                _ = await (detailTask, guideTask)
             }
             .sheet(isPresented: $isShowingProgressEditor) {
                 if let entry,
@@ -101,7 +107,7 @@ struct SeriesDetailScreen: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
-                    if let summary = catalogItem?.summary?.trimmingCharacters(in: .whitespacesAndNewlines),
+                    if let summary = effectiveCatalogItem?.summary?.trimmingCharacters(in: .whitespacesAndNewlines),
                        summary.isEmpty == false {
                         Text(summary)
                             .font(.system(size: 14, weight: .medium))
@@ -224,9 +230,9 @@ struct SeriesDetailScreen: View {
 
     @ViewBuilder
     private var artwork: some View {
-        if let entry {
-            SeriesEntryArtworkView(entry: entry, size: 92)
-        } else if let url = catalogItem?.displayArtwork.url {
+        if let detailEntry {
+            SeriesEntryArtworkView(entry: detailEntry, size: 92)
+        } else if let url = effectiveCatalogItem?.displayArtwork.url {
             AsyncImage(url: url) { phase in
                 switch phase {
                 case .success(let image):
@@ -251,20 +257,45 @@ struct SeriesDetailScreen: View {
     }
 
     private var seriesId: String {
-        entry?.seriesId ?? catalogItem?.seriesId ?? ""
+        entry?.seriesId ?? effectiveCatalogItem?.seriesId ?? ""
     }
 
     private var title: String {
-        entry?.title ?? catalogItem?.title ?? L10n.string("detail.title")
+        if let entryTitle = entry?.title.trimmingCharacters(in: .whitespacesAndNewlines),
+           entryTitle.isEmpty == false,
+           entryTitle.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() != seriesId.lowercased() {
+            return entryTitle
+        }
+        return effectiveCatalogItem?.title ?? entry?.title ?? L10n.string("detail.title")
     }
 
     private var metadataText: String {
-        let year = catalogItem?.startYear.map(String.init)
-        let genres = catalogItem?.genres ?? []
+        let year = effectiveCatalogItem?.startYear.map(String.init)
+        let genres = effectiveCatalogItem?.genres ?? []
         return ([year] + genres.prefix(2).map(Optional.some))
             .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { $0.isEmpty == false }
             .joined(separator: " · ")
+    }
+
+    private var effectiveCatalogItem: SeriesCatalogItem? {
+        catalogItem ?? resolvedCatalogItem
+    }
+
+    private var detailEntry: SeriesLibraryEntry? {
+        guard var entry else {
+            return nil
+        }
+        guard let catalogItem = effectiveCatalogItem else {
+            return entry
+        }
+        if entry.displayArtworkRef?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != false {
+            entry.displayArtworkRef = catalogItem.displayArtworkRef
+        }
+        if entry.fallbackVisualSeed?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != false {
+            entry.fallbackVisualSeed = catalogItem.title
+        }
+        return entry
     }
 
     private func trackingDetail(for entry: SeriesLibraryEntry) -> String {
@@ -304,6 +335,19 @@ struct SeriesDetailScreen: View {
             guideState = .loaded(response.items)
         } catch {
             guideState = .failed
+        }
+    }
+
+    private func loadCatalogDetailIfNeeded() async {
+        guard catalogItem == nil, seriesId.isEmpty == false else {
+            return
+        }
+
+        do {
+            let response = try await detailClient.series(seriesId, locale: Locale.current.identifier)
+            resolvedCatalogItem = response.summary
+        } catch {
+            resolvedCatalogItem = nil
         }
     }
 }
