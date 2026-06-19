@@ -6,7 +6,6 @@ import {
   SettingsSectionCard,
   useAppsAvLocale,
   appsAvLocaleNames,
-  appsAvExternalSearchEngines,
   type AppsAvExternalSearchEngine,
   type AppsAvLocale
 } from "@avalsys/apps-av-web";
@@ -88,7 +87,7 @@ function SettingsRoute() {
             <SettingsOptionButtonGroup
               selectedId={searchEngine}
               onSelect={(id) => setSearchEngine(id as AppsAvExternalSearchEngine)}
-              options={appsAvExternalSearchEngines.map((item) => ({
+              options={seriesSearchEngines.map((item) => ({
                 id: item,
                 label: labels.preferences.searchEngineOptions[item]
               }))}
@@ -122,6 +121,7 @@ function SettingsRoute() {
 const locales: AppsAvLocale[] = ["en", "es", "fr", "de", "ca"];
 const themeStorageKey = "series-av.theme";
 const themeOptions: AppsAvThemePreference[] = ["system", "light", "dark"];
+const seriesSearchEngines = ["google", "duckduckgo", "bing"] as const satisfies readonly AppsAvExternalSearchEngine[];
 
 function themeIcon(theme: AppsAvThemePreference) {
   if (theme === "light") {

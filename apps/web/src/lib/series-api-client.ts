@@ -11,12 +11,20 @@ export interface SeriesSearchResult {
   originalLanguage?: string | null;
   overview?: string | null;
   posterUrl?: string | null;
+  providerRef?: SeriesProviderRef | null;
   providerId?: string | null;
+  providerRefs?: SeriesProviderRef[];
   seriesId?: string;
   startYear?: number | null;
   statusText?: string | null;
   summary?: string | null;
   title: string;
+}
+
+export interface SeriesProviderRef {
+  provider: string;
+  providerSeriesId: string;
+  providerUrl?: string | null;
 }
 
 export interface SeriesSearchResponse {

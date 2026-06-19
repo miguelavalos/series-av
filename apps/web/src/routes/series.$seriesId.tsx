@@ -10,7 +10,7 @@ import { SeriesAppShell } from "@/components/series-app-shell";
 import { SeriesArtwork, StatusButtons, seriesLibraryUiText } from "@/components/series-library-ui";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { SeriesApiClient, readRememberedSeriesCatalogItem, type SeriesEpisodeGuideItem } from "@/lib/series-api-client";
+import { SeriesApiClient, readRememberedSeriesCatalogItem, type SeriesEpisodeGuideItem, type SeriesSearchResult } from "@/lib/series-api-client";
 import { getSeriesApiBaseUrl } from "@/lib/series-config";
 import { isPlaceholderSeriesTitle, normalizeSeriesId } from "@/lib/series-display";
 import { readSeriesExternalSearchEngine } from "@/lib/series-external-preferences";
@@ -75,7 +75,7 @@ function SeriesDetailRoute() {
   const title = catalog?.title ?? entry?.title ?? decodeURIComponent(seriesId);
   const catalogArtworkRef = catalog?.posterUrl ?? catalog?.displayArtwork?.url ?? null;
   const externalQuery = [title, catalog?.startYear ?? catalog?.firstAirDate].filter(Boolean).join(" ");
-  const sourceLinks = sourceLinksForSeries({ engine: externalSearchEngine, labels, query: externalQuery, seriesId });
+  const sourceLinks = sourceLinksForSeries({ catalog, engine: externalSearchEngine, labels, query: externalQuery, seriesId });
 
   useEffect(() => {
     setExternalSearchEngine(readSeriesExternalSearchEngine());
@@ -407,21 +407,23 @@ function normalizeEpisodeGuide(items: SeriesEpisodeGuideItem[]) {
 }
 
 function sourceLinksForSeries({
+  catalog,
   engine,
   labels,
   query,
   seriesId
 }: {
+  catalog: SeriesSearchResult | null | undefined;
   engine: string;
   labels: (typeof detailLabels)[keyof typeof detailLabels];
   query: string;
   seriesId: string;
 }): Array<{ href: string; icon: ReactNode; label: string }> {
   const links: Array<{ href: string; icon: ReactNode; label: string }> = [];
-  const theTvdbId = theTvdbIdFromSeriesId(seriesId);
-  if (theTvdbId) {
+  const theTvdbUrl = theTvdbUrlForSeries(catalog, seriesId);
+  if (theTvdbUrl) {
     links.push({
-      href: `https://thetvdb.com/series/${encodeURIComponent(theTvdbId)}`,
+      href: theTvdbUrl,
       icon: <Database className="size-4" aria-hidden="true" />,
       label: labels.sourceTheTvdb
     });
@@ -446,6 +448,17 @@ function sourceLinksForSeries({
   }
 
   return links;
+}
+
+function theTvdbUrlForSeries(catalog: SeriesSearchResult | null | undefined, seriesId: string) {
+  const providerRefs = [catalog?.providerRef, ...(catalog?.providerRefs ?? [])];
+  const providerUrl = providerRefs.find((ref) => ref?.provider === "thetvdb" && ref.providerUrl)?.providerUrl?.trim();
+  if (providerUrl) {
+    return providerUrl;
+  }
+
+  const theTvdbId = theTvdbIdFromSeriesId(seriesId);
+  return theTvdbId ? `https://thetvdb.com/dereferrer/series/${encodeURIComponent(theTvdbId)}` : null;
 }
 
 function theTvdbIdFromSeriesId(seriesId: string) {
