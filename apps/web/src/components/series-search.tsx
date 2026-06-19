@@ -102,7 +102,7 @@ function SearchResultCard({ locale, result }: { locale: ReturnType<typeof useApp
     <Card className="gap-0 overflow-hidden rounded-lg border-[#d7c494] bg-[#fff8df] py-0 shadow-sm shadow-[#172f5c]/8">
       <Link
         to={localizedSeriesPath(`/series/${encodeURIComponent(seriesId)}`, locale)}
-        className="block aspect-[16/10] bg-[#ead6a5]"
+        className="block aspect-[2/3] bg-[#ead6a5]"
         onClick={() => rememberSeriesCatalogItem(result)}
       >
         {artwork ? <img alt="" className="h-full w-full object-cover" loading="lazy" src={artwork} /> : <SearchArtworkFallback title={result.title} />}
