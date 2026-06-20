@@ -50,6 +50,32 @@ export interface SeriesDetailResponse {
   summary: SeriesSearchResult;
 }
 
+export interface SeriesShareInvitePreview {
+  createdAt: string;
+  expiresAt: string;
+  id: string;
+  kind: "recommendation";
+  message?: string | null;
+  senderDisplayName?: string | null;
+  series: {
+    displayArtwork?: SeriesSearchResult["displayArtwork"];
+    startYear?: number | null;
+    summary?: string | null;
+    title: string;
+  } | null;
+  seriesId: string;
+  status: "active" | "accepted" | "revoked" | "expired";
+}
+
+export interface SeriesShareInviteResponse {
+  generatedAt: string;
+  invite: SeriesShareInvitePreview;
+}
+
+export interface SeriesShareInviteCreateResponse extends SeriesShareInviteResponse {
+  token: string;
+}
+
 export interface SearchSeriesInput {
   limit?: number;
   locale?: string;
@@ -152,6 +178,52 @@ export class SeriesApiClient {
     }
 
     return response.json() as Promise<SeriesEpisodesResponse>;
+  }
+
+  async createShareInvite({
+    message,
+    seriesId,
+    token
+  }: {
+    message?: string | null;
+    seriesId: string;
+    token: string;
+  }): Promise<SeriesShareInviteCreateResponse> {
+    const response = await fetch(`${this.baseUrl}/v1/series/share-invites`, {
+      body: JSON.stringify({ message, seriesId }),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      method: "POST"
+    });
+    if (!response.ok) {
+      throw new Error(`Series share invite creation failed with ${response.status}.`);
+    }
+    return response.json() as Promise<SeriesShareInviteCreateResponse>;
+  }
+
+  async shareInvite(token: string): Promise<SeriesShareInviteResponse> {
+    const response = await fetch(`${this.baseUrl}/v1/series/share-invites/${encodeURIComponent(token)}`);
+    if (!response.ok) {
+      throw new Error(`Series share invite failed with ${response.status}.`);
+    }
+    return response.json() as Promise<SeriesShareInviteResponse>;
+  }
+
+  async acceptShareInvite({ authToken, token }: { authToken: string; token: string }): Promise<SeriesShareInviteResponse> {
+    const response = await fetch(`${this.baseUrl}/v1/series/share-invites/${encodeURIComponent(token)}/accept`, {
+      body: JSON.stringify({}),
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        "Content-Type": "application/json"
+      },
+      method: "POST"
+    });
+    if (!response.ok) {
+      throw new Error(`Series share invite accept failed with ${response.status}.`);
+    }
+    return response.json() as Promise<SeriesShareInviteResponse>;
   }
 
   async pullLibrary(token: string): Promise<{ document: SeriesLibrarySyncDocument; etag: string | null }> {

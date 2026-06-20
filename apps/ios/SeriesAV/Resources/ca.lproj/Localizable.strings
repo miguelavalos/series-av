@@ -66,6 +66,9 @@
 "detail.sources.imdb" = "IMDb";
 "detail.sources.wikipedia" = "Viquipèdia";
 "detail.sources.web" = "Cerca web";
+"detail.share" = "Comparteix recomanació";
+"detail.share.open" = "Comparteix recomanació";
+"detail.share.failed" = "No s'ha pogut crear l'enllaç ara mateix.";
 "home.queue.title" = "També veient";
 "home.queue.progress" = "%@ vist, %@ següent";
 "home.queue.wantToWatch.title" = "A punt per començar";

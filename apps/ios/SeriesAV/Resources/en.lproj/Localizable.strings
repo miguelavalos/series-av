@@ -66,6 +66,9 @@
 "detail.sources.imdb" = "IMDb";
 "detail.sources.wikipedia" = "Wikipedia";
 "detail.sources.web" = "Web search";
+"detail.share" = "Share recommendation";
+"detail.share.open" = "Share recommendation";
+"detail.share.failed" = "Could not create the share link right now.";
 "home.queue.title" = "Also watching";
 "home.queue.progress" = "%@ watched, %@ next";
 "home.queue.wantToWatch.title" = "Ready to start";

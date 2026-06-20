@@ -111,7 +111,8 @@ struct SeriesAppShellView: View {
                 )
             case .library:
                 SeriesLibraryTabScreen(
-                    store: store
+                    store: store,
+                    accessController: accessController
                 )
             case .search:
                 SeriesSearchScreen(

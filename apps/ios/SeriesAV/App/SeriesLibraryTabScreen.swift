@@ -4,6 +4,7 @@ import SwiftUI
 
 struct SeriesLibraryTabScreen: View {
     @Bindable var store: SeriesLibraryStore
+    let accessController: SeriesAccessController?
 
     @State private var query = ""
     @State private var selectedFilter: SeriesLibraryFilter = .all
@@ -11,6 +12,11 @@ struct SeriesLibraryTabScreen: View {
     @State private var detailEntry: SeriesLibraryEntry?
     @State private var pendingLibraryUndo: PendingLibraryMutationUndo?
     @State private var pendingProgressUndo: PendingProgressUndo?
+
+    init(store: SeriesLibraryStore, accessController: SeriesAccessController? = nil) {
+        self.store = store
+        self.accessController = accessController
+    }
 
     var body: some View {
         AVAppShellScrollableScreenScaffold(
@@ -86,7 +92,8 @@ struct SeriesLibraryTabScreen: View {
                     pendingProgressUndo = progressUndo(for: entry)
                     pendingLibraryUndo = nil
                     store.clearProgress(for: entry.id)
-                }
+                },
+                shareInviteClient: accessController.map { SeriesShareInviteClient(apiClient: $0.authenticatedAPIClient()) }
             )
             .presentationDetents([.large])
         }

@@ -284,7 +284,8 @@ private struct SeriesWatchingHomeScreen: View {
                     pendingProgressUndo = progressUndo(for: entry)
                     pendingUndo = nil
                     store.clearProgress(for: entry.id)
-                }
+                },
+                shareInviteClient: SeriesShareInviteClient(apiClient: accessController.authenticatedAPIClient())
             )
             .presentationDetents([.large])
         }

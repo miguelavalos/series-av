@@ -303,6 +303,82 @@ struct SeriesEpisodeGuideClient: Sendable {
     }
 }
 
+struct SeriesShareInvitePreview: Codable, Equatable, Sendable {
+    struct PreviewSeries: Codable, Equatable, Sendable {
+        struct PreviewArtwork: Codable, Equatable, Sendable {
+            var kind: String?
+            var url: URL?
+            var assetName: String?
+            var fallbackSeed: String?
+        }
+
+        var title: String
+        var startYear: Int?
+        var summary: String?
+        var displayArtwork: PreviewArtwork?
+    }
+
+    var id: String
+    var kind: String
+    var seriesId: String
+    var message: String?
+    var senderDisplayName: String?
+    var status: String
+    var expiresAt: Date
+    var createdAt: Date
+    var series: PreviewSeries?
+}
+
+struct SeriesShareInviteCreateRequest: Codable, Equatable, Sendable {
+    var seriesId: String
+    var message: String?
+}
+
+struct SeriesShareInviteCreateResponse: Codable, Equatable, Sendable {
+    var invite: SeriesShareInvitePreview
+    var token: String
+    var generatedAt: Date
+}
+
+struct SeriesShareInviteClient: Sendable {
+    var apiClient: SeriesAVAPIClient
+    var encoder: JSONEncoder
+    var decoder: JSONDecoder
+
+    init(
+        apiClient: SeriesAVAPIClient,
+        encoder: JSONEncoder = SeriesShareInviteClient.makeEncoder(),
+        decoder: JSONDecoder = SeriesShareInviteClient.makeDecoder()
+    ) {
+        self.apiClient = apiClient
+        self.encoder = encoder
+        self.decoder = decoder
+    }
+
+    func createRecommendation(seriesId: String, message: String? = nil) async throws -> SeriesShareInviteCreateResponse {
+        let body = try encoder.encode(SeriesShareInviteCreateRequest(seriesId: seriesId, message: message))
+        let (data, _) = try await apiClient.requestData(
+            path: "/v1/series/share-invites",
+            method: "POST",
+            body: body,
+            headers: ["Content-Type": "application/json"]
+        )
+        return try decoder.decode(SeriesShareInviteCreateResponse.self, from: data)
+    }
+
+    private static func makeEncoder() -> JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        return encoder
+    }
+
+    private static func makeDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .seriesAVISO8601
+        return decoder
+    }
+}
+
 private extension JSONDecoder.DateDecodingStrategy {
     static var seriesAVISO8601: JSONDecoder.DateDecodingStrategy {
         .custom { decoder in

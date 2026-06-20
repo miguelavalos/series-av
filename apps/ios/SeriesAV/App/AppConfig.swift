@@ -42,6 +42,10 @@ enum AppConfig {
         configuredURL(for: "SERIESAV_PRIVACY_URL", fallback: "https://series-av.avalsys.com/privacy")
     }
 
+    static var seriesWebBaseURL: URL {
+        BundleConfig.urlValue(for: "SERIESAV_WEB_BASE_URL") ?? configuredURL(for: "SERIESAV_PRIVACY_URL", fallback: "https://series-av.avalsys.com/privacy").deletingLastPathComponent()
+    }
+
     static var openSourceURL: URL {
         configuredURL(for: "SERIESAV_OPEN_SOURCE_URL", fallback: "https://github.com/avalsys/series-av")
     }

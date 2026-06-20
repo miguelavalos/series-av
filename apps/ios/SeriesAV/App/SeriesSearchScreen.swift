@@ -73,7 +73,8 @@ struct SeriesSearchScreen: View {
                 },
                 clearProgress: { entry in
                     store.clearProgress(for: entry.id)
-                }
+                },
+                shareInviteClient: SeriesShareInviteClient(apiClient: accessController.authenticatedAPIClient())
             )
             .presentationDetents([.large])
         }

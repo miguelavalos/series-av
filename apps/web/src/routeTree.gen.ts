@@ -17,6 +17,7 @@ import { Route as AviRouteImport } from './routes/avi'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SeriesSeriesIdRouteImport } from './routes/series.$seriesId'
+import { Route as IRTokenRouteImport } from './routes/i.r.$token'
 
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
@@ -58,6 +59,11 @@ const SeriesSeriesIdRoute = SeriesSeriesIdRouteImport.update({
   path: '/series/$seriesId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IRTokenRoute = IRTokenRouteImport.update({
+  id: '/i/r/$token',
+  path: '/i/r/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -68,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/series/$seriesId': typeof SeriesSeriesIdRoute
+  '/i/r/$token': typeof IRTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/series/$seriesId': typeof SeriesSeriesIdRoute
+  '/i/r/$token': typeof IRTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/series/$seriesId': typeof SeriesSeriesIdRoute
+  '/i/r/$token': typeof IRTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sign-in'
     | '/series/$seriesId'
+    | '/i/r/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sign-in'
     | '/series/$seriesId'
+    | '/i/r/$token'
   id:
     | '__root__'
     | '/'
@@ -121,6 +132,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sign-in'
     | '/series/$seriesId'
+    | '/i/r/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -132,6 +144,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   SignInRoute: typeof SignInRoute
   SeriesSeriesIdRoute: typeof SeriesSeriesIdRoute
+  IRTokenRoute: typeof IRTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -192,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SeriesSeriesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/i/r/$token': {
+      id: '/i/r/$token'
+      path: '/i/r/$token'
+      fullPath: '/i/r/$token'
+      preLoaderRoute: typeof IRTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -204,6 +224,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   SignInRoute: SignInRoute,
   SeriesSeriesIdRoute: SeriesSeriesIdRoute,
+  IRTokenRoute: IRTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

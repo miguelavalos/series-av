@@ -66,6 +66,9 @@
 "detail.sources.imdb" = "IMDb";
 "detail.sources.wikipedia" = "Wikipedia";
 "detail.sources.web" = "Buscar en web";
+"detail.share" = "Compartir recomendación";
+"detail.share.open" = "Compartir recomendación";
+"detail.share.failed" = "No se pudo crear el enlace ahora mismo.";
 "home.queue.title" = "También viendo";
 "home.queue.progress" = "%@ visto, %@ siguiente";
 "home.queue.wantToWatch.title" = "Listas para empezar";

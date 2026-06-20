@@ -19,11 +19,15 @@ struct SeriesDetailScreen: View {
 
     private let episodeGuideClient: SeriesEpisodeGuideClient
     private let detailClient: SeriesDetailClient
+    private let shareInviteClient: SeriesShareInviteClient?
 
     @State private var guideState: SeriesDetailGuideState = .loading
     @State private var resolvedCatalogItem: SeriesCatalogItem?
     @State private var isShowingProgressEditor = false
     @State private var inAppBrowserDestination: SeriesInAppBrowserDestination?
+    @State private var shareSheetItem: SeriesShareSheetItem?
+    @State private var shareError: String?
+    @State private var isCreatingShareInvite = false
 
     init(
         catalogItem: SeriesCatalogItem? = nil,
@@ -34,7 +38,8 @@ struct SeriesDetailScreen: View {
         markWatchedThrough: ((SeriesLibraryEntry, SeriesEpisodeCursor) -> Void)? = nil,
         clearProgress: ((SeriesLibraryEntry) -> Void)? = nil,
         episodeGuideClient: SeriesEpisodeGuideClient = SeriesEpisodeGuideClient(apiClient: SeriesAVAPIClient()),
-        detailClient: SeriesDetailClient = SeriesDetailClient()
+        detailClient: SeriesDetailClient = SeriesDetailClient(),
+        shareInviteClient: SeriesShareInviteClient? = nil
     ) {
         self.catalogItem = catalogItem
         self.entry = entry
@@ -45,6 +50,7 @@ struct SeriesDetailScreen: View {
         self.clearProgress = clearProgress
         self.episodeGuideClient = episodeGuideClient
         self.detailClient = detailClient
+        self.shareInviteClient = shareInviteClient
     }
 
     var body: some View {
@@ -65,6 +71,17 @@ struct SeriesDetailScreen: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(L10n.string("common.close")) {
                         dismiss()
+                    }
+                }
+                if shareInviteClient != nil {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button {
+                            Task { await createShareInvite() }
+                        } label: {
+                            Image(systemName: isCreatingShareInvite ? "hourglass" : "square.and.arrow.up")
+                        }
+                        .disabled(isCreatingShareInvite || seriesId.isEmpty)
+                        .accessibilityLabel(L10n.string("detail.share"))
                     }
                 }
             }
@@ -92,6 +109,16 @@ struct SeriesDetailScreen: View {
             .sheet(item: $inAppBrowserDestination) { destination in
                 SeriesInAppBrowserView(url: destination.url)
                     .ignoresSafeArea()
+            }
+            .sheet(item: $shareSheetItem) { item in
+                ShareLink(item: item.url) {
+                    Label(L10n.string("detail.share.open"), systemImage: "square.and.arrow.up")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .padding(24)
+                .presentationDetents([.height(140)])
             }
         }
     }
@@ -140,6 +167,13 @@ struct SeriesDetailScreen: View {
         AVAppShellCard {
             VStack(alignment: .leading, spacing: 14) {
                 sectionTitle(L10n.string("detail.tracking.title"))
+
+                if let shareError {
+                    Text(shareError)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.red)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
 
                 if let entry {
                     HStack(alignment: .center, spacing: 12) {
@@ -250,6 +284,29 @@ struct SeriesDetailScreen: View {
                 }
             }
         }
+    }
+
+    @MainActor
+    private func createShareInvite() async {
+        guard let shareInviteClient else { return }
+        isCreatingShareInvite = true
+        shareError = nil
+        defer { isCreatingShareInvite = false }
+
+        do {
+            let response = try await shareInviteClient.createRecommendation(seriesId: seriesId)
+            shareSheetItem = SeriesShareSheetItem(url: shareURL(for: response.token))
+        } catch {
+            shareError = L10n.string("detail.share.failed")
+        }
+    }
+
+    private func shareURL(for token: String) -> URL {
+        let encodedToken = token.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? token
+        return AppConfig.seriesWebBaseURL
+            .appending(path: "i")
+            .appending(path: "r")
+            .appending(path: encodedToken)
     }
 
     private func sectionTitle(_ title: String) -> some View {
@@ -455,6 +512,12 @@ private struct SeriesExternalSourceLink: Identifiable {
 }
 
 private struct SeriesInAppBrowserDestination: Identifiable {
+    let url: URL
+
+    var id: URL { url }
+}
+
+private struct SeriesShareSheetItem: Identifiable {
     let url: URL
 
     var id: URL { url }
