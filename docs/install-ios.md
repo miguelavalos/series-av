@@ -188,3 +188,29 @@ The production preflight must resolve:
 
 If any value is different, regenerate config from the right profile before
 building. Do not hand-edit `Local.xcconfig`.
+
+## Share Invite Link QA
+
+Series AV private share invites use HTTPS URLs shaped like:
+
+```text
+https://app.series-av.avalsys.com/i/r/<token>?lang=es
+```
+
+Production TestFlight builds must be tested with production invite links. A
+preview-domain invite token is not valid against the production API used by a
+Release/TestFlight build.
+
+The app supports two native entry paths:
+
+- Universal Links for `https://app.series-av.avalsys.com/i/r/*` and
+  `https://app.series-av-preview.avalsys.com/i/r/*`.
+- Custom-scheme fallback links shaped like
+  `com.avalsys.seriesav://i/r/<token>`.
+
+If WhatsApp or Safari opens the browser instead of the installed TestFlight app,
+first confirm the web preview shows the invite and use the visible **Open in
+Series AV** / **Abrir en Series AV** fallback button. iOS caches Universal Link
+association state per app install and domain; after AASA or domain fixes,
+delete and reinstall the TestFlight build to force a fresh association fetch
+before treating direct HTTPS handoff as an app-code failure.

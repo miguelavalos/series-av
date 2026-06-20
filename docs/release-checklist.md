@@ -88,6 +88,9 @@ device-specific Apple auth behavior.
 6. Confirm cloud library sync runs and status updates in profile when the submitted build enables Pro sync.
 7. Confirm signed-in search/detail can resolve backend-backed catalog data where expected.
 8. Confirm no visible shared-list, recommendation inbox, friends, public activity, or social-network surface is exposed in V1.
+9. Confirm private share invites can be created by a Pro account and shared as
+   `/i/r/<token>` links without exposing email, provider subject ids, public
+   people search, contact lists, followers, or activity feeds.
 
 ### Production iOS QA Before TestFlight
 
@@ -117,7 +120,15 @@ but it must not replace a real store purchase/restore validation.
 6. Run light mode, dark mode, Dynamic Type, five-locale, and long-string checks
    across Home, Library, Search, Detail, Profile, Account, Settings, Avi,
    guided progress actions, and Paywall.
-7. If a temporary internal grant is used for QA, revoke or allow it to expire
+7. Confirm a production private share invite opens safely from WhatsApp/Safari:
+   direct Universal Link handoff should open the installed TestFlight app when
+   iOS has refreshed the domain association; if it opens browser, the web page
+   must render the invite and the **Open in Series AV** fallback must open the
+   native app through `com.avalsys.seriesav://i/r/<token>`.
+8. If direct Universal Link handoff fails after AASA/domain changes, delete and
+   reinstall the TestFlight build before treating it as an app-code failure,
+   because iOS caches association state per install/domain.
+9. If a temporary internal grant is used for QA, revoke or allow it to expire
    after QA. It is smoke/QA evidence only and must not replace purchase/restore
    validation.
 
@@ -133,7 +144,7 @@ Current evidence:
 Additional local simulator evidence, 2026-06-17:
 
 - production Release build restored an existing signed Account AV session and
-  displayed the signed-in account email in the Account screen;
+  displayed signed-in account state in the Account screen;
 - production RevenueCat offer loading returned `seriesav_pro_monthly` with
   display price `$2.99`;
 - dark mode and Dynamic Type checks passed visually across Home, Search,

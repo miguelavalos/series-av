@@ -1,6 +1,6 @@
 # Series AV Web Audit
 
-Status: current as of 2026-06-19.
+Status: current as of 2026-06-20.
 
 Series AV commercial web and Series AV web app were checked as part of the AV
 web visual audit.
@@ -164,3 +164,17 @@ web visual audit.
   DuckDuckGo, Yandex, Baidu, Brave Search, Ecosia, Startpage, Qwant), Detail
   shows familiar IMDb, Wikipedia, and web-search shortcuts, and the web-search
   shortcut uses the user's selected search engine.
+- Production invite QA on 2026-06-20 aligned the web app with the native
+  TestFlight flow:
+  - `/i/r/$token` is the public invite preview route for opaque private share
+    links;
+  - production `https://app.series-av.avalsys.com/i/r/:token` returns 200 and
+    loads the Series AV app route instead of a Worker/static `Not Found`;
+  - the web Worker serves
+    `/.well-known/apple-app-site-association` for `/i/r/*` Universal Links;
+  - the invite page includes an explicit `Abrir en Series AV` / `Open in Series
+    AV` fallback button that opens `com.avalsys.seriesav://i/r/:token` when iOS
+    or a messaging app opens the browser instead of the installed app;
+  - the public preview must not expose email, provider subject ids, internal
+    Account AV ids, public people search, contact lists, followers, or activity
+    feeds.
