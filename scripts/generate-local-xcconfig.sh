@@ -54,10 +54,22 @@ terms_url="$(printenv_value SERIESAV_TERMS_URL)"
 privacy_url="$(printenv_value SERIESAV_PRIVACY_URL)"
 support_email="$(printenv_value SERIESAV_SUPPORT_EMAIL)"
 open_source_url="$(printenv_value SERIESAV_OPEN_SOURCE_URL)"
+seriesav_web_base_url="$(printenv_value SERIESAV_WEB_BASE_URL)"
 development_team="$(printenv_value AVALSYS_APPLE_DEVELOPMENT_TEAM)"
 
 if [ -z "$development_team" ]; then
   development_team="\$(inherited)"
+if [ -z "$seriesav_web_base_url" ]; then
+  case "$profile" in
+    production)
+      seriesav_web_base_url="https://app.series-av.avalsys.com"
+      ;;
+    *)
+      seriesav_web_base_url="https://app.series-av-preview.avalsys.com"
+      ;;
+  esac
+fi
+
 fi
 
 if [ "$development_team" = "346677S99H" ]; then
@@ -134,6 +146,7 @@ SERIESAV_DEBUG_FORCE_PRO_MODE = NO
 SERIESAV_DEBUG_SEED_SOCIAL_PREVIEW = NO
 SERIESAV_DEBUG_PREVIEW_DISPLAY_NAME =
 SERIESAV_DEBUG_PREVIEW_EMAIL =
+SERIESAV_WEB_BASE_URL = $(xcodebuild_url_value "${seriesav_web_base_url:-}")
 EOF
 )"
 

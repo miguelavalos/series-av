@@ -70,6 +70,8 @@
 	<key>SERIESAV_TERMS_URL</key>
 	<string>$(SERIESAV_TERMS_URL)</string>
 	<key>UIApplicationSceneManifest</key>
+	<key>SERIESAV_WEB_BASE_URL</key>
+	<string>$(SERIESAV_WEB_BASE_URL)</string>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<false/>

@@ -12,6 +12,7 @@ struct SeriesAppBootstrapView: View {
     @State private var initialSplashIsPresented = true
     @State private var initialAccountRestoreCompleted = false
     @State private var postAuthenticationSplashIsPresented = false
+    @State private var shareInviteBrowserDestination: SeriesInAppBrowserDestination?
 
     private let launchContext = SeriesLaunchContext.current
     private var splashPolicy: AVSplashTransitionPolicy {
@@ -65,6 +66,12 @@ struct SeriesAppBootstrapView: View {
                 automaticGuestOnboardingIsPresented = false
                 authPresentationState = .hidden
             }
+        }
+        .onOpenURL { url in
+            openShareInviteIfNeeded(url)
+        }
+        .sheet(item: $shareInviteBrowserDestination) { destination in
+            SeriesInAppBrowserView(url: destination.url)
         }
     }
 
@@ -181,5 +188,10 @@ struct SeriesAppBootstrapView: View {
         authenticationWasSkipped = false
         automaticGuestOnboardingIsPresented = false
         authPresentationState = .hidden
+    }
+
+    private func openShareInviteIfNeeded(_ url: URL) {
+        guard let deepLink = SeriesShareInviteDeepLink(url: url) else { return }
+        shareInviteBrowserDestination = SeriesInAppBrowserDestination(url: deepLink.webURL())
     }
 }
