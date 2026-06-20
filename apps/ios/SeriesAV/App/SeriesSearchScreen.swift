@@ -16,7 +16,7 @@ struct SeriesSearchScreen: View {
     @State private var remoteCatalogQuery = ""
     @State private var remoteCollectionResults: [SeriesCatalogPreview] = []
     @State private var remoteCollectionKey = ""
-    @State private var isSearchingCatalog = false
+    @State private var catalogLoadState = SeriesCatalogLoadState()
     @State private var detailSelection: SeriesSearchDetailSelection?
 
     var body: some View {
@@ -145,6 +145,10 @@ struct SeriesSearchScreen: View {
 
     private var searchRefreshKey: String {
         "\(selectedCollection.cacheKey)|\(trimmedQuery)"
+    }
+
+    private var isSearchingCatalog: Bool {
+        catalogLoadState.isLoading
     }
 
     private var searchControls: some View {
@@ -414,7 +418,11 @@ struct SeriesSearchScreen: View {
             return
         }
 
-        isSearchingCatalog = true
+        let loadToken = catalogLoadState.begin()
+        defer {
+            catalogLoadState.finish(loadToken)
+        }
+
         do {
             let client = SeriesCatalogSearchClient()
             let response = try await client.search(query: searchQuery, locale: Locale.current.identifier, limit: 12)
@@ -426,13 +434,16 @@ struct SeriesSearchScreen: View {
             remoteCatalogQuery = searchQuery
             remoteCatalogResults = []
         }
-        isSearchingCatalog = false
     }
 
     private func refreshSelectedCollection() async {
         let collection = selectedCollection
         let collectionKey = collection.cacheKey
-        isSearchingCatalog = true
+        let loadToken = catalogLoadState.begin()
+        defer {
+            catalogLoadState.finish(loadToken)
+        }
+
         let client = SeriesCatalogSearchClient()
         let response = try? await client.popular(locale: Locale.current.identifier, surface: "search", limit: 12)
 
@@ -444,7 +455,30 @@ struct SeriesSearchScreen: View {
         remoteCollectionResults = (response?.results ?? [])
             .filter { collection == .popular || $0.genres.contains { SeriesLibraryIdentity.normalizedSearchText($0).contains(collection.cacheKey) } }
             .map { SeriesCatalogPreview(catalogItem: $0, collections: [collection]) }
-        isSearchingCatalog = false
+    }
+}
+
+struct SeriesCatalogLoadState: Equatable {
+    struct Token: Equatable {
+        fileprivate let value: Int
+    }
+
+    private var nextTokenValue = 0
+    private(set) var activeToken: Token?
+    private(set) var isLoading = false
+
+    mutating func begin() -> Token {
+        nextTokenValue += 1
+        let token = Token(value: nextTokenValue)
+        activeToken = token
+        isLoading = true
+        return token
+    }
+
+    mutating func finish(_ token: Token) {
+        guard activeToken == token else { return }
+        activeToken = nil
+        isLoading = false
     }
 }
 
