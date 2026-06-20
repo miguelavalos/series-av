@@ -6,6 +6,7 @@ coverage
 .DerivedData*
 .derived-data*
 .derived-*
+.release-evidence/
 DerivedData/
 build/
 *.xcarchive

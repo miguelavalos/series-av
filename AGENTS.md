@@ -50,6 +50,9 @@ Mandatory rules:
   passed to Account AV, and validated by the runtime config check;
 - Series AV's Release/prod runtime config check is
   `scripts/verify-ios-runtime-config.sh production`;
+- before any TestFlight/App Store archive or upload, run the production
+  simulator release gate from this repo after generating production config:
+  `bun run ios:release:simulator`;
 - keep private URLs, service identifiers, approval status, and operations
   evidence out of this public repo;
 - treat Account AV provider session identity as session metadata only; product

@@ -35,7 +35,20 @@ Use this checklist before uploading the first App Store build and before later p
 
 3. Build a signed simulator or device candidate from Xcode before validating Sign in with Apple. The `bun run typecheck` simulator artifact intentionally disables code signing and cannot be used to approve Apple auth.
 4. Build a release candidate locally from Xcode before archiving for App Store Connect.
-5. Confirm the shipping version and build number are correct for App Store Connect. `1.0 (1)` is acceptable only if this is the first uploaded build for version `1.0`; otherwise increment `CFBundleVersion`.
+5. Before any TestFlight/App Store archive or upload, run the production
+   simulator release gate:
+
+   ```bash
+   bun run ios:config:production
+   bun run ios:release:simulator
+   ```
+
+   This gate validates public config hygiene, production runtime config,
+   production Series API Search dependencies, focused native tests for Search
+   loading and shell flows, a Release simulator build, and a screenshot evidence
+   capture from the Release/prod Search screen. It does not replace signed
+   device/TestFlight purchase, restore, Apple auth, or real Universal Link QA.
+6. Confirm the shipping version and build number are correct for App Store Connect. `1.0 (1)` is acceptable only if this is the first uploaded build for version `1.0`; otherwise increment `CFBundleVersion`.
 
 ## Automated And Manual QA
 
