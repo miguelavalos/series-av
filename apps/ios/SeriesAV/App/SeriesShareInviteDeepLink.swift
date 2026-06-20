@@ -7,6 +7,7 @@ struct SeriesShareInviteDeepLink: Equatable {
     ])
 
     let token: String
+    private let originalWebURL: URL?
 
     init?(url: URL) {
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
@@ -21,10 +22,15 @@ struct SeriesShareInviteDeepLink: Equatable {
         }
 
         token = sharePath[2]
+        originalWebURL = Self.isAllowedWebURL(url, components: components) ? url : nil
     }
 
     func webURL(baseURL: URL = AppConfig.seriesWebBaseURL) -> URL {
-        baseURL
+        if let originalWebURL {
+            return originalWebURL
+        }
+
+        return baseURL
             .appending(path: "i")
             .appending(path: "r")
             .appending(path: token)
@@ -35,11 +41,8 @@ struct SeriesShareInviteDeepLink: Equatable {
         components: URLComponents?,
         pathComponents: [String]
     ) -> [String] {
-        let scheme = url.scheme?.lowercased()
-
-        if scheme == "http" || scheme == "https" {
-            guard let host = components?.host?.lowercased(),
-                  allowedWebHosts.contains(host) else {
+        if isWebURL(url) {
+            guard isAllowedWebURL(url, components: components) else {
                 return []
             }
 
@@ -51,5 +54,19 @@ struct SeriesShareInviteDeepLink: Equatable {
         }
 
         return [host] + pathComponents
+    }
+
+    private static func isAllowedWebURL(_ url: URL, components: URLComponents?) -> Bool {
+        guard isWebURL(url),
+              let host = components?.host?.lowercased() else {
+            return false
+        }
+
+        return allowedWebHosts.contains(host)
+    }
+
+    private static func isWebURL(_ url: URL) -> Bool {
+        let scheme = url.scheme?.lowercased()
+        return scheme == "http" || scheme == "https"
     }
 }

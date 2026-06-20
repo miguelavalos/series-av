@@ -22,6 +22,13 @@ final class SeriesShareInviteDeepLinkTests: XCTestCase {
         XCTAssertEqual(link?.webURL(baseURL: baseURL).absoluteString, "https://app.series-av-preview.avalsys.com/i/r/share-token-123")
     }
 
+    func testPreservesOriginalWebInviteURL() {
+        let link = SeriesShareInviteDeepLink(url: URL(string: "https://app.series-av-preview.avalsys.com/i/r/share-token-123?lang=es")!)
+        let productionBaseURL = URL(string: "https://app.series-av.avalsys.com")!
+
+        XCTAssertEqual(link?.webURL(baseURL: productionBaseURL).absoluteString, "https://app.series-av-preview.avalsys.com/i/r/share-token-123?lang=es")
+    }
+
     func testRejectsNonInviteURLs() {
         XCTAssertNil(SeriesShareInviteDeepLink(url: URL(string: "com.avalsys.seriesav://library")!))
         XCTAssertNil(SeriesShareInviteDeepLink(url: URL(string: "https://app.series-av-preview.avalsys.com/search")!))
