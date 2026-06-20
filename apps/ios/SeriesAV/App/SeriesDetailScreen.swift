@@ -15,6 +15,7 @@ struct SeriesDetailScreen: View {
     let markNext: ((SeriesLibraryEntry) -> Void)?
     let markWatchedThrough: ((SeriesLibraryEntry, SeriesEpisodeCursor) -> Void)?
     let clearProgress: ((SeriesLibraryEntry) -> Void)?
+    let setPinned: ((SeriesLibraryEntry, Bool) -> Void)?
     let setPrivateNote: ((SeriesLibraryEntry, String?) -> Void)?
 
     private let episodeGuideClient: SeriesEpisodeGuideClient
@@ -25,6 +26,7 @@ struct SeriesDetailScreen: View {
     @State private var resolvedCatalogItem: SeriesCatalogItem?
     @State private var isShowingProgressEditor = false
     @State private var isShowingPrivateNoteEditor = false
+    @State private var displayedPinnedOverride: Bool?
     @State private var hasDisplayedPrivateNoteOverride = false
     @State private var displayedPrivateNote: String?
     @State private var isShowingShareComposer = false
@@ -39,6 +41,7 @@ struct SeriesDetailScreen: View {
         markNext: ((SeriesLibraryEntry) -> Void)? = nil,
         markWatchedThrough: ((SeriesLibraryEntry, SeriesEpisodeCursor) -> Void)? = nil,
         clearProgress: ((SeriesLibraryEntry) -> Void)? = nil,
+        setPinned: ((SeriesLibraryEntry, Bool) -> Void)? = nil,
         setPrivateNote: ((SeriesLibraryEntry, String?) -> Void)? = nil,
         episodeGuideClient: SeriesEpisodeGuideClient = SeriesEpisodeGuideClient(apiClient: SeriesAVAPIClient()),
         detailClient: SeriesDetailClient = SeriesDetailClient(),
@@ -51,6 +54,7 @@ struct SeriesDetailScreen: View {
         self.markNext = markNext
         self.markWatchedThrough = markWatchedThrough
         self.clearProgress = clearProgress
+        self.setPinned = setPinned
         self.setPrivateNote = setPrivateNote
         self.episodeGuideClient = episodeGuideClient
         self.detailClient = detailClient
@@ -227,6 +231,20 @@ struct SeriesDetailScreen: View {
                         .buttonStyle(.bordered)
                         .controlSize(.large)
                         .accessibilityLabel(L10n.string("home.adjust"))
+
+                        if let setPinned {
+                            Button {
+                                let nextPinned = currentIsPinned == false
+                                displayedPinnedOverride = nextPinned
+                                setPinned(entry, nextPinned)
+                            } label: {
+                                Image(systemName: currentIsPinned ? "pin.slash" : "pin")
+                                    .frame(width: 44, height: 44)
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.large)
+                            .accessibilityLabel(pinTitle)
+                        }
                     }
                 } else if let follow {
                     Text(L10n.string("detail.tracking.notFollowed"))
@@ -353,6 +371,14 @@ struct SeriesDetailScreen: View {
 
     private var currentPrivateNote: String? {
         hasDisplayedPrivateNoteOverride ? displayedPrivateNote : entry?.privateNote
+    }
+
+    private var currentIsPinned: Bool {
+        displayedPinnedOverride ?? (entry?.isPinnedHomeSeries == true)
+    }
+
+    private var pinTitle: String {
+        currentIsPinned ? L10n.string("home.unpin") : L10n.string("home.pin")
     }
 
     private func sectionTitle(_ title: String) -> some View {
