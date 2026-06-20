@@ -1,7 +1,6 @@
 import AVAppShellFoundation
 import AVBrandFoundation
 import AVExternalLinkFoundation
-import SafariServices
 import SwiftUI
 
 struct SeriesDetailScreen: View {
@@ -511,26 +510,10 @@ private struct SeriesExternalSourceLink: Identifiable {
     var id: URL { url }
 }
 
-private struct SeriesInAppBrowserDestination: Identifiable {
-    let url: URL
-
-    var id: URL { url }
-}
-
 private struct SeriesShareSheetItem: Identifiable {
     let url: URL
 
     var id: URL { url }
-}
-
-private struct SeriesInAppBrowserView: UIViewControllerRepresentable {
-    let url: URL
-
-    func makeUIViewController(context: Context) -> SFSafariViewController {
-        SFSafariViewController(url: url)
-    }
-
-    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
 }
 
 private enum SeriesDetailGuideState {

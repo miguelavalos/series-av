@@ -200,19 +200,19 @@
 				72508EE57AAF005C7D57D90F /* SeriesAviScreen.swift */,
 				54848FD3FA8A4FAE5ABAC868 /* SeriesAVSplashView.swift */,
 				95CB9C176D1FA8D01B9A5F67 /* SeriesDetailScreen.swift */,
+				6D41E01B35A1477DB3C9F001 /* SeriesInAppBrowserView.swift */,
 				EBFD99725B527557EED246FB /* SeriesLaunchContext.swift */,
 				332AC1912A119DE4FCDA1227 /* SeriesLibraryTabScreen.swift */,
 				7A61A33B6821805C523ACDBE /* SeriesRootTab.swift */,
 				21C8D017E63E4B405AB9FB3C /* SeriesSearchScreen.swift */,
+				6D41E01935A1477DB3C9F001 /* SeriesShareInviteDeepLink.swift */,
 				2EF0BD8F6256FAEAD9C6EFA5 /* SeriesSubscriptionPurchasingService.swift */,
 				99FE30D7480CA22D50E207D7 /* SeriesUpcomingEpisodes.swift */,
 			);
-				6D41E01B35A1477DB3C9F001 /* SeriesInAppBrowserView.swift */,
 			path = App;
 			sourceTree = "<group>";
 		};
 		3C3C51AD32C89EE9A289595D /* Features */ = {
-				6D41E01935A1477DB3C9F001 /* SeriesShareInviteDeepLink.swift */,
 			isa = PBXGroup;
 			children = (
 				F3A64473A350215E09C41F7C /* Profile */,
@@ -269,9 +269,9 @@
 				FF356E2FD2CC3CC73B7B7490 /* SeriesEntitlementServiceTests.swift */,
 				68FAC949798DD909B4FF68C5 /* SeriesLibraryStoreTests.swift */,
 				916AF9EA3C1212E25351DD1D /* SeriesLibrarySyncCoordinatorTests.swift */,
+				6D41E01D35A1477DB3C9F001 /* SeriesShareInviteDeepLinkTests.swift */,
 			);
 			path = SeriesAVTests;
-				6D41E01D35A1477DB3C9F001 /* SeriesShareInviteDeepLinkTests.swift */,
 			sourceTree = "<group>";
 		};
 		89BD05911C265EE1756328C7 /* Resources */ = {
@@ -464,9 +464,9 @@
 				159807956E30BB116384FADE /* SeriesEntitlementServiceTests.swift in Sources */,
 				96B90E763CC1A37D3DD098F1 /* SeriesLibraryStoreTests.swift in Sources */,
 				EC67B99ED99843EF58B10A26 /* SeriesLibrarySyncCoordinatorTests.swift in Sources */,
+				6D41E01E35A1477DB3C9F001 /* SeriesShareInviteDeepLinkTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-				6D41E01E35A1477DB3C9F001 /* SeriesShareInviteDeepLinkTests.swift in Sources */,
 		};
 		C1D128B97704746FA1D8FEFB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
