@@ -45,6 +45,13 @@ final class SeriesDetailPresentationBuilderTests: XCTestCase {
         XCTAssertEqual(presentation.title, "Catalog Title")
     }
 
+    func testExternalSearchQueryDoesNotDuplicateYearAlreadyInTitle() {
+        let catalogItem = catalogItem(id: "dororo", title: "Dororo 2019", year: 2019)
+
+        XCTAssertEqual(SeriesDetailPresentationBuilder.externalSearchQuery(title: "Dororo 2019", catalogItem: catalogItem), "Dororo 2019")
+        XCTAssertEqual(SeriesDetailPresentationBuilder.externalSearchQuery(title: "Dororo", catalogItem: catalogItem), "Dororo 2019")
+    }
+
     func testSourceLinksPreferEnrichedExternalLinksAndFallbackForWebSearch() {
         let imdbURL = URL(string: "https://www.imdb.com/title/tt123/")!
         let wikipediaURL = URL(string: "https://en.wikipedia.org/wiki/Example")!

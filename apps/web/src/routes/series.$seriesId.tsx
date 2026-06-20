@@ -74,7 +74,7 @@ function SeriesDetailRoute() {
   });
   const title = catalog?.title ?? entry?.title ?? decodeURIComponent(seriesId);
   const catalogArtworkRef = catalog?.posterUrl ?? catalog?.displayArtwork?.url ?? null;
-  const externalQuery = [title, catalog?.startYear ?? catalog?.firstAirDate].filter(Boolean).join(" ");
+  const externalQuery = seriesExternalQuery(title, catalog?.startYear ?? catalog?.firstAirDate);
   const sourceLinks = sourceLinksForSeries({ catalog, engine: externalSearchEngine, labels, query: externalQuery });
 
   useEffect(() => {
@@ -446,6 +446,15 @@ function sourceLinksForSeries({
   }
 
   return links;
+}
+
+export function seriesExternalQuery(title: string, yearOrDate: number | string | null | undefined): string {
+  const trimmedTitle = title.trim();
+  const yearText = yearOrDate === null || yearOrDate === undefined ? "" : String(yearOrDate).trim();
+  if (!yearText || trimmedTitle.endsWith(yearText)) {
+    return trimmedTitle;
+  }
+  return `${trimmedTitle} ${yearText}`.trim();
 }
 
 function externalLinkByKind(catalog: SeriesSearchResult | null | undefined, kind: "imdb" | "wikipedia") {

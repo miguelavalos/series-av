@@ -58,7 +58,10 @@ enum SeriesDetailPresentationBuilder {
     }
 
     static func externalSearchQuery(title: String, catalogItem: SeriesCatalogItem?) -> String {
-        [title, catalogItem?.startYear.map(String.init)]
+        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let year = catalogItem?.startYear.map(String.init)
+        let shouldAppendYear = year.map { trimmedTitle.hasSuffix($0) == false } ?? false
+        return [trimmedTitle, shouldAppendYear ? year : nil]
             .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { $0.isEmpty == false }
             .joined(separator: " ")
