@@ -23,10 +23,9 @@ struct SeriesDetailScreen: View {
     @State private var guideState: SeriesDetailGuideState = .loading
     @State private var resolvedCatalogItem: SeriesCatalogItem?
     @State private var isShowingProgressEditor = false
+    @State private var isShowingShareComposer = false
     @State private var inAppBrowserDestination: SeriesInAppBrowserDestination?
     @State private var shareSheetItem: SeriesShareSheetItem?
-    @State private var shareError: String?
-    @State private var isCreatingShareInvite = false
 
     init(
         catalogItem: SeriesCatalogItem? = nil,
@@ -75,11 +74,11 @@ struct SeriesDetailScreen: View {
                 if shareInviteClient != nil {
                     ToolbarItem(placement: .primaryAction) {
                         Button {
-                            Task { await createShareInvite() }
+                            isShowingShareComposer = true
                         } label: {
-                            Image(systemName: isCreatingShareInvite ? "hourglass" : "square.and.arrow.up")
+                            Image(systemName: "square.and.arrow.up")
                         }
-                        .disabled(isCreatingShareInvite || seriesId.isEmpty)
+                        .disabled(seriesId.isEmpty)
                         .accessibilityLabel(L10n.string("detail.share"))
                     }
                 }
@@ -109,8 +108,18 @@ struct SeriesDetailScreen: View {
                 SeriesInAppBrowserView(url: destination.url)
                     .ignoresSafeArea()
             }
+            .sheet(isPresented: $isShowingShareComposer) {
+                SeriesShareInviteComposerSheet(
+                    seriesTitle: title,
+                    createInvite: createShareInvite(message:),
+                    onCreated: { item in
+                        shareSheetItem = item
+                    }
+                )
+                .presentationDetents([.medium])
+            }
             .sheet(item: $shareSheetItem) { item in
-                ShareLink(item: item.url) {
+                ShareLink(item: item.url, subject: Text(item.subject), message: Text(item.message)) {
                     Label(L10n.string("detail.share.open"), systemImage: "square.and.arrow.up")
                         .frame(maxWidth: .infinity)
                 }
@@ -166,13 +175,6 @@ struct SeriesDetailScreen: View {
         AVAppShellCard {
             VStack(alignment: .leading, spacing: 14) {
                 sectionTitle(L10n.string("detail.tracking.title"))
-
-                if let shareError {
-                    Text(shareError)
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(.red)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
 
                 if let entry {
                     HStack(alignment: .center, spacing: 12) {
@@ -303,18 +305,18 @@ struct SeriesDetailScreen: View {
     }
 
     @MainActor
-    private func createShareInvite() async {
-        guard let shareInviteClient else { return }
-        isCreatingShareInvite = true
-        shareError = nil
-        defer { isCreatingShareInvite = false }
-
-        do {
-            let response = try await shareInviteClient.createRecommendation(seriesId: seriesId)
-            shareSheetItem = SeriesShareSheetItem(url: shareURL(for: response.token))
-        } catch {
-            shareError = L10n.string("detail.share.failed")
+    private func createShareInvite(message: String?) async throws -> SeriesShareSheetItem {
+        guard let shareInviteClient else {
+            throw SeriesShareInviteComposerError.missingClient
         }
+
+        let response = try await shareInviteClient.createRecommendation(seriesId: seriesId, message: message)
+        let url = shareURL(for: response.token)
+        return SeriesShareSheetItem(
+            title: title,
+            url: url,
+            message: Self.shareMessage(for: title, url: url)
+        )
     }
 
     private func shareURL(for token: String) -> URL {
@@ -323,6 +325,10 @@ struct SeriesDetailScreen: View {
             .appending(path: "i")
             .appending(path: "r")
             .appending(path: encodedToken)
+    }
+
+    private static func shareMessage(for title: String, url: URL) -> String {
+        String(format: L10n.string("detail.share.message"), title, url.absoluteString)
     }
 
     @ViewBuilder
@@ -427,9 +433,125 @@ struct SeriesDetailScreen: View {
 }
 
 private struct SeriesShareSheetItem: Identifiable {
+    let title: String
     let url: URL
+    let message: String
 
     var id: URL { url }
+    var subject: String { title }
+}
+
+private enum SeriesShareInviteComposerError: Error {
+    case missingClient
+}
+
+private struct SeriesShareInviteComposerSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    let seriesTitle: String
+    let createInvite: (String?) async throws -> SeriesShareSheetItem
+    let onCreated: (SeriesShareSheetItem) -> Void
+
+    @State private var message = ""
+    @State private var isCreating = false
+    @State private var errorMessage: String?
+
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(seriesTitle)
+                        .font(.system(size: 22, weight: .black, design: .rounded))
+                        .foregroundStyle(AVBrandColor.textPrimary)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.78)
+
+                    Text(L10n.string("detail.share.composer.detail"))
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                TextEditor(text: $message)
+                    .font(.system(size: 16, weight: .medium))
+                    .frame(minHeight: 108)
+                    .padding(8)
+                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .overlay(alignment: .topLeading) {
+                        if message.isEmpty {
+                            Text(L10n.string("detail.share.message.placeholder"))
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundStyle(.tertiary)
+                                .padding(.horizontal, 13)
+                                .padding(.vertical, 16)
+                                .allowsHitTesting(false)
+                        }
+                    }
+                    .onChange(of: message) { _, newValue in
+                        if newValue.count > 280 {
+                            message = String(newValue.prefix(280))
+                        }
+                    }
+
+                HStack {
+                    Spacer()
+                    Text("\(message.count)/280")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(.secondary)
+                }
+
+                if let errorMessage {
+                    Text(errorMessage)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.red)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Button {
+                    Task { await share() }
+                } label: {
+                    Label(isCreating ? L10n.string("detail.share.creating") : L10n.string("detail.share.create"), systemImage: "square.and.arrow.up")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(isCreating)
+
+                Spacer(minLength: 0)
+            }
+            .padding(20)
+            .background(AVBrandSurface.shellBackground.ignoresSafeArea())
+            .navigationTitle(L10n.string("detail.share"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(L10n.string("common.cancel")) {
+                        dismiss()
+                    }
+                    .disabled(isCreating)
+                }
+            }
+        }
+    }
+
+    @MainActor
+    private func share() async {
+        isCreating = true
+        errorMessage = nil
+        defer { isCreating = false }
+
+        do {
+            let trimmedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
+            let item = try await createInvite(trimmedMessage.isEmpty ? nil : trimmedMessage)
+            dismiss()
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 250_000_000)
+                onCreated(item)
+            }
+        } catch {
+            errorMessage = L10n.string("detail.share.failed")
+        }
+    }
 }
 
 private enum SeriesDetailGuideState {

@@ -69,6 +69,11 @@
 "detail.share" = "Share series";
 "detail.share.open" = "Share series";
 "detail.share.failed" = "Could not create the share link right now.";
+"detail.share.composer.detail" = "Add an optional message. It will be shown with the invitation before the other person accepts.";
+"detail.share.message.placeholder" = "Why are you recommending it?";
+"detail.share.create" = "Share link";
+"detail.share.creating" = "Creating link";
+"detail.share.message" = "I recommend \"%@\" on Series AV: %@";
 "home.queue.title" = "Also watching";
 "home.queue.progress" = "%@ watched, %@ next";
 "home.queue.wantToWatch.title" = "Ready to start";

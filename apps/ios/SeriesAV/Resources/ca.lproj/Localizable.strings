@@ -69,6 +69,11 @@
 "detail.share" = "Comparteix sèrie";
 "detail.share.open" = "Comparteix sèrie";
 "detail.share.failed" = "No s'ha pogut crear l'enllaç ara mateix.";
+"detail.share.composer.detail" = "Afegeix un missatge opcional. Es mostrarà amb la invitació abans que l'altra persona accepti.";
+"detail.share.message.placeholder" = "Per què la recomanes?";
+"detail.share.create" = "Compartir enllaç";
+"detail.share.creating" = "Creant enllaç";
+"detail.share.message" = "Et recomano \"%@\" a Series AV: %@";
 "home.queue.title" = "També veient";
 "home.queue.progress" = "%@ vist, %@ següent";
 "home.queue.wantToWatch.title" = "A punt per començar";

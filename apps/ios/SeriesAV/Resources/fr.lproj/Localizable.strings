@@ -69,6 +69,11 @@
 "detail.share" = "Partager la série";
 "detail.share.open" = "Partager la série";
 "detail.share.failed" = "Impossible de créer le lien pour le moment.";
+"detail.share.composer.detail" = "Ajoute un message facultatif. Il sera affiché avec l'invitation avant que l'autre personne accepte.";
+"detail.share.message.placeholder" = "Pourquoi la recommandes-tu ?";
+"detail.share.create" = "Partager le lien";
+"detail.share.creating" = "Création du lien";
+"detail.share.message" = "Je te recommande \"%@\" sur Series AV : %@";
 "home.queue.title" = "Aussi en cours";
 "home.queue.progress" = "%@ vu, %@ suivant";
 "home.queue.wantToWatch.title" = "Prêtes à démarrer";
