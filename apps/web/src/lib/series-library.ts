@@ -17,6 +17,7 @@ export interface SeriesLibraryEntry {
   isPinnedHomeSeries?: boolean | null;
   lastInteractedAt: string;
   lastWatchedEpisodeCursor?: SeriesEpisodeCursor | null;
+  privateNote?: string | null;
   seriesId: string;
   status: SeriesLibraryEntryStatus;
   title: string;
@@ -141,6 +142,7 @@ export function createLibraryEntry(input: SeriesCatalogLibraryInput, at = new Da
     isPinnedHomeSeries: false,
     lastInteractedAt: timestamp,
     lastWatchedEpisodeCursor: null,
+    privateNote: null,
     seriesId,
     status: "wantToWatch",
     title,

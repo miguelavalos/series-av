@@ -99,10 +99,18 @@ describe("series library model", () => {
       displayArtworkRef: "https://poster.test/a.jpg",
       entryId: "series-1",
       fallbackVisualSeed: "Show",
+      privateNote: null,
       seriesId: "series-1",
       status: "wantToWatch",
       title: "Show"
     });
+  });
+
+  it("preserves private notes during library updates", () => {
+    const entry = entryFixture({ privateNote: "Watch with Ana" });
+
+    expect(setStatus(entry, "watching", t1).privateNote).toBe("Watch with Ana");
+    expect(markWatchedThrough(entry, { episodeNumber: 2, seasonNumber: 1 }, t1).privateNote).toBe("Watch with Ana");
   });
 
   it("updates placeholder catalog metadata without overwriting human titles", () => {
@@ -146,6 +154,7 @@ function entryFixture(overrides: Partial<SeriesLibraryEntry> = {}): SeriesLibrar
     isPinnedHomeSeries: false,
     lastInteractedAt: t0.toISOString(),
     lastWatchedEpisodeCursor: null,
+    privateNote: null,
     seriesId: "series-1",
     status: "wantToWatch",
     title: "Series One",

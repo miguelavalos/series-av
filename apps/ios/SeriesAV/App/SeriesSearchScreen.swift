@@ -74,6 +74,9 @@ struct SeriesSearchScreen: View {
                 clearProgress: { entry in
                     store.clearProgress(for: entry.id)
                 },
+                setPrivateNote: { entry, note in
+                    store.setPrivateNote(note, for: entry.id)
+                },
                 shareInviteClient: shareInviteClient
             )
             .presentationDetents([.large])

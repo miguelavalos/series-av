@@ -15,6 +15,7 @@
 "access.unavailable" = "Els serveis del compte no estan disponibles ara mateix.";
 "common.cancel" = "Cancel·lar";
 "common.close" = "Tancar";
+"common.save" = "Desar";
 "language.catalan" = "Català";
 "language.english" = "Anglès";
 "language.french" = "Francès";
@@ -74,6 +75,10 @@
 "detail.share.create" = "Compartir enllaç";
 "detail.share.creating" = "Creant enllaç";
 "detail.share.message" = "Et recomano \"%@\" a Series AV: %@";
+"detail.privateNote.title" = "Nota privada";
+"detail.privateNote.empty" = "Afegeix una nota privada només per a tu.";
+"detail.privateNote.edit" = "Edita la nota privada";
+"detail.privateNote.count" = "%d de %d caràcters";
 "home.queue.title" = "També veient";
 "home.queue.progress" = "%@ vist, %@ següent";
 "home.queue.wantToWatch.title" = "A punt per començar";

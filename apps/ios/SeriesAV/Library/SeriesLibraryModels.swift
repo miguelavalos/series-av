@@ -58,6 +58,7 @@ struct SeriesLibraryEntry: Codable, Identifiable, Equatable, Sendable {
     var status: SeriesLibraryEntryStatus
     var lastWatchedEpisodeCursor: SeriesEpisodeCursor?
     var isPinnedHomeSeries: Bool?
+    var privateNote: String? = nil
     var displayArtworkRef: String?
     var fallbackVisualSeed: String?
     var archivedAt: Date?

@@ -15,6 +15,7 @@
 "access.unavailable" = "Account services are unavailable right now.";
 "common.cancel" = "Cancel";
 "common.close" = "Close";
+"common.save" = "Save";
 "language.catalan" = "Catalan";
 "language.english" = "English";
 "language.french" = "French";
@@ -74,6 +75,10 @@
 "detail.share.create" = "Share link";
 "detail.share.creating" = "Creating link";
 "detail.share.message" = "I recommend \"%@\" on Series AV: %@";
+"detail.privateNote.title" = "Private note";
+"detail.privateNote.empty" = "Add a private note for yourself.";
+"detail.privateNote.edit" = "Edit private note";
+"detail.privateNote.count" = "%d of %d characters";
 "home.queue.title" = "Also watching";
 "home.queue.progress" = "%@ watched, %@ next";
 "home.queue.wantToWatch.title" = "Ready to start";

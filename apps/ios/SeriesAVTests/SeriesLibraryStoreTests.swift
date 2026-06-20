@@ -423,6 +423,24 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertNil(store.entries[0].lastWatchedEpisodeCursor)
     }
 
+    func testSetPrivateNoteTrimsAndClearsBlankNotes() {
+        let t0 = Date(timeIntervalSince1970: 1_700_000_000)
+        let t1 = Date(timeIntervalSince1970: 1_700_000_200)
+        let store = SeriesLibraryStore(entries: [
+            entry(id: "entry", title: "Series A", pinned: false, interactedAt: t0)
+        ])
+
+        store.setPrivateNote("  Watch with Ana  ", for: "entry", at: t1)
+
+        XCTAssertEqual(store.entries[0].privateNote, "Watch with Ana")
+        XCTAssertEqual(store.entries[0].updatedAt, t1)
+        XCTAssertEqual(store.entries[0].lastInteractedAt, t1)
+
+        store.setPrivateNote("   ", for: "entry", at: t1)
+
+        XCTAssertNil(store.entries[0].privateNote)
+    }
+
     private func entry(
         id: String,
         title: String,

@@ -229,6 +229,18 @@ final class SeriesLibraryStore {
         persist()
     }
 
+    func setPrivateNote(_ note: String?, for entryId: String, at date: Date = Date()) {
+        guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
+            return
+        }
+
+        let normalizedNote = note?.trimmingCharacters(in: .whitespacesAndNewlines)
+        entries[index].privateNote = normalizedNote?.isEmpty == false ? normalizedNote : nil
+        entries[index].updatedAt = date
+        entries[index].lastInteractedAt = date
+        persist()
+    }
+
     func archive(_ entryId: String, at date: Date = Date()) {
         guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
             return

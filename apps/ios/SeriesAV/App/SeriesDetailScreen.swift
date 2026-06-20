@@ -15,6 +15,7 @@ struct SeriesDetailScreen: View {
     let markNext: ((SeriesLibraryEntry) -> Void)?
     let markWatchedThrough: ((SeriesLibraryEntry, SeriesEpisodeCursor) -> Void)?
     let clearProgress: ((SeriesLibraryEntry) -> Void)?
+    let setPrivateNote: ((SeriesLibraryEntry, String?) -> Void)?
 
     private let episodeGuideClient: SeriesEpisodeGuideClient
     private let detailClient: SeriesDetailClient
@@ -23,6 +24,9 @@ struct SeriesDetailScreen: View {
     @State private var guideState: SeriesDetailGuideState = .loading
     @State private var resolvedCatalogItem: SeriesCatalogItem?
     @State private var isShowingProgressEditor = false
+    @State private var isShowingPrivateNoteEditor = false
+    @State private var hasDisplayedPrivateNoteOverride = false
+    @State private var displayedPrivateNote: String?
     @State private var isShowingShareComposer = false
     @State private var inAppBrowserDestination: SeriesInAppBrowserDestination?
     @State private var shareSheetItem: SeriesShareSheetItem?
@@ -35,6 +39,7 @@ struct SeriesDetailScreen: View {
         markNext: ((SeriesLibraryEntry) -> Void)? = nil,
         markWatchedThrough: ((SeriesLibraryEntry, SeriesEpisodeCursor) -> Void)? = nil,
         clearProgress: ((SeriesLibraryEntry) -> Void)? = nil,
+        setPrivateNote: ((SeriesLibraryEntry, String?) -> Void)? = nil,
         episodeGuideClient: SeriesEpisodeGuideClient = SeriesEpisodeGuideClient(apiClient: SeriesAVAPIClient()),
         detailClient: SeriesDetailClient = SeriesDetailClient(),
         shareInviteClient: SeriesShareInviteClient? = nil
@@ -46,6 +51,7 @@ struct SeriesDetailScreen: View {
         self.markNext = markNext
         self.markWatchedThrough = markWatchedThrough
         self.clearProgress = clearProgress
+        self.setPrivateNote = setPrivateNote
         self.episodeGuideClient = episodeGuideClient
         self.detailClient = detailClient
         self.shareInviteClient = shareInviteClient
@@ -58,6 +64,7 @@ struct SeriesDetailScreen: View {
                     header
                     sourcesSection
                     trackingSection
+                    privateNoteSection
                     guideSection
                 }
                 .padding(18)
@@ -107,6 +114,19 @@ struct SeriesDetailScreen: View {
             .sheet(item: $inAppBrowserDestination) { destination in
                 SeriesInAppBrowserView(url: destination.url)
                     .ignoresSafeArea()
+            }
+            .sheet(isPresented: $isShowingPrivateNoteEditor) {
+                if let entry, let setPrivateNote {
+                    SeriesPrivateNoteEditorSheet(
+                        entry: entry,
+                        save: { note in
+                            hasDisplayedPrivateNoteOverride = true
+                            displayedPrivateNote = Self.normalizedPrivateNote(note)
+                            setPrivateNote(entry, note)
+                        }
+                    )
+                    .presentationDetents([.medium, .large])
+                }
             }
             .sheet(isPresented: $isShowingShareComposer) {
                 SeriesShareInviteComposerSheet(
@@ -248,6 +268,40 @@ struct SeriesDetailScreen: View {
         }
     }
 
+    @ViewBuilder
+    private var privateNoteSection: some View {
+        if entry != nil, setPrivateNote != nil {
+            AVAppShellCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        sectionTitle(L10n.string("detail.privateNote.title"))
+                        Spacer()
+                        Button {
+                            isShowingPrivateNoteEditor = true
+                        } label: {
+                            Image(systemName: "square.and.pencil")
+                                .frame(width: 36, height: 36)
+                        }
+                        .buttonStyle(.bordered)
+                        .accessibilityLabel(L10n.string("detail.privateNote.edit"))
+                    }
+
+                    if let note = currentPrivateNote?.trimmingCharacters(in: .whitespacesAndNewlines),
+                       note.isEmpty == false {
+                        Text(note)
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(AVBrandColor.textPrimary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    } else {
+                        Text(L10n.string("detail.privateNote.empty"))
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+    }
+
     private var guideSection: some View {
         AVAppShellCard {
             VStack(alignment: .leading, spacing: 14) {
@@ -297,6 +351,10 @@ struct SeriesDetailScreen: View {
         )
     }
 
+    private var currentPrivateNote: String? {
+        hasDisplayedPrivateNoteOverride ? displayedPrivateNote : entry?.privateNote
+    }
+
     private func sectionTitle(_ title: String) -> some View {
         Text(title)
             .font(.system(size: 13, weight: .black))
@@ -329,6 +387,11 @@ struct SeriesDetailScreen: View {
 
     private static func shareMessage(for title: String, url: URL) -> String {
         String(format: L10n.string("detail.share.message"), title, url.absoluteString)
+    }
+
+    private static func normalizedPrivateNote(_ note: String?) -> String? {
+        let normalizedNote = note?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return normalizedNote?.isEmpty == false ? normalizedNote : nil
     }
 
     @ViewBuilder
@@ -443,6 +506,69 @@ private struct SeriesShareSheetItem: Identifiable {
 
 private enum SeriesShareInviteComposerError: Error {
     case missingClient
+}
+
+private struct SeriesPrivateNoteEditorSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    let entry: SeriesLibraryEntry
+    let save: (String?) -> Void
+
+    @State private var note: String
+
+    init(entry: SeriesLibraryEntry, save: @escaping (String?) -> Void) {
+        self.entry = entry
+        self.save = save
+        _note = State(initialValue: entry.privateNote ?? "")
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 14) {
+                Text(entry.title)
+                    .font(.headline)
+                    .foregroundStyle(AVBrandColor.textPrimary)
+
+                TextEditor(text: $note)
+                    .font(.body)
+                    .frame(minHeight: 180)
+                    .padding(10)
+                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                    }
+                    .onChange(of: note) { _, value in
+                        if value.count > 2000 {
+                            note = String(value.prefix(2000))
+                        }
+                    }
+
+                Text(String(format: L10n.string("detail.privateNote.count"), note.count, 2000))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                Spacer(minLength: 0)
+            }
+            .padding(20)
+            .background(AVBrandSurface.shellBackground.ignoresSafeArea())
+            .navigationTitle(L10n.string("detail.privateNote.title"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(L10n.string("common.cancel")) {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(L10n.string("common.save")) {
+                        save(note)
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
 }
 
 private struct SeriesShareInviteComposerSheet: View {

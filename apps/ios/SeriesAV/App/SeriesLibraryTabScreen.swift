@@ -93,6 +93,9 @@ struct SeriesLibraryTabScreen: View {
                     pendingLibraryUndo = nil
                     store.clearProgress(for: entry.id)
                 },
+                setPrivateNote: { entry, note in
+                    store.setPrivateNote(note, for: entry.id)
+                },
                 shareInviteClient: shareInviteClient
             )
             .presentationDetents([.large])

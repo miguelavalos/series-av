@@ -15,6 +15,7 @@
 "access.unavailable" = "Les services de compte ne sont pas disponibles pour le moment.";
 "common.cancel" = "Annuler";
 "common.close" = "Fermer";
+"common.save" = "Enregistrer";
 "language.catalan" = "Catalan";
 "language.english" = "Anglais";
 "language.french" = "Francais";
@@ -74,6 +75,10 @@
 "detail.share.create" = "Partager le lien";
 "detail.share.creating" = "Création du lien";
 "detail.share.message" = "Je te recommande \"%@\" sur Series AV : %@";
+"detail.privateNote.title" = "Note privée";
+"detail.privateNote.empty" = "Ajoute une note privée rien que pour toi.";
+"detail.privateNote.edit" = "Modifier la note privée";
+"detail.privateNote.count" = "%d sur %d caractères";
 "home.queue.title" = "Aussi en cours";
 "home.queue.progress" = "%@ vu, %@ suivant";
 "home.queue.wantToWatch.title" = "Prêtes à démarrer";
