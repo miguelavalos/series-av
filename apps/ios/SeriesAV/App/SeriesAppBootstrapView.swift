@@ -10,8 +10,6 @@ struct SeriesAppBootstrapView: View {
     @State private var authPresentationState: AVProductAccountAuthPresentationState = .hidden
     @State private var authenticationWasSkipped = false
     @State private var automaticGuestOnboardingIsPresented = false
-    @State private var initialSplashIsPresented = true
-    @State private var initialAccountRestoreCompleted = false
     @State private var postAuthenticationSplashIsPresented = false
     @State private var shareInviteDeepLink: SeriesShareInviteDeepLink?
     @State private var store = SeriesLibraryStore.persisted()
@@ -28,9 +26,7 @@ struct SeriesAppBootstrapView: View {
 
     var body: some View {
         Group {
-            if shouldShowInitialSplash {
-                SeriesAVSplashView()
-            } else if shouldShowOnboarding {
+            if shouldShowOnboarding {
                 SeriesAuthOnboardingView(
                     authPresentationState: $authPresentationState,
                     accountIsAvailable: accessController.accountIsAvailable,
@@ -46,6 +42,9 @@ struct SeriesAppBootstrapView: View {
                     librarySync: librarySync,
                     startSignInFlow: startSignInFlow
                 )
+                .avSplashTransition(policy: splashPolicy) {
+                    SeriesAVSplashView()
+                }
                 .id(accessController.isSignedIn ? "signed-in-shell" : "skipped-auth-shell")
                 .overlay {
                     if postAuthenticationSplashIsPresented {
@@ -56,14 +55,9 @@ struct SeriesAppBootstrapView: View {
                 }
             }
         }
-        .task {
-            await restoreInitialAccountSessionIfNeeded()
-            await completeInitialSplashIfNeeded()
-        }
         .task(id: scenePhase) {
             guard scenePhase == .active else { return }
             await accessController.syncFromAccountProvider()
-            initialAccountRestoreCompleted = true
             markAutomaticGuestOnboardingSeenIfNeeded()
         }
         .onChange(of: accessController.accessMode) { _, accessMode in
@@ -103,43 +97,6 @@ struct SeriesAppBootstrapView: View {
         }
         guard !launchContext.shouldDisableOnboarding else { return false }
         return rootGate.shouldShowOnboarding || automaticGuestOnboardingIsPresented
-    }
-
-    private var shouldShowInitialSplash: Bool {
-        initialSplashIsPresented && !launchContext.shouldDisableSplash
-    }
-
-    private func completeInitialSplashIfNeeded() async {
-        guard initialSplashIsPresented else { return }
-        if !launchContext.shouldDisableSplash {
-            try? await Task.sleep(for: splashPolicy.displayDuration)
-        }
-        await MainActor.run {
-            withAnimation(splashPolicy.dismissAnimation) {
-                initialSplashIsPresented = false
-                showInitialOnboardingAfterSplashIfNeeded()
-            }
-        }
-    }
-
-    private func restoreInitialAccountSessionIfNeeded() async {
-        guard !initialAccountRestoreCompleted else { return }
-        await accessController.syncFromAccountProvider()
-        initialAccountRestoreCompleted = true
-    }
-
-    private func showInitialOnboardingAfterSplashIfNeeded() {
-        if SeriesUITestEnvironment.current.shouldForceGuestOnboarding {
-            forceGuestOnboardingForUITestsIfNeeded()
-            return
-        }
-        guard initialAccountRestoreCompleted else { return }
-        guard !launchContext.shouldDisableOnboarding else { return }
-        guard !accessController.isSignedIn else { return }
-        guard !authenticationWasSkipped else { return }
-        guard accessController.shouldAutoShowGuestOnboarding else { return }
-        guard authPresentationState == .hidden else { return }
-        markAutomaticGuestOnboardingSeenIfNeeded()
     }
 
     private func markAutomaticGuestOnboardingSeenIfNeeded() {
@@ -208,7 +165,6 @@ struct SeriesAppBootstrapView: View {
         guard let url else { return }
         pendingOpenURL.wrappedValue = nil
         guard let deepLink = SeriesShareInviteDeepLink(url: url) else { return }
-        initialSplashIsPresented = false
         automaticGuestOnboardingIsPresented = false
         shareInviteDeepLink = deepLink
     }
