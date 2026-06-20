@@ -85,7 +85,11 @@ struct SeriesUITestEnvironment {
     }
 
     var hasAccountOverride: Bool {
-        accountMode != nil
+        accountMode == "free" || accountMode == "pro"
+    }
+
+    var shouldUseAvailableGuestAccount: Bool {
+        accountMode == "guest_available"
     }
 
     var isProAccount: Bool {
@@ -95,6 +99,24 @@ struct SeriesUITestEnvironment {
     var accountDeletionScenario: String? {
         guard isEnabled else { return nil }
         return environment["SERIESAV_UI_TEST_ACCOUNT_DELETION"]
+    }
+
+    var forcedLibrarySyncState: SeriesLibrarySyncCoordinator.State? {
+        guard isEnabled else { return nil }
+        switch environment["SERIESAV_UI_TESTS_LIBRARY_SYNC_STATE"] {
+        case "disabled":
+            return .disabled
+        case "idle":
+            return .idle
+        case "syncing":
+            return .syncing
+        case "conflict":
+            return .conflict
+        case "failed":
+            return .failed("ui-test")
+        default:
+            return nil
+        }
     }
 
     static let accountUserId = "series-ui-test-user"

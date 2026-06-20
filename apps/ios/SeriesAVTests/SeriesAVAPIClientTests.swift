@@ -120,6 +120,88 @@ final class SeriesAVAPIClientTests: XCTestCase {
         XCTAssertEqual(result.generatedAt.timeIntervalSince1970, 1_781_535_724.123, accuracy: 0.001)
     }
 
+    func testShareInviteCreateSendsAuthenticatedPostAndDecodesResponse() async throws {
+        let response = """
+        {
+          "invite": {
+            "id": "invite_123",
+            "kind": "recommendation",
+            "seriesId": "thetvdb:348545",
+            "message": "Watch this",
+            "senderDisplayName": "Series User",
+            "status": "active",
+            "expiresAt": "2026-06-22T10:00:00.000Z",
+            "createdAt": "2026-06-20T10:00:00.000Z",
+            "series": {
+              "title": "Demon Slayer",
+              "startYear": 2019,
+              "summary": "A reviewed summary.",
+              "displayArtwork": {
+                "kind": "providerPoster",
+                "url": "https://artwork.example/demon.jpg",
+                "assetName": null,
+                "fallbackSeed": "Demon Slayer"
+              }
+            }
+          },
+          "token": "share-token-123",
+          "generatedAt": "2026-06-20T10:00:01.250Z"
+        }
+        """.data(using: .utf8)!
+        MockSeriesURLProtocol.response = (
+            response,
+            HTTPURLResponse(
+                url: URL(string: "https://api-series-av.test/v1/series/share-invites")!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: nil
+            )!
+        )
+
+        let client = SeriesShareInviteClient(
+            apiClient: SeriesAVAPIClient(
+                baseURL: URL(string: "https://api-series-av.test")!,
+                urlSession: Self.mockSession(),
+                tokenProvider: { "account-token" }
+            )
+        )
+
+        let result = try await client.createRecommendation(seriesId: "thetvdb:348545", message: "Watch this")
+
+        let request = try XCTUnwrap(MockSeriesURLProtocol.lastRequest)
+        XCTAssertEqual(request.url?.path, "/v1/series/share-invites")
+        XCTAssertEqual(request.httpMethod, "POST")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer account-token")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
+
+        let body = try XCTUnwrap(MockSeriesURLProtocol.lastRequestBody)
+        let payload = try JSONDecoder().decode(SeriesShareInviteCreateRequest.self, from: body)
+        XCTAssertEqual(payload, SeriesShareInviteCreateRequest(seriesId: "thetvdb:348545", message: "Watch this"))
+
+        XCTAssertEqual(result.token, "share-token-123")
+        XCTAssertEqual(result.invite.id, "invite_123")
+        XCTAssertEqual(result.invite.series?.title, "Demon Slayer")
+        XCTAssertEqual(result.invite.series?.displayArtwork?.url?.absoluteString, "https://artwork.example/demon.jpg")
+        XCTAssertEqual(result.generatedAt.timeIntervalSince1970, 1_781_949_601.25, accuracy: 0.001)
+    }
+
+    func testShareInviteCreateWithoutTokenFailsBeforeSendingRequest() async throws {
+        let client = SeriesShareInviteClient(
+            apiClient: SeriesAVAPIClient(
+                baseURL: URL(string: "https://api-series-av.test")!,
+                urlSession: Self.mockSession(),
+                tokenProvider: { nil }
+            )
+        )
+
+        do {
+            _ = try await client.createRecommendation(seriesId: "thetvdb:348545")
+            XCTFail("Expected missing token")
+        } catch SeriesAVAPIClientError.missingToken {
+            XCTAssertNil(MockSeriesURLProtocol.lastRequest)
+        }
+    }
+
     private static func mockSession() -> URLSession {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockSeriesURLProtocol.self]
@@ -129,6 +211,7 @@ final class SeriesAVAPIClientTests: XCTestCase {
 
 private final class MockSeriesURLProtocol: URLProtocol, @unchecked Sendable {
     nonisolated(unsafe) static var lastRequest: URLRequest?
+    nonisolated(unsafe) static var lastRequestBody: Data?
     nonisolated(unsafe) static var response: (Data, HTTPURLResponse)?
 
     override class func canInit(with request: URLRequest) -> Bool {
@@ -141,6 +224,7 @@ private final class MockSeriesURLProtocol: URLProtocol, @unchecked Sendable {
 
     override func startLoading() {
         Self.lastRequest = request
+        Self.lastRequestBody = request.httpBody ?? request.httpBodyStream?.readAllData()
         guard let response = Self.response else {
             client?.urlProtocol(self, didFailWithError: URLError(.badServerResponse))
             return
@@ -155,6 +239,26 @@ private final class MockSeriesURLProtocol: URLProtocol, @unchecked Sendable {
 
     static func reset() {
         lastRequest = nil
+        lastRequestBody = nil
         response = nil
+    }
+}
+
+private extension InputStream {
+    func readAllData() -> Data {
+        open()
+        defer { close() }
+
+        var data = Data()
+        var buffer = [UInt8](repeating: 0, count: 1024)
+        while hasBytesAvailable {
+            let count = read(&buffer, maxLength: buffer.count)
+            if count > 0 {
+                data.append(buffer, count: count)
+            } else {
+                break
+            }
+        }
+        return data
     }
 }

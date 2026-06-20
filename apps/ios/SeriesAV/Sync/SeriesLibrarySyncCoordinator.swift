@@ -9,6 +9,7 @@ final class SeriesLibrarySyncCoordinator {
         case disabled
         case idle
         case syncing
+        case conflict
         case failed(String)
     }
 
@@ -66,6 +67,36 @@ final class SeriesLibrarySyncCoordinator {
         }
     }
 
+    func overwriteCloudLibraryWithLocalData(
+        accessController: SeriesAccessController,
+        store: SeriesLibraryStore
+    ) async {
+        guard accessController.capabilities.canUseCloudSync else {
+            disable()
+            return
+        }
+
+        pendingPushTask?.cancel()
+        pendingPushTask = nil
+        state = .syncing
+
+        let client = makeClient(accessController: accessController)
+        do {
+            let document = try await client.pushLibrary(entries: store.entries, expectedETag: nil)
+            etag = document.etag
+            hasCompletedInitialPull = true
+            if document.data.entries != store.entries {
+                isApplyingRemoteEntries = true
+                store.replace(with: document.data.entries)
+                isApplyingRemoteEntries = false
+            }
+            state = .idle
+        } catch {
+            logger.error("Series AV Pro library sync overwrite failed")
+            state = Self.syncState(for: error)
+        }
+    }
+
     func disable() {
         pendingPushTask?.cancel()
         pendingPushTask = nil
@@ -73,6 +104,13 @@ final class SeriesLibrarySyncCoordinator {
         hasCompletedInitialPull = false
         isApplyingRemoteEntries = false
         state = .disabled
+    }
+
+    func setStateForUITests(_ state: State) {
+        guard SeriesUITestEnvironment.current.isEnabled else {
+            return
+        }
+        self.state = state
     }
 
     private func pullMergeAndPushIfNeeded(
@@ -110,7 +148,7 @@ final class SeriesLibrarySyncCoordinator {
         } catch {
             logger.error("Series AV Pro library sync pull failed")
             hasCompletedInitialPull = true
-            state = .failed(error.localizedDescription)
+            state = Self.syncState(for: error)
         }
     }
 
@@ -126,7 +164,7 @@ final class SeriesLibrarySyncCoordinator {
             state = .idle
         } catch {
             logger.error("Series AV Pro library sync push failed")
-            state = .failed(error.localizedDescription)
+            state = Self.syncState(for: error)
         }
     }
 
@@ -179,5 +217,13 @@ final class SeriesLibrarySyncCoordinator {
         let created = UUID().uuidString
         userDefaults.set(created, forKey: deviceIdKey)
         return created
+    }
+
+    static func syncState(for error: Error) -> State {
+        if case SeriesAVAPIClientError.requestFailed(let statusCode) = error,
+           statusCode == 409 || statusCode == 412 {
+            return .conflict
+        }
+        return .failed(error.localizedDescription)
     }
 }

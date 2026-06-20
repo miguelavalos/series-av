@@ -72,6 +72,16 @@ private struct SeriesWatchingHomeScreen: View {
     @State private var isLoadingHomeDiscovery = true
     @State private var artworkReconciliationSignature = ""
 
+    private var homeState: SeriesHomeScreenState {
+        SeriesHomeStateBuilder.build(
+            homeEntries: store.homeEntries,
+            activeEntries: store.activeEntries,
+            popularPreviews: popularPreviews,
+            upcomingPreviews: upcomingPreviews,
+            recommendedPreviews: recommendedPreviews
+        )
+    }
+
     var body: some View {
         AVAppShellScrollableScreenScaffold(
             alignment: .leading,
@@ -82,7 +92,7 @@ private struct SeriesWatchingHomeScreen: View {
         } content: {
             homeHeader
 
-            if let currentEntry {
+            if let currentEntry = homeState.currentEntry {
                 SeriesCurrentWatchingCard(
                     entry: currentEntry,
                     markPrevious: {
@@ -139,9 +149,9 @@ private struct SeriesWatchingHomeScreen: View {
                 openLibrary: openLibraryTab
             )
 
-            if secondaryEntries.isEmpty == false {
+            if homeState.secondaryEntries.isEmpty == false {
                 SeriesWatchingQueueSection(
-                    entries: secondaryEntries,
+                    entries: homeState.secondaryEntries,
                     markNext: { entry in
                         pendingProgressUndo = progressUndo(for: entry)
                         pendingUndo = nil
@@ -176,30 +186,30 @@ private struct SeriesWatchingHomeScreen: View {
 
             SeriesHomeDiscoveryRail(
                 title: L10n.string("home.rail.popular"),
-                previews: popularPreviews,
+                previews: homeState.visiblePopularPreviews,
                 isLoading: isLoadingHomeDiscovery,
-                libraryEntries: store.activeEntries,
                 canAddSeries: canAddSeries,
+                limitActionTitle: limitActionTitle,
                 addSeries: addDiscoverySeries,
                 showLimitAction: showLimitAction
             )
 
             SeriesHomeDiscoveryRail(
                 title: L10n.string("upcoming.home.title"),
-                previews: upcomingPreviews,
+                previews: homeState.visibleUpcomingPreviews,
                 isLoading: isLoadingHomeDiscovery,
-                libraryEntries: store.activeEntries,
                 canAddSeries: canAddSeries,
+                limitActionTitle: limitActionTitle,
                 addSeries: addDiscoverySeries,
                 showLimitAction: showLimitAction
             )
 
             SeriesHomeDiscoveryRail(
                 title: L10n.string("home.rail.recommended"),
-                previews: recommendedPreviews,
+                previews: homeState.visibleRecommendedPreviews,
                 isLoading: isLoadingHomeDiscovery,
-                libraryEntries: store.activeEntries,
                 canAddSeries: canAddSeries,
+                limitActionTitle: limitActionTitle,
                 addSeries: addDiscoverySeries,
                 showLimitAction: showLimitAction
             )
@@ -238,7 +248,7 @@ private struct SeriesWatchingHomeScreen: View {
                     )
                 }
 
-                if currentEntry == nil {
+                if homeState.currentEntry == nil {
                     Button(action: openSearch) {
                         Label(L10n.string("home.add"), systemImage: "magnifyingglass")
                             .frame(maxWidth: .infinity)
@@ -285,7 +295,7 @@ private struct SeriesWatchingHomeScreen: View {
                     pendingUndo = nil
                     store.clearProgress(for: entry.id)
                 },
-                shareInviteClient: SeriesShareInviteClient(apiClient: accessController.authenticatedAPIClient())
+                shareInviteClient: shareInviteClient
             )
             .presentationDetents([.large])
         }
@@ -300,20 +310,12 @@ private struct SeriesWatchingHomeScreen: View {
         }
         .onAppear {
             if SeriesUITestEnvironment.current.shouldShowProgressEditor, editorEntry == nil {
-                editorEntry = currentEntry ?? store.activeEntries.first
+                editorEntry = homeState.currentEntry ?? store.activeEntries.first
             }
         }
         .task(id: missingArtworkSignature) {
             await reconcileMissingArtwork()
         }
-    }
-
-    private var currentEntry: SeriesLibraryEntry? {
-        store.homeEntries.first
-    }
-
-    private var secondaryEntries: [SeriesLibraryEntry] {
-        Array(store.homeEntries.dropFirst())
     }
 
     private var activeLibraryLimitPolicy: SeriesActiveLibraryLimitPolicy {
@@ -331,6 +333,11 @@ private struct SeriesWatchingHomeScreen: View {
         activeLibraryLimitPolicy.remainingSeriesCount
     }
 
+    private var shareInviteClient: SeriesShareInviteClient? {
+        guard accessController.isSignedIn else { return nil }
+        return SeriesShareInviteClient(apiClient: accessController.authenticatedAPIClient())
+    }
+
     private var missingArtworkEntries: [SeriesLibraryEntry] {
         store.activeEntries.filter { $0.displayArtworkRef?.isEmpty != false }
     }
@@ -339,10 +346,6 @@ private struct SeriesWatchingHomeScreen: View {
         missingArtworkEntries
             .map { "\($0.entryId):\($0.seriesId):\($0.title)" }
             .joined(separator: "|")
-    }
-
-    private func countActiveEntries(with status: SeriesLibraryEntryStatus) -> Int {
-        store.activeEntries.filter { $0.status == status }.count
     }
 
     private func progressUndo(
@@ -442,6 +445,15 @@ private struct SeriesWatchingHomeScreen: View {
         }
     }
 
+    private var limitActionTitle: String {
+        switch accessController.accessMode {
+        case .guest:
+            accessController.accountIsAvailable ? L10n.string("add.footer.connectAccount") : L10n.string("profile.account.connectUnavailable")
+        case .signedInFree, .signedInPro:
+            L10n.string("add.footer.upgrade")
+        }
+    }
+
     private var homeHeader: some View {
         AVAppShellHomeHeader(
             title: L10n.string("home.header.title"),
@@ -454,9 +466,9 @@ private struct SeriesWatchingHomeScreen: View {
             )
         } content: {
             SeriesHomeAviBrief(
-                currentEntry: currentEntry,
-                watchingCount: countActiveEntries(with: .watching),
-                wantToWatchCount: countActiveEntries(with: .wantToWatch),
+                currentEntry: homeState.currentEntry,
+                watchingCount: homeState.watchingCount,
+                wantToWatchCount: homeState.wantToWatchCount,
                 openAvi: openAvi
             )
         }
@@ -1030,13 +1042,13 @@ private struct SeriesHomeDiscoveryRail: View {
     let title: String
     let previews: [SeriesHomeDiscoveryPreview]
     let isLoading: Bool
-    let libraryEntries: [SeriesLibraryEntry]
     let canAddSeries: Bool
+    let limitActionTitle: String
     let addSeries: (SeriesHomeDiscoveryPreview) -> Void
     let showLimitAction: () -> Void
 
     var body: some View {
-        if isLoading || visiblePreviews.isEmpty == false {
+        if isLoading || previews.isEmpty == false {
             VStack(alignment: .leading, spacing: 14) {
                 Text(title)
                     .font(.system(size: 17, weight: .black, design: .rounded))
@@ -1049,10 +1061,11 @@ private struct SeriesHomeDiscoveryRail: View {
                                 SeriesHomeDiscoverySkeletonCard(seed: index)
                             }
                         } else {
-                            ForEach(visiblePreviews) { preview in
+                            ForEach(previews) { preview in
                                 SeriesHomeDiscoveryCard(
                                     preview: preview,
                                     canAddSeries: canAddSeries,
+                                    limitActionTitle: limitActionTitle,
                                     addSeries: { addSeries(preview) },
                                     showLimitAction: showLimitAction
                                 )
@@ -1063,12 +1076,6 @@ private struct SeriesHomeDiscoveryRail: View {
                 }
             }
             .padding(.top, 6)
-        }
-    }
-
-    private var visiblePreviews: [SeriesHomeDiscoveryPreview] {
-        previews.filter { preview in
-            libraryEntries.contains { SeriesLibraryIdentity.sameSeries($0, preview.catalogItem) } == false
         }
     }
 }
@@ -1109,6 +1116,7 @@ private struct SeriesHomeDiscoveryCard: View {
 
     let preview: SeriesHomeDiscoveryPreview
     let canAddSeries: Bool
+    let limitActionTitle: String
     let addSeries: () -> Void
     let showLimitAction: () -> Void
 
@@ -1122,14 +1130,14 @@ private struct SeriesHomeDiscoveryCard: View {
             }
 
             Text(preview.title)
-                .font(.system(size: titleFontSize, weight: .black, design: .rounded))
+                .font(.system(size: preview.titleFontSize, weight: .black, design: .rounded))
                 .foregroundStyle(.primary)
                 .lineLimit(2)
                 .allowsTightening(true)
                 .truncationMode(.tail)
                 .frame(width: Self.artworkWidth, height: 36, alignment: .topLeading)
 
-            Text(metadataText)
+            Text(preview.metadataText)
             .font(.system(size: 11, weight: .bold))
             .foregroundStyle(.secondary)
             .lineLimit(1)
@@ -1138,21 +1146,6 @@ private struct SeriesHomeDiscoveryCard: View {
         }
         .frame(width: Self.itemWidth, alignment: .leading)
     }
-
-    private var metadataText: String {
-        let parts = [
-            preview.year.map(String.init),
-            preview.genres.first
-        ].compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { $0.isEmpty == false }
-
-        return parts.joined(separator: " · ")
-    }
-
-    private var titleFontSize: CGFloat {
-        preview.title.count > 30 ? 12.5 : 14
-    }
-
 
     @ViewBuilder
     private var actionButton: some View {
@@ -1166,7 +1159,7 @@ private struct SeriesHomeDiscoveryCard: View {
                 .background(.regularMaterial, in: Circle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(canAddSeries ? L10n.string("search.follow") : L10n.string("add.footer.upgrade"))
+        .accessibilityLabel(canAddSeries ? L10n.string("search.follow") : limitActionTitle)
     }
 }
 
@@ -1203,24 +1196,6 @@ private struct SeriesHomePreviewArtwork: View {
                 .stroke(Color.white.opacity(0.24), lineWidth: 1)
         }
         .shadow(color: .black.opacity(0.12), radius: 12, y: 6)
-    }
-}
-
-private struct SeriesHomeDiscoveryPreview: Identifiable, Equatable {
-    let id: String
-    let title: String
-    let year: Int?
-    let genres: [String]
-    let posterURL: URL?
-    let catalogItem: SeriesCatalogItem
-
-    init(catalogItem: SeriesCatalogItem) {
-        self.id = catalogItem.seriesId
-        self.title = catalogItem.title
-        self.year = catalogItem.startYear
-        self.genres = catalogItem.genres
-        self.posterURL = catalogItem.displayArtwork.url
-        self.catalogItem = catalogItem
     }
 }
 

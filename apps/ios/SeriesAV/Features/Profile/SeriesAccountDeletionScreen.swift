@@ -207,12 +207,14 @@ struct SeriesAccountDeletionScreen: View {
                 .accessibilityIdentifier("accountDeletion.unlinkButton")
             }
 
-            AVSettingsLinkButton(
-                title: L10n.string("accountDeletion.accountWebsiteLink"),
-                systemImage: "safari",
-                destination: AppConfig.accountDeletionURL
-            )
-            .accessibilityIdentifier("accountDeletion.accountWebsiteLink")
+            if let accountDeletionURL = AppConfig.accountDeletionURL {
+                AVSettingsLinkButton(
+                    title: L10n.string("accountDeletion.accountWebsiteLink"),
+                    systemImage: "safari",
+                    destination: accountDeletionURL
+                )
+                .accessibilityIdentifier("accountDeletion.accountWebsiteLink")
+            }
         }
     }
 
@@ -226,12 +228,14 @@ struct SeriesAccountDeletionScreen: View {
             .accessibilityIdentifier("accountDeletion.status.unavailable")
             warningList
 
-            AVSettingsLinkButton(
-                title: L10n.string("accountDeletion.accountWebsiteLink"),
-                systemImage: "safari",
-                destination: AppConfig.accountDeletionURL
-            )
-            .accessibilityIdentifier("accountDeletion.accountWebsiteLink")
+            if let accountDeletionURL = AppConfig.accountDeletionURL {
+                AVSettingsLinkButton(
+                    title: L10n.string("accountDeletion.accountWebsiteLink"),
+                    systemImage: "safari",
+                    destination: accountDeletionURL
+                )
+                .accessibilityIdentifier("accountDeletion.accountWebsiteLink")
+            }
         }
     }
 

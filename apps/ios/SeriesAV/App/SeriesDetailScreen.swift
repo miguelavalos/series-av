@@ -285,6 +285,23 @@ struct SeriesDetailScreen: View {
         }
     }
 
+    private var presentation: SeriesDetailPresentation {
+        SeriesDetailPresentationBuilder.build(
+            catalogItem: catalogItem,
+            resolvedCatalogItem: resolvedCatalogItem,
+            entry: entry,
+            searchEngine: externalLinkPreferences.searchEngine,
+            fallbackTitle: L10n.string("detail.title")
+        )
+    }
+
+    private func sectionTitle(_ title: String) -> some View {
+        Text(title)
+            .font(.system(size: 13, weight: .black))
+            .foregroundStyle(AVBrandColor.textSecondary)
+            .textCase(.uppercase)
+    }
+
     @MainActor
     private func createShareInvite() async {
         guard let shareInviteClient else { return }
@@ -308,16 +325,9 @@ struct SeriesDetailScreen: View {
             .appending(path: encodedToken)
     }
 
-    private func sectionTitle(_ title: String) -> some View {
-        Text(title)
-            .font(.system(size: 13, weight: .black))
-            .foregroundStyle(AVBrandColor.textSecondary)
-            .textCase(.uppercase)
-    }
-
     @ViewBuilder
     private var artwork: some View {
-        if let detailEntry {
+        if let detailEntry = presentation.detailEntry {
             SeriesEntryArtworkView(entry: detailEntry, size: 92)
         } else if let url = effectiveCatalogItem?.displayArtwork.url {
             AsyncImage(url: url) { phase in
@@ -348,117 +358,31 @@ struct SeriesDetailScreen: View {
     }
 
     private var title: String {
-        if let entryTitle = entry?.title.trimmingCharacters(in: .whitespacesAndNewlines),
-           entryTitle.isEmpty == false,
-           entryTitle.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() != seriesId.lowercased() {
-            return entryTitle
-        }
-        return effectiveCatalogItem?.title ?? entry?.title ?? L10n.string("detail.title")
+        presentation.title
     }
 
     private var metadataText: String {
-        let year = effectiveCatalogItem?.startYear.map(String.init)
-        let genres = effectiveCatalogItem?.genres ?? []
-        return ([year] + genres.prefix(2).map(Optional.some))
-            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { $0.isEmpty == false }
-            .joined(separator: " · ")
+        presentation.metadataText
     }
 
     private var effectiveCatalogItem: SeriesCatalogItem? {
         catalogItem ?? resolvedCatalogItem
     }
 
-    private var externalSearchQuery: String {
-        [title, effectiveCatalogItem?.startYear.map(String.init)]
-            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { $0.isEmpty == false }
-            .joined(separator: " ")
-    }
-
     private var sourceLinks: [SeriesExternalSourceLink] {
-        var links: [SeriesExternalSourceLink] = []
-
-        if let imdbURL = enrichedExternalLinkURL(kind: "imdb") ?? AVExternalSearchURL.imdbSearch(query: externalSearchQuery) {
-            links.append(SeriesExternalSourceLink(
-                title: L10n.string("detail.sources.imdb"),
-                systemImage: "magnifyingglass",
-                url: imdbURL
-            ))
-        }
-
-        if let wikipediaURL = enrichedExternalLinkURL(kind: "wikipedia") ?? wikipediaSearchURL(query: externalSearchQuery) {
-            links.append(SeriesExternalSourceLink(
-                title: L10n.string("detail.sources.wikipedia"),
-                systemImage: "book",
-                url: wikipediaURL
-            ))
-        }
-
-        if let webURL = AVExternalSearchURL.webSearch(
-            query: "\(externalSearchQuery) series",
-            engine: externalLinkPreferences.searchEngine
-        ) {
-            links.append(SeriesExternalSourceLink(
-                title: L10n.string("detail.sources.web"),
-                systemImage: "safari",
-                url: webURL
-            ))
-        }
-
-        return links
-    }
-
-    private func enrichedExternalLinkURL(kind: String) -> URL? {
-        effectiveCatalogItem?.externalLinks?.first { link in
-            link.kind.caseInsensitiveCompare(kind) == .orderedSame
-        }?.url
-    }
-
-    private func wikipediaSearchURL(query: String) -> URL? {
-        let normalizedQuery = AVExternalSearchURL.normalizedQuery(query)
-        guard normalizedQuery.isEmpty == false else { return nil }
-        var components = URLComponents(string: "https://www.wikipedia.org/search-redirect.php")
-        components?.queryItems = [URLQueryItem(name: "search", value: normalizedQuery)]
-        return components?.url
-    }
-
-    private var detailEntry: SeriesLibraryEntry? {
-        guard var entry else {
-            return nil
-        }
-        guard let catalogItem = effectiveCatalogItem else {
-            return entry
-        }
-        if entry.displayArtworkRef?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != false {
-            entry.displayArtworkRef = catalogItem.displayArtworkRef
-        }
-        if entry.fallbackVisualSeed?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != false {
-            entry.fallbackVisualSeed = catalogItem.title
-        }
-        return entry
+        presentation.sourceLinks
     }
 
     private func trackingDetail(for entry: SeriesLibraryEntry) -> String {
-        if entry.status == .wantToWatch {
-            return String(format: L10n.string("home.queue.wantToWatch.progress"), cursorLabel(entry.nextEpisodeCursor))
-        }
-        return "\(entry.progressLabel) · \(String(format: L10n.string("home.current.nextEpisode"), cursorLabel(entry.nextEpisodeCursor)))"
+        SeriesDetailPresentationBuilder.trackingDetail(for: entry)
     }
 
     private func nextActionTitle(for entry: SeriesLibraryEntry) -> String {
-        entry.status == .wantToWatch ? L10n.string("home.start") : L10n.string("shell.watch.next")
+        SeriesDetailPresentationBuilder.nextActionTitle(for: entry)
     }
 
     private func detailStatusIcon(_ status: SeriesLibraryEntryStatus) -> String {
-        switch status {
-        case .wantToWatch:
-            return "bookmark.fill"
-        case .watching:
-            return "play.circle.fill"
-        case .watched:
-            return "checkmark.circle.fill"
-        }
+        SeriesDetailPresentationBuilder.detailStatusIcon(status)
     }
 
     private func openSource(_ url: URL) {
@@ -500,14 +424,6 @@ struct SeriesDetailScreen: View {
             resolvedCatalogItem = nil
         }
     }
-}
-
-private struct SeriesExternalSourceLink: Identifiable {
-    let title: String
-    let systemImage: String
-    let url: URL
-
-    var id: URL { url }
 }
 
 private struct SeriesShareSheetItem: Identifiable {

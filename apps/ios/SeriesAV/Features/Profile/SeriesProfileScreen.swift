@@ -13,6 +13,7 @@ struct SeriesProfileScreen: View {
     let accessController: SeriesAccessController
     let startSignInFlow: () -> Void
     let synchronizeLibraryNow: () async -> Void
+    let keepDeviceLibraryNow: () async -> Void
 
     @EnvironmentObject private var languageController: AppLanguageController
     @EnvironmentObject private var themeController: AppThemeController
@@ -24,7 +25,7 @@ struct SeriesProfileScreen: View {
     @State private var isShowingSignOutError = false
     @State private var isShowingProPaywall = false
     @State private var isShowingAccountDeletion = false
-    @State private var isShowingDeleteLocalDataConfirmation = false
+    @State private var isShowingLocalDataActions = false
 
     var body: some View {
         AVSettingsProfileScreenScaffold(
@@ -52,14 +53,6 @@ struct SeriesProfileScreen: View {
         } message: {
             Text(signOutErrorMessage)
         }
-        .alert(L10n.string("profile.local.delete.confirm.title"), isPresented: $isShowingDeleteLocalDataConfirmation) {
-            Button(L10n.string("common.cancel"), role: .cancel) {}
-            Button(L10n.string("profile.local.delete.confirm.action"), role: .destructive) {
-                store.deleteAllLocalData()
-            }
-        } message: {
-            Text(L10n.string("profile.local.delete.confirm.detail"))
-        }
         .sheet(isPresented: $isShowingProPaywall) {
             SeriesProPaywallView(
                 accessController: accessController,
@@ -68,6 +61,16 @@ struct SeriesProfileScreen: View {
         }
         .sheet(isPresented: $isShowingAccountDeletion) {
             SeriesAccountDeletionScreen(viewModel: accountDeletionViewModel)
+        }
+        .sheet(isPresented: $isShowingLocalDataActions) {
+            SeriesLocalDataMaintenanceSheet(
+                seriesCount: store.entries.count,
+                clearLocalData: {
+                    store.deleteAllLocalData()
+                }
+            )
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
         }
     }
 
@@ -99,11 +102,11 @@ struct SeriesProfileScreen: View {
 
     @ViewBuilder
     private var accountContent: some View {
+        accountCard
         proCard
         if accessController.capabilities.canUseCloudSync {
             cloudSyncCard
         }
-        accountCard
         if accessController.isSignedIn {
             accountSafetyCard
         }
@@ -129,22 +132,6 @@ struct SeriesProfileScreen: View {
             )
 
             themeSelector
-
-            AVSettingsInfoRow(
-                systemImage: "magnifyingglass",
-                title: L10n.string("profile.preferences.searchEngine.title"),
-                detail: L10n.string("profile.preferences.searchEngine.detail")
-            )
-
-            searchEngineSelector
-
-            AVSettingsInfoRow(
-                systemImage: "safari",
-                title: L10n.string("profile.preferences.webOpenMode.title"),
-                detail: L10n.string("profile.preferences.webOpenMode.detail")
-            )
-
-            webOpenModeSelector
         }
     }
 
@@ -163,6 +150,25 @@ struct SeriesProfileScreen: View {
                 title: L10n.string("profile.series.reversible.title"),
                 detail: L10n.string("profile.series.reversible.detail")
             )
+
+            Divider()
+                .overlay(AVBrandColor.borderSubtle)
+
+            AVSettingsInfoRow(
+                systemImage: "safari",
+                title: L10n.string("profile.preferences.webOpenMode.title"),
+                detail: L10n.string("profile.preferences.webOpenMode.detail")
+            )
+
+            webOpenModeSelector
+
+            AVSettingsInfoRow(
+                systemImage: "magnifyingglass",
+                title: L10n.string("profile.preferences.searchEngine.title"),
+                detail: L10n.string("profile.preferences.searchEngine.detail")
+            )
+
+            searchEngineSelector
         }
     }
 
@@ -181,14 +187,13 @@ struct SeriesProfileScreen: View {
                 title: L10n.string("profile.local.sync.title"),
                 detail: L10n.string("profile.local.sync.detail")
             )
-            AVSettingsActionRow(
-                systemImage: "trash",
-                title: L10n.string("profile.local.delete.title"),
-                detail: localDeleteDetail,
-                action: { isShowingDeleteLocalDataConfirmation = true }
+            AVSettingsButton(
+                title: L10n.string("profile.actions.manageLocalData"),
+                style: .destructive,
+                action: { isShowingLocalDataActions = true }
             )
             .disabled(store.entries.isEmpty)
-            .accessibilityIdentifier("profile.local.delete")
+            .accessibilityIdentifier("profile.local.manage")
         }
     }
 
@@ -259,9 +264,7 @@ struct SeriesProfileScreen: View {
             .accessibilityIdentifier("profile.sync.status")
 
             AVSettingsButton(
-                title: librarySync.state == .syncing
-                    ? L10n.string("profile.sync.retry.syncing")
-                    : L10n.string("profile.sync.retry"),
+                title: cloudSyncActionTitle,
                 style: .secondary,
                 isLoading: librarySync.state == .syncing,
                 action: {
@@ -272,6 +275,19 @@ struct SeriesProfileScreen: View {
             )
             .disabled(librarySync.state == .syncing)
             .accessibilityIdentifier("profile.sync.retry")
+
+            if librarySync.state == .conflict {
+                AVSettingsButton(
+                    title: L10n.string("profile.sync.keepDevice"),
+                    style: .secondary,
+                    action: {
+                        Task {
+                            await keepDeviceLibraryNow()
+                        }
+                    }
+                )
+                .accessibilityIdentifier("profile.sync.keepDevice")
+            }
         }
         .accessibilityIdentifier("profile.sync.card")
     }
@@ -529,14 +545,6 @@ struct SeriesProfileScreen: View {
         }
     }
 
-    private var localDeleteDetail: String {
-        let count = store.entries.count
-        guard count > 0 else {
-            return L10n.string("profile.local.delete.empty")
-        }
-        return L10n.string("profile.local.delete.detail", count)
-    }
-
     private var cloudSyncHeadline: String {
         switch librarySync.state {
         case .disabled:
@@ -545,6 +553,8 @@ struct SeriesProfileScreen: View {
             L10n.string("profile.sync.headline.synced")
         case .syncing:
             L10n.string("profile.sync.headline.syncing")
+        case .conflict:
+            L10n.string("profile.sync.headline.conflict")
         case .failed:
             L10n.string("profile.sync.headline.failed")
         }
@@ -558,8 +568,21 @@ struct SeriesProfileScreen: View {
             L10n.string("profile.sync.detail.synced")
         case .syncing:
             L10n.string("profile.sync.detail.syncing")
+        case .conflict:
+            L10n.string("profile.sync.detail.conflict")
         case .failed:
             L10n.string("profile.sync.detail.failed")
+        }
+    }
+
+    private var cloudSyncActionTitle: String {
+        switch librarySync.state {
+        case .syncing:
+            L10n.string("profile.sync.retry.syncing")
+        case .conflict:
+            L10n.string("profile.sync.refresh")
+        case .disabled, .idle, .failed:
+            L10n.string("profile.sync.retry")
         }
     }
 
@@ -571,6 +594,8 @@ struct SeriesProfileScreen: View {
             "checkmark.icloud"
         case .syncing:
             "arrow.triangle.2.circlepath.icloud"
+        case .conflict:
+            "exclamationmark.icloud"
         case .failed:
             "xmark.icloud"
         }
@@ -676,5 +701,52 @@ struct SeriesProfileScreen: View {
             baseURL: AppConfig.apiBaseURL,
             tokenProvider: { try await accountService.getToken() }
         ))
+    }
+}
+
+private struct SeriesLocalDataMaintenanceSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    let seriesCount: Int
+    let clearLocalData: () -> Void
+
+    @State private var isShowingDeleteConfirmation = false
+
+    var body: some View {
+        AVSettingsSheetScaffold(
+            backgroundStyle: AnyShapeStyle(AVBrandSurface.shellBackground),
+            closeTitle: L10n.string("common.cancel"),
+            onClose: { dismiss() }
+        ) {
+            AVSettingsSheetHeader(
+                title: L10n.string("profile.localDataSheet.title"),
+                subtitle: L10n.string("profile.localDataSheet.subtitle")
+            )
+
+            AVSettingsDestructiveActionCard(
+                sectionTitle: L10n.string("profile.localDataSheet.dangerTitle"),
+                systemImage: "trash",
+                title: L10n.string("profile.local.delete.title"),
+                detail: localDeleteDetail,
+                action: { isShowingDeleteConfirmation = true }
+            )
+            .accessibilityIdentifier("profile.local.delete")
+        }
+        .alert(L10n.string("profile.local.delete.confirm.title"), isPresented: $isShowingDeleteConfirmation) {
+            Button(L10n.string("common.cancel"), role: .cancel) {}
+            Button(L10n.string("profile.local.delete.confirm.action"), role: .destructive) {
+                clearLocalData()
+                dismiss()
+            }
+        } message: {
+            Text(L10n.string("profile.local.delete.confirm.detail"))
+        }
+    }
+
+    private var localDeleteDetail: String {
+        guard seriesCount > 0 else {
+            return L10n.string("profile.local.delete.empty")
+        }
+        return L10n.string("profile.local.delete.detail", seriesCount)
     }
 }

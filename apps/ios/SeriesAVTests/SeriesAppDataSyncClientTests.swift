@@ -68,4 +68,34 @@ final class SeriesAppDataSyncClientTests: XCTestCase {
         XCTAssertEqual(document.revision, 5)
         XCTAssertEqual(document.etag, "\"revision-5\"")
     }
+
+    func testPushLibraryWithoutExpectedETagOmitsIfMatchForOverwrite() async throws {
+        let response = """
+        {
+          "data": {
+            "appId": "seriesav",
+            "resource": "seriesLibrary",
+            "deviceId": "ios-device",
+            "sentAt": "2026-06-12T10:00:00Z",
+            "entries": []
+          },
+          "updatedAt": "2026-06-12T10:00:00Z",
+          "revision": 6,
+          "etag": "\\\"revision-6\\\""
+        }
+        """.data(using: .utf8)!
+
+        let client = SeriesAppDataSyncClient(deviceId: "ios-device") { _, method, body, headers in
+            XCTAssertEqual(method, "PUT")
+            XCTAssertNotNil(body)
+            XCTAssertNil(headers["If-Match"])
+            XCTAssertEqual(headers["Content-Type"], "application/json")
+            return (response, "\"revision-6\"")
+        }
+
+        let document = try await client.pushLibrary(entries: [], expectedETag: nil)
+
+        XCTAssertEqual(document.revision, 6)
+        XCTAssertEqual(document.etag, "\"revision-6\"")
+    }
 }

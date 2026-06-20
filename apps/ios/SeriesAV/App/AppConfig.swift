@@ -50,13 +50,12 @@ enum AppConfig {
         configuredURL(for: "SERIESAV_OPEN_SOURCE_URL", fallback: "https://github.com/avalsys/series-av")
     }
 
-    static var accountDeletionURL: URL {
-        if let url = BundleConfig.urlValue(for: "SERIESAV_DELETE_ACCOUNT_URL") {
-            return url
-        }
-
-        return accountManagementURL?.appending(path: "delete-account")
-            ?? URL(string: "https://account.avalsys.com/account/delete")!
+    static var accountDeletionURL: URL? {
+        BundleConfig.deleteAccountURL(
+            explicitURL: BundleConfig.urlValue(for: "SERIESAV_DELETE_ACCOUNT_URL"),
+            accountURL: BundleConfig.urlValue(for: "ACCOUNTAV_DELETE_ACCOUNT_URL"),
+            accountManagementURL: accountManagementURL
+        )
     }
 
     static var revenueCatPublicAPIKey: String? {
@@ -90,30 +89,48 @@ enum AppConfig {
 }
 
 enum BundleConfig {
-    static func stringValue(for key: String) -> String {
-        guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String else {
-            return ""
+    static func stringValue(for key: String, in bundle: Bundle = .main) -> String {
+        nonEmptyStringValue(for: key, in: bundle) ?? ""
+    }
+
+    static func boolValue(for key: String, in bundle: Bundle = .main, default defaultValue: Bool = false) -> Bool {
+        guard let value = nonEmptyStringValue(for: key, in: bundle) else {
+            return defaultValue
         }
-        return value.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        switch value.lowercased() {
+        case "1", "true", "yes", "on", "enabled":
+            return true
+        case "0", "false", "no", "off", "disabled":
+            return false
+        default:
+            return defaultValue
+        }
     }
 
-    static func boolValue(for key: String) -> Bool {
-        ["1", "true", "yes", "on"]
-            .contains(stringValue(for: key).lowercased())
-    }
-
-    static func nonEmptyStringValue(for key: String) -> String? {
-        let value = stringValue(for: key)
+    static func nonEmptyStringValue(for key: String, in bundle: Bundle = .main) -> String? {
+        guard let rawValue = bundle.object(forInfoDictionaryKey: key) as? String else {
+            return nil
+        }
+        let value = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !value.isEmpty, !value.contains("$(") else {
             return nil
         }
         return value
     }
 
-    static func urlValue(for key: String) -> URL? {
-        guard let value = nonEmptyStringValue(for: key) else {
+    static func urlValue(for key: String, in bundle: Bundle = .main) -> URL? {
+        guard let value = nonEmptyStringValue(for: key, in: bundle) else {
             return nil
         }
         return URL(string: value)
+    }
+
+    static func deleteAccountURL(
+        explicitURL: URL?,
+        accountURL: URL?,
+        accountManagementURL: URL?
+    ) -> URL? {
+        explicitURL ?? accountURL ?? accountManagementURL?.appending(path: "account/delete")
     }
 }

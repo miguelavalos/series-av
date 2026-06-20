@@ -10,6 +10,8 @@
 	<string>$(ACCOUNTAV_KEYCHAIN_SERVICE)</string>
 	<key>ACCOUNTAV_MANAGEMENT_URL</key>
 	<string>$(ACCOUNTAV_MANAGEMENT_URL)</string>
+	<key>ACCOUNTAV_DELETE_ACCOUNT_URL</key>
+	<string>$(ACCOUNTAV_DELETE_ACCOUNT_URL)</string>
 	<key>ACCOUNTAV_PUBLISHABLE_KEY</key>
 	<string>$(ACCOUNTAV_PUBLISHABLE_KEY)</string>
 	<key>CFBundleDevelopmentRegion</key>
@@ -42,7 +44,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>4</string>
+	<string>3</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>SERIESAV_API_BASE_URL</key>
@@ -53,6 +55,8 @@
 	<string>$(SERIESAV_CONVEX_URL)</string>
 	<key>SERIESAV_DEBUG_FORCE_PRO_MODE</key>
 	<string>$(SERIESAV_DEBUG_FORCE_PRO_MODE)</string>
+	<key>SERIESAV_DELETE_ACCOUNT_URL</key>
+	<string>$(SERIESAV_DELETE_ACCOUNT_URL)</string>
 	<key>SERIESAV_OPEN_SOURCE_URL</key>
 	<string>$(SERIESAV_OPEN_SOURCE_URL)</string>
 	<key>SERIESAV_PRIVACY_URL</key>

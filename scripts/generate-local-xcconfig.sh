@@ -44,17 +44,19 @@ account_publishable_key="$(printenv_value ACCOUNTAV_PUBLISHABLE_KEY)"
 account_keychain_service="$(printenv_value ACCOUNTAV_KEYCHAIN_SERVICE)"
 account_keychain_access_group="$(printenv_value ACCOUNTAV_KEYCHAIN_ACCESS_GROUP)"
 avaccount_api_base_url="$(printenv_value ACCOUNTAV_API_BASE_URL)"
+account_delete_account_url="$(printenv_value ACCOUNTAV_DELETE_ACCOUNT_URL)"
 seriesav_api_base_url="$(printenv_value SERIESAV_API_BASE_URL)"
 seriesav_convex_url="$(printenv_value SERIESAV_CONVEX_URL)"
+seriesav_delete_account_url="$(printenv_value SERIESAV_DELETE_ACCOUNT_URL)"
 account_management_url="$(printenv_value ACCOUNTAV_MANAGEMENT_URL)"
 revenuecat_public_api_key="$(printenv_value SERIESAV_REVENUECAT_PUBLIC_API_KEY)"
 revenuecat_offering_id="$(printenv_value SERIESAV_REVENUECAT_OFFERING_ID)"
 revenuecat_monthly_package_id="$(printenv_value SERIESAV_REVENUECAT_MONTHLY_PACKAGE_ID)"
 terms_url="$(printenv_value SERIESAV_TERMS_URL)"
 privacy_url="$(printenv_value SERIESAV_PRIVACY_URL)"
+seriesav_web_base_url="$(printenv_value SERIESAV_WEB_BASE_URL)"
 support_email="$(printenv_value SERIESAV_SUPPORT_EMAIL)"
 open_source_url="$(printenv_value SERIESAV_OPEN_SOURCE_URL)"
-seriesav_web_base_url="$(printenv_value SERIESAV_WEB_BASE_URL)"
 development_team="$(printenv_value AVALSYS_APPLE_DEVELOPMENT_TEAM)"
 
 if [ -z "$seriesav_web_base_url" ]; then
@@ -125,6 +127,19 @@ case "$seriesav_convex_url" in
     ;;
 esac
 
+for url_name in account_delete_account_url seriesav_delete_account_url; do
+  url_value="${!url_name:-}"
+  if [ -n "$url_value" ]; then
+    case "$url_value" in
+      https://*) ;;
+      *)
+        echo "$url_name must use HTTPS." >&2
+        exit 1
+        ;;
+    esac
+  fi
+done
+
 rendered_config="$(cat <<EOF
 SERIESAV_BUNDLE_IDENTIFIER = $bundle_identifier
 AVALSYS_APPLE_DEVELOPMENT_TEAM = $development_team
@@ -132,13 +147,16 @@ ACCOUNTAV_PUBLISHABLE_KEY = $account_publishable_key
 ACCOUNTAV_KEYCHAIN_SERVICE = $account_keychain_service
 ACCOUNTAV_KEYCHAIN_ACCESS_GROUP = $account_keychain_access_group
 ACCOUNTAV_API_BASE_URL = $(xcodebuild_url_value "${avaccount_api_base_url:-}")
+ACCOUNTAV_DELETE_ACCOUNT_URL = $(xcodebuild_url_value "${account_delete_account_url:-}")
 SERIESAV_API_BASE_URL = $(xcodebuild_url_value "${seriesav_api_base_url:-}")
 SERIESAV_CONVEX_URL = $(xcodebuild_url_value "${seriesav_convex_url:-}")
+SERIESAV_DELETE_ACCOUNT_URL = $(xcodebuild_url_value "${seriesav_delete_account_url:-}")
 SERIESAV_REVENUECAT_PUBLIC_API_KEY = $revenuecat_public_api_key
 SERIESAV_REVENUECAT_OFFERING_ID = $revenuecat_offering_id
 SERIESAV_REVENUECAT_MONTHLY_PACKAGE_ID = $revenuecat_monthly_package_id
 SERIESAV_TERMS_URL = $(xcodebuild_url_value "${terms_url:-}")
 SERIESAV_PRIVACY_URL = $(xcodebuild_url_value "${privacy_url:-}")
+SERIESAV_WEB_BASE_URL = $(xcodebuild_url_value "${seriesav_web_base_url:-}")
 ACCOUNTAV_MANAGEMENT_URL = $(xcodebuild_url_value "${account_management_url:-}")
 SERIESAV_SUPPORT_EMAIL = ${support_email:-}
 SERIESAV_OPEN_SOURCE_URL = $(xcodebuild_url_value "${open_source_url:-}")
@@ -146,7 +164,6 @@ SERIESAV_DEBUG_FORCE_PRO_MODE = NO
 SERIESAV_DEBUG_SEED_SOCIAL_PREVIEW = NO
 SERIESAV_DEBUG_PREVIEW_DISPLAY_NAME =
 SERIESAV_DEBUG_PREVIEW_EMAIL =
-SERIESAV_WEB_BASE_URL = $(xcodebuild_url_value "${seriesav_web_base_url:-}")
 EOF
 )"
 

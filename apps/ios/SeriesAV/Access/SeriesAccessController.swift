@@ -101,7 +101,7 @@ final class SeriesAccessController {
             try? await Task.sleep(nanoseconds: nanoseconds)
         }
     ) {
-        let currentUser = Self.shouldForceGuestForUITests
+        let currentUser = Self.shouldForceGuestForUITests || Self.shouldUseAvailableGuestAccountForUITests
             ? nil
             : Self.uiTestAccountUser ?? Self.lastKnownAccountUser(from: userDefaults, key: lastKnownAccountUserKey)
         let accessClient = SeriesAccountAccessClient(apiClient: SeriesAVAPIClient(
@@ -184,17 +184,26 @@ final class SeriesAccessController {
             return
         }
 
+        if Self.shouldUseAvailableGuestAccountForUITests {
+            clearSignedOutAccountState()
+            await refreshAccess()
+            return
+        }
+
         accessRefreshGeneration += 1
         let generation = accessRefreshGeneration
 
+        let diagnostics = SeriesProductAccountDiagnostics()
         let sessionController = AVProductAccountSessionController(
             configuration: .seriesAV,
             provider: SeriesProductAccountProvider(accountService: accountService),
             resolver: SeriesProductAccountResolver(profileResolver: profileResolver),
-            persistence: SeriesProductAccountPersistence(userDefaults: userDefaults, key: lastKnownAccountUserKey)
+            persistence: AVUserDefaultsProductAccountPersistence(userDefaults: userDefaults, key: lastKnownAccountUserKey),
+            diagnostics: diagnostics
         )
 
         let productAccountState = await sessionController.restore()
+        let diagnosticEvents = await diagnostics.events
         guard generation == accessRefreshGeneration else { return }
 
         switch productAccountState {
@@ -208,6 +217,17 @@ final class SeriesAccessController {
             accountUser = lastKnownUser.map(SeriesAccountUser.init(productAccountUser:))
             isAccountSessionTemporarilyUnavailable = lastKnownUser != nil
         case .guest:
+            if diagnosticEvents.contains(.productUserResolutionTemporarilyUnavailable) ||
+                diagnosticEvents.contains(.providerTokenUnavailable) ||
+                diagnosticEvents.contains(.providerSessionUnavailable) {
+                isAccountSessionTemporarilyUnavailable = true
+                accountSession = nil
+                platformUserId = nil
+                clearSubscriptionState()
+                resolveAccessState()
+                return
+            }
+
             clearSignedOutAccountState()
         }
 
@@ -322,7 +342,7 @@ final class SeriesAccessController {
             guard isWaitingForSubscriptionReconciliation else { return }
             guard accountUser == reconciliationAccountUser else { return }
 
-            await refreshAccess()
+            await syncFromAccountProvider()
             if accessMode == .signedInPro {
                 clearSubscriptionReconciliationState()
                 return
@@ -389,6 +409,10 @@ final class SeriesAccessController {
         SeriesUITestEnvironment.current.shouldForceGuest
     }
 
+    private static var shouldUseAvailableGuestAccountForUITests: Bool {
+        SeriesUITestEnvironment.current.shouldUseAvailableGuestAccount
+    }
+
     private static var uiTestAccountUser: SeriesAccountUser? {
         guard SeriesUITestEnvironment.current.hasAccountOverride else { return nil }
         return SeriesAccountUser(
@@ -424,6 +448,14 @@ final class SeriesAccessController {
             displayName: accountUser.displayName,
             emailAddress: accountUser.emailAddress
         )
+    }
+}
+
+private actor SeriesProductAccountDiagnostics: AVProductAccountDiagnostics {
+    private(set) var events: [AVProductAccountDiagnosticEvent] = []
+
+    func recordAccountEvent(_ event: AVProductAccountDiagnosticEvent) async {
+        events.append(event)
     }
 }
 
@@ -484,29 +516,5 @@ private struct SeriesProductAccountResolver: AVProductAccountResolving {
 
         let accountUser = try await profileResolver.resolveCurrentAccountUser()
         return accountUser.productAccountUser
-    }
-}
-
-@MainActor
-private struct SeriesProductAccountPersistence: AVProductAccountPersistence {
-    let userDefaults: UserDefaults
-    let key: String
-
-    func loadLastKnownUser() async -> AVProductAccountUser? {
-        guard let data = userDefaults.data(forKey: key),
-              let user = try? JSONDecoder().decode(SeriesAccountUser.self, from: data) else {
-            return nil
-        }
-        return user.productAccountUser
-    }
-
-    func saveLastKnownUser(_ user: AVProductAccountUser) async throws {
-        let accountUser = SeriesAccountUser(productAccountUser: user)
-        guard let data = try? JSONEncoder().encode(accountUser) else { return }
-        userDefaults.set(data, forKey: key)
-    }
-
-    func clearLastKnownUser() async throws {
-        userDefaults.removeObject(forKey: key)
     }
 }

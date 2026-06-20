@@ -74,7 +74,7 @@ struct SeriesSearchScreen: View {
                 clearProgress: { entry in
                     store.clearProgress(for: entry.id)
                 },
-                shareInviteClient: SeriesShareInviteClient(apiClient: accessController.authenticatedAPIClient())
+                shareInviteClient: shareInviteClient
             )
             .presentationDetents([.large])
         }
@@ -88,6 +88,11 @@ struct SeriesSearchScreen: View {
             activeCount: store.activeEntries.count,
             activeLimit: accessController.limits.activeLibrarySeries
         )
+    }
+
+    private var shareInviteClient: SeriesShareInviteClient? {
+        guard accessController.isSignedIn else { return nil }
+        return SeriesShareInviteClient(apiClient: accessController.authenticatedAPIClient())
     }
 
     private var canAddSeries: Bool {

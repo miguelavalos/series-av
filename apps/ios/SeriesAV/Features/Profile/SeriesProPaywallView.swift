@@ -48,7 +48,7 @@ struct SeriesProPaywallView: View {
             subscriptionTermsRow
 
             if accessController.isWaitingForSubscriptionReconciliation {
-                AVPaywallStatusRow(systemImage: "clock.arrow.circlepath", message: reconciliationStatus)
+                AVPaywallStatusRow(systemImage: "arrow.triangle.2.circlepath", message: L10n.string("paywall.status.refreshingAccess"))
             } else if let error = accessController.subscriptionError?.errorDescription {
                 AVPaywallStatusRow(systemImage: "exclamationmark.triangle", message: error)
             }
@@ -104,6 +104,9 @@ struct SeriesProPaywallView: View {
         if accessController.isSubscriptionOperationInProgress {
             return L10n.string("paywall.purchase.loading")
         }
+        if accessController.isWaitingForSubscriptionReconciliation {
+            return L10n.string("paywall.purchase.refreshingAccess")
+        }
         guard let offer = accessController.subscriptionOffer else {
             return L10n.string("paywall.purchase.loadingOffer")
         }
@@ -114,7 +117,9 @@ struct SeriesProPaywallView: View {
         if !accessController.isSignedIn {
             return !accessController.accountIsAvailable
         }
-        return accessController.isSubscriptionOperationInProgress || accessController.subscriptionOffer == nil
+        return accessController.isWaitingForSubscriptionReconciliation ||
+            accessController.isSubscriptionOperationInProgress ||
+            accessController.subscriptionOffer == nil
     }
 
     private var restoreTitle: String {

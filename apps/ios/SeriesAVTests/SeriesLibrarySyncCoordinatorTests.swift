@@ -59,6 +59,25 @@ final class SeriesLibrarySyncCoordinatorTests: XCTestCase {
         XCTAssertEqual(merged.map(\.entryId), ["local-two", "local-one"])
     }
 
+    func testSyncStateTreatsRevisionConflictsAsConflict() {
+        XCTAssertEqual(
+            SeriesLibrarySyncCoordinator.syncState(for: SeriesAVAPIClientError.requestFailed(statusCode: 409)),
+            .conflict
+        )
+        XCTAssertEqual(
+            SeriesLibrarySyncCoordinator.syncState(for: SeriesAVAPIClientError.requestFailed(statusCode: 412)),
+            .conflict
+        )
+    }
+
+    func testSyncStateKeepsOtherRequestFailuresGeneric() {
+        guard case .failed = SeriesLibrarySyncCoordinator.syncState(
+            for: SeriesAVAPIClientError.requestFailed(statusCode: 500)
+        ) else {
+            return XCTFail("Expected non-conflict request failures to stay generic")
+        }
+    }
+
     private func makeEntry(
         entryId: String,
         seriesId: String,

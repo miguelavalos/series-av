@@ -130,11 +130,11 @@
 "add.footer.limitReached" = "Tu límite de biblioteca activa está lleno.";
 "add.footer.connectAccount" = "Conectar cuenta";
 "add.footer.upgrade" = "Ver Pro";
-"profile.alert.signOutFailed.title" = "Problema al salir";
+"profile.alert.signOutFailed.title" = "No se pudo cerrar la sesión";
 "profile.settingsScreen.title" = "Ajustes";
 "profile.accountScreen.title" = "Mi cuenta";
 "profile.settingsScreen.subtitle" = "Ajusta la app, gestiona este dispositivo y abre enlaces de ayuda.";
-"profile.accountScreen.subtitle" = "Gestiona inicio de sesión, acceso, facturación y seguridad de cuenta.";
+"profile.accountScreen.subtitle" = "Gestiona inicio de sesión, acceso, sincronización y seguridad de cuenta.";
 "profile.preferences.title" = "Preferencias de la app";
 "profile.preferences.subtitle" = "Elige cómo se muestra Series AV en este dispositivo.";
 "profile.preferences.language.title" = "Idioma de la app";
@@ -156,12 +156,12 @@
 "profile.preferences.searchEngine.ecosia" = "Ecosia";
 "profile.preferences.searchEngine.startpage" = "Startpage";
 "profile.preferences.searchEngine.qwant" = "Qwant";
-"profile.preferences.webOpenMode.title" = "Abrir enlaces";
-"profile.preferences.webOpenMode.detail" = "Elige si los enlaces de fuentes se abren dentro de Series AV o en el navegador por defecto.";
-"profile.preferences.webOpenMode.inApp" = "En la app";
-"profile.preferences.webOpenMode.system" = "Navegador";
-"profile.series.title" = "Seguimiento de series";
-"profile.series.subtitle" = "Un único punto claro por serie.";
+"profile.preferences.webOpenMode.title" = "Abrir enlaces web";
+"profile.preferences.webOpenMode.detail" = "Elige dónde se abren los enlaces de fuentes, ayuda y búsqueda.";
+"profile.preferences.webOpenMode.inApp" = "Dentro de Series AV";
+"profile.preferences.webOpenMode.system" = "Navegador del sistema";
+"profile.series.title" = "Preferencias de Series AV";
+"profile.series.subtitle" = "Ajusta seguimiento, fuentes y enlaces en este dispositivo.";
 "profile.series.cursor.title" = "Punto único de progreso";
 "profile.series.cursor.detail" = "Marca un episodio y Series AV deja anteriores como vistos y posteriores como pendientes.";
 "profile.series.reversible.title" = "Correcciones rápidas";
@@ -169,9 +169,13 @@
 "profile.local.title" = "En este dispositivo";
 "profile.local.subtitle" = "El modo local se mantiene simple y privado.";
 "profile.local.library.title" = "Biblioteca local";
-"profile.local.library.detail" = "Guest y Free guardan el seguimiento en este dispositivo.";
+"profile.local.library.detail" = "Los modos invitado y gratuito guardan el seguimiento en este dispositivo.";
 "profile.local.sync.title" = "Datos locales";
 "profile.local.sync.detail" = "El progreso se guarda en este dispositivo mientras uses modo local.";
+"profile.actions.manageLocalData" = "Gestionar almacenamiento";
+"profile.localDataSheet.title" = "Almacenamiento de Series AV";
+"profile.localDataSheet.subtitle" = "Elige qué quitar de este dispositivo. Los datos de cuenta se gestionan aparte en Apps AV.";
+"profile.localDataSheet.dangerTitle" = "Quitar de este dispositivo";
 "profile.local.delete.title" = "Borrar datos locales";
 "profile.local.delete.detail" = "Borra %d series de este dispositivo.";
 "profile.local.delete.empty" = "No hay datos locales que borrar.";
@@ -179,7 +183,7 @@
 "profile.local.delete.confirm.detail" = "Se borrarán las series, estados y progreso guardados en este dispositivo. Esta acción no borra tu cuenta Apps AV.";
 "profile.local.delete.confirm.action" = "Borrar datos";
 "profile.help.title" = "Ayuda y legal";
-"profile.help.subtitle" = "Abre desde aquí soporte, privacidad, términos y enlaces del código fuente.";
+"profile.help.subtitle" = "Abre desde aquí los enlaces del proyecto, soporte, privacidad y términos.";
 "profile.help.opensource.title" = "Proyecto de código abierto";
 "profile.help.opensource.detail" = "Series AV se mantiene como una app de código abierto e independiente.";
 "profile.help.sourceCode.title" = "Código fuente";
@@ -190,18 +194,22 @@
 "profile.help.privacy.detail" = "Consulta cómo Series AV gestiona tus datos.";
 "profile.help.terms.title" = "Términos del servicio";
 "profile.help.terms.detail" = "Revisa los términos aplicables a Series AV.";
-"profile.sync.title" = "Sincronización cloud";
+"profile.sync.title" = "Sincronización en la nube";
 "profile.sync.subtitle" = "Tu biblioteca Pro sigue a tu cuenta de Apps AV.";
-"profile.sync.headline.disabled" = "Sync no disponible";
+"profile.sync.headline.disabled" = "Sincronización no disponible";
 "profile.sync.headline.synced" = "Biblioteca sincronizada";
 "profile.sync.headline.syncing" = "Sincronizando biblioteca";
-"profile.sync.headline.failed" = "La sync necesita atención";
-"profile.sync.detail.disabled" = "La sincronización cloud se activa con Series AV Pro.";
+"profile.sync.headline.conflict" = "La sincronización necesita atención";
+"profile.sync.headline.failed" = "La sincronización necesita atención";
+"profile.sync.detail.disabled" = "La sincronización en la nube se activa con Series AV Pro.";
 "profile.sync.detail.synced" = "Series, estado y progreso de episodios están al día.";
 "profile.sync.detail.syncing" = "Series AV está actualizando la biblioteca de tu cuenta.";
+"profile.sync.detail.conflict" = "Tu biblioteca cambió en otro dispositivo. Actualiza desde la nube antes de hacer más cambios.";
 "profile.sync.detail.failed" = "Series AV no pudo actualizar la biblioteca de tu cuenta. Inténtalo de nuevo cuando tengas conexión.";
 "profile.sync.retry" = "Sincronizar ahora";
-"profile.sync.retry.syncing" = "Sincronizando...";
+"profile.sync.refresh" = "Actualizar";
+"profile.sync.keepDevice" = "Mantener este dispositivo";
+"profile.sync.retry.syncing" = "Sincronizando…";
 "profile.account.title" = "Cuenta";
 "profile.summary.account.title" = "Sesión";
 "profile.account.email.title" = "Correo electrónico";
@@ -217,7 +225,7 @@
 "profile.safety.subtitle" = "Las acciones sensibles usan Account AV sin enviarte a iniciar sesión otra vez en la web.";
 "profile.safety.delete.title" = "Eliminar cuenta de Apps AV";
 "profile.safety.delete.detail" = "Inicia una solicitud protegida dentro de la app para tu cuenta compartida de Apps AV.";
-"profile.actions.signingOut" = "Cerrando sesión...";
+"profile.actions.signingOut" = "Cerrando sesión…";
 "profile.actions.signOut" = "Cerrar sesión";
 "profile.account.connect" = "Iniciar sesión";
 "profile.account.connectUnavailable" = "El acceso a la cuenta no está disponible ahora";
@@ -247,9 +255,11 @@
 "paywall.purchase.loading" = "Procesando…";
 "paywall.purchase.loadingOffer" = "Cargando precio…";
 "paywall.purchase.price" = "Continuar por %@";
+"paywall.purchase.refreshingAccess" = "Comprobando acceso…";
 "paywall.restore" = "Restaurar compras";
 "paywall.restore.loading" = "Restaurando…";
 "paywall.status.purchasePending" = "Compra recibida. Series AV desbloqueará Pro cuando Apps AV confirme el acceso de tu cuenta.";
+"paywall.status.refreshingAccess" = "Comprobando el acceso de tu cuenta con Apps AV.";
 "paywall.status.restorePending" = "Restauración completada. Si tu App Store tiene una suscripción activa, Series AV desbloqueará Pro cuando Apps AV confirme el acceso.";
 "paywall.benefit.sync.title" = "Acceso de cuenta";
 "paywall.benefit.sync" = "Mantén el acceso Pro vinculado a tu cuenta de Apps AV.";
@@ -341,7 +351,7 @@
 
 "accountDeletion.deleteButton" = "Eliminar cuenta de Apps AV";
 
-"accountDeletion.deleting" = "Eliminando cuenta...";
+"accountDeletion.deleting" = "Eliminando cuenta…";
 
 "accountDeletion.eligible.detail" = "Revisa las advertencias y confirma para solicitar la eliminación de la cuenta compartida de Apps AV.";
 
@@ -359,7 +369,7 @@
 
 "accountDeletion.finalizeButton" = "Finalizar eliminación";
 
-"accountDeletion.finalizing" = "Finalizando...";
+"accountDeletion.finalizing" = "Finalizando…";
 
 "accountDeletion.impact.high.detail" = "Eliminar esta cuenta es permanente. Puedes perder acceso Pro, suscripciones gestionadas por otro proveedor, créditos sin usar, créditos reservados, contenido generado y datos de todas las apps Apps AV. Esto no se puede deshacer. La eliminación sigue disponible si decides continuar.";
 
@@ -373,7 +383,7 @@
 
 "accountDeletion.inProgress.title" = "Eliminación en curso";
 
-"accountDeletion.loading" = "Cargando estado de eliminación...";
+"accountDeletion.loading" = "Cargando estado de eliminación…";
 
 "accountDeletion.manageLink" = "Gestionar";
 
@@ -395,7 +405,7 @@
 
 "accountDeletion.unlinkButton" = "Desvincular esta app";
 
-"accountDeletion.unlinking" = "Desvinculando...";
+"accountDeletion.unlinking" = "Desvinculando…";
 
 "accountDeletion.statusUpdateFailed.detail" = "No se pudo actualizar el estado de borrado. Inténtalo de nuevo.";
 

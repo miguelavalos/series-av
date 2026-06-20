@@ -130,11 +130,11 @@
 "add.footer.limitReached" = "Your active library limit is full.";
 "add.footer.connectAccount" = "Connect account";
 "add.footer.upgrade" = "View Pro";
-"profile.alert.signOutFailed.title" = "Sign-out problem";
+"profile.alert.signOutFailed.title" = "Couldn't sign out";
 "profile.settingsScreen.title" = "Settings";
 "profile.accountScreen.title" = "My account";
 "profile.settingsScreen.subtitle" = "Tune the app, manage this device, and open help links.";
-"profile.accountScreen.subtitle" = "Manage sign-in, access, billing, and account safety.";
+"profile.accountScreen.subtitle" = "Manage sign-in, access, sync, and account safety.";
 "profile.preferences.title" = "App preferences";
 "profile.preferences.subtitle" = "Pick how Series AV is shown on this device.";
 "profile.preferences.language.title" = "App language";
@@ -156,12 +156,12 @@
 "profile.preferences.searchEngine.ecosia" = "Ecosia";
 "profile.preferences.searchEngine.startpage" = "Startpage";
 "profile.preferences.searchEngine.qwant" = "Qwant";
-"profile.preferences.webOpenMode.title" = "Open links";
-"profile.preferences.webOpenMode.detail" = "Choose whether source links open inside Series AV or in the default browser.";
-"profile.preferences.webOpenMode.inApp" = "In app";
-"profile.preferences.webOpenMode.system" = "Browser";
-"profile.series.title" = "Series tracking";
-"profile.series.subtitle" = "One clear watching point per series.";
+"profile.preferences.webOpenMode.title" = "Open web links";
+"profile.preferences.webOpenMode.detail" = "Choose where source, help, and search links open.";
+"profile.preferences.webOpenMode.inApp" = "Inside Series AV";
+"profile.preferences.webOpenMode.system" = "System browser";
+"profile.series.title" = "Series AV preferences";
+"profile.series.subtitle" = "Adjust tracking, sources and link behavior on this device.";
 "profile.series.cursor.title" = "Single progress point";
 "profile.series.cursor.detail" = "Mark an episode and Series AV keeps earlier episodes watched and later episodes pending.";
 "profile.series.reversible.title" = "Fast corrections";
@@ -172,6 +172,10 @@
 "profile.local.library.detail" = "Guest and Free modes keep tracking on this device.";
 "profile.local.sync.title" = "Local data";
 "profile.local.sync.detail" = "Progress stays on this device while you use local mode.";
+"profile.actions.manageLocalData" = "Manage storage";
+"profile.localDataSheet.title" = "Series AV storage";
+"profile.localDataSheet.subtitle" = "Choose what to remove from this device. Account data is managed separately in Apps AV.";
+"profile.localDataSheet.dangerTitle" = "Remove from this device";
 "profile.local.delete.title" = "Delete local data";
 "profile.local.delete.detail" = "Deletes %d series from this device.";
 "profile.local.delete.empty" = "There is no local data to delete.";
@@ -179,7 +183,7 @@
 "profile.local.delete.confirm.detail" = "Series, status, and progress saved on this device will be deleted. This does not delete your Apps AV account.";
 "profile.local.delete.confirm.action" = "Delete data";
 "profile.help.title" = "Help and legal";
-"profile.help.subtitle" = "Open support, privacy, terms, and source links from here.";
+"profile.help.subtitle" = "Open project links, support, privacy, and terms from here.";
 "profile.help.opensource.title" = "Open-source project";
 "profile.help.opensource.detail" = "Series AV is maintained as an independent open-source project.";
 "profile.help.sourceCode.title" = "Source code";
@@ -195,17 +199,21 @@
 "profile.sync.headline.disabled" = "Sync unavailable";
 "profile.sync.headline.synced" = "Library synced";
 "profile.sync.headline.syncing" = "Syncing library";
+"profile.sync.headline.conflict" = "Sync needs attention";
 "profile.sync.headline.failed" = "Sync needs attention";
 "profile.sync.detail.disabled" = "Cloud sync turns on with Series AV Pro.";
 "profile.sync.detail.synced" = "Series, status, and episode progress are up to date.";
 "profile.sync.detail.syncing" = "Series AV is updating your account library.";
+"profile.sync.detail.conflict" = "Your library changed on another device. Refresh from cloud before making more changes.";
 "profile.sync.detail.failed" = "Series AV could not update your account library. Try again when you are online.";
 "profile.sync.retry" = "Sync now";
-"profile.sync.retry.syncing" = "Syncing...";
+"profile.sync.refresh" = "Refresh";
+"profile.sync.keepDevice" = "Keep this device";
+"profile.sync.retry.syncing" = "Syncing…";
 "profile.account.title" = "Account";
 "profile.summary.account.title" = "Session";
 "profile.account.email.title" = "Email";
-"profile.summary.plan.title" = "Plan";
+"profile.summary.plan.title" = "Access";
 "profile.pro.title" = "Series AV Pro";
 "profile.pro.account.title" = "Pro account";
 "profile.pro.account.detail" = "Keep Pro access linked to your Apps AV account.";
@@ -214,10 +222,10 @@
 "profile.pro.avi.title" = "Avi on Home";
 "profile.pro.avi.detail" = "Keep tracking guidance next to your current series.";
 "profile.safety.title" = "Account safety";
-"profile.safety.subtitle" = "Account-level actions open the shared Account AV flow.";
-"profile.safety.delete.title" = "Delete account";
-"profile.safety.delete.detail" = "Open the shared account deletion page.";
-"profile.actions.signingOut" = "Signing out...";
+"profile.safety.subtitle" = "Sensitive account actions use Account AV without sending you through a second web sign-in.";
+"profile.safety.delete.title" = "Delete Apps AV account";
+"profile.safety.delete.detail" = "Start a guarded in-app deletion request for your shared Apps AV account.";
+"profile.actions.signingOut" = "Signing out…";
 "profile.actions.signOut" = "Sign out";
 "profile.account.connect" = "Sign in";
 "profile.account.connectUnavailable" = "Account sign-in is not available right now";
@@ -247,9 +255,11 @@
 "paywall.purchase.loading" = "Working…";
 "paywall.purchase.loadingOffer" = "Loading price…";
 "paywall.purchase.price" = "Continue for %@";
+"paywall.purchase.refreshingAccess" = "Checking access…";
 "paywall.restore" = "Restore purchases";
 "paywall.restore.loading" = "Restoring…";
 "paywall.status.purchasePending" = "Purchase received. Series AV will unlock Pro after Apps AV confirms your account access.";
+"paywall.status.refreshingAccess" = "Checking your account access with Apps AV.";
 "paywall.status.restorePending" = "Restore completed. If your App Store account has an active subscription, Series AV will unlock Pro after Apps AV confirms access.";
 "paywall.benefit.sync.title" = "Account access";
 "paywall.benefit.sync" = "Keep Pro access linked to your Apps AV account.";
@@ -341,7 +351,7 @@
 
 "accountDeletion.deleteButton" = "Delete Apps AV account";
 
-"accountDeletion.deleting" = "Deleting account...";
+"accountDeletion.deleting" = "Deleting account…";
 
 "accountDeletion.eligible.detail" = "Review any warnings below, then confirm to request deletion of the shared Apps AV account.";
 
@@ -359,7 +369,7 @@
 
 "accountDeletion.finalizeButton" = "Finalize deletion";
 
-"accountDeletion.finalizing" = "Finalizing...";
+"accountDeletion.finalizing" = "Finalizing…";
 
 "accountDeletion.impact.high.detail" = "Deleting this account is permanent. You may lose paid access, subscriptions managed in another provider, unused credits, reserved credits, generated content, and data from every Apps AV app. This cannot be undone. Deletion is still available if you choose to continue.";
 
@@ -373,7 +383,7 @@
 
 "accountDeletion.inProgress.title" = "Deletion in progress";
 
-"accountDeletion.loading" = "Loading deletion status...";
+"accountDeletion.loading" = "Loading deletion status…";
 
 "accountDeletion.manageLink" = "Manage";
 
@@ -395,7 +405,7 @@
 
 "accountDeletion.unlinkButton" = "Unlink this app";
 
-"accountDeletion.unlinking" = "Unlinking...";
+"accountDeletion.unlinking" = "Unlinking…";
 
 "accountDeletion.statusUpdateFailed.detail" = "Could not update deletion status. Try again.";
 

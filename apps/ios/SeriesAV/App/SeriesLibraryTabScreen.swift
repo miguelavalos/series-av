@@ -93,7 +93,7 @@ struct SeriesLibraryTabScreen: View {
                     pendingLibraryUndo = nil
                     store.clearProgress(for: entry.id)
                 },
-                shareInviteClient: accessController.map { SeriesShareInviteClient(apiClient: $0.authenticatedAPIClient()) }
+                shareInviteClient: shareInviteClient
             )
             .presentationDetents([.large])
         }
@@ -189,6 +189,11 @@ struct SeriesLibraryTabScreen: View {
                 }
             }
         }
+    }
+
+    private var shareInviteClient: SeriesShareInviteClient? {
+        guard let accessController, accessController.isSignedIn else { return nil }
+        return SeriesShareInviteClient(apiClient: accessController.authenticatedAPIClient())
     }
 
     private func screenTitle(title: String, subtitle: String) -> some View {

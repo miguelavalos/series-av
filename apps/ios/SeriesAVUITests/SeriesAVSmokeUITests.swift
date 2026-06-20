@@ -161,6 +161,42 @@ final class SeriesAVSmokeUITests: XCTestCase {
     }
 
     @MainActor
+    func testInitialOnboardingExpandedAuthOptions() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_FORCE_GUEST": "0",
+            "SERIESAV_UI_TESTS_ACCOUNT_MODE": "guest_available",
+            "SERIESAV_UI_TESTS_SHOW_ONBOARDING": "1",
+            "SERIESAV_UI_TESTS_SHOW_AUTH_OPTIONS": "1"
+        ])
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Conecta tu cuenta"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Usa tu cuenta AV para gestionar tu acceso Pro."].exists)
+        XCTAssertTrue(app.buttons["series.onboarding.auth.apple"].exists)
+        XCTAssertTrue(app.buttons["series.onboarding.auth.google"].exists)
+        XCTAssertTrue(app.buttons["Omitir por ahora"].exists)
+        XCTAssertTrue(app.staticTexts["Al continuar, aceptas los Términos y la Política de privacidad de Series AV."].exists)
+    }
+
+    @MainActor
+    func testInitialOnboardingSkipContinuesToHomeShell() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SHOW_ONBOARDING": "1"
+        ])
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Sigue series y ponte al día"].waitForExistence(timeout: 10))
+        app.buttons["OMITIR POR AHORA"].tap()
+
+        XCTAssertTrue(app.staticTexts["Sigue tu primera serie"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.staticTexts["Sigue series y ponte al día"].exists)
+        XCTAssertFalse(app.staticTexts["Conecta tu cuenta"].exists)
+        XCTAssertTrue(app.buttons["series.tab.home"].exists)
+    }
+
+    @MainActor
     func testSignedInFreePaywallShowsPriceRestoreAndTerms() throws {
         continueAfterFailure = false
         let app = makeApp(environment: [

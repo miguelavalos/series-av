@@ -41,6 +41,8 @@ struct DefaultSeriesAVAccountService: SeriesAVAccountServicing {
     )
 
     var isAvailable: Bool {
+        guard !Self.shouldForceGuestForUITests else { return false }
+        if Self.shouldUseAvailableGuestAccountForUITests { return true }
         if Self.uiTestAccountUser != nil { return true }
         return accountService.isAvailable
     }
@@ -55,6 +57,7 @@ struct DefaultSeriesAVAccountService: SeriesAVAccountServicing {
 
     func restoreSession() async -> SeriesAVAccountSessionRestoreResult {
         guard !Self.shouldForceGuestForUITests else { return .signedOut }
+        if Self.shouldUseAvailableGuestAccountForUITests { return .signedOut }
         if let uiTestAccountUser = Self.uiTestAccountUser {
             return .active(uiTestAccountUser)
         }
@@ -73,7 +76,7 @@ struct DefaultSeriesAVAccountService: SeriesAVAccountServicing {
 
     func getToken() async throws -> String? {
         if Self.shouldUseGuestTokenForUITests {
-            return SeriesUITestEnvironment.accountToken
+            return nil
         }
         if Self.uiTestAccountUser != nil {
             return SeriesUITestEnvironment.accountToken
@@ -102,12 +105,23 @@ struct DefaultSeriesAVAccountService: SeriesAVAccountServicing {
     }
 
     private static var shouldForceGuestForUITests: Bool {
-        SeriesUITestEnvironment.current.shouldForceGuest
+        shouldForceGuestForUITests(environment: .current)
     }
 
     private static var shouldUseGuestTokenForUITests: Bool {
-        let environment = SeriesUITestEnvironment.current
-        return environment.isEnabled && environment.shouldForceGuest
+        shouldUseGuestTokenForUITests(environment: .current)
+    }
+
+    private static var shouldUseAvailableGuestAccountForUITests: Bool {
+        SeriesUITestEnvironment.current.shouldUseAvailableGuestAccount
+    }
+
+    static func shouldForceGuestForUITests(environment: SeriesUITestEnvironment) -> Bool {
+        environment.shouldForceGuest
+    }
+
+    static func shouldUseGuestTokenForUITests(environment: SeriesUITestEnvironment) -> Bool {
+        environment.isEnabled && !environment.hasAccountOverride
     }
 
     private static var uiTestAccountUser: SeriesAccountUser? {

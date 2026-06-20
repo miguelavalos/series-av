@@ -54,6 +54,35 @@ final class SeriesAccessControllerTests: XCTestCase {
         XCTAssertEqual(controller.capabilities.canUseCloudSync, false)
     }
 
+    func testProviderSessionDoesNotPublishProviderUserIdWhenInternalResolutionFails() async {
+        let controller = SeriesAccessController(
+            accountService: StubSeriesAVAccountService(
+                restoreResult: .active(SeriesAccountUser(
+                    id: "user_clerk_subject",
+                    displayName: "Provider User",
+                    emailAddress: "provider@example.com"
+                )),
+                token: "provider-token"
+            ),
+            profileResolver: StubSeriesAccountProfileResolver(user: nil),
+            entitlementService: StubSeriesEntitlementService(access: SeriesResolvedAccess(
+                platformUserId: "apps-av-user-1",
+                planTier: .free,
+                accessMode: .signedInFree,
+                capabilities: .forMode(.signedInFree),
+                limits: .forMode(.signedInFree)
+            )),
+            userDefaults: isolatedUserDefaults()
+        )
+
+        await controller.syncFromAccountProvider()
+
+        XCTAssertNil(controller.accountUser)
+        XCTAssertNil(controller.accountSession)
+        XCTAssertEqual(controller.accessMode, .guest)
+        XCTAssertTrue(controller.isAccountSessionTemporarilyUnavailable)
+    }
+
     func testInitializesWithLastKnownAccountUser() {
         let defaults = isolatedUserDefaults()
         persistLastKnownAccountUser(
@@ -87,6 +116,66 @@ final class SeriesAccessControllerTests: XCTestCase {
                 emailAddress: "apps@example.com"
             )
         )))
+    }
+
+    func testLastKnownAccountUserPreservesColdStartDuringTemporarySessionFailure() async {
+        let defaults = isolatedUserDefaults()
+        let user = SeriesAccountUser(
+            id: "apps-av-user-1",
+            displayName: "Apps AV User",
+            emailAddress: "apps@example.com"
+        )
+        persistLastKnownAccountUser(user, in: defaults)
+        let controller = SeriesAccessController(
+            accountService: StubSeriesAVAccountService(restoreResult: .temporarilyUnavailable(nil)),
+            profileResolver: StubSeriesAccountProfileResolver(user: user),
+            entitlementService: StubSeriesEntitlementService(access: SeriesResolvedAccess(
+                platformUserId: user.id,
+                planTier: .pro,
+                accessMode: .signedInPro,
+                capabilities: .forMode(.signedInPro),
+                limits: .forMode(.signedInPro)
+            )),
+            userDefaults: defaults
+        )
+
+        await controller.syncFromAccountProvider()
+
+        XCTAssertTrue(controller.isSignedIn)
+        XCTAssertEqual(controller.accountUser, user)
+        XCTAssertEqual(controller.accountSession?.user, user)
+        XCTAssertEqual(controller.accessMode, .signedInPro)
+        XCTAssertTrue(controller.isAccountSessionTemporarilyUnavailable)
+    }
+
+    func testSignedOutProviderPreservesLastKnownAccountUserAsTemporarilyUnavailable() async {
+        let defaults = isolatedUserDefaults()
+        let user = SeriesAccountUser(
+            id: "apps-av-user-1",
+            displayName: "Apps AV User",
+            emailAddress: "apps@example.com"
+        )
+        persistLastKnownAccountUser(user, in: defaults)
+        let controller = SeriesAccessController(
+            accountService: StubSeriesAVAccountService(restoreResult: .signedOut),
+            profileResolver: StubSeriesAccountProfileResolver(user: user),
+            entitlementService: StubSeriesEntitlementService(access: SeriesResolvedAccess(
+                platformUserId: user.id,
+                planTier: .pro,
+                accessMode: .signedInPro,
+                capabilities: .forMode(.signedInPro),
+                limits: .forMode(.signedInPro)
+            )),
+            userDefaults: defaults
+        )
+
+        await controller.syncFromAccountProvider()
+
+        XCTAssertTrue(controller.isSignedIn)
+        XCTAssertEqual(controller.accountUser, user)
+        XCTAssertEqual(controller.accountSession?.user, user)
+        XCTAssertEqual(controller.accessMode, .signedInPro)
+        XCTAssertTrue(controller.isAccountSessionTemporarilyUnavailable)
     }
 
     func testSignOutClearsLastKnownAccountUser() async throws {
@@ -271,6 +360,65 @@ final class SeriesAccessControllerTests: XCTestCase {
         XCTAssertNil(controller.subscriptionError)
     }
 
+    func testPurchaseRetriesAccountSyncUntilBackendEntitlementIsVisible() async {
+        let entitlementService = SequenceSeriesEntitlementService(accesses: [
+            SeriesResolvedAccess(
+                platformUserId: "apps-av-user-1",
+                planTier: .free,
+                accessMode: .signedInFree,
+                capabilities: .forMode(.signedInFree),
+                limits: .forMode(.signedInFree)
+            ),
+            SeriesResolvedAccess(
+                platformUserId: "apps-av-user-1",
+                planTier: .free,
+                accessMode: .signedInFree,
+                capabilities: .forMode(.signedInFree),
+                limits: .forMode(.signedInFree)
+            ),
+            SeriesResolvedAccess(
+                platformUserId: "apps-av-user-1",
+                planTier: .pro,
+                accessMode: .signedInPro,
+                capabilities: .forMode(.signedInPro),
+                limits: .forMode(.signedInPro)
+            )
+        ])
+        let subscriptionPurchasing = StubSeriesSubscriptionPurchasing()
+        var sleepCalls: [UInt64] = []
+        let controller = SeriesAccessController(
+            accountService: StubSeriesAVAccountService(
+                restoreResult: .active(SeriesAccountUser(
+                    id: "provider-user-1",
+                    displayName: "Provider User",
+                    emailAddress: "provider@example.com"
+                )),
+                token: "provider-token"
+            ),
+            profileResolver: StubSeriesAccountProfileResolver(user: SeriesAccountUser(
+                id: "apps-av-user-1",
+                displayName: "Apps AV User",
+                emailAddress: "apps@example.com"
+            )),
+            entitlementService: entitlementService,
+            subscriptionPurchasing: subscriptionPurchasing,
+            userDefaults: isolatedUserDefaults(),
+            subscriptionReconciliationRetryDelaysNanoseconds: [1, 2],
+            sleepNanoseconds: { delay in
+                sleepCalls.append(delay)
+            }
+        )
+
+        await controller.syncFromAccountProvider()
+        await controller.purchaseMonthlyPro()
+
+        XCTAssertEqual(controller.accessMode, .signedInPro)
+        XCTAssertFalse(controller.isWaitingForSubscriptionReconciliation)
+        XCTAssertNil(controller.subscriptionReconciliationSource)
+        XCTAssertEqual(entitlementService.refreshCount, 3)
+        XCTAssertEqual(sleepCalls, [1])
+    }
+
     func testSubscriptionOperationsUsePlatformUserIdWhenAvailable() async {
         let subscriptionPurchasing = StubSeriesSubscriptionPurchasing()
         let controller = SeriesAccessController(
@@ -323,6 +471,24 @@ final class SeriesAccessControllerTests: XCTestCase {
         await controller.loadMonthlySubscriptionOffer()
 
         XCTAssertEqual(controller.subscriptionError, .missingAccountUser)
+    }
+
+    func testGuestCannotStartSubscriptionPurchaseOrRestore() async {
+        let subscriptionPurchasing = StubSeriesSubscriptionPurchasing()
+        let controller = SeriesAccessController(
+            accountService: StubSeriesAVAccountService(restoreResult: .signedOut),
+            profileResolver: StubSeriesAccountProfileResolver(user: nil),
+            entitlementService: StubSeriesEntitlementService(access: .guest),
+            subscriptionPurchasing: subscriptionPurchasing,
+            userDefaults: isolatedUserDefaults()
+        )
+
+        await controller.purchaseMonthlyPro()
+        await controller.restorePurchases()
+
+        XCTAssertEqual(controller.subscriptionError, .missingAccountUser)
+        XCTAssertEqual(subscriptionPurchasing.purchaseCount, 0)
+        XCTAssertEqual(subscriptionPurchasing.restoreCount, 0)
     }
 
     private func isolatedUserDefaults() -> UserDefaults {
@@ -408,6 +574,7 @@ private struct StubSeriesEntitlementService: SeriesEntitlementServicing {
 private final class SequenceSeriesEntitlementService: SeriesEntitlementServicing {
     private var accesses: [SeriesResolvedAccess]
     private var lastAccess: SeriesResolvedAccess
+    private(set) var refreshCount = 0
 
     init(accesses: [SeriesResolvedAccess]) {
         self.accesses = accesses
@@ -420,6 +587,7 @@ private final class SequenceSeriesEntitlementService: SeriesEntitlementServicing
 
     func refreshAccess(for user: SeriesAccountUser?) async -> SeriesResolvedAccess {
         guard user != nil else { return .guest }
+        refreshCount += 1
         if !accesses.isEmpty {
             lastAccess = accesses.removeFirst()
         }
