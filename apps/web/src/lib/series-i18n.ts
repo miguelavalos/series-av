@@ -118,6 +118,7 @@ const en = {
     alreadyInLibrary: "In library",
     fallbackTitle: "Shared series",
     libraryLimitReached: "Library limit reached",
+    openInApp: "Open in Series AV",
     signInToAccept: "Sign in to add",
     unavailableTitle: "Shared series unavailable",
     userRecommendation: "{{name}} recommends"
@@ -238,6 +239,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       alreadyInLibrary: "A la biblioteca",
       fallbackTitle: "Recomanació",
       libraryLimitReached: "Límit de biblioteca assolit",
+      openInApp: "Obre a Series AV",
       signInToAccept: "Inicia sessió per afegir",
       unavailableTitle: "Recomanació no disponible",
       userRecommendation: "{{name}} recomana"
@@ -356,6 +358,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       alreadyInLibrary: "In der Bibliothek",
       fallbackTitle: "Geteilte Serie",
       libraryLimitReached: "Bibliothekslimit erreicht",
+      openInApp: "In Series AV öffnen",
       signInToAccept: "Anmelden und hinzufügen",
       unavailableTitle: "Geteilte Serie nicht verfügbar",
       userRecommendation: "{{name}} empfiehlt"
@@ -475,6 +478,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       alreadyInLibrary: "En biblioteca",
       fallbackTitle: "Recomendación",
       libraryLimitReached: "Límite de biblioteca alcanzado",
+      openInApp: "Abrir en Series AV",
       signInToAccept: "Inicia sesión para añadir",
       unavailableTitle: "Recomendación no disponible",
       userRecommendation: "{{name}} recomienda"
@@ -593,6 +597,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       alreadyInLibrary: "Dans la bibliothèque",
       fallbackTitle: "Série partagée",
       libraryLimitReached: "Limite de bibliothèque atteinte",
+      openInApp: "Ouvrir dans Series AV",
       signInToAccept: "Connectez-vous pour ajouter",
       unavailableTitle: "Série partagée indisponible",
       userRecommendation: "{{name}} recommande"

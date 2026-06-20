@@ -2,7 +2,7 @@ import { useAccountSession, useAccountToken } from "@avalsys/account-av-web";
 import { ErrorState, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, CheckCircle2, Clock, Plus, UserRound } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Clock, Plus, Smartphone, UserRound } from "lucide-react";
 import { useMemo } from "react";
 
 import { SeriesAppShell } from "@/components/series-app-shell";
@@ -65,6 +65,7 @@ function ShareInviteRoute() {
   const canAccept = Boolean(invite && invite.status === "active" && accountSession.isSignedIn && !existingEntry);
   const returnTo = localizedSeriesPath(`/i/r/${encodeURIComponent(token)}`, locale);
   const signInHref = withReturnTo(localizedSeriesPath("/sign-in", locale), returnTo);
+  const nativeAppHref = `com.avalsys.seriesav://i/r/${encodeURIComponent(token)}`;
 
   return (
     <SeriesAppShell showAssistant={false}>
@@ -104,6 +105,11 @@ function ShareInviteRoute() {
                 ) : null}
 
                 <div className="mt-6 flex flex-wrap gap-2">
+                  <Button asChild variant="outline" className="rounded-full border-[#d7c494] bg-white/70 text-[#112a55] hover:bg-white">
+                    <a href={nativeAppHref}>
+                      <Smartphone className="size-4" /> {shareText.openInApp}
+                    </a>
+                  </Button>
                   {existingEntry ? (
                     <Button asChild className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]">
                       <Link to={localizedSeriesPath("/library", locale)}>
