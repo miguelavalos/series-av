@@ -616,7 +616,8 @@ struct SeriesProfileScreen: View {
         AVAppLegalLinks(
             supportURL: appExperience.legalLinks.supportURL,
             privacyURL: appExperience.legalLinks.privacyURL,
-            termsURL: appExperience.legalLinks.termsURL
+            termsURL: appExperience.legalLinks.termsURL,
+            accountDeletionURL: appExperience.legalLinks.accountDeletionURL
         )
     }
 
