@@ -4,14 +4,14 @@
 <dict>
 	<key>ACCOUNTAV_API_BASE_URL</key>
 	<string>$(ACCOUNTAV_API_BASE_URL)</string>
+	<key>ACCOUNTAV_DELETE_ACCOUNT_URL</key>
+	<string>$(ACCOUNTAV_DELETE_ACCOUNT_URL)</string>
 	<key>ACCOUNTAV_KEYCHAIN_ACCESS_GROUP</key>
 	<string>$(ACCOUNTAV_KEYCHAIN_ACCESS_GROUP)</string>
 	<key>ACCOUNTAV_KEYCHAIN_SERVICE</key>
 	<string>$(ACCOUNTAV_KEYCHAIN_SERVICE)</string>
 	<key>ACCOUNTAV_MANAGEMENT_URL</key>
 	<string>$(ACCOUNTAV_MANAGEMENT_URL)</string>
-	<key>ACCOUNTAV_DELETE_ACCOUNT_URL</key>
-	<string>$(ACCOUNTAV_DELETE_ACCOUNT_URL)</string>
 	<key>ACCOUNTAV_PUBLISHABLE_KEY</key>
 	<string>$(ACCOUNTAV_PUBLISHABLE_KEY)</string>
 	<key>CFBundleDevelopmentRegion</key>
@@ -44,7 +44,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>5</string>
+	<string>6</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>SERIESAV_API_BASE_URL</key>
