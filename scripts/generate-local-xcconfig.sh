@@ -57,8 +57,6 @@ open_source_url="$(printenv_value SERIESAV_OPEN_SOURCE_URL)"
 seriesav_web_base_url="$(printenv_value SERIESAV_WEB_BASE_URL)"
 development_team="$(printenv_value AVALSYS_APPLE_DEVELOPMENT_TEAM)"
 
-if [ -z "$development_team" ]; then
-  development_team="\$(inherited)"
 if [ -z "$seriesav_web_base_url" ]; then
   case "$profile" in
     production)
@@ -70,6 +68,8 @@ if [ -z "$seriesav_web_base_url" ]; then
   esac
 fi
 
+if [ -z "$development_team" ]; then
+  development_team="\$(inherited)"
 fi
 
 if [ "$development_team" = "346677S99H" ]; then
