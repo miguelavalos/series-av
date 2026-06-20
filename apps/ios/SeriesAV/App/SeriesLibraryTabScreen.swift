@@ -99,6 +99,26 @@ struct SeriesLibraryTabScreen: View {
                 setPrivateNote: { entry, note in
                     store.setPrivateNote(note, for: entry.id)
                 },
+                archive: entry.archivedAt == nil ? { entry in
+                    pendingLibraryUndo = PendingLibraryMutationUndo(
+                        entryId: entry.id,
+                        title: entry.title,
+                        messageKey: "home.undo.archived",
+                        action: .restoreActive
+                    )
+                    pendingProgressUndo = nil
+                    store.archive(entry.id)
+                } : nil,
+                delete: { entry in
+                    pendingLibraryUndo = PendingLibraryMutationUndo(
+                        entryId: entry.id,
+                        title: entry.title,
+                        messageKey: "home.undo.deleted",
+                        action: entry.archivedAt == nil ? .restoreActive : .restoreArchived
+                    )
+                    pendingProgressUndo = nil
+                    store.delete(entry.id)
+                },
                 shareInviteClient: shareInviteClient
             )
             .presentationDetents([.large])

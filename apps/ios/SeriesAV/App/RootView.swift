@@ -301,6 +301,16 @@ private struct SeriesWatchingHomeScreen: View {
                 setPrivateNote: { entry, note in
                     store.setPrivateNote(note, for: entry.id)
                 },
+                archive: { entry in
+                    store.archive(entry.id)
+                    pendingProgressUndo = nil
+                    pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.archived")
+                },
+                delete: { entry in
+                    store.delete(entry.id)
+                    pendingProgressUndo = nil
+                    pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.deleted")
+                },
                 shareInviteClient: shareInviteClient
             )
             .presentationDetents([.large])

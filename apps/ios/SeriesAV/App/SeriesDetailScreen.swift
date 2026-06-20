@@ -17,6 +17,8 @@ struct SeriesDetailScreen: View {
     let clearProgress: ((SeriesLibraryEntry) -> Void)?
     let setPinned: ((SeriesLibraryEntry, Bool) -> Void)?
     let setPrivateNote: ((SeriesLibraryEntry, String?) -> Void)?
+    let archive: ((SeriesLibraryEntry) -> Void)?
+    let delete: ((SeriesLibraryEntry) -> Void)?
 
     private let episodeGuideClient: SeriesEpisodeGuideClient
     private let detailClient: SeriesDetailClient
@@ -43,6 +45,8 @@ struct SeriesDetailScreen: View {
         clearProgress: ((SeriesLibraryEntry) -> Void)? = nil,
         setPinned: ((SeriesLibraryEntry, Bool) -> Void)? = nil,
         setPrivateNote: ((SeriesLibraryEntry, String?) -> Void)? = nil,
+        archive: ((SeriesLibraryEntry) -> Void)? = nil,
+        delete: ((SeriesLibraryEntry) -> Void)? = nil,
         episodeGuideClient: SeriesEpisodeGuideClient = SeriesEpisodeGuideClient(apiClient: SeriesAVAPIClient()),
         detailClient: SeriesDetailClient = SeriesDetailClient(),
         shareInviteClient: SeriesShareInviteClient? = nil
@@ -56,6 +60,8 @@ struct SeriesDetailScreen: View {
         self.clearProgress = clearProgress
         self.setPinned = setPinned
         self.setPrivateNote = setPrivateNote
+        self.archive = archive
+        self.delete = delete
         self.episodeGuideClient = episodeGuideClient
         self.detailClient = detailClient
         self.shareInviteClient = shareInviteClient
@@ -69,6 +75,7 @@ struct SeriesDetailScreen: View {
                     sourcesSection
                     trackingSection
                     privateNoteSection
+                    libraryManagementSection
                     guideSection
                 }
                 .padding(18)
@@ -280,6 +287,43 @@ struct SeriesDetailScreen: View {
                                 .frame(maxWidth: .infinity, minHeight: 42)
                         }
                         .buttonStyle(.bordered)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var libraryManagementSection: some View {
+        if let entry, archive != nil || delete != nil {
+            AVAppShellCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    sectionTitle(L10n.string("library.title"))
+
+                    HStack(spacing: 10) {
+                        if let archive {
+                            Button {
+                                archive(entry)
+                                dismiss()
+                            } label: {
+                                Label(L10n.string("home.archive"), systemImage: "archivebox")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.large)
+                        }
+
+                        if let delete {
+                            Button(role: .destructive) {
+                                delete(entry)
+                                dismiss()
+                            } label: {
+                                Label(L10n.string("home.delete"), systemImage: "trash")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.large)
+                        }
                     }
                 }
             }
