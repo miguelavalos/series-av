@@ -28,24 +28,24 @@ final class SeriesAVSmokeUITests: XCTestCase {
         LocaleSmokeConfiguration(
             language: "ca",
             locale: "ca_ES",
-            homeTitle: "Segueix la primera serie",
+            homeTitle: "Segueix la primera sèrie",
             searchTab: "Cerca",
-            searchTitle: "Cercar series",
+            searchTitle: "Cercar sèries",
             libraryTab: "Biblioteca",
             libraryTitle: "Biblioteca",
             accountTitle: "Compte",
-            paywallTitle: "Segueix mes series"
+            paywallTitle: "Segueix més sèries"
         ),
         LocaleSmokeConfiguration(
             language: "fr",
             locale: "fr_FR",
-            homeTitle: "Suivez votre premiere serie",
+            homeTitle: "Suivez votre première série",
             searchTab: "Recherche",
-            searchTitle: "Rechercher des series",
-            libraryTab: "Bibliotheque",
-            libraryTitle: "Bibliotheque",
+            searchTitle: "Rechercher des séries",
+            libraryTab: "Bibliothèque",
+            libraryTitle: "Bibliothèque",
             accountTitle: "Compte",
-            paywallTitle: "Suivez plus de series"
+            paywallTitle: "Suivez plus de séries"
         ),
         LocaleSmokeConfiguration(
             language: "de",

@@ -19,7 +19,7 @@ final class SeriesAVProfileUITests: XCTestCase {
         ])
 
         XCTAssertTrue(app.descendants(matching: .any)["profile.sync.card"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["La sync necesita atención"].exists)
+        XCTAssertTrue(app.staticTexts["La sincronización necesita atención"].exists)
         XCTAssertTrue(app.staticTexts["Tu biblioteca cambió en otro dispositivo. Actualiza desde la nube antes de hacer más cambios."].exists)
         XCTAssertTrue(app.buttons["Actualizar"].exists)
         XCTAssertTrue(app.buttons["Mantener este dispositivo"].exists)
