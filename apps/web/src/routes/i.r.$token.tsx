@@ -64,7 +64,7 @@ function ShareInviteRoute() {
   const canAccept = Boolean(invite && invite.status === "active" && accountSession.isSignedIn && !existingEntry);
 
   return (
-    <SeriesAppShell>
+    <SeriesAppShell showAssistant={false}>
       <section className="mx-auto grid max-w-4xl gap-6">
         <Button asChild variant="ghost" className="w-fit rounded-full">
           <Link to={localizedSeriesPath("/", locale)}>
