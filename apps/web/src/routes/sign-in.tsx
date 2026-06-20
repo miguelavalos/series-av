@@ -1,6 +1,6 @@
 import { AccountSignIn, SignedIn, SignedOut } from "@avalsys/account-av-web";
 import { AvAppFooter, useAppsAvLocale } from "@avalsys/apps-av-web";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute, useRouterState } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { seriesBrandAssets } from "@/lib/series-config";
 import { localizedSeriesPath, useSeriesProductConfig, useSeriesText } from "@/lib/series-i18n";
@@ -13,6 +13,8 @@ function SignInRoute() {
   const locale = useAppsAvLocale();
   const text = useSeriesText();
   const productConfig = useSeriesProductConfig();
+  const searchStr = useRouterState({ select: (state) => state.location.searchStr });
+  const fallbackRedirectUrl = safeReturnTo(searchStr) ?? localizedSeriesPath("/", locale);
 
   return (
     <div className="series-paper flex min-h-screen flex-col bg-[#fff3cf]">
@@ -57,13 +59,13 @@ function SignInRoute() {
             <SignedIn>
               <div className="rounded-2xl border border-[#d7c494] bg-[#fff8df] p-6 text-center shadow-lg shadow-[#172f5c]/10">
                 <p className="text-sm font-semibold text-[#112a55]">{text.signIn.signedIn}</p>
-                <Link className="mt-4 inline-flex h-10 items-center justify-center rounded-full bg-[#112a55] px-4 text-sm font-semibold text-white" to={localizedSeriesPath("/", locale)}>
+                <Link className="mt-4 inline-flex h-10 items-center justify-center rounded-full bg-[#112a55] px-4 text-sm font-semibold text-white" to={fallbackRedirectUrl}>
                   {text.signIn.continue}
                 </Link>
               </div>
             </SignedIn>
             <SignedOut>
-              <AccountSignIn fallbackRedirectUrl={localizedSeriesPath("/", locale)} path="/sign-in" />
+              <AccountSignIn fallbackRedirectUrl={fallbackRedirectUrl} path="/sign-in" />
             </SignedOut>
           </div>
         </section>
@@ -71,4 +73,12 @@ function SignInRoute() {
       <AvAppFooter labels={text.footer} product={productConfig} />
     </div>
   );
+}
+
+function safeReturnTo(searchStr: string) {
+  const returnTo = new URLSearchParams(searchStr).get("returnTo")?.trim();
+  if (!returnTo || !returnTo.startsWith("/") || returnTo.startsWith("//")) {
+    return null;
+  }
+  return returnTo;
 }

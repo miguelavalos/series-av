@@ -113,6 +113,15 @@ const en = {
     signedIn: "You are signed in.",
     title: "Your Series AV library follows you."
   },
+  shareInvite: {
+    accept: "Add to library",
+    alreadyInLibrary: "In library",
+    fallbackTitle: "Recommendation",
+    libraryLimitReached: "Library limit reached",
+    signInToAccept: "Sign in to add",
+    unavailableTitle: "Recommendation unavailable",
+    userRecommendation: "{{name}} recommends"
+  },
   search: {
     dateUnknown: "Date unknown",
     description: "Find a title, review its artwork, and prepare it for the signed-in library workflow.",
@@ -224,6 +233,15 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       signedIn: "Ja has iniciat sessió.",
       title: "La teva biblioteca de Series AV t'acompanya."
     },
+    shareInvite: {
+      accept: "Afegeix a la biblioteca",
+      alreadyInLibrary: "A la biblioteca",
+      fallbackTitle: "Recomanació",
+      libraryLimitReached: "Límit de biblioteca assolit",
+      signInToAccept: "Inicia sessió per afegir",
+      unavailableTitle: "Recomanació no disponible",
+      userRecommendation: "{{name}} recomana"
+    },
     search: {
       dateUnknown: "Data desconeguda",
       description: "Troba un títol, revisa'n l'art i prepara'l per al flux de biblioteca amb sessió iniciada.",
@@ -332,6 +350,15 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       continue: "Weiter",
       signedIn: "Du bist angemeldet.",
       title: "Deine Series AV Bibliothek begleitet dich."
+    },
+    shareInvite: {
+      accept: "Zur Bibliothek hinzufügen",
+      alreadyInLibrary: "In der Bibliothek",
+      fallbackTitle: "Empfehlung",
+      libraryLimitReached: "Bibliothekslimit erreicht",
+      signInToAccept: "Anmelden und hinzufügen",
+      unavailableTitle: "Empfehlung nicht verfügbar",
+      userRecommendation: "{{name}} empfiehlt"
     },
     search: {
       dateUnknown: "Datum unbekannt",
@@ -443,6 +470,15 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       signedIn: "Has iniciado sesión.",
       title: "Tu biblioteca de Series AV te acompaña."
     },
+    shareInvite: {
+      accept: "Añadir a la biblioteca",
+      alreadyInLibrary: "En biblioteca",
+      fallbackTitle: "Recomendación",
+      libraryLimitReached: "Límite de biblioteca alcanzado",
+      signInToAccept: "Inicia sesión para añadir",
+      unavailableTitle: "Recomendación no disponible",
+      userRecommendation: "{{name}} recomienda"
+    },
     search: {
       dateUnknown: "Fecha desconocida",
       description: "Encuentra un título, revisa su arte y prepáralo para el flujo de biblioteca con sesión iniciada.",
@@ -551,6 +587,15 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       continue: "Continuer",
       signedIn: "Vous êtes connecté.",
       title: "Votre bibliothèque Series AV vous accompagne."
+    },
+    shareInvite: {
+      accept: "Ajouter à la bibliothèque",
+      alreadyInLibrary: "Dans la bibliothèque",
+      fallbackTitle: "Recommandation",
+      libraryLimitReached: "Limite de bibliothèque atteinte",
+      signInToAccept: "Connectez-vous pour ajouter",
+      unavailableTitle: "Recommandation indisponible",
+      userRecommendation: "{{name}} recommande"
     },
     search: {
       dateUnknown: "Date inconnue",

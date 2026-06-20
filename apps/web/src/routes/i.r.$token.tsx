@@ -22,6 +22,7 @@ function ShareInviteRoute() {
   const { token } = Route.useParams();
   const locale = useAppsAvLocale();
   const text = useSeriesText();
+  const shareText = text.shareInvite;
   const accountSession = useAccountSession();
   const getToken = useAccountToken();
   const library = useSeriesLibrary();
@@ -62,6 +63,8 @@ function ShareInviteRoute() {
     }
   });
   const canAccept = Boolean(invite && invite.status === "active" && accountSession.isSignedIn && !existingEntry);
+  const returnTo = localizedSeriesPath(`/i/r/${encodeURIComponent(token)}`, locale);
+  const signInHref = withReturnTo(localizedSeriesPath("/sign-in", locale), returnTo);
 
   return (
     <SeriesAppShell showAssistant={false}>
@@ -77,7 +80,7 @@ function ShareInviteRoute() {
         ) : null}
 
         {inviteQuery.isError ? (
-          <ErrorState className="border-[#d7c494] bg-[#fff8df]/90" description={inviteQuery.error.message} title="Recommendation unavailable" />
+          <ErrorState className="border-[#d7c494] bg-[#fff8df]/90" description={inviteQuery.error.message} title={shareText.unavailableTitle} />
         ) : null}
 
         {invite && artworkEntry ? (
@@ -87,7 +90,7 @@ function ShareInviteRoute() {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-[#5a8f2f]">
                   <UserRound className="size-4" />
-                  {invite.senderDisplayName ? `${invite.senderDisplayName} recommends` : "Recommendation"}
+                  {invite.senderDisplayName ? shareText.userRecommendation.replace("{{name}}", invite.senderDisplayName) : shareText.fallbackTitle}
                 </div>
                 <h1 className="mt-3 text-3xl font-semibold leading-tight text-[#112a55] sm:text-4xl">{seriesTitle}</h1>
                 <p className="mt-3 text-sm font-semibold text-[#53617a]">
@@ -104,17 +107,17 @@ function ShareInviteRoute() {
                   {existingEntry ? (
                     <Button asChild className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]">
                       <Link to={localizedSeriesPath("/library", locale)}>
-                        <CheckCircle2 className="size-4" /> In library
+                        <CheckCircle2 className="size-4" /> {shareText.alreadyInLibrary}
                       </Link>
                     </Button>
                   ) : accountSession.isSignedIn ? (
                     <Button className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" disabled={!canAccept || acceptMutation.isPending || !library.canAddSeries} onClick={() => acceptMutation.mutate()}>
-                      <Plus className="size-4" /> {library.canAddSeries ? "Add to library" : "Library limit reached"}
+                      <Plus className="size-4" /> {library.canAddSeries ? shareText.accept : shareText.libraryLimitReached}
                     </Button>
                   ) : (
                     <Button asChild className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]">
-                      <Link to={localizedSeriesPath("/sign-in", locale)}>
-                        <Plus className="size-4" /> Sign in to add
+                      <Link to={signInHref}>
+                        <Plus className="size-4" /> {shareText.signInToAccept}
                       </Link>
                     </Button>
                   )}
@@ -131,4 +134,9 @@ function ShareInviteRoute() {
       </section>
     </SeriesAppShell>
   );
+}
+
+function withReturnTo(path: string, returnTo: string) {
+  const separator = path.includes("?") ? "&" : "?";
+  return `${path}${separator}returnTo=${encodeURIComponent(returnTo)}`;
 }
