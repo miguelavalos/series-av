@@ -37,7 +37,7 @@ enum SeriesAppExperience {
             headerLogoName: "SeriesHeaderWordmark",
             splashLogoName: "SeriesAVLogo",
             splashHeroName: "SeriesSplashHero",
-            onboardingBrandName: "SeriesHeaderWordmark",
+            onboardingBrandName: "SeriesOnboardingWordmark",
             onboardingHeroName: "SeriesOnboardingHero",
             onboardingCTACompanionName: "AviOnboardingCTA",
             onboardingAuthPanelCompanionName: "AviLoginSheetPeek",
