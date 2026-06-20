@@ -340,6 +340,13 @@ struct SeriesShareInviteCreateResponse: Codable, Equatable, Sendable {
     var generatedAt: Date
 }
 
+struct SeriesShareInviteAcceptRequest: Codable, Equatable, Sendable {}
+
+struct SeriesShareInviteAcceptResponse: Codable, Equatable, Sendable {
+    var invite: SeriesShareInvitePreview
+    var generatedAt: Date
+}
+
 struct SeriesShareInviteClient: Sendable {
     var apiClient: SeriesAVAPIClient
     var encoder: JSONEncoder
@@ -364,6 +371,18 @@ struct SeriesShareInviteClient: Sendable {
             headers: ["Content-Type": "application/json"]
         )
         return try decoder.decode(SeriesShareInviteCreateResponse.self, from: data)
+    }
+
+    func accept(token: String) async throws -> SeriesShareInviteAcceptResponse {
+        let encodedToken = token.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? token
+        let body = try encoder.encode(SeriesShareInviteAcceptRequest())
+        let (data, _) = try await apiClient.requestData(
+            path: "/v1/series/share-invites/\(encodedToken)/accept",
+            method: "POST",
+            body: body,
+            headers: ["Content-Type": "application/json"]
+        )
+        return try decoder.decode(SeriesShareInviteAcceptResponse.self, from: data)
     }
 
     private static func makeEncoder() -> JSONEncoder {

@@ -6,7 +6,7 @@ struct SeriesAVApp: App {
     @StateObject private var languageController = AppLanguageController()
     @StateObject private var themeController = AppThemeController()
     @StateObject private var externalLinkPreferences = AppExternalLinkPreferencesController()
-    @State private var shareInviteBrowserDestination: SeriesInAppBrowserDestination?
+    @State private var pendingOpenURL: URL?
 
     init() {
         AppConfig.configureAVAccountIfPossible()
@@ -22,16 +22,9 @@ struct SeriesAVApp: App {
                 .avCommonAppExperience(SeriesAppExperience.experience)
                 .preferredColorScheme(themeController.currentTheme.preferredColorScheme)
                 .onOpenURL { url in
-                    openShareInviteIfNeeded(url)
+                    pendingOpenURL = url
                 }
-                .sheet(item: $shareInviteBrowserDestination) { destination in
-                    SeriesInAppBrowserView(url: destination.url)
-                }
+                .environment(\.seriesPendingOpenURL, $pendingOpenURL)
         }
-    }
-
-    private func openShareInviteIfNeeded(_ url: URL) {
-        guard let deepLink = SeriesShareInviteDeepLink(url: url) else { return }
-        shareInviteBrowserDestination = SeriesInAppBrowserDestination(url: deepLink.webURL())
     }
 }

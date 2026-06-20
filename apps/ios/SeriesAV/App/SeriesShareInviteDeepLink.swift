@@ -1,6 +1,6 @@
 import Foundation
 
-struct SeriesShareInviteDeepLink: Equatable {
+struct SeriesShareInviteDeepLink: Equatable, Identifiable {
     private static let allowedWebHosts = Set([
         "app.series-av-preview.avalsys.com",
         "app.series-av.avalsys.com",
@@ -8,6 +8,8 @@ struct SeriesShareInviteDeepLink: Equatable {
 
     let token: String
     private let originalWebURL: URL?
+
+    var id: String { token }
 
     init?(url: URL) {
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)

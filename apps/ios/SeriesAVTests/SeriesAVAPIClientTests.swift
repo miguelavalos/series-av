@@ -202,6 +202,75 @@ final class SeriesAVAPIClientTests: XCTestCase {
         }
     }
 
+    func testShareInviteAcceptSendsAuthenticatedPostAndDecodesResponse() async throws {
+        let response = """
+        {
+          "invite": {
+            "id": "invite_123",
+            "kind": "recommendation",
+            "seriesId": "thetvdb:348545",
+            "message": null,
+            "senderDisplayName": "Series User",
+            "status": "accepted",
+            "expiresAt": "2026-06-22T10:00:00.000Z",
+            "createdAt": "2026-06-20T10:00:00.000Z",
+            "series": {
+              "title": "Demon Slayer",
+              "startYear": 2019,
+              "summary": "A reviewed summary.",
+              "displayArtwork": null
+            }
+          },
+          "generatedAt": "2026-06-20T10:00:01.250Z"
+        }
+        """.data(using: .utf8)!
+        MockSeriesURLProtocol.response = (
+            response,
+            HTTPURLResponse(
+                url: URL(string: "https://api-series-av.test/v1/series/share-invites/share-token-123/accept")!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: nil
+            )!
+        )
+
+        let client = SeriesShareInviteClient(
+            apiClient: SeriesAVAPIClient(
+                baseURL: URL(string: "https://api-series-av.test")!,
+                urlSession: Self.mockSession(),
+                tokenProvider: { "account-token" }
+            )
+        )
+
+        let result = try await client.accept(token: "share-token-123")
+
+        let request = try XCTUnwrap(MockSeriesURLProtocol.lastRequest)
+        XCTAssertEqual(request.url?.path, "/v1/series/share-invites/share-token-123/accept")
+        XCTAssertEqual(request.httpMethod, "POST")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer account-token")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
+        XCTAssertEqual(MockSeriesURLProtocol.lastRequestBody, "{}".data(using: .utf8))
+        XCTAssertEqual(result.invite.status, "accepted")
+        XCTAssertEqual(result.invite.series?.title, "Demon Slayer")
+    }
+
+    func testShareInviteAcceptWithoutTokenFailsBeforeSendingRequest() async throws {
+        let client = SeriesShareInviteClient(
+            apiClient: SeriesAVAPIClient(
+                baseURL: URL(string: "https://api-series-av.test")!,
+                urlSession: Self.mockSession(),
+                tokenProvider: { nil }
+            )
+        )
+
+        do {
+            _ = try await client.accept(token: "share-token-123")
+            XCTFail("Expected missing token")
+        } catch SeriesAVAPIClientError.missingToken {
+            XCTAssertNil(MockSeriesURLProtocol.lastRequest)
+        }
+    }
+
     private static func mockSession() -> URLSession {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockSeriesURLProtocol.self]

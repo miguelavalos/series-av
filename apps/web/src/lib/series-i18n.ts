@@ -116,10 +116,10 @@ const en = {
   shareInvite: {
     accept: "Add to library",
     alreadyInLibrary: "In library",
-    fallbackTitle: "Recommendation",
+    fallbackTitle: "Shared series",
     libraryLimitReached: "Library limit reached",
     signInToAccept: "Sign in to add",
-    unavailableTitle: "Recommendation unavailable",
+    unavailableTitle: "Shared series unavailable",
     userRecommendation: "{{name}} recommends"
   },
   search: {
@@ -354,10 +354,10 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
     shareInvite: {
       accept: "Zur Bibliothek hinzufügen",
       alreadyInLibrary: "In der Bibliothek",
-      fallbackTitle: "Empfehlung",
+      fallbackTitle: "Geteilte Serie",
       libraryLimitReached: "Bibliothekslimit erreicht",
       signInToAccept: "Anmelden und hinzufügen",
-      unavailableTitle: "Empfehlung nicht verfügbar",
+      unavailableTitle: "Geteilte Serie nicht verfügbar",
       userRecommendation: "{{name}} empfiehlt"
     },
     search: {
@@ -591,10 +591,10 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
     shareInvite: {
       accept: "Ajouter à la bibliothèque",
       alreadyInLibrary: "Dans la bibliothèque",
-      fallbackTitle: "Recommandation",
+      fallbackTitle: "Série partagée",
       libraryLimitReached: "Limite de bibliothèque atteinte",
       signInToAccept: "Connectez-vous pour ajouter",
-      unavailableTitle: "Recommandation indisponible",
+      unavailableTitle: "Série partagée indisponible",
       userRecommendation: "{{name}} recommande"
     },
     search: {

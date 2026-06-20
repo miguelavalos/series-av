@@ -4,6 +4,7 @@ import SwiftUI
 
 struct SeriesAppBootstrapView: View {
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.seriesPendingOpenURL) private var pendingOpenURL
     @State private var accessController = SeriesAccessController()
     @State private var selectedTab: SeriesRootTab
     @State private var authPresentationState: AVProductAccountAuthPresentationState = .hidden
@@ -12,6 +13,7 @@ struct SeriesAppBootstrapView: View {
     @State private var initialSplashIsPresented = true
     @State private var initialAccountRestoreCompleted = false
     @State private var postAuthenticationSplashIsPresented = false
+    @State private var shareInviteDeepLink: SeriesShareInviteDeepLink?
 
     private let launchContext = SeriesLaunchContext.current
     private var splashPolicy: AVSplashTransitionPolicy {
@@ -65,6 +67,19 @@ struct SeriesAppBootstrapView: View {
                 automaticGuestOnboardingIsPresented = false
                 authPresentationState = .hidden
             }
+        }
+        .onChange(of: pendingOpenURL.wrappedValue) { _, url in
+            handlePendingOpenURL(url)
+        }
+        .sheet(item: $shareInviteDeepLink) { deepLink in
+            SeriesShareInviteAcceptanceView(
+                deepLink: deepLink,
+                accessController: accessController,
+                startSignInFlow: startSignInFlow,
+                onDismiss: {
+                    shareInviteDeepLink = nil
+                }
+            )
         }
     }
 
@@ -183,4 +198,12 @@ struct SeriesAppBootstrapView: View {
         authPresentationState = .hidden
     }
 
+    private func handlePendingOpenURL(_ url: URL?) {
+        guard let url else { return }
+        pendingOpenURL.wrappedValue = nil
+        guard let deepLink = SeriesShareInviteDeepLink(url: url) else { return }
+        initialSplashIsPresented = false
+        automaticGuestOnboardingIsPresented = false
+        shareInviteDeepLink = deepLink
+    }
 }
