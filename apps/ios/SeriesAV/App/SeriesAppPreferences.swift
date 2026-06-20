@@ -160,14 +160,18 @@ final class AppExternalLinkPreferencesController: ObservableObject {
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
-        searchEngine = AVExternalSearchEngine.resolved(from: userDefaults.string(forKey: searchEngineKey))
+        if let storedSearchEngine = userDefaults.string(forKey: searchEngineKey) {
+            searchEngine = AVExternalSearchEngine.resolved(from: storedSearchEngine)
+        } else {
+            searchEngine = .duckDuckGo
+        }
         webOpenMode = AVExternalWebOpenMode.resolved(from: userDefaults.string(forKey: webOpenModeKey))
     }
 
     func selectSearchEngine(_ engine: AVExternalSearchEngine) {
         guard searchEngine != engine else { return }
         searchEngine = engine
-        if engine == .google {
+        if engine == .duckDuckGo {
             userDefaults.removeObject(forKey: searchEngineKey)
         } else {
             userDefaults.set(engine.rawValue, forKey: searchEngineKey)

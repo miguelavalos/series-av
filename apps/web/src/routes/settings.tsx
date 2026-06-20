@@ -18,7 +18,7 @@ import { useEffect, useState } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { SeriesAppShell } from "@/components/series-app-shell";
 import { seriesProductConfig } from "@/lib/series-config";
-import { readSeriesExternalSearchEngine, writeSeriesExternalSearchEngine } from "@/lib/series-external-preferences";
+import { defaultSeriesExternalSearchEngine, readSeriesExternalSearchEngine, writeSeriesExternalSearchEngine } from "@/lib/series-external-preferences";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
 import { localizedExternalUrl, localizedSeriesPath } from "@/lib/series-i18n";
 
@@ -31,7 +31,7 @@ function SettingsRoute() {
   const library = useSeriesLibrary();
   const labels = profileLabels[locale];
   const [theme, setThemeState] = useState<AppsAvThemePreference>("system");
-  const [searchEngine, setSearchEngineState] = useState<AppsAvExternalSearchEngine>("google");
+  const [searchEngine, setSearchEngineState] = useState<AppsAvExternalSearchEngine>(defaultSeriesExternalSearchEngine);
 
   useEffect(() => {
     const storedTheme = normalizeAppsAvThemePreference(readAppsAvThemePreference(themeStorageKey));
