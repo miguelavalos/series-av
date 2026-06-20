@@ -14,6 +14,8 @@ struct SeriesAppBootstrapView: View {
     @State private var initialAccountRestoreCompleted = false
     @State private var postAuthenticationSplashIsPresented = false
     @State private var shareInviteDeepLink: SeriesShareInviteDeepLink?
+    @State private var store = SeriesLibraryStore.persisted()
+    @State private var librarySync = SeriesLibrarySyncCoordinator()
 
     private let launchContext = SeriesLaunchContext.current
     private var splashPolicy: AVSplashTransitionPolicy {
@@ -40,6 +42,8 @@ struct SeriesAppBootstrapView: View {
                 SeriesAppShellView(
                     selectedTab: $selectedTab,
                     accessController: accessController,
+                    store: store,
+                    librarySync: librarySync,
                     startSignInFlow: startSignInFlow
                 )
                 .id(accessController.isSignedIn ? "signed-in-shell" : "skipped-auth-shell")
@@ -75,6 +79,8 @@ struct SeriesAppBootstrapView: View {
             SeriesShareInviteAcceptanceView(
                 deepLink: deepLink,
                 accessController: accessController,
+                store: store,
+                librarySync: librarySync,
                 startSignInFlow: startSignInFlow,
                 onDismiss: {
                     shareInviteDeepLink = nil

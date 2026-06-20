@@ -389,12 +389,20 @@ enum SeriesLibraryIdentity {
         "series:\(catalogItem.seriesId.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())"
     }
 
+    static func key(forSeriesId seriesId: String) -> String {
+        "series:\(seriesId.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())"
+    }
+
     static func sameSeries(_ lhs: SeriesLibraryEntry, _ rhs: SeriesLibraryEntry) -> Bool {
         key(for: lhs) == key(for: rhs)
     }
 
     static func sameSeries(_ lhs: SeriesLibraryEntry, _ rhs: SeriesCatalogItem) -> Bool {
         key(for: lhs) == key(for: rhs)
+    }
+
+    static func sameSeries(_ lhs: SeriesLibraryEntry, _ rhsSeriesId: String) -> Bool {
+        key(for: lhs) == key(forSeriesId: rhsSeriesId)
     }
 
     static func normalizedSearchText(_ value: String) -> String {

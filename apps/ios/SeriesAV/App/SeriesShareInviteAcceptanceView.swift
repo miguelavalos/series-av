@@ -4,6 +4,8 @@ import SwiftUI
 struct SeriesShareInviteAcceptanceView: View {
     let deepLink: SeriesShareInviteDeepLink
     let accessController: SeriesAccessController
+    let store: SeriesLibraryStore
+    let librarySync: SeriesLibrarySyncCoordinator
     let startSignInFlow: () -> Void
     let onDismiss: () -> Void
 
@@ -12,11 +14,15 @@ struct SeriesShareInviteAcceptanceView: View {
     init(
         deepLink: SeriesShareInviteDeepLink,
         accessController: SeriesAccessController,
+        store: SeriesLibraryStore,
+        librarySync: SeriesLibrarySyncCoordinator,
         startSignInFlow: @escaping () -> Void,
         onDismiss: @escaping () -> Void
     ) {
         self.deepLink = deepLink
         self.accessController = accessController
+        self.store = store
+        self.librarySync = librarySync
         self.startSignInFlow = startSignInFlow
         self.onDismiss = onDismiss
     }
@@ -141,6 +147,7 @@ struct SeriesShareInviteAcceptanceView: View {
         do {
             let client = SeriesShareInviteClient(apiClient: accessController.authenticatedAPIClient())
             let response = try await client.accept(token: deepLink.token)
+            addAcceptedSeriesToLibraryIfNeeded(response.invite)
             state = .accepted(response)
         } catch SeriesAVAPIClientError.requestFailed(let statusCode) {
             state = .failed(Self.message(for: statusCode))
@@ -161,6 +168,33 @@ struct SeriesShareInviteAcceptanceView: View {
         default:
             L10n.string("shareInvite.errorGeneric")
         }
+    }
+
+    private func addAcceptedSeriesToLibraryIfNeeded(_ invite: SeriesShareInvitePreview) {
+        guard store.entries.contains(where: { SeriesLibraryIdentity.sameSeries($0, invite.seriesId) }) == false else {
+            return
+        }
+
+        let title = invite.series?.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let title, title.isEmpty == false else {
+            return
+        }
+
+        let now = Date()
+        let entry = SeriesLibraryEntry(
+            entryId: invite.seriesId,
+            seriesId: invite.seriesId,
+            title: title,
+            status: .wantToWatch,
+            lastWatchedEpisodeCursor: nil,
+            displayArtworkRef: invite.series?.displayArtwork?.url?.absoluteString ?? invite.series?.displayArtwork?.assetName,
+            fallbackVisualSeed: invite.series?.displayArtwork?.fallbackSeed ?? title,
+            addedAt: now,
+            updatedAt: now,
+            lastInteractedAt: now
+        )
+        store.upsert(entry)
+        librarySync.localEntriesDidChange(store.entries, accessController: accessController)
     }
 
     private enum InviteAcceptanceState: Equatable {

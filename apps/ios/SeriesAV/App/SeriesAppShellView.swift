@@ -6,11 +6,11 @@ struct SeriesAppShellView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Binding var selectedTab: SeriesRootTab
     let accessController: SeriesAccessController
+    let store: SeriesLibraryStore
+    let librarySync: SeriesLibrarySyncCoordinator
     let startSignInFlow: () -> Void
 
     @Environment(\.avCommonAppExperience) private var appExperience
-    @State private var store = SeriesLibraryStore.persisted()
-    @State private var librarySync = SeriesLibrarySyncCoordinator()
     @State private var librarySyncTask: Task<Void, Never>?
     @State private var lastAutomaticLibrarySyncRequestedAt: Date?
     @State private var chromeItem: AVAppShellChromeItem?
@@ -19,10 +19,14 @@ struct SeriesAppShellView: View {
     init(
         selectedTab: Binding<SeriesRootTab>,
         accessController: SeriesAccessController,
+        store: SeriesLibraryStore,
+        librarySync: SeriesLibrarySyncCoordinator,
         startSignInFlow: @escaping () -> Void
     ) {
         _selectedTab = selectedTab
         self.accessController = accessController
+        self.store = store
+        self.librarySync = librarySync
         self.startSignInFlow = startSignInFlow
         _chromeItem = State(initialValue: SeriesUITestEnvironment.current.initialChromeItem)
     }
