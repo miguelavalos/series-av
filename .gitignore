@@ -3,7 +3,9 @@ node_modules
 dist
 coverage
 .turbo
-.DerivedData*/
+.DerivedData*
+.derived-data*
+.derived-*
 DerivedData/
 build/
 *.xcarchive
@@ -19,6 +21,9 @@ package-lock.json
 .infisical/*
 !apps/ios/
 !apps/ios/**
+apps/ios/.DerivedData*
+apps/ios/.derived-data*
+apps/ios/.derived-*
 apps/ios_old/
 apps/ios/Config/Local.xcconfig
 apps/ios/**/*.xcuserdatad
