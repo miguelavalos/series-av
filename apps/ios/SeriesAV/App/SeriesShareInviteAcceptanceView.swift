@@ -58,11 +58,6 @@ struct SeriesShareInviteAcceptanceView: View {
                     Button(L10n.string("common.done"), action: onDismiss)
                 }
             }
-            .task(id: accessController.isSignedIn) {
-                guard accessController.isSignedIn else { return }
-                guard case .idle = state else { return }
-                await acceptInvite()
-            }
         }
     }
 
