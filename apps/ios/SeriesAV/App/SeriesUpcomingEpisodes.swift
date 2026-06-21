@@ -130,7 +130,7 @@ final class SeriesUpcomingEpisodesModel: ObservableObject {
 
 struct SeriesUpcomingEpisodesSection: View {
     let entries: [SeriesLibraryEntry]
-    let editProgress: (SeriesLibraryEntry) -> Void
+    let markWatchedThrough: (SeriesLibraryEntry, SeriesEpisodeCursor) -> Void
 
     @StateObject private var model = SeriesUpcomingEpisodesModel()
 
@@ -158,7 +158,7 @@ struct SeriesUpcomingEpisodesSection: View {
                                 SeriesUpcomingEpisodeRow(
                                     episode: episode,
                                     entry: entries.first { $0.id == episode.entryId },
-                                    editProgress: editProgress
+                                    markWatchedThrough: markWatchedThrough
                                 )
 
                                 if episode.id != episodes.last?.id {
@@ -255,7 +255,7 @@ struct SeriesHomeUpcomingEpisodesSection: View {
 private struct SeriesUpcomingEpisodeRow: View {
     let episode: SeriesUpcomingEpisode
     let entry: SeriesLibraryEntry?
-    let editProgress: (SeriesLibraryEntry) -> Void
+    let markWatchedThrough: (SeriesLibraryEntry, SeriesEpisodeCursor) -> Void
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -277,14 +277,16 @@ private struct SeriesUpcomingEpisodeRow: View {
 
             if let entry {
                 Button {
-                    editProgress(entry)
+                    markWatchedThrough(entry, episode.cursor)
                 } label: {
-                    Image(systemName: "checkmark.circle")
-                        .frame(width: 32, height: 32)
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 14, weight: .black))
+                        .foregroundStyle(Color.black.opacity(0.84))
+                        .frame(width: 34, height: 34)
+                        .background(AVBrandColor.accent, in: Circle())
                 }
                 .buttonStyle(.plain)
-                .foregroundStyle(AVBrandColor.accent)
-                .accessibilityLabel(L10n.string("upcoming.adjustProgress"))
+                .accessibilityLabel(String(format: L10n.string("home.editor.confirmThrough"), cursorLabel(episode.cursor)))
             }
         }
     }

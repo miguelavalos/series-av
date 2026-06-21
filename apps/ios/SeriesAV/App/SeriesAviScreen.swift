@@ -30,15 +30,6 @@ struct SeriesAviScreen: View {
                 .frame(width: 82, height: 82)
                 .accessibilityLabel("Avi")
         } content: {
-            if accessController.accessMode == .guest {
-                SeriesAviSignInCard(
-                    accountIsAvailable: accessController.accountIsAvailable,
-                    startSignInFlow: startSignInFlow
-                )
-            }
-
-            SeriesAviPreparationCard(openSearch: openSearch)
-
             SeriesAviCurrentFocusCard(
                 currentEntry: currentEntry,
                 startWatching: startWatching,
@@ -47,12 +38,21 @@ struct SeriesAviScreen: View {
                 togglePinned: togglePinnedCurrent
             )
 
+            SeriesAviPreparationCard(openSearch: openSearch)
+
             SeriesAviLibraryGuidanceCard(
                 activeCount: store.activeEntries.count,
                 watchingCount: store.watchingEntries.count,
                 archivedCount: store.archivedEntries.count,
                 openLibrary: openLibrary
             )
+
+            if accessController.accessMode == .guest {
+                SeriesAviSignInCard(
+                    accountIsAvailable: accessController.accountIsAvailable,
+                    startSignInFlow: startSignInFlow
+                )
+            }
 
             SeriesAviTrackingHelpCard()
         }

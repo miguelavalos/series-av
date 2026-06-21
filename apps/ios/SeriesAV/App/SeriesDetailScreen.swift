@@ -223,11 +223,14 @@ struct SeriesDetailScreen: View {
                         Button {
                             markNext?(entry)
                         } label: {
-                            Label(nextActionTitle(for: entry), systemImage: entry.status == .wantToWatch ? "play.fill" : "checkmark")
-                                .frame(maxWidth: .infinity)
+                            Image(systemName: entry.status == .wantToWatch ? "play.fill" : "checkmark")
+                                .font(.system(size: 18, weight: .black))
+                                .frame(width: 50, height: 50)
                         }
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.large)
+                        .buttonStyle(.plain)
+                        .foregroundStyle(Color.black.opacity(0.84))
+                        .background(AVBrandColor.accent, in: Circle())
+                        .accessibilityLabel(nextActionTitle(for: entry))
 
                         Button {
                             isShowingProgressEditor = true
@@ -382,7 +385,10 @@ struct SeriesDetailScreen: View {
                     } else {
                         VStack(spacing: 8) {
                             ForEach(episodes.prefix(8), id: \.cursor) { episode in
-                                SeriesDetailEpisodeRow(episode: episode)
+                                SeriesDetailEpisodeRow(
+                                    episode: episode,
+                                    markWatchedThrough: markEpisodeWatchedThroughAction(for: episode)
+                                )
                             }
                         }
 
@@ -522,6 +528,17 @@ struct SeriesDetailScreen: View {
 
     private func detailStatusIcon(_ status: SeriesLibraryEntryStatus) -> String {
         SeriesDetailPresentationBuilder.detailStatusIcon(status)
+    }
+
+    private func markEpisodeWatchedThroughAction(for episode: SeriesEpisodeGuideItem) -> (() -> Void)? {
+        guard let entry, let markWatchedThrough else {
+            return nil
+        }
+
+        return {
+            markWatchedThrough(entry, episode.cursor)
+            dismiss()
+        }
     }
 
     private func openSource(_ url: URL) {
@@ -758,8 +775,29 @@ private enum SeriesDetailGuideState {
 
 private struct SeriesDetailEpisodeRow: View {
     let episode: SeriesEpisodeGuideItem
+    let markWatchedThrough: (() -> Void)?
 
     var body: some View {
+        if let markWatchedThrough {
+            Button(action: markWatchedThrough) {
+                rowContent
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(String(format: L10n.string("home.editor.confirmThrough"), cursorLabel(episode.cursor)))
+        } else {
+            rowContent
+        }
+    }
+
+    private var episodeTitle: String {
+        guard let title = episode.title?.trimmingCharacters(in: .whitespacesAndNewlines),
+              title.isEmpty == false else {
+            return L10n.string("detail.episodes.untitled")
+        }
+        return title
+    }
+
+    private var rowContent: some View {
         HStack(alignment: .top, spacing: 10) {
             Text(cursorLabel(episode.cursor))
                 .font(.system(size: 13, weight: .black, design: .rounded))
@@ -770,6 +808,7 @@ private struct SeriesDetailEpisodeRow: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(episodeTitle)
                     .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(AVBrandColor.textPrimary)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
 
@@ -781,17 +820,38 @@ private struct SeriesDetailEpisodeRow: View {
             }
 
             Spacer(minLength: 0)
+
+            if markWatchedThrough != nil {
+                Image(systemName: stateIconName)
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(stateIconColor)
+                    .frame(width: 32, height: 32)
+                    .background(Color(.secondarySystemGroupedBackground), in: Circle())
+                    .accessibilityHidden(true)
+            }
         }
         .padding(10)
         .background(Color(.tertiarySystemGroupedBackground).opacity(0.62), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
-    private var episodeTitle: String {
-        guard let title = episode.title?.trimmingCharacters(in: .whitespacesAndNewlines),
-              title.isEmpty == false else {
-            return L10n.string("detail.episodes.untitled")
+    private var stateIconName: String {
+        switch episode.relativeState {
+        case .watched:
+            "checkmark.circle.fill"
+        case .current, .next:
+            "checkmark"
+        case .pending:
+            "scope"
         }
-        return title
+    }
+
+    private var stateIconColor: Color {
+        switch episode.relativeState {
+        case .watched:
+            AVBrandColor.accent
+        case .current, .next, .pending:
+            AVBrandColor.textSecondary
+        }
     }
 }
 

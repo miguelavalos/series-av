@@ -41,17 +41,19 @@ struct SeriesLibraryTabScreen: View {
                     )
                 }
             } else {
+                if filteredActiveEntries.isEmpty == false {
+                    librarySection(title: L10n.string("library.active.title"), entries: filteredActiveEntries, isArchived: false)
+                }
+
                 if selectedFilter == .all && normalizedQuery.isEmpty {
                     SeriesUpcomingEpisodesSection(
                         entries: store.activeEntries,
-                        editProgress: { entry in
-                            editorEntry = entry
+                        markWatchedThrough: { entry, cursor in
+                            pendingProgressUndo = progressUndo(for: entry)
+                            pendingLibraryUndo = nil
+                            store.markWatchedThrough(cursor, for: entry.id)
                         }
                     )
-                }
-
-                if filteredActiveEntries.isEmpty == false {
-                    librarySection(title: L10n.string("library.active.title"), entries: filteredActiveEntries, isArchived: false)
                 }
 
                 if filteredArchivedEntries.isEmpty == false {

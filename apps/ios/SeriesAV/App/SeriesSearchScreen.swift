@@ -282,13 +282,13 @@ struct SeriesSearchScreen: View {
 
     private var limitText: String {
         if accessController.accessMode == .signedInPro && canAddSeries {
-            return "\(L10n.string("add.footer.pro"))\n\(L10n.string("add.footer.hint"))"
+            return L10n.string("add.footer.pro")
         }
         guard let remainingSeriesCount else {
-            return "\(L10n.string("add.footer.pro"))\n\(L10n.string("add.footer.hint"))"
+            return L10n.string("add.footer.pro")
         }
         if canAddSeries {
-            return "\(String(format: L10n.string("add.footer.remaining"), remainingSeriesCount))\n\(L10n.string("add.footer.hint"))"
+            return String(format: L10n.string("add.footer.remaining"), remainingSeriesCount)
         }
         return L10n.string("add.footer.limitReached")
     }

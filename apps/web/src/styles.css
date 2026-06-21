@@ -312,9 +312,22 @@ input {
   font: inherit;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1100px) {
   .series-guest-copy {
     min-height: auto;
+  }
+
+  .series-guest-title {
+    max-width: 12ch;
+    font-size: clamp(2.35rem, 11vw, 3.4rem);
+    overflow-wrap: anywhere;
+  }
+
+  .series-guest-body,
+  .series-guest-copy p,
+  .series-guest-copy span {
+    max-width: 100%;
+    overflow-wrap: anywhere;
   }
 
   .series-guest-gallery {
