@@ -143,6 +143,7 @@
 "library.status.wantToWatch" = "Merkliste";
 "library.status.watching" = "Aktuell";
 "library.status.watched" = "Gesehen";
+"library.status.menu.title" = "Status";
 "library.status.action" = "Zu %@ ändern";
 "upcoming.title" = "Demnächst";
 "upcoming.subtitle" = "Die nächsten datierten Folgen deiner gespeicherten Serien.";

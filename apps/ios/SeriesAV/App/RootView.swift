@@ -1405,12 +1405,14 @@ struct SeriesStatusButtons: View {
     let setStatus: (SeriesLibraryEntryStatus) -> Void
 
     var body: some View {
-        ForEach(SeriesLibraryEntryStatus.allCases, id: \.self) { status in
-            if status != entry.status {
-                Button {
-                    setStatus(status)
-                } label: {
-                    Label(statusActionTitle(status), systemImage: statusIcon(status, isSelected: false))
+        Section(L10n.string("library.status.menu.title")) {
+            ForEach(SeriesLibraryEntryStatus.allCases, id: \.self) { status in
+                if status != entry.status {
+                    Button {
+                        setStatus(status)
+                    } label: {
+                        Label(statusActionTitle(status), systemImage: statusIcon(status, isSelected: false))
+                    }
                 }
             }
         }

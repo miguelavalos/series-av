@@ -143,6 +143,7 @@
 "library.status.wantToWatch" = "A regarder";
 "library.status.watching" = "En cours";
 "library.status.watched" = "Vue";
+"library.status.menu.title" = "Statut";
 "library.status.action" = "Passer à %@";
 "upcoming.title" = "A venir";
 "upcoming.subtitle" = "Les prochains épisodes datés de vos séries enregistrées.";
