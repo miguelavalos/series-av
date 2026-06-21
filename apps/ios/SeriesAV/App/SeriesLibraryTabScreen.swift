@@ -335,7 +335,7 @@ struct SeriesLibraryTabScreen: View {
             pendingProgressUndo = nil
             store.archive(entry.id)
         } label: {
-            Label(L10n.string("home.archive"), systemImage: "archivebox")
+            Label(L10n.string("home.archiveSeries"), systemImage: "archivebox")
         }
 
         Divider()
@@ -344,7 +344,7 @@ struct SeriesLibraryTabScreen: View {
             pendingDeleteConfirmation = PendingLibraryDeleteConfirmation(entry: entry, action: .restoreActive)
             isConfirmingDelete = true
         } label: {
-            Label(L10n.string("home.delete"), systemImage: "trash")
+            Label(L10n.string("home.deleteSeries"), systemImage: "trash")
         }
     }
 
@@ -368,7 +368,7 @@ struct SeriesLibraryTabScreen: View {
             pendingProgressUndo = nil
             store.restore(entry.id)
         } label: {
-            Label(L10n.string("library.restore"), systemImage: "arrow.uturn.backward")
+            Label(L10n.string("library.restoreSeries"), systemImage: "arrow.uturn.backward")
         }
 
         Divider()
@@ -377,7 +377,7 @@ struct SeriesLibraryTabScreen: View {
             pendingDeleteConfirmation = PendingLibraryDeleteConfirmation(entry: entry, action: .restoreArchived)
             isConfirmingDelete = true
         } label: {
-            Label(L10n.string("home.delete"), systemImage: "trash")
+            Label(L10n.string("home.deleteSeries"), systemImage: "trash")
         }
     }
 

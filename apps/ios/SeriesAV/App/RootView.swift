@@ -1339,7 +1339,7 @@ private struct SeriesEntryActionsMenu: View {
             }
 
             Button(action: archive) {
-                Label(L10n.string("home.archive"), systemImage: "archivebox")
+                Label(L10n.string("home.archiveSeries"), systemImage: "archivebox")
             }
 
             Divider()
@@ -1347,7 +1347,7 @@ private struct SeriesEntryActionsMenu: View {
             Button(role: .destructive) {
                 isConfirmingDelete = true
             } label: {
-                Label(L10n.string("home.delete"), systemImage: "trash")
+                Label(L10n.string("home.deleteSeries"), systemImage: "trash")
             }
         } label: {
             Image(systemName: "ellipsis")

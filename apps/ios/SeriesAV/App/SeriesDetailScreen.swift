@@ -326,7 +326,7 @@ struct SeriesDetailScreen: View {
                                 archive(entry)
                                 dismiss()
                             } label: {
-                                Label(L10n.string("home.archive"), systemImage: "archivebox")
+                                Label(L10n.string("home.archiveSeries"), systemImage: "archivebox")
                                     .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(.bordered)
@@ -337,7 +337,7 @@ struct SeriesDetailScreen: View {
                             Button(role: .destructive) {
                                 isConfirmingDelete = true
                             } label: {
-                                Label(L10n.string("home.delete"), systemImage: "trash")
+                                Label(L10n.string("home.deleteSeries"), systemImage: "trash")
                                     .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(.bordered)
