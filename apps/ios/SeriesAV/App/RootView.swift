@@ -681,7 +681,7 @@ struct SeriesLibraryRow<MenuContent: View>: View {
 
             if let markNext {
                 Button(action: markNext) {
-                    Image(systemName: entry.status == .wantToWatch ? "play.fill" : "checkmark")
+                    Image(systemName: "checkmark")
                         .font(.system(size: 14, weight: .black))
                         .foregroundStyle(Color.black.opacity(0.84))
                         .frame(width: 36, height: 36)
@@ -1088,7 +1088,7 @@ private struct SeriesWatchingQueueSection: View {
                         Button {
                             markNext(entry)
                         } label: {
-                            Image(systemName: entry.status == .wantToWatch ? "play.fill" : "checkmark")
+                            Image(systemName: "checkmark")
                                 .font(.system(size: 14, weight: .black))
                                 .foregroundStyle(Color.black.opacity(0.84))
                                 .frame(width: 34, height: 34)

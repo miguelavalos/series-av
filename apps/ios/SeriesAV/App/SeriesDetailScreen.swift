@@ -244,7 +244,7 @@ struct SeriesDetailScreen: View {
                         Button {
                             markNext?(entry)
                         } label: {
-                            Image(systemName: entry.status == .wantToWatch ? "play.fill" : "checkmark")
+                            Image(systemName: "checkmark")
                                 .font(.system(size: 18, weight: .black))
                                 .frame(width: 50, height: 50)
                         }
