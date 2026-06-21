@@ -9,6 +9,8 @@ fi
 
 web_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 repo_root="$(cd "$web_root/../.." && pwd)"
+workspace_root="$(cd "$repo_root/../.." && pwd)"
+suite_root="${AVALSYS_SUITE_DIR:-$workspace_root/private/avalsys-suite}"
 varlock_bin="$repo_root/node_modules/.bin/varlock"
 
 eval "$("$repo_root/scripts/resolve-infisical-bootstrap-env.sh" "$profile")"
@@ -30,6 +32,10 @@ export_from_varlock() {
 
   if [ -z "$value" ]; then
     value="$("$varlock_bin" printenv --path "$repo_root" "$source_key" 2>/dev/null || true)"
+  fi
+
+  if [ -z "$value" ] && [ -x "$suite_root/scripts/resolve-infisical-optional-secret.sh" ]; then
+    value="$("$suite_root/scripts/resolve-infisical-optional-secret.sh" "$profile" "$source_key" 2>/dev/null || true)"
   fi
 
   if [ -z "$value" ] && [ "$required" = "required" ]; then
