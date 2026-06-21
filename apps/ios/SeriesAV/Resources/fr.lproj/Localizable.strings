@@ -88,6 +88,7 @@
 "home.queue.progress" = "%@ vu, %@ suivant";
 "home.queue.wantToWatch.title" = "Prêtes à démarrer";
 "home.queue.wantToWatch.progress" = "Démarrer avec %@";
+"home.readyToStart.title" = "Prêtes à démarrer";
 "home.rail.popular" = "Populaires";
 "home.rail.recommended" = "Plus à suivre";
 "home.editor.season" = "Saison %d";

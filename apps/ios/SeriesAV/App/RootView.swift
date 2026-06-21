@@ -158,6 +158,46 @@ private struct SeriesWatchingHomeScreen: View {
             if homeState.secondaryEntries.isEmpty == false {
                 SeriesWatchingQueueSection(
                     entries: homeState.secondaryEntries,
+                    title: L10n.string("home.queue.title"),
+                    markNext: { entry in
+                        pendingProgressUndo = progressUndo(
+                            for: entry,
+                            messageKey: progressCommitMessageKey(for: entry)
+                        )
+                        pendingUndo = nil
+                        store.markNextEpisodeWatched(for: entry.id)
+                    },
+                    editProgress: { entry in
+                        editorEntry = entry
+                    },
+                    togglePinned: { entry in
+                        store.setPinned(entry.isPinnedHomeSeries != true, for: entry.id)
+                    },
+                    openDetail: { entry in
+                        detailEntry = entry
+                    },
+                    setStatus: { entry, status in
+                        pendingProgressUndo = progressUndo(for: entry, messageKey: "home.undo.status")
+                        pendingUndo = nil
+                        store.setStatus(status, for: entry.id)
+                    },
+                    archive: { entry in
+                        store.archive(entry.id)
+                        pendingProgressUndo = nil
+                        pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.archived")
+                    },
+                    delete: { entry in
+                        store.delete(entry.id)
+                        pendingProgressUndo = nil
+                        pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.deleted")
+                    }
+                )
+            }
+
+            if homeState.readyToStartEntries.isEmpty == false {
+                SeriesWatchingQueueSection(
+                    entries: homeState.readyToStartEntries,
+                    title: L10n.string("home.readyToStart.title"),
                     markNext: { entry in
                         pendingProgressUndo = progressUndo(
                             for: entry,
@@ -1002,6 +1042,7 @@ private struct SeriesCurrentWatchingCard: View {
 
 private struct SeriesWatchingQueueSection: View {
     let entries: [SeriesLibraryEntry]
+    let title: String
     let markNext: (SeriesLibraryEntry) -> Void
     let editProgress: (SeriesLibraryEntry) -> Void
     let togglePinned: (SeriesLibraryEntry) -> Void
@@ -1012,7 +1053,7 @@ private struct SeriesWatchingQueueSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(queueTitle)
+            Text(title)
                 .font(.system(size: 16, weight: .bold))
                 .foregroundStyle(.secondary)
 
@@ -1071,12 +1112,6 @@ private struct SeriesWatchingQueueSection: View {
         }
         .padding(14)
         .background(Color(.secondarySystemGroupedBackground).opacity(0.44), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-    }
-
-    private var queueTitle: String {
-        entries.allSatisfy { $0.status == .wantToWatch }
-            ? L10n.string("home.queue.wantToWatch.title")
-            : L10n.string("home.queue.title")
     }
 
     private func queueProgress(for entry: SeriesLibraryEntry) -> String {

@@ -17,8 +17,28 @@ final class SeriesHomeStateBuilderTests: XCTestCase {
 
         XCTAssertEqual(state.currentEntry?.entryId, "current")
         XCTAssertEqual(state.secondaryEntries.map(\.entryId), ["next"])
+        XCTAssertEqual(state.readyToStartEntries.map(\.entryId), ["later"])
         XCTAssertEqual(state.watchingCount, 2)
         XCTAssertEqual(state.wantToWatchCount, 1)
+    }
+
+    func testBuildLimitsReadyToStartEntriesAndExcludesHomeEntries() {
+        let current = entry(id: "current", title: "Current", status: .watching, interactedAt: date(40))
+        let pinnedLater = entry(id: "pinned-later", title: "Pinned Later", status: .wantToWatch, interactedAt: date(35))
+        let later1 = entry(id: "later-1", title: "Later 1", status: .wantToWatch, interactedAt: date(30))
+        let later2 = entry(id: "later-2", title: "Later 2", status: .wantToWatch, interactedAt: date(20))
+        let later3 = entry(id: "later-3", title: "Later 3", status: .wantToWatch, interactedAt: date(10))
+        let later4 = entry(id: "later-4", title: "Later 4", status: .wantToWatch, interactedAt: date(5))
+
+        let state = SeriesHomeStateBuilder.build(
+            homeEntries: [current, pinnedLater],
+            activeEntries: [current, pinnedLater, later1, later2, later3, later4],
+            popularPreviews: [],
+            upcomingPreviews: [],
+            recommendedPreviews: []
+        )
+
+        XCTAssertEqual(state.readyToStartEntries.map(\.entryId), ["later-1", "later-2", "later-3"])
     }
 
     func testBuildFiltersDiscoveryPreviewsAlreadyInLibrary() {

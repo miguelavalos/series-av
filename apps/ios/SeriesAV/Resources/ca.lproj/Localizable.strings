@@ -88,6 +88,7 @@
 "home.queue.progress" = "%@ vist, %@ següent";
 "home.queue.wantToWatch.title" = "A punt per començar";
 "home.queue.wantToWatch.progress" = "Començar per %@";
+"home.readyToStart.title" = "A punt per començar";
 "home.rail.popular" = "Populars";
 "home.rail.recommended" = "Més per seguir";
 "home.editor.season" = "Temporada %d";

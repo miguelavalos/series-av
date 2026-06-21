@@ -4,6 +4,7 @@ import Foundation
 struct SeriesHomeScreenState: Equatable {
     var currentEntry: SeriesLibraryEntry?
     var secondaryEntries: [SeriesLibraryEntry]
+    var readyToStartEntries: [SeriesLibraryEntry]
     var watchingCount: Int
     var wantToWatchCount: Int
     var visiblePopularPreviews: [SeriesHomeDiscoveryPreview]
@@ -22,6 +23,11 @@ enum SeriesHomeStateBuilder {
         SeriesHomeScreenState(
             currentEntry: homeEntries.first,
             secondaryEntries: Array(homeEntries.dropFirst()),
+            readyToStartEntries: readyToStartEntries(
+                from: activeEntries,
+                excluding: homeEntries,
+                limit: 3
+            ),
             watchingCount: activeEntries.filter { $0.status == .watching }.count,
             wantToWatchCount: activeEntries.filter { $0.status == .wantToWatch }.count,
             visiblePopularPreviews: visiblePreviews(popularPreviews, excluding: activeEntries),
@@ -37,6 +43,19 @@ enum SeriesHomeStateBuilder {
         previews.filter { preview in
             libraryEntries.contains { SeriesLibraryIdentity.sameSeries($0, preview.catalogItem) } == false
         }
+    }
+
+    private static func readyToStartEntries(
+        from activeEntries: [SeriesLibraryEntry],
+        excluding homeEntries: [SeriesLibraryEntry],
+        limit: Int
+    ) -> [SeriesLibraryEntry] {
+        activeEntries
+            .filter { entry in
+                entry.status == .wantToWatch && homeEntries.contains { $0.id == entry.id } == false
+            }
+            .prefix(limit)
+            .map { $0 }
     }
 }
 
