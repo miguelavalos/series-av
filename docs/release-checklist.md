@@ -107,11 +107,15 @@ device-specific Apple auth behavior.
 
 ### Production iOS QA Before TestFlight
 
-App Store/TestFlight purchase, restore, webhook, and review screenshot evidence
-must still be completed on an approved TestFlight/App Store build. Local
+App Store/TestFlight purchase, restore, and webhook evidence must still be
+completed on an approved TestFlight/App Store build. Local
 simulator QA can validate production config, signed Account AV session restore,
 paywall offer loading, restore button visibility, and non-purchase UI behavior,
 but it must not replace a real store purchase/restore validation.
+
+Submission snapshot, 2026-06-21: iOS app version `1.0 (11)` was submitted to
+App Review and is `Pendiente de revisión` in App Store Connect. The subscription
+review screenshot and promotional image were attached before submission.
 
 1. Generate production iOS config and run the app:
 
@@ -214,14 +218,15 @@ Additional local simulator evidence, 2026-06-17:
 The first iOS release ships with the Tune AV-style Pro paywall, RevenueCat
 purchase/restore handling, and App Store subscription management.
 
-Current external setup snapshot, 2026-06-17:
+Current external setup snapshot, 2026-06-21:
 
 - App Store Connect has subscription group `Series AV Pro` and monthly product
   `seriesav_pro_monthly` configured at USD 2.99 base price, all current
   countries and regions, and future country/region availability enabled.
-- App Store Connect still reports the subscription as missing metadata until the
-  required review screenshot is uploaded and the first subscription is submitted
-  with the app version.
+- App Store Connect reports `Series AV Pro Monthly` as `Lista para enviar`.
+  Product images, product localizations, group localizations, price, and review
+  notes are complete. The subscription was attached to the submitted iOS
+  `1.0 (11)` app version.
 - RevenueCat has product `seriesav_pro_monthly` attached to entitlement `pro`
   and included in offering `default`, package `$rc_monthly`.
 - Production `ios:preflight` and iOS simulator build passed after the setup.
@@ -259,13 +264,18 @@ Current external setup snapshot, 2026-06-17:
 
 ## Release Sign-Off
 
-Do not submit until these are true:
+For the 2026-06-21 App Store submission, these were closed or explicitly
+accepted before submit:
 
-1. Guest, signed-in free, and signed-in Pro manual QA are signed off.
-2. Preview and production signed-in smokes pass.
-3. Store metadata matches the exact shipped behavior.
-4. All public/legal/support URLs are reachable.
-5. The archive submitted to App Store Connect matches the reviewed build.
+1. Guest, signed-in free, and signed-in Pro manual QA were covered by local,
+   TestFlight, and private smoke evidence, with real purchase/restore evidence
+   deferred to post-submission monitoring.
+2. Preview and production signed-in smokes passed.
+3. Store metadata matches the submitted build.
+4. Public/legal/support/delete-account URLs are reachable.
+5. The archive submitted to App Store Connect matches build `1.0 (11)`.
+6. App Store Connect submission id:
+   `914c99f2-95c6-4b0d-a651-d15433efe639`.
 
 ## Native Test Coverage
 

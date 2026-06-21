@@ -71,10 +71,12 @@ Account-gated onboarding tests should model the real restore contract: active
 provider session, non-empty provider token, and internal Apps AV user resolution
 before asserting signed-in UI state.
 
-Still pending before App Store submission:
+After the 2026-06-21 App Store submission of iOS `1.0 (11)`, still pending:
 
+- App Review monitoring for submission
+  `914c99f2-95c6-4b0d-a651-d15433efe639`;
 - signed purchase/restore smoke through the submitted RevenueCat/App Store
-  subscription configuration;
+  subscription configuration after approval or a safe store test path;
 - signed Pro cloud-sync smoke against the submitted Apps AV environment;
 - advanced account-management flows beyond shared links;
 - Convex realtime projection;

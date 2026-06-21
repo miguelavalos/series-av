@@ -122,14 +122,17 @@ For simulator or physical iPhone installs, follow [docs/install-ios.md](docs/ins
 
 ## Open product work
 
-1. Finish TestFlight/App Store purchase, restore, webhook, and review
-   screenshot validation for `seriesav_pro_monthly`.
-2. Keep the shared RevenueCat project intact. Moments AV and Animate AV
+1. Monitor App Store review for submitted iOS version `1.0 (11)`, submission
+   `914c99f2-95c6-4b0d-a651-d15433efe639`.
+2. After approval or a safe store test path is available, complete purchase,
+   restore, RevenueCat webhook, and Apps AV entitlement validation for
+   `seriesav_pro_monthly`.
+3. Keep the shared RevenueCat project intact. Moments AV and Animate AV
    offerings may exist beside Series AV; Series AV readiness depends on
    offering `default` containing `$rc_monthly -> seriesav_pro_monthly`.
-3. Finish production QA for backend-backed catalog routes where V1 needs
+4. Finish production QA for backend-backed catalog routes where V1 needs
    account-aware data: Search/resolve, Detail, and compact episode guide.
-4. Keep the reserved Avi limits documented, but do not expose Avi action copy or
+5. Keep the reserved Avi limits documented, but do not expose Avi action copy or
    UI until Series AV has real Avi-assisted flows.
 
 ## Contributing And Security
