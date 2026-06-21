@@ -286,7 +286,7 @@ function HomeDiscoverySection({
   return (
     <section>
       <h2 className="mb-3 text-sm font-bold uppercase text-[#53617a]">{title}</h2>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+      <div className="flex snap-x gap-4 overflow-x-auto pb-2">
         {results.slice(0, 8).map((result) => (
           <HomeDiscoveryCard key={seriesIdFor(result)} labels={labels} locale={locale} result={result} />
         ))}
@@ -303,23 +303,23 @@ function HomeDiscoveryCard({ labels, locale, result }: { labels: (typeof homeLab
   const artwork = artworkFor(result);
 
   return (
-    <Card className="min-w-0 gap-0 overflow-hidden rounded-lg border-[#d7c494] bg-[#fff8df] py-0 shadow-sm shadow-[#172f5c]/8">
+    <Card className="w-[13.75rem] shrink-0 snap-start gap-0 overflow-hidden rounded-lg border-[#d7c494] bg-[#fff8df] py-0 shadow-sm shadow-[#172f5c]/8 sm:w-[14.5rem]">
       <Link
         to={localizedSeriesPath(`/series/${encodeURIComponent(seriesId)}`, locale)}
-        className="block aspect-[16/10] bg-[#ead6a5]"
+        className="block aspect-[2/3] bg-[#ead6a5]"
         onClick={() => rememberSeriesCatalogItem(result)}
       >
         {artwork ? <img alt="" className="h-full w-full object-cover" loading="lazy" src={artwork} /> : <div className="flex h-full items-center justify-center text-sm font-medium text-[#748098]">{labels.noArtwork}</div>}
       </Link>
-      <div className="flex min-h-52 flex-col gap-3 p-4">
+      <div className="flex min-h-48 flex-col gap-3 p-3">
         <div>
-          <h3 className="line-clamp-2 text-base font-semibold text-[#112a55]">{result.title}</h3>
+          <h3 className="line-clamp-2 text-sm font-semibold leading-5 text-[#112a55]">{result.title}</h3>
           <p className="mt-2 flex items-center gap-2 text-xs font-medium uppercase text-[#5a8f2f]">
             <Calendar className="size-3.5" aria-hidden="true" />
             {result.firstAirDate ?? result.startYear ?? text.search.dateUnknown}
           </p>
         </div>
-        <p className="line-clamp-3 text-sm leading-6 text-[#53617a]">{result.overview ?? result.summary ?? text.search.noOverview}</p>
+        <p className="line-clamp-2 text-xs leading-5 text-[#53617a]">{result.overview ?? result.summary ?? text.search.noOverview}</p>
         <div className="mt-auto flex flex-wrap gap-2">
           <Button
             size="sm"
