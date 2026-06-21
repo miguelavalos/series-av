@@ -274,12 +274,14 @@ final class SeriesLibraryStoreTests: XCTestCase {
         store.restoreProgress(
             status: .wantToWatch,
             lastWatchedEpisodeCursor: nil,
+            isPinnedHomeSeries: false,
             for: "entry",
             at: date.addingTimeInterval(20)
         )
 
         XCTAssertEqual(store.entries[0].status, .wantToWatch)
         XCTAssertNil(store.entries[0].lastWatchedEpisodeCursor)
+        XCTAssertEqual(store.entries[0].isPinnedHomeSeries, false)
     }
 
     func testAddCatalogSeriesTrimsTitleAndDeduplicatesBySeriesId() {

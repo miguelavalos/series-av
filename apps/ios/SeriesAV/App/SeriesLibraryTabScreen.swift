@@ -164,6 +164,7 @@ struct SeriesLibraryTabScreen: View {
                         store.restoreProgress(
                             status: pendingProgressUndo.status,
                             lastWatchedEpisodeCursor: pendingProgressUndo.lastWatchedEpisodeCursor,
+                            isPinnedHomeSeries: pendingProgressUndo.isPinnedHomeSeries,
                             for: pendingProgressUndo.entryId
                         )
                         self.pendingProgressUndo = nil
@@ -507,7 +508,8 @@ struct SeriesLibraryTabScreen: View {
             title: entry.title,
             messageKey: messageKey,
             status: entry.status,
-            lastWatchedEpisodeCursor: entry.lastWatchedEpisodeCursor
+            lastWatchedEpisodeCursor: entry.lastWatchedEpisodeCursor,
+            isPinnedHomeSeries: entry.isPinnedHomeSeries
         )
     }
 

@@ -156,6 +156,7 @@ final class SeriesLibraryStore {
     func restoreProgress(
         status: SeriesLibraryEntryStatus,
         lastWatchedEpisodeCursor: SeriesEpisodeCursor?,
+        isPinnedHomeSeries: Bool?,
         for entryId: String,
         at date: Date = Date()
     ) {
@@ -165,6 +166,7 @@ final class SeriesLibraryStore {
 
         entries[index].status = status
         entries[index].lastWatchedEpisodeCursor = lastWatchedEpisodeCursor
+        entries[index].isPinnedHomeSeries = isPinnedHomeSeries
         entries[index].updatedAt = date
         entries[index].lastInteractedAt = date
         persist()
