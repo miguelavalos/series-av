@@ -50,6 +50,7 @@
 "home.undo.archived" = "\"%@\" archivada";
 "home.undo.deleted" = "\"%@\" eliminada";
 "home.undo.progress" = "Progreso de \"%@\" cambiado";
+"home.undo.nowWatching" = "\"%@\" ahora está en Viendo ahora";
 "home.undo.restored" = "\"%@\" restaurada";
 "home.undo.status" = "Estado de \"%@\" cambiado";
 "detail.title" = "Info de serie";

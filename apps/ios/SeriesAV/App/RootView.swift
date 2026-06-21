@@ -101,7 +101,10 @@ private struct SeriesWatchingHomeScreen: View {
                         store.markPreviousEpisodeWatched(for: currentEntry.id)
                     },
                     markNext: {
-                        pendingProgressUndo = progressUndo(for: currentEntry)
+                        pendingProgressUndo = progressUndo(
+                            for: currentEntry,
+                            messageKey: progressCommitMessageKey(for: currentEntry)
+                        )
                         pendingUndo = nil
                         store.markNextEpisodeWatched(for: currentEntry.id)
                     },
@@ -111,7 +114,10 @@ private struct SeriesWatchingHomeScreen: View {
                         store.setStatus(.watching, for: currentEntry.id)
                     },
                     markWatchedThrough: { cursor in
-                        pendingProgressUndo = progressUndo(for: currentEntry)
+                        pendingProgressUndo = progressUndo(
+                            for: currentEntry,
+                            messageKey: progressCommitMessageKey(for: currentEntry)
+                        )
                         pendingUndo = nil
                         store.markWatchedThrough(cursor, for: currentEntry.id)
                     },
@@ -153,7 +159,10 @@ private struct SeriesWatchingHomeScreen: View {
                 SeriesWatchingQueueSection(
                     entries: homeState.secondaryEntries,
                     markNext: { entry in
-                        pendingProgressUndo = progressUndo(for: entry)
+                        pendingProgressUndo = progressUndo(
+                            for: entry,
+                            messageKey: progressCommitMessageKey(for: entry)
+                        )
                         pendingUndo = nil
                         store.markNextEpisodeWatched(for: entry.id)
                     },
@@ -265,7 +274,10 @@ private struct SeriesWatchingHomeScreen: View {
             SeriesProgressEditorSheet(
                 entry: entry,
                 markWatchedThrough: { cursor in
-                    pendingProgressUndo = progressUndo(for: entry)
+                    pendingProgressUndo = progressUndo(
+                        for: entry,
+                        messageKey: progressCommitMessageKey(for: entry)
+                    )
                     pendingUndo = nil
                     store.markWatchedThrough(cursor, for: entry.id)
                 },
@@ -281,12 +293,18 @@ private struct SeriesWatchingHomeScreen: View {
             SeriesDetailScreen(
                 entry: entry,
                 markNext: { entry in
-                    pendingProgressUndo = progressUndo(for: entry)
+                    pendingProgressUndo = progressUndo(
+                        for: entry,
+                        messageKey: progressCommitMessageKey(for: entry)
+                    )
                     pendingUndo = nil
                     store.markNextEpisodeWatched(for: entry.id)
                 },
                 markWatchedThrough: { entry, cursor in
-                    pendingProgressUndo = progressUndo(for: entry)
+                    pendingProgressUndo = progressUndo(
+                        for: entry,
+                        messageKey: progressCommitMessageKey(for: entry)
+                    )
                     pendingUndo = nil
                     store.markWatchedThrough(cursor, for: entry.id)
                 },
@@ -375,6 +393,10 @@ private struct SeriesWatchingHomeScreen: View {
             status: entry.status,
             lastWatchedEpisodeCursor: entry.lastWatchedEpisodeCursor
         )
+    }
+
+    private func progressCommitMessageKey(for entry: SeriesLibraryEntry) -> String {
+        entry.status == .wantToWatch ? "home.undo.nowWatching" : "home.undo.progress"
     }
 
     private func addDiscoverySeries(_ preview: SeriesHomeDiscoveryPreview) {

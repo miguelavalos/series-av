@@ -50,6 +50,7 @@
 "home.undo.archived" = "\"%@\" archiviert";
 "home.undo.deleted" = "\"%@\" gelöscht";
 "home.undo.progress" = "Fortschritt von \"%@\" geändert";
+"home.undo.nowWatching" = "\"%@\" ist jetzt unter Gerade aktuell";
 "home.undo.restored" = "\"%@\" wiederhergestellt";
 "home.undo.status" = "Status von \"%@\" geändert";
 "detail.title" = "Serieninfo";
