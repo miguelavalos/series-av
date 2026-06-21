@@ -1,5 +1,6 @@
 import {
   SettingsActionRow,
+  HelpLegalSection,
   SettingsInfoRow,
   SettingsOptionButtonGroup,
   SettingsProfileScaffold,
@@ -7,13 +8,15 @@ import {
   useAppsAvLocale,
   appsAvLocaleNames,
   appsAvExternalSearchEngines,
+  applyAppsAvThemePreference,
+  normalizeAppsAvThemePreference,
+  readAppsAvThemePreference,
   type AppsAvExternalSearchEngine,
-  type AppsAvLocale
+  type AppsAvLocale,
+  type AppsAvThemePreference
 } from "@avalsys/apps-av-web";
-import { HelpLegalSection } from "@avalsys/apps-av-web/src/components/account-settings-sections";
-import { applyAppsAvThemePreference, normalizeAppsAvThemePreference, readAppsAvThemePreference, type AppsAvThemePreference } from "@avalsys/apps-av-web/src/lib/theme-preference";
 import { createFileRoute } from "@tanstack/react-router";
-import { Contrast, Globe, HardDrive, Languages, ListChecks, Moon, RotateCcw, Search, Smartphone, Sun, Trash2 } from "lucide-react";
+import { Contrast, ExternalLink, Globe, HardDrive, Languages, ListChecks, Moon, RotateCcw, Search, Smartphone, Sun, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { SeriesAppShell } from "@/components/series-app-shell";
@@ -60,7 +63,7 @@ function SettingsRoute() {
   return (
     <ProtectedRoute>
       <SeriesAppShell>
-        <SettingsProfileScaffold title={labels.settingsTitle} subtitle={labels.settingsSubtitle} heroClassName="series-paper">
+        <SettingsProfileScaffold title={labels.settingsTitle} subtitle={labels.settingsSubtitle}>
           <SettingsSectionCard title={labels.preferences.title} subtitle={labels.preferences.subtitle}>
             <SettingsInfoRow icon={<Globe className="size-5" />} title={labels.preferences.languageTitle} detail={labels.preferences.languageDetail} />
             <SettingsOptionButtonGroup
@@ -84,9 +87,15 @@ function SettingsRoute() {
                 label: labels.preferences.themeOptions[item]
               }))}
             />
-            <SettingsInfoRow icon={<Search className="size-5" />} title={labels.preferences.searchEngineTitle} detail={labels.preferences.searchEngineDetail} />
+          </SettingsSectionCard>
+
+          <SettingsSectionCard title={labels.series.title} subtitle={labels.series.subtitle}>
+            <SettingsInfoRow icon={<ListChecks className="size-5" />} title={labels.series.cursorTitle} detail={labels.series.cursorDetail} />
+            <SettingsInfoRow icon={<RotateCcw className="size-5" />} title={labels.series.reversibleTitle} detail={labels.series.reversibleDetail} />
+            <SettingsInfoRow icon={<ExternalLink className="size-5" />} title={labels.series.webOpenModeTitle} detail={labels.series.webOpenModeDetail} />
+            <SettingsInfoRow icon={<Search className="size-5" />} title={labels.series.searchEngineTitle} detail={labels.series.searchEngineDetail} />
             <label className="grid gap-2">
-              <span className="sr-only">{labels.preferences.searchEngineTitle}</span>
+              <span className="sr-only">{labels.series.searchEngineTitle}</span>
               <select
                 className="h-12 w-full rounded-lg border border-[#d7c494] bg-[#fff8df]/80 px-4 text-sm font-semibold text-[#112a55] outline-none transition focus:border-[#112a55] focus:ring-2 focus:ring-[#112a55]/20"
                 value={searchEngine}
@@ -94,16 +103,11 @@ function SettingsRoute() {
               >
                 {appsAvExternalSearchEngines.map((engine) => (
                   <option key={engine} value={engine}>
-                    {labels.preferences.searchEngineOptions[engine]}
+                    {labels.series.searchEngineOptions[engine]}
                   </option>
                 ))}
               </select>
             </label>
-          </SettingsSectionCard>
-
-          <SettingsSectionCard title={labels.series.title} subtitle={labels.series.subtitle}>
-            <SettingsInfoRow icon={<ListChecks className="size-5" />} title={labels.series.cursorTitle} detail={labels.series.cursorDetail} />
-            <SettingsInfoRow icon={<RotateCcw className="size-5" />} title={labels.series.reversibleTitle} detail={labels.series.reversibleDetail} />
           </SettingsSectionCard>
 
           <SettingsSectionCard title={labels.local.title} subtitle={labels.local.subtitle}>
@@ -199,8 +203,13 @@ const profileLabels = {
       cursorTitle: "Punt únic de progrés",
       reversibleDetail: "Mou el punt enrere o endavant si toques l'episodi incorrecte.",
       reversibleTitle: "Correccions ràpides",
+      searchEngineDetail: "Tria el cercador que s'obre des dels enllaços de fonts.",
+      searchEngineOptions: externalSearchEngineLabels,
+      searchEngineTitle: "Cercador",
       subtitle: "Un únic punt clar per sèrie.",
-      title: "Seguiment de sèries"
+      title: "Seguiment de sèries",
+      webOpenModeDetail: "A la web, els enllaços externs s'obren amb el comportament del navegador actual.",
+      webOpenModeTitle: "Obertura d'enllaços"
     },
     local: {
       delete: {
@@ -253,8 +262,13 @@ const profileLabels = {
       cursorTitle: "Ein Fortschrittspunkt",
       reversibleDetail: "Verschiebe den Punkt zurück oder vor, wenn du die falsche Folge antippst.",
       reversibleTitle: "Schnelle Korrekturen",
+      searchEngineDetail: "Wähle die Suchmaschine für Quellen-Links.",
+      searchEngineOptions: externalSearchEngineLabels,
+      searchEngineTitle: "Suchmaschine",
       subtitle: "Ein klarer Fortschrittspunkt pro Serie.",
-      title: "Serien-Tracking"
+      title: "Serien-Tracking",
+      webOpenModeDetail: "Im Web öffnen externe Links mit dem aktuellen Browserverhalten.",
+      webOpenModeTitle: "Links öffnen"
     },
     local: {
       delete: {
@@ -307,8 +321,13 @@ const profileLabels = {
       cursorTitle: "Single progress point",
       reversibleDetail: "Move the point backward or forward whenever you tap the wrong episode.",
       reversibleTitle: "Fast corrections",
+      searchEngineDetail: "Choose the search engine opened by source links.",
+      searchEngineOptions: externalSearchEngineLabels,
+      searchEngineTitle: "Search engine",
       subtitle: "One clear watching point per series.",
-      title: "Series tracking"
+      title: "Series tracking",
+      webOpenModeDetail: "On web, external links open with the current browser behavior.",
+      webOpenModeTitle: "Link opening"
     },
     local: {
       delete: {
@@ -361,8 +380,13 @@ const profileLabels = {
       cursorTitle: "Punto único de progreso",
       reversibleDetail: "Mueve el punto atrás o adelante si tocas el episodio incorrecto.",
       reversibleTitle: "Correcciones rápidas",
+      searchEngineDetail: "Elige el buscador que se abre desde los enlaces de fuentes.",
+      searchEngineOptions: externalSearchEngineLabels,
+      searchEngineTitle: "Buscador",
       subtitle: "Un único punto claro por serie.",
-      title: "Seguimiento de series"
+      title: "Seguimiento de series",
+      webOpenModeDetail: "En web, los enlaces externos se abren con el comportamiento del navegador actual.",
+      webOpenModeTitle: "Apertura de enlaces"
     },
     local: {
       delete: {
@@ -415,8 +439,13 @@ const profileLabels = {
       cursorTitle: "Point de progression unique",
       reversibleDetail: "Déplacez le point en arrière ou en avant si vous touchez le mauvais épisode.",
       reversibleTitle: "Corrections rapides",
+      searchEngineDetail: "Choisissez le moteur utilisé par les liens de sources.",
+      searchEngineOptions: externalSearchEngineLabels,
+      searchEngineTitle: "Moteur de recherche",
       subtitle: "Un seul point clair par série.",
-      title: "Suivi des séries"
+      title: "Suivi des séries",
+      webOpenModeDetail: "Sur le web, les liens externes suivent le comportement du navigateur actuel.",
+      webOpenModeTitle: "Ouverture des liens"
     },
     local: {
       delete: {

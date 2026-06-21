@@ -1,5 +1,4 @@
-import { EmptyState, useAppsAvLocale } from "@avalsys/apps-av-web";
-import { CompactSyncStatus } from "@avalsys/apps-av-web/src/components/compact-sync-status";
+import { AppRowsSkeleton, AppSearchField, AppSegmentedControl, CompactSyncStatus, EmptyState, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -55,18 +54,12 @@ function LibraryRoute() {
               </Button>
             </div>
             <div className="mt-6 grid gap-3 lg:grid-cols-[1fr_auto]">
-              <input className="h-11 rounded-full border border-[#d7c494] bg-[#fff8df] px-4 text-[#112a55]" placeholder={labels.searchPlaceholder} value={query} onChange={(event) => setQuery(event.target.value)} />
-              <div className="flex flex-wrap gap-2">
-                {filters.map((item, index) => (
-                  <button key={item} className={filter === item ? "rounded-full bg-[#112a55] px-3 py-2 text-sm font-semibold text-white" : "rounded-full border border-[#d7c494] bg-[#fff8df]/80 px-3 py-2 text-sm font-semibold text-[#334766]"} type="button" onClick={() => setFilter(item)}>
-                    {text.library.filters[index] ?? item}
-                  </button>
-                ))}
-              </div>
+              <AppSearchField placeholder={labels.searchPlaceholder} value={query} onValueChange={setQuery} />
+              <AppSegmentedControl ariaLabel={labels.filters} options={filterOptions(text.library.filters)} value={filter} onValueChange={setFilter} />
             </div>
           </Card>
 
-          {isInitialSyncing ? <LibraryRowsSkeleton /> : null}
+          {isInitialSyncing ? <AppRowsSkeleton /> : null}
 
           {!isInitialSyncing && active.length === 0 && archived.length === 0 ? (
             <EmptyState className="border-[#d7c494] bg-[#fff8df]" description={text.library.emptyBody} title={text.library.emptyTitle} />
@@ -96,36 +89,17 @@ function LibraryRoute() {
 }
 
 const libraryLabels = {
-  ca: { active: "Actives", activeLower: "actives", searchPlaceholder: "Cerca a la biblioteca", syncStatus: { disabled: "Local", failed: "Error", idle: "Al dia", syncing: "Sincronitzant" } },
-  de: { active: "Aktiv", activeLower: "aktiv", searchPlaceholder: "Bibliothek durchsuchen", syncStatus: { disabled: "Lokal", failed: "Fehler", idle: "Aktuell", syncing: "Sync läuft" } },
-  en: { active: "Active", activeLower: "active", searchPlaceholder: "Search your library", syncStatus: { disabled: "Local", failed: "Error", idle: "Current", syncing: "Syncing" } },
-  es: { active: "Activas", activeLower: "activas", searchPlaceholder: "Buscar en tu biblioteca", syncStatus: { disabled: "Local", failed: "Error", idle: "Al día", syncing: "Sincronizando" } },
-  fr: { active: "Actives", activeLower: "actives", searchPlaceholder: "Rechercher dans la bibliothèque", syncStatus: { disabled: "Local", failed: "Erreur", idle: "À jour", syncing: "Sync" } }
+  ca: { active: "Actives", activeLower: "actives", filters: "Filtres de biblioteca", searchPlaceholder: "Cerca a la biblioteca", syncStatus: { disabled: "Local", failed: "Error", idle: "Al dia", syncing: "Sincronitzant" } },
+  de: { active: "Aktiv", activeLower: "aktiv", filters: "Bibliotheksfilter", searchPlaceholder: "Bibliothek durchsuchen", syncStatus: { disabled: "Lokal", failed: "Fehler", idle: "Aktuell", syncing: "Sync läuft" } },
+  en: { active: "Active", activeLower: "active", filters: "Library filters", searchPlaceholder: "Search your library", syncStatus: { disabled: "Local", failed: "Error", idle: "Current", syncing: "Syncing" } },
+  es: { active: "Activas", activeLower: "activas", filters: "Filtros de biblioteca", searchPlaceholder: "Buscar en tu biblioteca", syncStatus: { disabled: "Local", failed: "Error", idle: "Al día", syncing: "Sincronizando" } },
+  fr: { active: "Actives", activeLower: "actives", filters: "Filtres de bibliothèque", searchPlaceholder: "Rechercher dans la bibliothèque", syncStatus: { disabled: "Local", failed: "Erreur", idle: "À jour", syncing: "Sync" } }
 } as const;
 
 const filters: Filter[] = ["all", "watching", "wantToWatch", "watched", "archived"];
 
-function LibraryRowsSkeleton() {
-  return (
-    <section className="grid gap-3" aria-hidden="true">
-      <div className="h-4 w-20 animate-pulse rounded-full bg-[#d8c27d]/70" />
-      {Array.from({ length: 3 }).map((_, index) => (
-        <div key={index} className="rounded-lg border border-[#d7c494] bg-[#fff8df]/88 p-4 shadow-sm shadow-[#172f5c]/6">
-          <div className="flex gap-4">
-            <div className="h-20 w-14 shrink-0 animate-pulse rounded-lg border border-[#d7c494] bg-[#ead6a5]" />
-            <div className="min-w-0 flex-1">
-              <div className="h-5 w-48 max-w-full animate-pulse rounded-full bg-[#ead6a5]" />
-              <div className="mt-3 h-4 w-72 max-w-full animate-pulse rounded-full bg-[#ead6a5]/70" />
-              <div className="mt-4 flex gap-2">
-                <div className="h-9 w-24 animate-pulse rounded-full bg-[#112a55]/25" />
-                <div className="h-9 w-20 animate-pulse rounded-full bg-white/45" />
-              </div>
-            </div>
-          </div>
-        </div>
-      ))}
-    </section>
-  );
+function filterOptions(labels: readonly string[]) {
+  return filters.map((value, index) => ({ label: labels[index] ?? value, value }));
 }
 
 function filterEntries(entries: SeriesLibraryEntry[], filter: Filter, normalizedQuery: string) {

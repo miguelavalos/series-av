@@ -1,6 +1,5 @@
 import { AccountAvProvider } from "@avalsys/account-av-web";
-import { AppsAvWebProvider, getAppsAvLocaleFromSearch, useAppsAvLocale } from "@avalsys/apps-av-web";
-import { applyAppsAvThemePreference, normalizeAppsAvThemePreference, readAppsAvThemePreference } from "@avalsys/apps-av-web/src/lib/theme-preference";
+import { AppsAvWebProvider, applyAppsAvThemePreference, getAppsAvLocaleFromSearch, normalizeAppsAvThemePreference, readAppsAvThemePreference, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { HeadContent, Outlet, Scripts, createRootRoute, useRouterState } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { getAccountApiBaseUrl, getAccountPublishableKey } from "@/lib/series-config";

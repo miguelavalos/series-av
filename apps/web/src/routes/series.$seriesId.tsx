@@ -1,9 +1,8 @@
-import { appsAvExternalSearchUrl, appsAvImdbSearchUrl, ErrorState, useAppsAvLocale } from "@avalsys/apps-av-web";
+import { AppExternalLinkPanel, AppSegmentedControl, appsAvExternalSearchUrl, appsAvImdbSearchUrl, ErrorState, type AppExternalLinkItem, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { useAccountSession, useAccountToken } from "@avalsys/account-av-web";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, BookOpen, CheckCircle2, ChevronLeft, ChevronRight, ExternalLink, Plus, RotateCcw, Search, StepBack, StepForward } from "lucide-react";
-import type { ReactNode } from "react";
+import { ArrowLeft, BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Plus, RotateCcw, Search, StepBack, StepForward } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { SeriesAppShell } from "@/components/series-app-shell";
@@ -124,81 +123,7 @@ function SeriesDetailRoute() {
               ) : null}
             </div>
 
-            {isCatalogResolving ? (
-              <SeriesDetailHeroSkeleton />
-            ) : (
-              <div className="grid gap-6 lg:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[13.5rem_minmax(0,1fr)]">
-                <SeriesArtwork entry={artwork} size="xl" />
-                <div className="min-w-0">
-                  <div className="max-w-4xl">
-                    <h1 className="text-3xl font-semibold leading-tight text-[#112a55] sm:text-4xl">{title}</h1>
-                    <p className="mt-3 text-sm font-semibold text-[#5a8f2f]">
-                      {catalog?.startYear ?? catalog?.firstAirDate ?? text.search.dateUnknown}
-                      {catalog?.genres?.length ? ` · ${catalog.genres.slice(0, 3).join(" · ")}` : ""}
-                    </p>
-                    {detail.isError ? <p className="mt-3 text-sm font-semibold text-[#b15b22]">{labels.detailUnavailable}</p> : null}
-                    <p className="mt-4 text-base leading-7 text-[#334766]">{catalog?.summary ?? catalog?.overview ?? text.search.noOverview}</p>
-                  </div>
-
-                  {sourceLinks.length > 0 ? (
-                    <div className="mt-5 rounded-lg border border-[#d7c494] bg-white/45 p-4">
-                      <p className="text-sm font-bold text-[#112a55]">{labels.sourcesTitle}</p>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {sourceLinks.map((source) => (
-                          <a
-                            key={source.href}
-                            className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[#c8ad72] bg-[#fff8df]/80 px-4 text-sm font-bold text-[#112a55] hover:bg-white"
-                            href={source.href}
-                            rel="noreferrer"
-                            target="_blank"
-                          >
-                            {source.icon}
-                            {source.label}
-                            <ExternalLink className="size-3.5" aria-hidden="true" />
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
-
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    {entry ? (
-                      <>
-                        <Button className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" onClick={() => library.markNextEpisodeWatched(entry.entryId)}>
-                          <StepForward className="size-4" /> {labels.markNext} {cursorLabel(nextEpisodeCursor(entry.lastWatchedEpisodeCursor))}
-                        </Button>
-                        {entry.lastWatchedEpisodeCursor ? (
-                          <>
-                            <Button variant="outline" className="rounded-full border-[#c8ad72] bg-white/60" onClick={() => library.markPreviousEpisodeWatched(entry.entryId)}>
-                              <StepBack className="size-4" /> {libraryLabels.previous}
-                            </Button>
-                            <Button variant="ghost" className="rounded-full text-[#112a55]" onClick={() => library.clearProgress(entry.entryId)}>
-                              <RotateCcw className="size-4" /> {libraryLabels.clear}
-                            </Button>
-                          </>
-                        ) : null}
-                        <StatusButtons entry={entry} locale={locale} />
-                      </>
-                    ) : (
-                      <Button
-                        className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]"
-                        disabled={!library.canAddSeries}
-                        onClick={() =>
-                          library.addCatalogSeries({
-                            displayArtworkRef: catalogArtworkRef,
-                            fallbackVisualSeed: title,
-                            seriesId,
-                            title
-                          })
-                        }
-                      >
-                        <Plus className="size-4" /> {library.canAddSeries ? labels.follow : labels.limitReached}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
+            {isCatalogResolving ? <SeriesDetailHeroSkeleton /> : <SeriesDetailHero artwork={artwork} catalog={catalog} catalogArtworkRef={catalogArtworkRef} detailUnavailable={detail.isError} entry={entry} labels={labels} library={library} libraryLabels={libraryLabels} locale={locale} seriesId={seriesId} sourceLinks={sourceLinks} title={title} unknownDate={text.search.dateUnknown} noOverview={text.search.noOverview} />}
           </Card>
 
           <Card className="gap-4 rounded-lg border-[#d7c494] bg-[#fff8df]/88 p-5 py-5 text-[#112a55] shadow-sm shadow-[#172f5c]/6 sm:p-6">
@@ -212,6 +137,95 @@ function SeriesDetailRoute() {
         </section>
       </SeriesAppShell>
     </ProtectedRoute>
+  );
+}
+
+function SeriesDetailHero({
+  artwork,
+  catalog,
+  catalogArtworkRef,
+  detailUnavailable,
+  entry,
+  labels,
+  library,
+  libraryLabels,
+  locale,
+  noOverview,
+  seriesId,
+  sourceLinks,
+  title,
+  unknownDate
+}: {
+  artwork: Pick<SeriesLibraryEntry, "displayArtworkRef" | "fallbackVisualSeed" | "title"> & { seriesId?: string };
+  catalog: SeriesSearchResult | null | undefined;
+  catalogArtworkRef: string | null;
+  detailUnavailable: boolean;
+  entry: SeriesLibraryEntry | null;
+  labels: (typeof detailLabels)[keyof typeof detailLabels];
+  library: ReturnType<typeof useSeriesLibrary>;
+  libraryLabels: ReturnType<typeof seriesLibraryUiText>;
+  locale: ReturnType<typeof useAppsAvLocale>;
+  noOverview: string;
+  seriesId: string;
+  sourceLinks: AppExternalLinkItem[];
+  title: string;
+  unknownDate: string;
+}) {
+  return (
+    <div className="grid gap-6 lg:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[13.5rem_minmax(0,1fr)]">
+      <SeriesArtwork entry={artwork} size="xl" />
+      <div className="min-w-0">
+        <div className="max-w-4xl">
+          <h1 className="text-3xl font-semibold leading-tight text-[#112a55] sm:text-4xl">{title}</h1>
+          <p className="mt-3 text-sm font-semibold text-[#5a8f2f]">
+            {catalog?.startYear ?? catalog?.firstAirDate ?? unknownDate}
+            {catalog?.genres?.length ? ` · ${catalog.genres.slice(0, 3).join(" · ")}` : ""}
+          </p>
+          {detailUnavailable ? <p className="mt-3 text-sm font-semibold text-[#b15b22]">{labels.detailUnavailable}</p> : null}
+          <p className="mt-4 text-base leading-7 text-[#334766]">{catalog?.summary ?? catalog?.overview ?? noOverview}</p>
+        </div>
+
+        <div className="mt-5">
+          <AppExternalLinkPanel links={sourceLinks} title={labels.sourcesTitle} />
+        </div>
+
+        <div className="mt-6 flex flex-wrap gap-2">
+          {entry ? (
+            <>
+              <Button className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" onClick={() => library.markNextEpisodeWatched(entry.entryId)}>
+                <StepForward className="size-4" /> {labels.markNext} {cursorLabel(nextEpisodeCursor(entry.lastWatchedEpisodeCursor))}
+              </Button>
+              {entry.lastWatchedEpisodeCursor ? (
+                <>
+                  <Button variant="outline" className="rounded-full border-[#c8ad72] bg-white/60" onClick={() => library.markPreviousEpisodeWatched(entry.entryId)}>
+                    <StepBack className="size-4" /> {libraryLabels.previous}
+                  </Button>
+                  <Button variant="ghost" className="rounded-full text-[#112a55]" onClick={() => library.clearProgress(entry.entryId)}>
+                    <RotateCcw className="size-4" /> {libraryLabels.clear}
+                  </Button>
+                </>
+              ) : null}
+              <StatusButtons entry={entry} locale={locale} />
+            </>
+          ) : (
+            <Button
+              className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]"
+              disabled={!library.canAddSeries}
+              onClick={() =>
+                library.addCatalogSeries({
+                  displayArtworkRef: catalogArtworkRef,
+                  fallbackVisualSeed: title,
+                  seriesId,
+                  title
+                })
+              }
+            >
+              <Plus className="size-4" /> {library.canAddSeries ? labels.follow : labels.limitReached}
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -293,23 +307,13 @@ function EpisodeGuide({
           </div>
         </div>
 
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] sm:flex-wrap sm:overflow-visible [&::-webkit-scrollbar]:hidden">
-          {guide.seasons.map((season) => (
-            <button
-              key={season}
-              type="button"
-              aria-current={selectedSeason === season ? "true" : undefined}
-              className={
-                selectedSeason === season
-                  ? "min-h-10 shrink-0 rounded-lg bg-[#112a55] px-4 text-sm font-bold text-white shadow-sm shadow-[#172f5c]/15"
-                  : "min-h-10 shrink-0 rounded-lg border border-[#d7c494] bg-white/70 px-4 text-sm font-bold text-[#112a55] hover:bg-white"
-              }
-              onClick={() => setSelectedSeason(season)}
-            >
-              {labels.seasonShort} {season}
-            </button>
-          ))}
-        </div>
+        <AppSegmentedControl
+          ariaLabel={labels.season}
+          className="mt-3 overflow-x-auto pb-1 [scrollbar-width:none] sm:overflow-visible [&::-webkit-scrollbar]:hidden"
+          options={guide.seasons.map((season) => ({ label: `${labels.seasonShort} ${season}`, value: String(season) }))}
+          value={String(selectedSeason)}
+          onValueChange={(season) => setSelectedSeason(Number(season))}
+        />
       </div>
 
       <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
@@ -416,8 +420,8 @@ function sourceLinksForSeries({
   engine: string;
   labels: (typeof detailLabels)[keyof typeof detailLabels];
   query: string;
-}): Array<{ href: string; icon: ReactNode; label: string }> {
-  const links: Array<{ href: string; icon: ReactNode; label: string }> = [];
+}): AppExternalLinkItem[] {
+  const links: AppExternalLinkItem[] = [];
   const imdbUrl = externalLinkByKind(catalog, "imdb")?.url ?? appsAvImdbSearchUrl(query);
   if (imdbUrl) {
     links.push({

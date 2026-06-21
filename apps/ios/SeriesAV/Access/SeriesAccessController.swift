@@ -151,6 +151,13 @@ final class SeriesAccessController {
         )
     }
 
+    func authenticatedAppDataAPIClient() -> SeriesAVAPIClient {
+        SeriesAVAPIClient(
+            baseURL: AppConfig.apiBaseURL,
+            tokenProvider: { [accountService] in try await accountService.getToken() }
+        )
+    }
+
     var shouldAutoShowGuestOnboarding: Bool {
         if SeriesUITestEnvironment.current.shouldForceGuestOnboarding {
             return true

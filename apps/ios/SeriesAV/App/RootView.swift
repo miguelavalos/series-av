@@ -1355,7 +1355,7 @@ struct SeriesProgressEditorSheet: View {
                     seasonSelector
                     episodeSelector
                     explanation
-                    actions
+                    clearProgressAction
                 }
                 .padding(18)
             }
@@ -1461,7 +1461,7 @@ struct SeriesProgressEditorSheet: View {
                 LazyVStack(spacing: 8) {
                     ForEach(loadedGuide.items(in: selectedSeasonNumber), id: \.cursor) { item in
                         episodeGuideRow(item) {
-                            selectEpisode(item.episodeNumber)
+                            commitEpisode(item.episodeNumber)
                         }
                     }
                 }
@@ -1472,7 +1472,7 @@ struct SeriesProgressEditorSheet: View {
                             title: episodeChipTitle(for: episode),
                             episode: episode
                         ) {
-                            selectEpisode(episode)
+                            commitEpisode(episode)
                         }
                     }
 
@@ -1494,32 +1494,16 @@ struct SeriesProgressEditorSheet: View {
             .fixedSize(horizontal: false, vertical: true)
     }
 
-    private var actions: some View {
-        VStack(spacing: 10) {
-            Button {
-                markWatchedThrough(selectedCursor)
-                dismiss()
-            } label: {
-                Text(confirmTitle)
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-
-            Button(role: entry.lastWatchedEpisodeCursor == nil ? nil : .destructive) {
-                clearProgress()
-                dismiss()
-            } label: {
-                Text(L10n.string("home.notStarted"))
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
+    private var clearProgressAction: some View {
+        Button(role: entry.lastWatchedEpisodeCursor == nil ? nil : .destructive) {
+            clearProgress()
+            dismiss()
+        } label: {
+            Text(L10n.string("home.notStarted"))
+                .frame(maxWidth: .infinity)
         }
-    }
-
-    private var confirmTitle: String {
-        String(format: L10n.string("home.editor.confirmThrough"), selectedCursorLabel)
+        .buttonStyle(.bordered)
+        .controlSize(.large)
     }
 
     private var selectedCursorLabel: String {
@@ -1748,6 +1732,12 @@ struct SeriesProgressEditorSheet: View {
         } else {
             visibleEpisodeCount = Self.defaultEpisodeCount
         }
+    }
+
+    private func commitEpisode(_ episode: Int) {
+        selectEpisode(episode)
+        markWatchedThrough(SeriesEpisodeCursor(seasonNumber: selectedSeasonNumber, episodeNumber: episode))
+        dismiss()
     }
 
     private func loadEpisodeGuide() async {

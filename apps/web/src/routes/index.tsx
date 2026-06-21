@@ -1,7 +1,5 @@
 import { SignedIn, SignedOut } from "@avalsys/account-av-web";
-import { useAppsAvLocale } from "@avalsys/apps-av-web";
-import { CompactSyncStatus } from "@avalsys/apps-av-web/src/components/compact-sync-status";
-import { AppSurfaceState } from "@avalsys/apps-av-web/src/components/protected-app-gate";
+import { AppAssistantBriefCard, AppGridSkeleton, AppMetricTile, AppSurfaceState, CompactSyncStatus, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, BookOpenCheck, Calendar, Check, Plus, Search, Sparkles, StepForward } from "lucide-react";
@@ -108,21 +106,20 @@ function HomeContent() {
           ) : <AppSurfaceState icon={<Search className="size-10" aria-hidden="true" />} title={text.library.emptyTitle} description={text.library.emptyBody} />}
 
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
-            <Metric icon={<BookOpenCheck className="size-4" />} label={labels.active} value={String(library.snapshot.activeEntries.length)} />
-            <Metric icon={<StepForward className="size-4" />} label={libraryLabels.status.watching} value={String(library.snapshot.watchingEntries.length)} />
-            <Metric icon={<Sparkles className="size-4" />} label={labels.sync} value={<CompactSyncStatus labels={labels.syncStatus} syncState={library.syncState} />} />
+            <AppMetricTile icon={<BookOpenCheck className="size-4" />} label={labels.active} value={String(library.snapshot.activeEntries.length)} />
+            <AppMetricTile icon={<StepForward className="size-4" />} label={libraryLabels.status.watching} value={String(library.snapshot.watchingEntries.length)} />
+            <AppMetricTile icon={<Sparkles className="size-4" />} label={labels.sync} value={<CompactSyncStatus labels={labels.syncStatus} syncState={library.syncState} />} />
           </div>
         </Card>
-        <Card className="gap-0 rounded-lg border-[#d7c494] bg-[#10284f] p-5 py-5 text-white shadow-lg shadow-[#172f5c]/14">
-          <div className="flex items-center gap-2 text-sm font-semibold text-[#b6dd89]">
-            <Sparkles className="size-4" aria-hidden="true" />
-            {text.home.aviTitle}
-          </div>
-          <p className="mt-4 text-sm leading-6 text-white/74">{current && currentTitle && !shouldShowCurrentSkeleton ? labels.avi(currentTitle) : text.home.aviBody[0]}</p>
-          <Button asChild className="mt-5 rounded-full bg-white text-[#10284f] hover:bg-white/90">
-            <Link to={localizedSeriesPath("/avi", locale)}>{text.nav.avi}</Link>
-          </Button>
-        </Card>
+        <AppAssistantBriefCard
+          title={text.home.aviTitle}
+          body={current && currentTitle && !shouldShowCurrentSkeleton ? labels.avi(currentTitle) : text.home.aviBody[0]}
+          action={
+            <Button asChild className="rounded-full bg-white text-[#10284f] hover:bg-white/90">
+              <Link to={localizedSeriesPath("/avi", locale)}>{text.nav.avi}</Link>
+            </Button>
+          }
+        />
       </div>
 
       <HomeDiscoverySection isLoading={popular.isLoading} labels={labels} locale={locale} results={popular.data?.results ?? []} title={labels.popular} />
@@ -230,18 +227,6 @@ const homeLabels = {
   }
 } as const;
 
-function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
-  return (
-    <div className="rounded-lg border border-[#d7c494] bg-[#fff8df]/72 p-4 text-[#112a55]">
-      <div className="flex items-center gap-2 text-sm font-semibold">
-        <span className="text-[#5a8f2f]">{icon}</span>
-        {label}
-      </div>
-      <div className="mt-2 text-lg font-semibold text-[#112a55]">{value}</div>
-    </div>
-  );
-}
-
 function HomeCurrentSkeleton() {
   return (
     <div className="mt-8 flex flex-col gap-5 rounded-lg border border-[#d7c494] bg-[#fff8df]/78 p-4 sm:flex-row" aria-hidden="true">
@@ -275,11 +260,7 @@ function HomeDiscoverySection({
     return (
       <section>
         <h2 className="mb-3 text-sm font-bold uppercase text-[#53617a]">{title}</h2>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <div key={index} className="h-72 animate-pulse rounded-lg border border-[#d7c494] bg-[#fff8df]" />
-          ))}
-        </div>
+        <AppGridSkeleton className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" itemCount={4} />
       </section>
     );
   }

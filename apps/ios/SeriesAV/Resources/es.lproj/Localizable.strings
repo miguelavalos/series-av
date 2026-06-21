@@ -89,8 +89,8 @@
 "home.editor.season.short" = "Temporada";
 "home.editor.episode" = "Episodio %d";
 "home.editor.episode.short" = "Episodio";
-"home.editor.footer" = "Al fijar este punto, los episodios anteriores quedan vistos y los posteriores pendientes.";
-"home.editor.footer.realGuide" = "Elige el último episodio visto. Los anteriores quedan vistos y los posteriores pendientes.";
+"home.editor.footer" = "Toca el último episodio visto. Los anteriores quedan vistos y los posteriores pendientes.";
+"home.editor.footer.realGuide" = "Toca el último episodio visto. Los anteriores quedan vistos y los posteriores pendientes.";
 "home.editor.footer.loadingGuide" = "Preparando episodios.";
 "home.editor.confirm" = "Fijar punto visto";
 "home.editor.confirmThrough" = "Fijar hasta %@";

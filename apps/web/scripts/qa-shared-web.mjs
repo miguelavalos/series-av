@@ -4,6 +4,7 @@ import { runSharedWebSmokeQa } from "../../../../apps-av/web/scripts/shared-web-
 
 const result = await runSharedWebSmokeQa({
   baseUrl: process.env.SERIESAV_WEB_QA_BASE_URL ?? "http://localhost:5193",
+  guestCopyPattern: /\b(guest-mode|invitado|invitada|convidat|convidada|gastmodus)\b/i,
   expectations: {
     ca: {
       protectedTitle: "Porta el teu quadern de series amb tu",

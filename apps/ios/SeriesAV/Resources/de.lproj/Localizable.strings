@@ -89,8 +89,8 @@
 "home.editor.season.short" = "Staffel";
 "home.editor.episode" = "Folge %d";
 "home.editor.episode.short" = "Folge";
-"home.editor.footer" = "Wenn du diesen Punkt setzt, gelten frühere Folgen als gesehen und spätere als offen.";
-"home.editor.footer.realGuide" = "Wähle die zuletzt gesehene Folge. Frühere Folgen gelten als gesehen, spätere bleiben offen.";
+"home.editor.footer" = "Tippe auf die zuletzt gesehene Folge. Frühere Folgen gelten als gesehen, spätere bleiben offen.";
+"home.editor.footer.realGuide" = "Tippe auf die zuletzt gesehene Folge. Frühere Folgen gelten als gesehen, spätere bleiben offen.";
 "home.editor.footer.loadingGuide" = "Folgen werden vorbereitet.";
 "home.editor.confirm" = "Gesehenen Punkt setzen";
 "home.editor.confirmThrough" = "Bis %@ setzen";

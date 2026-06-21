@@ -1,6 +1,5 @@
 import { AuthLoading, SignedIn, SignedOut } from "@avalsys/account-av-web";
-import { AuthSkeleton, useAppsAvLocale } from "@avalsys/apps-av-web";
-import { ProtectedAppGate } from "@avalsys/apps-av-web/src/components/protected-app-gate";
+import { AuthSkeleton, ProtectedAppGate, useAppsAvLocale } from "@avalsys/apps-av-web";
 import type { ReactNode } from "react";
 import { seriesBrandAssets } from "@/lib/series-config";
 import { localizedSeriesPath, useSeriesProductConfig, useSeriesText } from "@/lib/series-i18n";

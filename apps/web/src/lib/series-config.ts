@@ -27,6 +27,9 @@ export const seriesBrandAssets = {
   aviLoginPeek: "https://cdn.avalsys.com/apps-av/series-av/web-v3/series-av-splash.png",
   aviLoginSheetPeek: "/assets/avi-login-sheet-peek.png",
   aviOnboardingCta: "/assets/avi-onboarding-cta.png",
+  guestHomeShelf: "/assets/series-av-guest-home-1.webp",
+  guestHomePlanning: "/assets/series-av-guest-home-2.webp",
+  guestHomeAvi: "/assets/series-av-guest-home-3.webp",
   logo: "https://cdn.avalsys.com/apps-av/series-av/web-v3/series-av-logo.png",
   onboarding: "https://cdn.avalsys.com/apps-av/series-av/web-v3/series-av-onboarding.png",
   wordmark: "https://cdn.avalsys.com/apps-av/series-av/web-v3/series-av-wordmark.png"

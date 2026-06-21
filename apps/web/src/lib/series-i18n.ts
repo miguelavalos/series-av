@@ -1,6 +1,5 @@
 import { useMemo } from "react";
-import { useAppsAvLocale, type AppsAvLocale, type AppsAvProductConfig, type AppsAvProductLink } from "@avalsys/apps-av-web";
-import { appsAvLocalizedPath } from "@avalsys/apps-av-web/src/lib/localized-links";
+import { appsAvLocalizedPath, useAppsAvLocale, type AppsAvLocale, type AppsAvProductConfig, type AppsAvProductLink } from "@avalsys/apps-av-web";
 import { caES } from "@clerk/localizations/ca-ES";
 import { deDE } from "@clerk/localizations/de-DE";
 import { enUS } from "@clerk/localizations/en-US";
@@ -629,7 +628,6 @@ export function useSeriesNavLinks(): AppsAvProductLink[] {
     { href: localizedSeriesPath("/", locale), label: text.nav.home },
     { href: localizedSeriesPath("/library", locale), label: text.nav.library },
     { href: localizedSeriesPath("/search", locale), label: text.nav.search },
-    { href: localizedSeriesPath("/avi", locale), label: text.nav.avi },
     { href: localizedSeriesPath("/account", locale), label: text.nav.account },
     { href: localizedSeriesPath("/settings", locale), label: text.nav.settings }
   ];

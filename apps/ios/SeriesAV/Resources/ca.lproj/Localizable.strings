@@ -89,8 +89,8 @@
 "home.editor.season.short" = "Temporada";
 "home.editor.episode" = "Episodi %d";
 "home.editor.episode.short" = "Episodi";
-"home.editor.footer" = "En fixar aquest punt, els episodis anteriors queden vistos i els posteriors pendents.";
-"home.editor.footer.realGuide" = "Tria l'últim episodi vist. Els anteriors queden vistos i els posteriors pendents.";
+"home.editor.footer" = "Toca l'últim episodi vist. Els anteriors queden vistos i els posteriors pendents.";
+"home.editor.footer.realGuide" = "Toca l'últim episodi vist. Els anteriors queden vistos i els posteriors pendents.";
 "home.editor.footer.loadingGuide" = "Preparant episodis.";
 "home.editor.confirm" = "Fixar punt vist";
 "home.editor.confirmThrough" = "Fixar fins a %@";

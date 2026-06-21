@@ -169,7 +169,7 @@ final class SeriesLibrarySyncCoordinator {
     }
 
     private func makeClient(accessController: SeriesAccessController) -> SeriesAppDataSyncClient {
-        let apiClient = accessController.authenticatedAPIClient()
+        let apiClient = accessController.authenticatedAppDataAPIClient()
         return SeriesAppDataSyncClient(deviceId: deviceId) { path, method, body, headers in
             try await apiClient.requestData(path: path, method: method, body: body, headers: headers)
         }

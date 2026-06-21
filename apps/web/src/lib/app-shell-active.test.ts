@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isActiveAppShellLink } from "@avalsys/apps-av-web/src/components/app-shell";
+import { isActiveAppShellLink } from "@avalsys/apps-av-web";
 
 describe("shared app shell active links", () => {
   it("matches localized links by pathname", () => {

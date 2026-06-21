@@ -1,7 +1,7 @@
-import { EmptyState, ErrorState } from "@avalsys/apps-av-web";
+import { AppGridSkeleton, AppSearchField, EmptyState, ErrorState } from "@avalsys/apps-av-web";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Calendar, Check, Plus, Search } from "lucide-react";
+import { Calendar, Check, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -49,15 +49,9 @@ export function SeriesSearch() {
             {library.limit.activeCount}/{library.limit.activeLimit} {labels.activeLower}
           </p>
         </div>
-        <label className="relative flex-1">
+        <label className="block">
           <span className="sr-only">{text.search.inputLabel}</span>
-          <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#5a8f2f]" aria-hidden="true" />
-          <input
-            className="h-13 w-full rounded-full border border-[#d7c494] bg-[#fff8df] pl-12 pr-4 text-base text-[#112a55] shadow-sm placeholder:text-[#748098]"
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={text.search.placeholder}
-            value={query}
-          />
+          <AppSearchField placeholder={text.search.placeholder} value={query} onValueChange={setQuery} />
         </label>
       </div>
 
@@ -72,7 +66,7 @@ export function SeriesSearch() {
         </section>
       ) : null}
 
-      {isLoading ? <SearchGridSkeleton /> : null}
+      {isLoading ? <AppGridSkeleton /> : null}
       {isError ? <ErrorState className="border-[#d7c494] bg-[#fff8df]" description={catalog.error?.message ?? ""} title={text.search.errorTitle} /> : null}
       {!isLoading && trimmedQuery && catalog.data?.results.length === 0 ? <EmptyState className="border-[#d7c494] bg-[#fff8df]" description={text.search.emptyBody} title={text.search.emptyTitle} /> : null}
 
@@ -164,16 +158,6 @@ const searchLabels = {
   es: { activeLower: "activas", catalog: "Catálogo", detail: "Detalle", follow: "Seguir", following: "Siguiendo", inLibrary: "En tu biblioteca", limitReached: "Límite alcanzado", popular: "Popular" },
   fr: { activeLower: "actives", catalog: "Catalogue", detail: "Détail", follow: "Suivre", following: "Suivi", inLibrary: "Dans votre bibliothèque", limitReached: "Limite atteinte", popular: "Populaire" }
 } as const;
-
-function SearchGridSkeleton() {
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {Array.from({ length: 6 }).map((_, index) => (
-        <div key={index} className="h-72 animate-pulse rounded-lg border border-[#d7c494] bg-[#fff8df]" />
-      ))}
-    </div>
-  );
-}
 
 function seriesIdFor(result: SeriesSearchResult) {
   return result.seriesId ?? result.id;

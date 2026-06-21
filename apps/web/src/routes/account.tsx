@@ -1,6 +1,5 @@
 import { AccountSignOutButton, useAccountUser } from "@avalsys/account-av-web";
-import { SettingsButton, SettingsInfoRow, SettingsProfileScaffold, SettingsSectionCard, useAppsAvLocale } from "@avalsys/apps-av-web";
-import { AccountSafetySection, CloudSyncSection, PlanFeatureSection } from "@avalsys/apps-av-web/src/components/account-settings-sections";
+import { AccountSafetySection, CloudSyncSection, PlanFeatureSection, SettingsButton, SettingsInfoRow, SettingsProfileScaffold, SettingsSectionCard, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { createFileRoute } from "@tanstack/react-router";
 import { Mail, Sparkles, UserCircle } from "lucide-react";
 import { ProtectedRoute } from "@/components/protected-route";
@@ -27,13 +26,7 @@ function AccountRoute() {
   return (
     <ProtectedRoute>
       <SeriesAppShell>
-        <SettingsProfileScaffold title={labels.accountTitle} subtitle={labels.accountSubtitle} heroClassName="series-paper">
-          <PlanFeatureSection isPro={isPro} labels={labels.pro} manageHref={localizedExternalUrl(seriesProductConfig.links.suite?.href, locale)} />
-
-          {canUseCloudSync ? (
-            <CloudSyncSection labels={labels.sync} syncState={library.syncState} error={library.syncError} onRetry={() => void library.refreshSync()} />
-          ) : null}
-
+        <SettingsProfileScaffold title={labels.accountTitle} subtitle={labels.accountSubtitle}>
           <SettingsSectionCard title={labels.account.title} subtitle={email ?? labels.account.connected}>
             <SettingsInfoRow icon={<UserCircle className="size-5" />} title={labels.account.sessionTitle} detail={displayName} />
             {email ? <SettingsInfoRow icon={<Mail className="size-5" />} title={labels.account.emailTitle} detail={email} /> : null}
@@ -42,6 +35,12 @@ function AccountRoute() {
               <SettingsButton>{labels.account.signOut}</SettingsButton>
             </AccountSignOutButton>
           </SettingsSectionCard>
+
+          <PlanFeatureSection isPro={isPro} labels={labels.pro} manageHref={localizedExternalUrl(seriesProductConfig.links.suite?.href, locale)} />
+
+          {canUseCloudSync ? (
+            <CloudSyncSection labels={labels.sync} syncState={library.syncState} error={library.syncError} onRetry={() => void library.refreshSync()} />
+          ) : null}
 
           <AccountSafetySection labels={labels.safety} deleteHref={localizedExternalUrl(seriesProductConfig.links.deleteAccount?.href, locale)} />
         </SettingsProfileScaffold>
@@ -59,11 +58,11 @@ const syncLabels = {
 } as const;
 
 const accountLabels = {
-  ca: { connected: "Connectat a Account AV.", emailTitle: "Correu electrònic", planFree: "Compte connectat", planPro: "Pro", planTitle: "Accés", sessionTitle: "Sessió", signOut: "Tancar sessió", signedIn: "Sessió iniciada", title: "Compte" },
-  de: { connected: "Verbunden mit Account AV.", emailTitle: "E-Mail", planFree: "Verbundenes Konto", planPro: "Pro", planTitle: "Zugriff", sessionTitle: "Sitzung", signOut: "Abmelden", signedIn: "Angemeldet", title: "Konto" },
-  en: { connected: "Connected to Account AV.", emailTitle: "Email", planFree: "Connected account", planPro: "Pro", planTitle: "Plan", sessionTitle: "Session", signOut: "Sign out", signedIn: "Signed in", title: "Account" },
-  es: { connected: "Conectado a Account AV.", emailTitle: "Email", planFree: "Cuenta conectada", planPro: "Pro", planTitle: "Plan", sessionTitle: "Sesión", signOut: "Cerrar sesión", signedIn: "Sesión iniciada", title: "Cuenta" },
-  fr: { connected: "Connecté à Account AV.", emailTitle: "E-mail", planFree: "Compte connecté", planPro: "Pro", planTitle: "Accès", sessionTitle: "Session", signOut: "Se déconnecter", signedIn: "Connecté", title: "Compte" }
+  ca: { connected: "Connectat a Account AV.", emailTitle: "Correu electrònic", planFree: "Free", planPro: "Pro", planTitle: "Accés", sessionTitle: "Sessió", signOut: "Tancar sessió", signedIn: "Sessió iniciada", title: "Compte" },
+  de: { connected: "Verbunden mit Account AV.", emailTitle: "E-Mail", planFree: "Free", planPro: "Pro", planTitle: "Zugriff", sessionTitle: "Sitzung", signOut: "Abmelden", signedIn: "Angemeldet", title: "Konto" },
+  en: { connected: "Connected to Account AV.", emailTitle: "Email", planFree: "Free", planPro: "Pro", planTitle: "Plan", sessionTitle: "Session", signOut: "Sign out", signedIn: "Signed in", title: "Account" },
+  es: { connected: "Conectado a Account AV.", emailTitle: "Email", planFree: "Free", planPro: "Pro", planTitle: "Plan", sessionTitle: "Sesión", signOut: "Cerrar sesión", signedIn: "Sesión iniciada", title: "Cuenta" },
+  fr: { connected: "Connecté à Account AV.", emailTitle: "E-mail", planFree: "Free", planPro: "Pro", planTitle: "Accès", sessionTitle: "Session", signOut: "Se déconnecter", signedIn: "Connecté", title: "Compte" }
 } as const;
 
 const safetyLabels = {

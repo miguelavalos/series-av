@@ -89,8 +89,8 @@
 "home.editor.season.short" = "Saison";
 "home.editor.episode" = "Épisode %d";
 "home.editor.episode.short" = "Épisode";
-"home.editor.footer" = "Définir ce point marque les épisodes précédents comme vus et les suivants en attente.";
-"home.editor.footer.realGuide" = "Choisis le dernier épisode vu. Les précédents sont vus et les suivants restent en attente.";
+"home.editor.footer" = "Touche le dernier épisode vu. Les précédents sont vus et les suivants restent en attente.";
+"home.editor.footer.realGuide" = "Touche le dernier épisode vu. Les précédents sont vus et les suivants restent en attente.";
 "home.editor.footer.loadingGuide" = "Préparation des épisodes.";
 "home.editor.confirm" = "Définir le point vu";
 "home.editor.confirmThrough" = "Définir jusqu'à %@";

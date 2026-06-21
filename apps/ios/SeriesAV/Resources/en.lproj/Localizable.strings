@@ -89,8 +89,8 @@
 "home.editor.season.short" = "Season";
 "home.editor.episode" = "Episode %d";
 "home.editor.episode.short" = "Episode";
-"home.editor.footer" = "Setting this point marks earlier episodes watched and later episodes pending.";
-"home.editor.footer.realGuide" = "Choose the last watched episode. Earlier episodes become watched and later episodes stay pending.";
+"home.editor.footer" = "Tap the last episode watched. Earlier episodes become watched and later episodes stay pending.";
+"home.editor.footer.realGuide" = "Tap the last episode watched. Earlier episodes become watched and later episodes stay pending.";
 "home.editor.footer.loadingGuide" = "Preparing episodes.";
 "home.editor.confirm" = "Set watched point";
 "home.editor.confirmThrough" = "Set through %@";
