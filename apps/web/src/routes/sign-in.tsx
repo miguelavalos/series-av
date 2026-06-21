@@ -17,23 +17,23 @@ function SignInRoute() {
   const fallbackRedirectUrl = safeReturnTo(searchStr) ?? localizedSeriesPath("/", locale);
 
   return (
-    <div className="series-paper flex min-h-screen flex-col bg-[#fff3cf]">
-      <main className="grid flex-1 lg:grid-cols-[0.92fr_1.08fr]">
-        <section className="relative hidden min-h-screen overflow-hidden bg-[#10284f] p-10 text-white lg:flex lg:flex-col lg:justify-between">
+    <div className="series-paper flex min-h-screen flex-col bg-[#fff3cf] px-4 py-4 sm:px-6">
+      <main className="mx-auto grid w-full max-w-6xl flex-1 overflow-hidden rounded-lg border border-[#d7c494] bg-[#fff6da]/88 shadow-2xl shadow-[#172f5c]/16 backdrop-blur lg:min-h-[40rem] lg:grid-cols-[0.92fr_1.08fr]">
+        <section className="relative hidden overflow-hidden bg-[#10284f] p-8 text-white lg:flex lg:flex-col lg:justify-between">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_25%,rgba(109,190,69,0.2),transparent_28%),linear-gradient(160deg,#17386c_0%,#10284f_54%,#07162e_100%)]" />
           <Link className="relative inline-flex items-center gap-2 text-sm font-medium text-white/76 transition hover:text-white" to={localizedSeriesPath("/", locale)}>
             <ArrowLeft className="size-4" aria-hidden="true" />
             Series AV
           </Link>
           <div className="relative max-w-md">
-            <img className="mb-10 h-auto w-64 brightness-0 invert" src={seriesBrandAssets.logo} alt="Series AV" />
+            <img className="mb-8 h-auto w-56 brightness-0 invert" src={seriesBrandAssets.logo} alt="Series AV" />
             <h1 className="text-4xl font-semibold leading-tight">{text.signIn.title}</h1>
             <p className="mt-5 text-base leading-7 text-white/70">
               {text.signIn.body}
             </p>
           </div>
-          <div className="relative overflow-hidden rounded-[1.5rem] border border-white/12 bg-[#fff0c7] p-5 pb-0 text-[#112a55] shadow-2xl shadow-black/22">
-            <div className="relative z-10 max-w-xs pb-28">
+          <div className="relative overflow-hidden rounded-lg border border-white/12 bg-[#fff0c7] p-5 pb-0 text-[#112a55] shadow-2xl shadow-black/22">
+            <div className="relative z-10 max-w-xs pb-24">
               <p className="text-sm font-semibold text-[#5a8f2f]">Avi</p>
               <p className="mt-2 font-serif text-3xl leading-tight">{text.signIn.aviPanelBody}</p>
             </div>
@@ -45,7 +45,7 @@ function SignInRoute() {
           </div>
         </section>
 
-        <section className="flex min-h-screen items-center justify-center px-5 py-10">
+        <section className="flex items-center justify-center px-5 py-10 sm:px-8">
           <div className="w-full max-w-md">
             <Link className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-[#334766] transition hover:text-[#112a55] lg:hidden" to={localizedSeriesPath("/", locale)}>
               <ArrowLeft className="size-4" aria-hidden="true" />
@@ -70,7 +70,7 @@ function SignInRoute() {
           </div>
         </section>
       </main>
-      <AvAppFooter labels={text.footer} product={productConfig} />
+      <AvAppFooter className="mx-auto mt-4 w-full max-w-6xl border-transparent bg-transparent px-0 pb-0 pt-2" labels={text.footer} product={productConfig} />
     </div>
   );
 }
