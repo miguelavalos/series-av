@@ -18,8 +18,7 @@ export const seriesProductConfig: AppsAvProductConfig = {
     privacy: externalLink(import.meta.env.VITE_SERIESAV_PRIVACY_URL, "Privacy"),
     suite: externalLink(import.meta.env.VITE_ACCOUNTAV_MANAGEMENT_URL, "Apps"),
     support: externalLink(supportUrl(), "Support"),
-    terms: externalLink(import.meta.env.VITE_SERIESAV_TERMS_URL, "Terms"),
-    website: externalLink("https://series-av.avalsys.com", "Series AV")
+    terms: externalLink(import.meta.env.VITE_SERIESAV_TERMS_URL, "Terms")
   }
 };
 
