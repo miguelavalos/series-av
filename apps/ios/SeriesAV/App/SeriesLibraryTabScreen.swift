@@ -458,12 +458,14 @@ struct SeriesLibraryTabScreen: View {
     }
 
     private var librarySubtitle: String {
-        let activeCount = store.activeEntries.count
-        let archivedCount = store.archivedEntries.count
-        if activeCount == 0 && archivedCount == 0 {
+        if store.activeEntries.isEmpty && store.archivedEntries.isEmpty {
             return L10n.string("library.empty.subtitle")
         }
-        return "\(filterTitle(selectedFilter)) · \(activeCount + archivedCount)"
+        return "\(filterTitle(selectedFilter)) · \(visibleLibraryCount)"
+    }
+
+    private var visibleLibraryCount: Int {
+        filteredActiveEntries.count + filteredArchivedEntries.count
     }
 
     private func filter(_ entries: [SeriesLibraryEntry]) -> [SeriesLibraryEntry] {

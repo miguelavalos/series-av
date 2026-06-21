@@ -245,6 +245,24 @@ final class SeriesAVSmokeUITests: XCTestCase {
     }
 
     @MainActor
+    func testSampleLibraryFilterCountMatchesVisibleRows() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "library"
+        ])
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Biblioteca"].waitForExistence(timeout: 10))
+        app.buttons["Por ver"].tap()
+
+        XCTAssertTrue(app.staticTexts["Por ver · 1"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Later List"].exists)
+        XCTAssertFalse(app.staticTexts["Current Series"].exists)
+        XCTAssertFalse(app.staticTexts["Slow Weekend Show"].exists)
+    }
+
+    @MainActor
     func testProgressEditorOpensForSampleCurrentSeries() throws {
         continueAfterFailure = false
         let app = makeApp(environment: [
