@@ -1,14 +1,12 @@
 import { AuthLoading, SignedIn, SignedOut } from "@avalsys/account-av-web";
-import { AuthSkeleton, ProtectedAppGate, useAppsAvLocale } from "@avalsys/apps-av-web";
+import { AuthSkeleton, useAppsAvLocale } from "@avalsys/apps-av-web";
+import { useEffect } from "react";
 import type { ReactNode } from "react";
-import { seriesBrandAssets } from "@/lib/series-config";
-import { localizedSeriesPath, useSeriesProductConfig, useSeriesText } from "@/lib/series-i18n";
+import { localizedSeriesPath } from "@/lib/series-i18n";
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
-  const text = useSeriesText();
   const locale = useAppsAvLocale();
-  const productConfig = useSeriesProductConfig();
-  const signInHref = localizedSeriesPath("/sign-in", locale);
+  const homeHref = localizedSeriesPath("/", locale);
 
   return (
     <>
@@ -17,19 +15,16 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
       </AuthLoading>
       <SignedIn>{children}</SignedIn>
       <SignedOut>
-        <ProtectedAppGate
-          body={text.protected.body}
-          cta={text.protected.cta}
-          footerLabels={text.footer}
-          logoAlt="Series AV"
-          logoSrc={seriesBrandAssets.logo}
-          mascotAlt="Avi"
-          mascotSrc={seriesBrandAssets.aviFullBody}
-          product={productConfig}
-          signInHref={signInHref}
-          title={text.protected.title}
-        />
+        <RedirectHome href={homeHref} />
       </SignedOut>
     </>
   );
+}
+
+function RedirectHome({ href }: { href: string }) {
+  useEffect(() => {
+    window.location.replace(href);
+  }, [href]);
+
+  return <AuthSkeleton />;
 }
