@@ -51,27 +51,27 @@ function AccountRoute() {
 }
 
 const syncLabels = {
-  ca: { detailDisabled: "La sincronització cloud s'activa amb Series AV Pro.", detailFailed: "Series AV no ha pogut actualitzar la biblioteca del teu compte. Torna-ho a provar quan tinguis connexió.", detailSynced: "Sèries, estat i progrés d'episodis estan al dia.", detailSyncing: "Series AV està actualitzant la biblioteca del teu compte.", headlineDisabled: "Sync no disponible", headlineFailed: "La sync necessita atenció", headlineSynced: "Biblioteca sincronitzada", headlineSyncing: "Sincronitzant biblioteca", retry: "Sincronitzar ara", retrySyncing: "Sincronitzant...", subtitle: "La teva biblioteca Pro segueix el teu compte d'Apps AV.", title: "Sincronització cloud" },
-  de: { detailDisabled: "Cloud-Sync wird mit Series AV Pro aktiviert.", detailFailed: "Series AV konnte deine Kontobibliothek nicht aktualisieren. Versuche es erneut, wenn du online bist.", detailSynced: "Serien, Status und Folgenfortschritt sind aktuell.", detailSyncing: "Series AV aktualisiert deine Kontobibliothek.", headlineDisabled: "Sync nicht verfügbar", headlineFailed: "Sync braucht Aufmerksamkeit", headlineSynced: "Bibliothek synchronisiert", headlineSyncing: "Bibliothek wird synchronisiert", retry: "Jetzt synchronisieren", retrySyncing: "Synchronisiert...", subtitle: "Deine Pro-Bibliothek folgt deinem Apps AV-Konto.", title: "Cloud-Sync" },
-  en: { detailDisabled: "Cloud sync turns on with Series AV Pro.", detailFailed: "Series AV could not update your account library. Try again when you are online.", detailSynced: "Series, status, and episode progress are up to date.", detailSyncing: "Series AV is updating your account library.", headlineDisabled: "Sync unavailable", headlineFailed: "Sync needs attention", headlineSynced: "Library synced", headlineSyncing: "Syncing library", retry: "Sync now", retrySyncing: "Syncing...", subtitle: "Your Pro library follows your Apps AV account.", title: "Cloud sync" },
-  es: { detailDisabled: "La sincronización cloud se activa con Series AV Pro.", detailFailed: "Series AV no ha podido actualizar la biblioteca de tu cuenta. Inténtalo de nuevo cuando tengas conexión.", detailSynced: "Series, estado y progreso de episodios están al día.", detailSyncing: "Series AV está actualizando la biblioteca de tu cuenta.", headlineDisabled: "Sync no disponible", headlineFailed: "La sync necesita atención", headlineSynced: "Biblioteca sincronizada", headlineSyncing: "Sincronizando biblioteca", retry: "Sincronizar ahora", retrySyncing: "Sincronizando...", subtitle: "Tu biblioteca Pro sigue tu cuenta de Apps AV.", title: "Sincronización cloud" },
-  fr: { detailDisabled: "La sync cloud s'active avec Series AV Pro.", detailFailed: "Series AV n'a pas pu mettre à jour la bibliothèque de votre compte. Réessayez quand vous êtes en ligne.", detailSynced: "Séries, état et progression des épisodes sont à jour.", detailSyncing: "Series AV met à jour la bibliothèque de votre compte.", headlineDisabled: "Sync indisponible", headlineFailed: "La sync demande votre attention", headlineSynced: "Bibliothèque synchronisée", headlineSyncing: "Synchronisation de la bibliothèque", retry: "Synchroniser maintenant", retrySyncing: "Synchronisation...", subtitle: "Votre bibliothèque Pro suit votre compte Apps AV.", title: "Sync cloud" }
+  ca: { detailDisabled: "Amb Series AV Pro, la teva biblioteca queda guardada al compte.", detailFailed: "Series AV no ha pogut actualitzar la teva biblioteca. Torna-ho a provar quan tinguis connexió.", detailSynced: "Sèries, estat i progrés d'episodis estan al dia.", detailSyncing: "Series AV està actualitzant la teva biblioteca.", headlineDisabled: "Disponible amb Pro", headlineFailed: "Revisa la connexió", headlineSynced: "Biblioteca al dia", headlineSyncing: "Actualitzant biblioteca", retry: "Actualitzar ara", retrySyncing: "Actualitzant...", subtitle: "El teu progrés Pro es conserva al compte.", title: "Biblioteca del compte" },
+  de: { detailDisabled: "Mit Series AV Pro bleibt deine Bibliothek in deinem Konto gesichert.", detailFailed: "Series AV konnte deine Bibliothek nicht aktualisieren. Versuche es erneut, wenn du online bist.", detailSynced: "Serien, Status und Folgenfortschritt sind aktuell.", detailSyncing: "Series AV aktualisiert deine Bibliothek.", headlineDisabled: "Mit Pro verfügbar", headlineFailed: "Verbindung prüfen", headlineSynced: "Bibliothek aktuell", headlineSyncing: "Bibliothek wird aktualisiert", retry: "Jetzt aktualisieren", retrySyncing: "Aktualisiert...", subtitle: "Dein Pro-Fortschritt bleibt in deinem Konto erhalten.", title: "Kontobibliothek" },
+  en: { detailDisabled: "With Series AV Pro, your library is saved to your account.", detailFailed: "Series AV could not update your library. Try again when you are online.", detailSynced: "Series, status, and episode progress are up to date.", detailSyncing: "Series AV is updating your library.", headlineDisabled: "Available with Pro", headlineFailed: "Check your connection", headlineSynced: "Library up to date", headlineSyncing: "Updating library", retry: "Update now", retrySyncing: "Updating...", subtitle: "Your Pro progress stays with your account.", title: "Account library" },
+  es: { detailDisabled: "Con Series AV Pro, tu biblioteca queda guardada en tu cuenta.", detailFailed: "Series AV no ha podido actualizar tu biblioteca. Inténtalo de nuevo cuando tengas conexión.", detailSynced: "Series, estado y progreso de episodios están al día.", detailSyncing: "Series AV está actualizando tu biblioteca.", headlineDisabled: "Disponible con Pro", headlineFailed: "Revisa la conexión", headlineSynced: "Biblioteca al día", headlineSyncing: "Actualizando biblioteca", retry: "Actualizar ahora", retrySyncing: "Actualizando...", subtitle: "Tu progreso Pro se conserva en tu cuenta.", title: "Biblioteca de la cuenta" },
+  fr: { detailDisabled: "Avec Series AV Pro, votre bibliothèque est enregistrée dans votre compte.", detailFailed: "Series AV n'a pas pu mettre à jour votre bibliothèque. Réessayez quand vous êtes en ligne.", detailSynced: "Séries, état et progression des épisodes sont à jour.", detailSyncing: "Series AV met à jour votre bibliothèque.", headlineDisabled: "Disponible avec Pro", headlineFailed: "Vérifiez la connexion", headlineSynced: "Bibliothèque à jour", headlineSyncing: "Bibliothèque en cours", retry: "Mettre à jour", retrySyncing: "Mise à jour...", subtitle: "Votre progression Pro reste liée à votre compte.", title: "Bibliothèque du compte" }
 } as const;
 
 const accountLabels = {
-  ca: { connected: "Connectat a Account AV.", emailTitle: "Correu electrònic", planFree: "Free", planLoading: "Actualitzant accés", planPro: "Pro", planTitle: "Accés", sessionTitle: "Sessió", signOut: "Tancar sessió", signedIn: "Sessió iniciada", title: "Compte" },
-  de: { connected: "Verbunden mit Account AV.", emailTitle: "E-Mail", planFree: "Free", planLoading: "Zugriff wird aktualisiert", planPro: "Pro", planTitle: "Zugriff", sessionTitle: "Sitzung", signOut: "Abmelden", signedIn: "Angemeldet", title: "Konto" },
-  en: { connected: "Connected to Account AV.", emailTitle: "Email", planFree: "Free", planLoading: "Updating access", planPro: "Pro", planTitle: "Plan", sessionTitle: "Session", signOut: "Sign out", signedIn: "Signed in", title: "Account" },
-  es: { connected: "Conectado a Account AV.", emailTitle: "Email", planFree: "Free", planLoading: "Actualizando acceso", planPro: "Pro", planTitle: "Plan", sessionTitle: "Sesión", signOut: "Cerrar sesión", signedIn: "Sesión iniciada", title: "Cuenta" },
-  fr: { connected: "Connecté à Account AV.", emailTitle: "E-mail", planFree: "Free", planLoading: "Mise à jour de l'accès", planPro: "Pro", planTitle: "Accès", sessionTitle: "Session", signOut: "Se déconnecter", signedIn: "Connecté", title: "Compte" }
+  ca: { connected: "Sessió iniciada.", emailTitle: "Correu electrònic", planFree: "Free", planLoading: "Actualitzant accés", planPro: "Pro", planTitle: "Accés", sessionTitle: "Sessió", signOut: "Tancar sessió", signedIn: "Sessió iniciada", title: "Compte" },
+  de: { connected: "Angemeldet.", emailTitle: "E-Mail", planFree: "Free", planLoading: "Zugriff wird aktualisiert", planPro: "Pro", planTitle: "Zugriff", sessionTitle: "Sitzung", signOut: "Abmelden", signedIn: "Angemeldet", title: "Konto" },
+  en: { connected: "Signed in.", emailTitle: "Email", planFree: "Free", planLoading: "Updating access", planPro: "Pro", planTitle: "Plan", sessionTitle: "Session", signOut: "Sign out", signedIn: "Signed in", title: "Account" },
+  es: { connected: "Sesión iniciada.", emailTitle: "Email", planFree: "Free", planLoading: "Actualizando acceso", planPro: "Pro", planTitle: "Plan", sessionTitle: "Sesión", signOut: "Cerrar sesión", signedIn: "Sesión iniciada", title: "Cuenta" },
+  fr: { connected: "Connecté.", emailTitle: "E-mail", planFree: "Free", planLoading: "Mise à jour de l'accès", planPro: "Pro", planTitle: "Accès", sessionTitle: "Session", signOut: "Se déconnecter", signedIn: "Connecté", title: "Compte" }
 } as const;
 
 const safetyLabels = {
-  ca: { deleteDetail: "Obre la pàgina compartida d'eliminació de compte.", deleteTitle: "Eliminar compte", subtitle: "Les accions de compte sensibles obren el flux compartit d'Account AV.", title: "Seguretat del compte" },
-  de: { deleteDetail: "Öffne die gemeinsame Seite zur Kontolöschung.", deleteTitle: "Konto löschen", subtitle: "Sensible Kontoaktionen öffnen den gemeinsamen Account AV-Ablauf.", title: "Kontosicherheit" },
-  en: { deleteDetail: "Open the shared account deletion page.", deleteTitle: "Delete account", subtitle: "Account-level actions open the shared Account AV flow.", title: "Account safety" },
-  es: { deleteDetail: "Abre la página compartida de eliminación de cuenta.", deleteTitle: "Eliminar cuenta", subtitle: "Las acciones de cuenta sensibles abren el flujo compartido de Account AV.", title: "Seguridad de cuenta" },
-  fr: { deleteDetail: "Ouvrir la page partagée de suppression du compte.", deleteTitle: "Supprimer le compte", subtitle: "Les actions sensibles ouvrent le flux Account AV partagé.", title: "Sécurité du compte" }
+  ca: { deleteDetail: "Obre la pàgina per eliminar el compte.", deleteTitle: "Eliminar compte", subtitle: "Gestiona les accions importants del compte amb calma.", title: "Seguretat del compte" },
+  de: { deleteDetail: "Öffnet die Seite zum Löschen deines Kontos.", deleteTitle: "Konto löschen", subtitle: "Verwalte wichtige Kontoaktionen in Ruhe.", title: "Kontosicherheit" },
+  en: { deleteDetail: "Open the page to delete your account.", deleteTitle: "Delete account", subtitle: "Manage important account actions carefully.", title: "Account safety" },
+  es: { deleteDetail: "Abre la página para eliminar tu cuenta.", deleteTitle: "Eliminar cuenta", subtitle: "Gestiona las acciones importantes de la cuenta con calma.", title: "Seguridad de cuenta" },
+  fr: { deleteDetail: "Ouvrir la page pour supprimer votre compte.", deleteTitle: "Supprimer le compte", subtitle: "Gérez les actions importantes du compte avec attention.", title: "Sécurité du compte" }
 } as const;
 
 interface ProfileLabels {
@@ -104,7 +104,7 @@ const profileLabels = {
       libraryTitle: "Biblioteca més gran",
       manage: "Gestionar subscripció",
       subtitleFree: "Millora per seguir més sèries actives i mantenir l'accés Pro vinculat al compte.",
-      subtitlePro: "El teu accés Pro està actiu. Gestiona la facturació a Account AV.",
+      subtitlePro: "El teu accés Pro està actiu. Pots gestionar la subscripció des d'aquí.",
       title: "Series AV Pro",
       upgrade: "Veure Pro"
     },
@@ -124,7 +124,7 @@ const profileLabels = {
       libraryTitle: "Größere Bibliothek",
       manage: "Abo verwalten",
       subtitleFree: "Upgrade, um mehr aktive Serien zu verfolgen und Pro-Zugriff mit deinem Konto zu verbinden.",
-      subtitlePro: "Dein Pro-Zugriff ist aktiv. Verwalte die Abrechnung in Account AV.",
+      subtitlePro: "Dein Pro-Zugriff ist aktiv. Du kannst dein Abo von hier aus verwalten.",
       title: "Series AV Pro",
       upgrade: "Pro ansehen"
     },
@@ -144,7 +144,7 @@ const profileLabels = {
       libraryTitle: "Larger library",
       manage: "Manage subscription",
       subtitleFree: "Upgrade to track more active series and keep Pro access linked to your account.",
-      subtitlePro: "Your Pro access is active. Manage billing in Account AV.",
+      subtitlePro: "Your Pro access is active. You can manage your subscription from here.",
       title: "Series AV Pro",
       upgrade: "View Pro"
     },
@@ -164,7 +164,7 @@ const profileLabels = {
       libraryTitle: "Biblioteca mayor",
       manage: "Gestionar suscripción",
       subtitleFree: "Mejora para seguir más series activas y mantener tu acceso Pro vinculado a la cuenta.",
-      subtitlePro: "Tu acceso Pro está activo. Gestiona la facturación en Account AV.",
+      subtitlePro: "Tu acceso Pro está activo. Puedes gestionar tu suscripción desde aquí.",
       title: "Series AV Pro",
       upgrade: "Ver Pro"
     },
@@ -184,7 +184,7 @@ const profileLabels = {
       libraryTitle: "Bibliothèque plus grande",
       manage: "Gérer l'abonnement",
       subtitleFree: "Passez à Pro pour suivre plus de séries actives et garder l'accès Pro lié au compte.",
-      subtitlePro: "Votre accès Pro est actif. Gérez la facturation dans Account AV.",
+      subtitlePro: "Votre accès Pro est actif. Vous pouvez gérer l'abonnement depuis ici.",
       title: "Series AV Pro",
       upgrade: "Voir Pro"
     },

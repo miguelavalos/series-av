@@ -209,16 +209,16 @@ const profileLabels = {
     },
     local: {
       delete: {
-        confirmDetail: "S'esborraran les sèries, estats i progrés guardats en aquest navegador. Això no esborra el teu compte Apps AV.",
+        confirmDetail: "S'esborraran les sèries, estats i progrés guardats en aquest navegador. El teu compte no s'elimina.",
         confirmTitle: "Esborrar dades locals",
         detail: (count: number) => `Esborra ${count} sèries d'aquest navegador.`,
         empty: "No hi ha dades locals per esborrar.",
         title: "Esborrar dades locals"
       },
-      libraryDetail: "Free guarda el seguiment en aquest navegador quan la sync cloud no està activa.",
+      libraryDetail: "Free guarda el seguiment només en aquest navegador.",
       libraryTitle: "Biblioteca local",
       subtitle: "El mode local es manté simple i privat.",
-      syncDetail: "El progrés local queda en aquest navegador fins que Account AV habilita sync.",
+      syncDetail: "Si canvies de dispositiu, inicia sessió amb Pro per conservar el progrés.",
       syncTitle: "Dades locals",
       title: "En aquest dispositiu"
     },
@@ -236,7 +236,7 @@ const profileLabels = {
       termsTitle: "Termes del servei",
       title: "Ajuda i legal"
     },
-    safety: { deleteDetail: "Obre la pàgina compartida d'eliminació de compte.", deleteTitle: "Eliminar compte" }
+    safety: { deleteDetail: "Obre la pàgina per eliminar el compte.", deleteTitle: "Eliminar compte" }
   },
   de: {
     settingsTitle: "Einstellungen",
@@ -268,16 +268,16 @@ const profileLabels = {
     },
     local: {
       delete: {
-        confirmDetail: "Serien, Status und Fortschritt in diesem Browser werden gelöscht. Dein Apps AV-Konto wird dadurch nicht gelöscht.",
+        confirmDetail: "Serien, Status und Fortschritt in diesem Browser werden gelöscht. Dein Konto wird dadurch nicht gelöscht.",
         confirmTitle: "Lokale Daten löschen",
         detail: (count: number) => `Löscht ${count} Serien von diesem Browser.`,
         empty: "Es gibt keine lokalen Daten zum Löschen.",
         title: "Lokale Daten löschen"
       },
-      libraryDetail: "Free speichert Tracking in diesem Browser, wenn Cloud-Sync nicht aktiv ist.",
+      libraryDetail: "Free speichert dein Tracking nur in diesem Browser.",
       libraryTitle: "Lokale Bibliothek",
       subtitle: "Der lokale Modus bleibt einfach und privat.",
-      syncDetail: "Lokaler Fortschritt bleibt in diesem Browser, bis Account AV Sync aktiviert.",
+      syncDetail: "Wenn du das Gerät wechselst, melde dich mit Pro an, damit dein Fortschritt erhalten bleibt.",
       syncTitle: "Lokale Daten",
       title: "Auf diesem Gerät"
     },
@@ -295,7 +295,7 @@ const profileLabels = {
       termsTitle: "Nutzungsbedingungen",
       title: "Hilfe und Rechtliches"
     },
-    safety: { deleteDetail: "Öffne die gemeinsame Seite zur Kontolöschung.", deleteTitle: "Konto löschen" }
+    safety: { deleteDetail: "Öffnet die Seite zum Löschen deines Kontos.", deleteTitle: "Konto löschen" }
   },
   en: {
     settingsTitle: "Settings",
@@ -327,16 +327,16 @@ const profileLabels = {
     },
     local: {
       delete: {
-        confirmDetail: "Series, status, and progress saved in this browser will be deleted. This does not delete your Apps AV account.",
+        confirmDetail: "Series, status, and progress saved in this browser will be deleted. This does not delete your account.",
         confirmTitle: "Delete local data",
         detail: (count: number) => `Deletes ${count} series from this browser.`,
         empty: "There is no local data to delete.",
         title: "Delete local data"
       },
-      libraryDetail: "Free keeps tracking in this browser when cloud sync is not active.",
+      libraryDetail: "Free keeps your tracking only in this browser.",
       libraryTitle: "Local library",
       subtitle: "Local mode stays simple and private.",
-      syncDetail: "Local progress stays in this browser until Account AV enables sync.",
+      syncDetail: "If you switch devices, sign in with Pro to keep your progress.",
       syncTitle: "Local data",
       title: "On this device"
     },
@@ -354,7 +354,7 @@ const profileLabels = {
       termsTitle: "Terms of service",
       title: "Help and legal"
     },
-    safety: { deleteDetail: "Open the shared account deletion page.", deleteTitle: "Delete account" }
+    safety: { deleteDetail: "Open the page to delete your account.", deleteTitle: "Delete account" }
   },
   es: {
     settingsTitle: "Ajustes",
@@ -386,16 +386,16 @@ const profileLabels = {
     },
     local: {
       delete: {
-        confirmDetail: "Se borrarán las series, estados y progreso guardados en este navegador. Esta acción no borra tu cuenta Apps AV.",
+        confirmDetail: "Se borrarán las series, estados y progreso guardados en este navegador. Esta acción no borra tu cuenta.",
         confirmTitle: "Borrar datos locales",
         detail: (count: number) => `Borra ${count} series de este navegador.`,
         empty: "No hay datos locales que borrar.",
         title: "Borrar datos locales"
       },
-      libraryDetail: "Free guarda el seguimiento en este navegador cuando la sync cloud no está activa.",
+      libraryDetail: "Free guarda tu seguimiento solo en este navegador.",
       libraryTitle: "Biblioteca local",
       subtitle: "El modo local se mantiene simple y privado.",
-      syncDetail: "El progreso local queda en este navegador hasta que Account AV habilita sync.",
+      syncDetail: "Si cambias de dispositivo, inicia sesión con Pro para conservar el progreso.",
       syncTitle: "Datos locales",
       title: "En este dispositivo"
     },
@@ -413,7 +413,7 @@ const profileLabels = {
       termsTitle: "Términos del servicio",
       title: "Ayuda y legal"
     },
-    safety: { deleteDetail: "Abre la página compartida de eliminación de cuenta.", deleteTitle: "Eliminar cuenta" }
+    safety: { deleteDetail: "Abre la página para eliminar tu cuenta.", deleteTitle: "Eliminar cuenta" }
   },
   fr: {
     settingsTitle: "Réglages",
@@ -445,16 +445,16 @@ const profileLabels = {
     },
     local: {
       delete: {
-        confirmDetail: "Les séries, états et progressions enregistrés dans ce navigateur seront supprimés. Cela ne supprime pas votre compte Apps AV.",
+        confirmDetail: "Les séries, états et progressions enregistrés dans ce navigateur seront supprimés. Cela ne supprime pas votre compte.",
         confirmTitle: "Supprimer les données locales",
         detail: (count: number) => `Supprime ${count} séries de ce navigateur.`,
         empty: "Aucune donnée locale à supprimer.",
         title: "Supprimer les données locales"
       },
-      libraryDetail: "Free garde le suivi dans ce navigateur quand la sync cloud n'est pas active.",
+      libraryDetail: "Free garde votre suivi uniquement dans ce navigateur.",
       libraryTitle: "Bibliothèque locale",
       subtitle: "Le mode local reste simple et privé.",
-      syncDetail: "La progression locale reste dans ce navigateur jusqu'à ce qu'Account AV active la sync.",
+      syncDetail: "Si vous changez d'appareil, connectez-vous avec Pro pour conserver votre progression.",
       syncTitle: "Données locales",
       title: "Sur cet appareil"
     },
@@ -472,6 +472,6 @@ const profileLabels = {
       termsTitle: "Conditions d'utilisation",
       title: "Aide et légal"
     },
-    safety: { deleteDetail: "Ouvrir la page partagée de suppression du compte.", deleteTitle: "Supprimer le compte" }
+    safety: { deleteDetail: "Ouvrir la page pour supprimer votre compte.", deleteTitle: "Supprimer le compte" }
   }
 } as const;
