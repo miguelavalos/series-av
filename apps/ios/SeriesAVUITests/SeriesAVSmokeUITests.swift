@@ -280,6 +280,25 @@ final class SeriesAVSmokeUITests: XCTestCase {
     }
 
     @MainActor
+    func testProgressEditorExplainsReadySeriesMovesToWatching() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "home",
+            "SERIESAV_UI_TESTS_SHOW_PROGRESS_EDITOR": "1",
+            "SERIESAV_UI_TESTS_PROGRESS_EDITOR_ENTRY_ID": "sample-3"
+        ])
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Later List"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Último episodio visto"].exists)
+        XCTAssertTrue(app.staticTexts["S1 E1"].exists)
+        XCTAssertTrue(app.staticTexts["Al guardar pasará a Viendo ahora. El siguiente será S1 E2."].exists)
+        XCTAssertTrue(app.buttons["Marcar este episodio visto"].exists)
+        XCTAssertTrue(app.buttons["Cancelar"].exists)
+    }
+
+    @MainActor
     func testSampleHomeShowsReadyToStartBeforeSecondaryWatchingQueue() throws {
         continueAfterFailure = false
         let app = makeApp(environment: [

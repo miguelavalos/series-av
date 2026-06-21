@@ -104,6 +104,7 @@
 "home.editor.confirm" = "Fijar punto visto";
 "home.editor.confirmThrough" = "Fijar hasta %@";
 "home.editor.watchedThrough" = "Quedará visto hasta %@";
+"home.editor.startTransition" = "Al guardar pasará a Viendo ahora. El siguiente será %@.";
 "home.editor.startPrompt" = "Último episodio visto";
 "home.editor.confirmFirstPoint" = "Marcar este episodio visto";
 "home.editor.confirmStart" = "Empezar desde este punto";

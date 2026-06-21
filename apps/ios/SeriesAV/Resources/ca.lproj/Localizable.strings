@@ -104,6 +104,7 @@
 "home.editor.confirm" = "Fixar punt vist";
 "home.editor.confirmThrough" = "Fixar fins a %@";
 "home.editor.watchedThrough" = "Quedarà vist fins a %@";
+"home.editor.startTransition" = "En desar passarà a Veient ara. El següent serà %@.";
 "home.editor.startPrompt" = "Últim episodi vist";
 "home.editor.confirmFirstPoint" = "Marcar aquest episodi vist";
 "home.editor.confirmStart" = "Començar des d'aquest punt";

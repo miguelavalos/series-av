@@ -104,6 +104,7 @@
 "home.editor.confirm" = "Set watched point";
 "home.editor.confirmThrough" = "Set through %@";
 "home.editor.watchedThrough" = "Watched through %@";
+"home.editor.startTransition" = "Saving moves it to Watching now. Next up will be %@.";
 "home.editor.startPrompt" = "Last episode watched";
 "home.editor.confirmFirstPoint" = "Mark this episode watched";
 "home.editor.confirmStart" = "Start from this point";

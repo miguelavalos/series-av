@@ -104,6 +104,7 @@
 "home.editor.confirm" = "Gesehenen Punkt setzen";
 "home.editor.confirmThrough" = "Bis %@ setzen";
 "home.editor.watchedThrough" = "Gesehen bis %@";
+"home.editor.startTransition" = "Beim Speichern wechselt die Serie zu Wird gerade gesehen. Als Nächstes kommt %@.";
 "home.editor.startPrompt" = "Zuletzt gesehene Folge";
 "home.editor.confirmFirstPoint" = "Diese Folge als gesehen markieren";
 "home.editor.confirmStart" = "Ab diesem Punkt starten";

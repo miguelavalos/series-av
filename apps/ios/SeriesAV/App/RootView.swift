@@ -384,7 +384,12 @@ private struct SeriesWatchingHomeScreen: View {
         }
         .onAppear {
             if SeriesUITestEnvironment.current.shouldShowProgressEditor, editorEntry == nil {
-                editorEntry = homeState.currentEntry ?? store.activeEntries.first
+                if let requestedEntryId = SeriesUITestEnvironment.current.progressEditorEntryId,
+                   let requestedEntry = store.entries.first(where: { $0.id == requestedEntryId }) {
+                    editorEntry = requestedEntry
+                } else {
+                    editorEntry = homeState.currentEntry ?? store.activeEntries.first
+                }
             }
         }
         .task(id: missingArtworkSignature) {
@@ -1501,7 +1506,7 @@ struct SeriesProgressEditorSheet: View {
                             .lineLimit(2)
                             .fixedSize(horizontal: false, vertical: true)
 
-                        Text(String(format: L10n.string("home.current.nextEpisode"), cursorLabel(selectedCursor.nextEpisode)))
+                        Text(nextEpisodeSummaryText)
                             .font(.system(size: 13, weight: .bold))
                             .foregroundStyle(AVBrandColor.accent)
                             .lineLimit(2)
@@ -1617,6 +1622,13 @@ struct SeriesProgressEditorSheet: View {
         SeriesEpisodeCursor(seasonNumber: selectedSeasonNumber, episodeNumber: selectedEpisodeNumber)
     }
 
+    private var nextEpisodeSummaryText: String {
+        if entry.lastWatchedEpisodeCursor == nil {
+            return String(format: L10n.string("home.editor.startTransition"), cursorLabel(selectedCursor.nextEpisode))
+        }
+        return String(format: L10n.string("home.current.nextEpisode"), cursorLabel(selectedCursor.nextEpisode))
+    }
+
     private var seasonNumbers: [Int] {
         if let guide = loadedGuide {
             return guide.seasonNumbers
@@ -1670,7 +1682,7 @@ struct SeriesProgressEditorSheet: View {
 
     private var confirmActionTitle: String {
         entry.lastWatchedEpisodeCursor == nil
-            ? L10n.string("home.editor.confirmStart")
+            ? L10n.string("home.editor.confirmFirstPoint")
             : String(format: L10n.string("home.editor.confirmThrough"), selectedCursorLabel)
     }
 

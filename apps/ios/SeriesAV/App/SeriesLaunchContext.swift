@@ -67,6 +67,13 @@ struct SeriesUITestEnvironment {
         isEnabled && environment["SERIESAV_UI_TESTS_SHOW_PROGRESS_EDITOR"] == "1"
     }
 
+    var progressEditorEntryId: String? {
+        guard isEnabled else {
+            return nil
+        }
+        return environment["SERIESAV_UI_TESTS_PROGRESS_EDITOR_ENTRY_ID"]
+    }
+
     var initialChromeItem: AVAppShellChromeItem? {
         guard isEnabled else { return nil }
         switch environment["SERIESAV_UI_TESTS_INITIAL_CHROME"] {

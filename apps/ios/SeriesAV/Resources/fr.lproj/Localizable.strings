@@ -104,6 +104,7 @@
 "home.editor.confirm" = "Définir le point vu";
 "home.editor.confirmThrough" = "Définir jusqu'à %@";
 "home.editor.watchedThrough" = "Vu jusqu'à %@";
+"home.editor.startTransition" = "En enregistrant, la série passe dans En cours. Le suivant sera %@.";
 "home.editor.startPrompt" = "Dernier épisode vu";
 "home.editor.confirmFirstPoint" = "Marquer cet épisode comme vu";
 "home.editor.confirmStart" = "Démarrer depuis ce point";
