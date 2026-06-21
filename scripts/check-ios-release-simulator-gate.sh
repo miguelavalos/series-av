@@ -97,6 +97,7 @@ xcodebuild build \
   -configuration Release \
   -destination "platform=iOS Simulator,id=$device_id" \
   -derivedDataPath "$DERIVED_DATA_PATH" \
+  ONLY_ACTIVE_ARCH=YES \
   CODE_SIGNING_ALLOWED=NO
 
 app_path="$DERIVED_DATA_PATH/Build/Products/Release-iphonesimulator/SeriesAV.app"

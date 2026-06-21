@@ -104,30 +104,21 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.textFields["Buscar por título"].exists)
         XCTAssertTrue(app.staticTexts["The Last of Us"].waitForExistence(timeout: 10))
 
-        let firstInfoButton = app.buttons["Ver info"].firstMatch
-        XCTAssertTrue(firstInfoButton.waitForExistence(timeout: 5))
-        firstInfoButton.tap()
+        let firstResultButton = app.buttons["The Last of Us"].firstMatch
+        XCTAssertTrue(firstResultButton.waitForExistence(timeout: 5))
+        firstResultButton.tap()
         XCTAssertTrue(app.staticTexts["Info de serie"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Seguimiento"].exists)
         XCTAssertTrue(app.staticTexts["Episodios"].exists)
         app.buttons["Cerrar"].tap()
 
-        let firstFollowButton = app.buttons.matching(identifier: "plus").firstMatch
+        let firstFollowButton = app.buttons["Seguir serie"].firstMatch
         XCTAssertTrue(firstFollowButton.waitForExistence(timeout: 5))
         firstFollowButton.tap()
 
         XCTAssertTrue(app.staticTexts["\"The Last of Us\" seguida"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Último episodio visto"].waitForExistence(timeout: 5))
-        XCTAssertTrue(
-            app.staticTexts["Elige el último episodio visto. Los anteriores quedan vistos y los posteriores pendientes."]
-                .waitForExistence(timeout: 10)
-        )
-        XCTAssertTrue(app.buttons["Episodio 1"].exists)
-        XCTAssertTrue(app.buttons["Episodio 2"].exists)
+        XCTAssertFalse(app.staticTexts["Último episodio visto"].exists)
         XCTAssertFalse(app.staticTexts["Añadir serie"].exists)
-
-        app.buttons["Cancelar"].tap()
-        XCTAssertTrue(app.buttons["Ajustar episodio"].waitForExistence(timeout: 5))
 
         app.buttons["Biblioteca"].tap()
         XCTAssertTrue(app.staticTexts["Todo · 1"].waitForExistence(timeout: 5))
@@ -135,8 +126,9 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Por ver · Empezar por S1 E1"].exists)
 
         app.buttons["Inicio"].tap()
-        XCTAssertTrue(app.staticTexts["Lista para empezar"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Siguiente S1 E1"].exists)
+        XCTAssertTrue(app.staticTexts["Listas para empezar"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Empezar por S1 E1"].exists)
+        XCTAssertTrue(app.buttons["Empezar"].exists)
         XCTAssertEqual(app.staticTexts.matching(NSPredicate(format: "label == %@", "The Last of Us")).count, 1)
         XCTAssertFalse(app.staticTexts["Sigue tu primera serie"].exists)
     }
