@@ -337,7 +337,7 @@ struct SeriesDetailScreen: View {
                             .controlSize(.large)
                         }
 
-                        if let delete {
+                        if delete != nil {
                             Button(role: .destructive) {
                                 isConfirmingDelete = true
                             } label: {
