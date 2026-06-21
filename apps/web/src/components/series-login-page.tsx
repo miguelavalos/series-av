@@ -1,9 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, BookOpenCheck, ListChecks, Search, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpenCheck, Search, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import { AvAppFooter, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { seriesBrandAssets } from "@/lib/series-config";
 import { localizedSeriesPath, useSeriesProductConfig, useSeriesText } from "@/lib/series-i18n";
 
@@ -11,18 +10,6 @@ export function SeriesLoginPage({ comingSoon = false }: { comingSoon?: boolean }
   const locale = useAppsAvLocale();
   const text = useSeriesText();
   const productConfig = useSeriesProductConfig();
-  const guestHomeScenes = [
-    {
-      alt: "",
-      className: "series-guest-scene-card series-guest-scene-card--left",
-      src: seriesBrandAssets.guestHomePlanning
-    },
-    {
-      alt: "",
-      className: "series-guest-scene-card series-guest-scene-card--right",
-      src: seriesBrandAssets.guestHomeAvi
-    }
-  ];
 
   return (
     <div className="series-paper min-h-screen overflow-hidden px-4 pt-4 sm:px-6">
@@ -69,19 +56,8 @@ export function SeriesLoginPage({ comingSoon = false }: { comingSoon?: boolean }
         </section>
 
         <div className="series-guest-gallery" aria-hidden="true">
-          {guestHomeScenes.map((scene) => (
-            <img key={scene.src} className={scene.className} src={scene.src} alt={scene.alt} />
-          ))}
-          <Card className="series-guest-note max-w-sm gap-2 rounded-2xl border-[#d4bf88] bg-[#fff8df]/90 p-5 py-5 text-[#112a55] shadow-xl shadow-[#112a55]/14 backdrop-blur-md">
-            <p className="flex items-center gap-2 text-sm font-semibold">
-              <ListChecks className="size-4 text-[#6DBE45]" aria-hidden="true" />
-              {text.login.cardTitle}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-[#47566f]">
-              {text.login.cardBody}
-            </p>
-          </Card>
-          <div className="series-guest-caption max-w-sm rounded-2xl border border-[#d7c494]/82 bg-[#fff8df]/86 p-5 text-[#112a55] shadow-xl shadow-[#112a55]/12 backdrop-blur-md">
+          <img className="series-guest-gallery-image" src={seriesBrandAssets.guestHomePlanning} alt="" />
+          <div className="series-guest-caption">
             <p className="font-serif text-3xl leading-tight">{text.login.mapTitle}</p>
             <p className="mt-4 text-sm leading-6 text-[#3d4e68]">{text.login.mapBody}</p>
           </div>

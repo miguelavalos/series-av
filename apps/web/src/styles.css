@@ -166,50 +166,28 @@ body {
   position: absolute;
   inset: 1.5rem 1.5rem 1.5rem auto;
   width: min(38%, 28rem);
-}
-
-.series-guest-gallery::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 64% 28%, rgb(255 248 223 / 32%), transparent 17rem),
-    linear-gradient(180deg, rgb(16 40 79 / 10%), rgb(16 40 79 / 42%));
-  pointer-events: none;
-}
-
-.series-guest-scene-card {
-  position: absolute;
-  width: min(24vw, 18rem);
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
   border: 1px solid rgb(255 248 223 / 54%);
-  border-radius: 1.15rem;
+  border-radius: 1.35rem;
+  overflow: hidden;
+  background: #10284f;
   box-shadow: 0 24px 60px rgb(17 42 85 / 28%);
 }
 
-.series-guest-scene-card--left {
-  top: 1.25rem;
-  right: 1rem;
-  transform: rotate(-2.5deg);
-}
-
-.series-guest-scene-card--right {
-  right: 6rem;
-  bottom: 6.5rem;
-  transform: rotate(2deg);
-}
-
-.series-guest-note {
-  position: absolute;
-  right: 0;
-  bottom: 0;
+.series-guest-gallery-image {
+  display: block;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
 }
 
 .series-guest-caption {
   position: absolute;
   left: 0;
-  top: 45%;
+  right: 0;
+  bottom: 0;
+  padding: 4rem 1.25rem 1.25rem;
+  color: #112a55;
+  background: linear-gradient(180deg, rgb(255 248 223 / 0%) 0%, rgb(255 248 223 / 92%) 34%, rgb(255 248 223 / 96%) 100%);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -348,10 +326,6 @@ input {
     min-height: 19rem;
     width: min(55%, 25rem);
   }
-
-  .series-guest-scene-card {
-    width: min(35vw, 15rem);
-  }
 }
 
 @media (max-width: 639px) {
@@ -377,35 +351,12 @@ input {
     display: block;
     position: relative;
     inset: auto;
-    min-height: 32rem;
+    min-height: 18rem;
     width: 100%;
-    padding: 1rem;
-  }
-
-  .series-guest-scene-card {
-    width: min(76vw, 22rem);
-    border-radius: 0.95rem;
-  }
-
-  .series-guest-scene-card--left {
-    top: 1rem;
-    left: 1rem;
-  }
-
-  .series-guest-scene-card--right {
-    right: 1rem;
-    bottom: 1rem;
-  }
-
-  .series-guest-note {
-    right: 1rem;
-    bottom: 1rem;
-    max-width: calc(100% - 2rem);
+    margin-top: 1rem;
   }
 
   .series-guest-caption {
-    left: 1rem;
-    right: 1rem;
-    top: 45%;
+    padding: 3.5rem 1rem 1rem;
   }
 }
