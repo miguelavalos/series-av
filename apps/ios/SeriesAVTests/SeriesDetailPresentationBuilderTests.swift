@@ -111,8 +111,14 @@ final class SeriesDetailPresentationBuilderTests: XCTestCase {
         XCTAssertEqual(SeriesDetailPresentationBuilder.detailStatusIcon(.wantToWatch), "bookmark.fill")
         XCTAssertEqual(SeriesDetailPresentationBuilder.detailStatusIcon(.watching), "play.circle.fill")
         XCTAssertEqual(SeriesDetailPresentationBuilder.detailStatusIcon(.watched), "checkmark.circle.fill")
-        XCTAssertEqual(SeriesDetailPresentationBuilder.nextActionTitle(for: wantToWatch), L10n.string("home.start"))
-        XCTAssertEqual(SeriesDetailPresentationBuilder.nextActionTitle(for: watching), L10n.string("shell.watch.next"))
+        XCTAssertEqual(
+            SeriesDetailPresentationBuilder.nextActionTitle(for: wantToWatch),
+            String(format: L10n.string("home.action.markEpisodeWatched"), "S1 E1")
+        )
+        XCTAssertEqual(
+            SeriesDetailPresentationBuilder.nextActionTitle(for: watching),
+            String(format: L10n.string("home.action.markEpisodeWatched"), "S2 E4")
+        )
         XCTAssertTrue(SeriesDetailPresentationBuilder.trackingDetail(for: watching).contains("S2 E3"))
         XCTAssertTrue(SeriesDetailPresentationBuilder.trackingDetail(for: watching).contains("S2 E4"))
     }
