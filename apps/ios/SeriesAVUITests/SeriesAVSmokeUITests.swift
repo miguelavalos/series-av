@@ -262,6 +262,33 @@ final class SeriesAVSmokeUITests: XCTestCase {
     }
 
     @MainActor
+    func testSampleHomeShowsReadyToStartBelowWatchingQueue() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "home"
+        ])
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Current Series"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Viendo ahora"].exists)
+        XCTAssertTrue(app.staticTexts["Siguiente S1 E3"].exists)
+
+        if !app.staticTexts["Listas para empezar"].waitForExistence(timeout: 2) {
+            app.swipeUp()
+        }
+
+        XCTAssertTrue(app.staticTexts["También viendo"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Slow Weekend Show"].exists)
+        XCTAssertTrue(app.staticTexts["S2 E7 visto, S2 E8 siguiente"].exists)
+        XCTAssertTrue(app.staticTexts["Listas para empezar"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Later List"].exists)
+        XCTAssertTrue(app.staticTexts["Empezar por S1 E1"].exists)
+        XCTAssertTrue(app.buttons["Empezar"].exists)
+        XCTAssertFalse(app.staticTexts["Sigue tu primera serie"].exists)
+    }
+
+    @MainActor
     func testLocalizedHomeSearchAndLibraryRenderWithLargeDynamicType() throws {
         continueAfterFailure = false
 
