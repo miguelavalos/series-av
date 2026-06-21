@@ -318,15 +318,24 @@ input {
   }
 
   .series-guest-title {
-    max-width: 12ch;
-    font-size: clamp(2.35rem, 11vw, 3.4rem);
+    max-width: 9ch;
+    font-size: clamp(2.25rem, 10vw, 3rem);
     overflow-wrap: anywhere;
   }
 
-  .series-guest-body,
   .series-guest-copy p,
   .series-guest-copy span {
     max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .series-guest-copy > div:first-child p {
+    max-width: 18ch;
+  }
+
+  .series-guest-body {
+    width: 14ch !important;
+    max-width: 14ch !important;
     overflow-wrap: anywhere;
   }
 

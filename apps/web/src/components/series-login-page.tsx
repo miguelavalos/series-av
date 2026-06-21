@@ -43,7 +43,7 @@ export function SeriesLoginPage() {
               <h1 className="series-guest-title max-w-full text-[2.35rem] font-semibold leading-[1.03] text-[#112a55] sm:text-5xl xl:text-6xl">
                 {text.login.heroTitle}
               </h1>
-              <p className="series-guest-body mt-6 max-w-lg text-base leading-7 text-[#334766]">
+              <p className="series-guest-body mt-6 text-base leading-7 text-[#334766]">
                 {text.login.heroBody}
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
