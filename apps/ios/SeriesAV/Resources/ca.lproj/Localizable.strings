@@ -45,7 +45,9 @@
 "home.pin" = "Fixar a dalt";
 "home.unpin" = "Treure fixat";
 "home.archive" = "Arxivar";
+"home.archiveSeries" = "Arxivar sèrie";
 "home.delete" = "Eliminar";
+"home.deleteSeries" = "Eliminar sèrie";
 "home.undo" = "Desfer";
 "home.undo.added" = "\"%@\" seguida";
 "home.undo.archived" = "\"%@\" arxivada a Biblioteca > Arxiu";
@@ -124,6 +126,7 @@
 "library.archived.title" = "Arxivades";
 "library.archived.detail" = "Arxivada";
 "library.restore" = "Restaurar";
+"library.restoreSeries" = "Restaurar sèrie";
 "library.empty.title" = "Encara no hi ha sèries";
 "library.empty.subtitle" = "Segueix una sèrie des de Cerca i apareixerà aquí.";
 "library.search.placeholder" = "Buscar a la biblioteca";

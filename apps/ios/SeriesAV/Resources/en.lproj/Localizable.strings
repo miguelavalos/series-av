@@ -45,7 +45,9 @@
 "home.pin" = "Pin to top";
 "home.unpin" = "Unpin";
 "home.archive" = "Archive";
+"home.archiveSeries" = "Archive series";
 "home.delete" = "Delete";
+"home.deleteSeries" = "Delete series";
 "home.undo" = "Undo";
 "home.undo.added" = "\"%@\" followed";
 "home.undo.archived" = "\"%@\" archived in Library > Archive";
@@ -124,6 +126,7 @@
 "library.archived.title" = "Archived";
 "library.archived.detail" = "Archived";
 "library.restore" = "Restore";
+"library.restoreSeries" = "Restore series";
 "library.empty.title" = "No series yet";
 "library.empty.subtitle" = "Follow a series from Search and it will appear here.";
 "library.search.placeholder" = "Search your library";

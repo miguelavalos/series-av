@@ -45,7 +45,9 @@
 "home.pin" = "Épingler en haut";
 "home.unpin" = "Retirer l'épinglage";
 "home.archive" = "Archiver";
+"home.archiveSeries" = "Archiver la série";
 "home.delete" = "Supprimer";
+"home.deleteSeries" = "Supprimer la série";
 "home.undo" = "Annuler";
 "home.undo.added" = "\"%@\" suivie";
 "home.undo.archived" = "\"%@\" archivée dans Bibliothèque > Archive";
@@ -124,6 +126,7 @@
 "library.archived.title" = "Archivées";
 "library.archived.detail" = "Archivée";
 "library.restore" = "Restaurer";
+"library.restoreSeries" = "Restaurer la série";
 "library.empty.title" = "Aucune série pour l'instant";
 "library.empty.subtitle" = "Suivez une série depuis Recherche et elle apparaîtra ici.";
 "library.search.placeholder" = "Rechercher dans la bibliothèque";
