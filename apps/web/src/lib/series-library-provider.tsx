@@ -34,6 +34,7 @@ type SyncState = "disabled" | "idle" | "syncing" | "failed";
 
 interface SeriesLibraryContextValue {
   access: AccountAvAppAccess | null | undefined;
+  accessIsLoading: boolean;
   addCatalogSeries: (input: SeriesCatalogLibraryInput) => SeriesLibraryEntry | null;
   archive: (entryId: string) => void;
   canAddSeries: boolean;
@@ -69,6 +70,7 @@ export function SeriesLibraryProvider({ children }: { children: ReactNode }) {
   const getToken = useAccountToken();
   const accountUser = useAccountUser();
   const access = useAccountAppAccess("seriesav");
+  const refetchAccess = access.refetch;
   const [entries, setEntries] = useState<SeriesLibraryEntry[]>([]);
   const [syncState, setSyncState] = useState<SyncState>("disabled");
   const [syncError, setSyncError] = useState<string | null>(null);
@@ -107,7 +109,7 @@ export function SeriesLibraryProvider({ children }: { children: ReactNode }) {
   }, [entries, userStorageKey]);
 
   const refreshSync = useCallback(async () => {
-    if (!session.isLoaded || !session.isSignedIn || !access.data?.capabilities.canUseCloudSync) {
+    if (!session.isLoaded || !session.isSignedIn) {
       setSyncState("disabled");
       setIsInitialSyncComplete(false);
       etagRef.current = null;
@@ -117,6 +119,14 @@ export function SeriesLibraryProvider({ children }: { children: ReactNode }) {
     setSyncState("syncing");
     setSyncError(null);
     try {
+      const refreshedAccess = await refetchAccess();
+      const canUseCloudSync = refreshedAccess.data?.capabilities.canUseCloudSync === true;
+      if (!canUseCloudSync) {
+        setSyncState("disabled");
+        setIsInitialSyncComplete(false);
+        etagRef.current = null;
+        return;
+      }
       const token = await getTokenRef.current();
       if (!token) {
         throw new Error("Missing Account AV session token.");
@@ -157,7 +167,7 @@ export function SeriesLibraryProvider({ children }: { children: ReactNode }) {
       setSyncError(error instanceof Error ? error.message : "Series library sync failed.");
       setSyncState("failed");
     }
-  }, [access.data?.capabilities.canUseCloudSync, client, deviceId, session.isLoaded, session.isSignedIn]);
+  }, [client, deviceId, refetchAccess, session.isLoaded, session.isSignedIn]);
 
   useEffect(() => {
     void refreshSync();
@@ -196,6 +206,7 @@ export function SeriesLibraryProvider({ children }: { children: ReactNode }) {
   const value = useMemo<SeriesLibraryContextValue>(
     () => ({
       access: access.data,
+      accessIsLoading: access.isLoading || access.isFetching,
       addCatalogSeries(input) {
         const entry = createLibraryEntry(input);
         if (!entry || !limit.canAddSeries) {

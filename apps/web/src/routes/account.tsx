@@ -19,6 +19,7 @@ function AccountRoute() {
   const labels = profileLabels[locale];
   const plan = library.access?.planTier ?? "free";
   const isPro = plan === "pro";
+  const planDetail = library.accessIsLoading ? labels.account.planLoading : isPro ? labels.account.planPro : labels.account.planFree;
   const canUseCloudSync = library.access?.capabilities.canUseCloudSync === true;
   const email = account.data?.email ?? null;
   const displayName = account.data?.displayName ?? email ?? labels.account.signedIn;
@@ -30,7 +31,7 @@ function AccountRoute() {
           <SettingsSectionCard title={labels.account.title} subtitle={email ?? labels.account.connected}>
             <SettingsInfoRow icon={<UserCircle className="size-5" />} title={labels.account.sessionTitle} detail={displayName} />
             {email ? <SettingsInfoRow icon={<Mail className="size-5" />} title={labels.account.emailTitle} detail={email} /> : null}
-            <SettingsInfoRow icon={<Sparkles className="size-5" />} title={labels.account.planTitle} detail={isPro ? labels.account.planPro : labels.account.planFree} />
+            <SettingsInfoRow icon={<Sparkles className="size-5" />} title={labels.account.planTitle} detail={planDetail} />
             <AccountSignOutButton>
               <SettingsButton>{labels.account.signOut}</SettingsButton>
             </AccountSignOutButton>
@@ -58,11 +59,11 @@ const syncLabels = {
 } as const;
 
 const accountLabels = {
-  ca: { connected: "Connectat a Account AV.", emailTitle: "Correu electrònic", planFree: "Free", planPro: "Pro", planTitle: "Accés", sessionTitle: "Sessió", signOut: "Tancar sessió", signedIn: "Sessió iniciada", title: "Compte" },
-  de: { connected: "Verbunden mit Account AV.", emailTitle: "E-Mail", planFree: "Free", planPro: "Pro", planTitle: "Zugriff", sessionTitle: "Sitzung", signOut: "Abmelden", signedIn: "Angemeldet", title: "Konto" },
-  en: { connected: "Connected to Account AV.", emailTitle: "Email", planFree: "Free", planPro: "Pro", planTitle: "Plan", sessionTitle: "Session", signOut: "Sign out", signedIn: "Signed in", title: "Account" },
-  es: { connected: "Conectado a Account AV.", emailTitle: "Email", planFree: "Free", planPro: "Pro", planTitle: "Plan", sessionTitle: "Sesión", signOut: "Cerrar sesión", signedIn: "Sesión iniciada", title: "Cuenta" },
-  fr: { connected: "Connecté à Account AV.", emailTitle: "E-mail", planFree: "Free", planPro: "Pro", planTitle: "Accès", sessionTitle: "Session", signOut: "Se déconnecter", signedIn: "Connecté", title: "Compte" }
+  ca: { connected: "Connectat a Account AV.", emailTitle: "Correu electrònic", planFree: "Free", planLoading: "Actualitzant accés", planPro: "Pro", planTitle: "Accés", sessionTitle: "Sessió", signOut: "Tancar sessió", signedIn: "Sessió iniciada", title: "Compte" },
+  de: { connected: "Verbunden mit Account AV.", emailTitle: "E-Mail", planFree: "Free", planLoading: "Zugriff wird aktualisiert", planPro: "Pro", planTitle: "Zugriff", sessionTitle: "Sitzung", signOut: "Abmelden", signedIn: "Angemeldet", title: "Konto" },
+  en: { connected: "Connected to Account AV.", emailTitle: "Email", planFree: "Free", planLoading: "Updating access", planPro: "Pro", planTitle: "Plan", sessionTitle: "Session", signOut: "Sign out", signedIn: "Signed in", title: "Account" },
+  es: { connected: "Conectado a Account AV.", emailTitle: "Email", planFree: "Free", planLoading: "Actualizando acceso", planPro: "Pro", planTitle: "Plan", sessionTitle: "Sesión", signOut: "Cerrar sesión", signedIn: "Sesión iniciada", title: "Cuenta" },
+  fr: { connected: "Connecté à Account AV.", emailTitle: "E-mail", planFree: "Free", planLoading: "Mise à jour de l'accès", planPro: "Pro", planTitle: "Accès", sessionTitle: "Session", signOut: "Se déconnecter", signedIn: "Connecté", title: "Compte" }
 } as const;
 
 const safetyLabels = {
