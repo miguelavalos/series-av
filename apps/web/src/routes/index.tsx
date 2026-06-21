@@ -75,11 +75,11 @@ function HomeContent() {
       <section className="relative isolate overflow-hidden rounded-[1.5rem] border border-[#d7c494] bg-[#fff8df] shadow-xl shadow-[#172f5c]/10">
         <img className="absolute inset-y-0 right-0 z-[-2] hidden h-full w-[48%] object-cover object-center opacity-95 lg:block" src={seriesBrandAssets.guestHomeShelf} alt="" />
         <div className="absolute inset-0 z-[-1] bg-[linear-gradient(90deg,#fff8df_0%,rgba(255,248,223,0.96)_45%,rgba(255,248,223,0.42)_100%)]" />
-        <div className="grid min-h-[31rem] gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
+        <div className="grid min-h-[26rem] gap-6 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_17rem] lg:items-end">
           <div className="flex max-w-3xl flex-col justify-between gap-8 self-stretch">
             <div>
               <img className="h-auto w-48 max-w-full" src={seriesBrandAssets.logo} alt="Series AV" />
-              <h1 className="mt-8 max-w-2xl text-5xl font-semibold leading-tight text-[#112a55] sm:text-6xl">{current && !shouldShowCurrentSkeleton ? labels.continueWatching : text.home.title}</h1>
+              <h1 className="mt-7 max-w-2xl text-4xl font-semibold leading-tight text-[#112a55] sm:text-5xl">{current && !shouldShowCurrentSkeleton ? labels.continueWatching : text.home.title}</h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-[#334766]">{current && currentTitle && !shouldShowCurrentSkeleton ? labels.ready(currentTitle, cursorLabel(next ?? { episodeNumber: 1, seasonNumber: 1 })) : text.home.body}</p>
               <div className="mt-7 flex flex-wrap gap-3">
                 <Button asChild className="h-11 rounded-full bg-[#112a55] px-5 text-white hover:bg-[#19396f]">
@@ -89,7 +89,7 @@ function HomeContent() {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="h-11 rounded-full border-[#c8ad72] bg-white/62 px-5">
-                  <Link to={localizedSeriesPath("/avi", locale)}>{text.nav.avi}</Link>
+                  <Link to={localizedSeriesPath("/library", locale)}>{text.nav.library}</Link>
                 </Button>
               </div>
             </div>
@@ -121,20 +121,6 @@ function HomeContent() {
               </div>
             </div>
           ) : <div className="self-end rounded-[1.25rem] border border-[#d7c494] bg-white/76 p-5 shadow-lg shadow-[#172f5c]/10 backdrop-blur"><AppSurfaceState icon={<Search className="size-10" aria-hidden="true" />} title={text.library.emptyTitle} description={text.library.emptyBody} /></div>}
-        </div>
-      </section>
-
-      <section className="grid gap-5 lg:grid-cols-[0.92fr_1.08fr]">
-        <div className="series-paper rounded-[1.25rem] border border-[#d7c494] p-6 shadow-lg shadow-[#172f5c]/8 sm:p-8">
-          <p className="max-w-xl text-sm leading-6 text-[#334766]">{current && currentTitle && !shouldShowCurrentSkeleton ? labels.avi(currentTitle) : text.home.aviBody[0]}</p>
-          <h2 className="mt-6 max-w-lg text-3xl font-semibold leading-tight text-[#112a55] sm:text-4xl">{text.home.aviTitle}</h2>
-        </div>
-        <div className="relative min-h-80 overflow-hidden rounded-[1.25rem] border border-[#d7c494] bg-[#10284f] shadow-lg shadow-[#172f5c]/12">
-          <img className="h-full min-h-80 w-full object-cover" src={seriesBrandAssets.guestHomeAvi} alt="" />
-          <div className="absolute bottom-5 left-5 max-w-sm rounded-[1rem] border border-[#d7c494]/80 bg-[#fff8df]/90 p-5 shadow-xl shadow-[#172f5c]/18 backdrop-blur">
-            <p className="font-serif text-2xl leading-tight text-[#112a55]">{text.login.mapTitle}</p>
-            <p className="mt-3 text-sm leading-6 text-[#53617a]">{text.login.mapBody}</p>
-          </div>
         </div>
       </section>
 
