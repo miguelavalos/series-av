@@ -801,7 +801,7 @@ private struct SeriesDetailEpisodeRow: View {
         HStack(alignment: .top, spacing: 10) {
             Text(cursorLabel(episode.cursor))
                 .font(.system(size: 13, weight: .black, design: .rounded))
-                .foregroundStyle(AVBrandColor.accent)
+                .foregroundStyle(cursorColor)
                 .monospacedDigit()
                 .frame(width: 54, alignment: .leading)
 
@@ -822,35 +822,99 @@ private struct SeriesDetailEpisodeRow: View {
             Spacer(minLength: 0)
 
             if markWatchedThrough != nil {
-                Image(systemName: stateIconName)
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundStyle(stateIconColor)
-                    .frame(width: 32, height: 32)
-                    .background(Color(.secondarySystemGroupedBackground), in: Circle())
-                    .accessibilityHidden(true)
+                stateIcon
             }
         }
         .padding(10)
-        .background(Color(.tertiarySystemGroupedBackground).opacity(0.62), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .background(rowBackground, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .strokeBorder(rowBorderColor, lineWidth: rowBorderWidth)
+        )
+    }
+
+    private var stateIcon: some View {
+        Image(systemName: stateIconName)
+            .font(.system(size: stateIconSize, weight: .black))
+            .foregroundStyle(stateIconColor)
+            .frame(width: 34, height: 34)
+            .background(stateIconBackground, in: Circle())
+            .accessibilityHidden(true)
     }
 
     private var stateIconName: String {
         switch episode.relativeState {
         case .watched:
-            "checkmark.circle.fill"
+            "checkmark"
         case .current, .next:
             "checkmark"
         case .pending:
-            "scope"
+            "plus"
+        }
+    }
+
+    private var stateIconSize: CGFloat {
+        switch episode.relativeState {
+        case .watched:
+            13
+        case .current, .next, .pending:
+            15
         }
     }
 
     private var stateIconColor: Color {
         switch episode.relativeState {
         case .watched:
-            AVBrandColor.accent
-        case .current, .next, .pending:
             AVBrandColor.textSecondary
+        case .current, .next, .pending:
+            Color.black.opacity(0.84)
+        }
+    }
+
+    private var stateIconBackground: Color {
+        switch episode.relativeState {
+        case .watched:
+            Color(.secondarySystemGroupedBackground)
+        case .current, .next, .pending:
+            AVBrandColor.accent
+        }
+    }
+
+    private var cursorColor: Color {
+        switch episode.relativeState {
+        case .watched:
+            AVBrandColor.textSecondary
+        case .current, .next, .pending:
+            AVBrandColor.accent
+        }
+    }
+
+    private var rowBackground: Color {
+        switch episode.relativeState {
+        case .watched:
+            Color(.tertiarySystemGroupedBackground).opacity(0.44)
+        case .current, .next:
+            AVBrandColor.accent.opacity(0.11)
+        case .pending:
+            Color(.tertiarySystemGroupedBackground).opacity(0.62)
+        }
+    }
+
+    private var rowBorderColor: Color {
+        switch episode.relativeState {
+        case .current, .next:
+            AVBrandColor.accent.opacity(0.34)
+        case .watched, .pending:
+            Color.clear
+        }
+    }
+
+    private var rowBorderWidth: CGFloat {
+        switch episode.relativeState {
+        case .current, .next:
+            1
+        case .watched, .pending:
+            0
         }
     }
 }
