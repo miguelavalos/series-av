@@ -415,11 +415,12 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Marcar S1 E3 visto"].exists)
         XCTAssertTrue(app.buttons["Ajustar episodio"].exists)
         XCTAssertTrue(app.buttons["Quitar fijado"].exists)
+        XCTAssertTrue(app.staticTexts["Episodios"].waitForExistence(timeout: 5))
+
         let setProgressButton = app.buttons["series-detail-episode-1-2-set-progress"]
-        for _ in 0..<3 where !setProgressButton.exists {
+        for _ in 0..<6 where !setProgressButton.exists {
             app.swipeUp()
         }
-        XCTAssertTrue(app.staticTexts["Episodios"].waitForExistence(timeout: 5))
         XCTAssertTrue(setProgressButton.exists)
         XCTAssertTrue(app.staticTexts["Fijar"].exists)
         XCTAssertFalse(app.staticTexts["Guardar S1 E3"].exists)
