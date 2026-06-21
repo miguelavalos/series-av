@@ -50,7 +50,7 @@
 "home.undo.archived" = "\"%@\" archivée dans Bibliothèque > Archive";
 "home.undo.deleted" = "\"%@\" supprimée";
 "home.undo.progress" = "Progression de \"%@\" modifiée";
-"home.undo.nowWatching" = "\"%@\" est maintenant dans En cours";
+"home.undo.nowWatching" = "\"%@\" a quitté Prêtes à commencer et est maintenant dans En cours";
 "home.undo.restored" = "\"%@\" restaurée";
 "home.undo.status" = "Statut de \"%@\" modifié";
 "detail.title" = "Info série";

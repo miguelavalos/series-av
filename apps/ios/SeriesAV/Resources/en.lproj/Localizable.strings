@@ -50,7 +50,7 @@
 "home.undo.archived" = "\"%@\" archived in Library > Archive";
 "home.undo.deleted" = "\"%@\" deleted";
 "home.undo.progress" = "\"%@\" progress changed";
-"home.undo.nowWatching" = "\"%@\" moved to Watching now";
+"home.undo.nowWatching" = "\"%@\" left Ready to start and moved to Watching now";
 "home.undo.restored" = "\"%@\" restored";
 "home.undo.status" = "\"%@\" status changed";
 "detail.title" = "Series info";

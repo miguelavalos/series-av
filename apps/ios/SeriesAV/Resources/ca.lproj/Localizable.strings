@@ -50,7 +50,7 @@
 "home.undo.archived" = "\"%@\" arxivada a Biblioteca > Arxiu";
 "home.undo.deleted" = "\"%@\" eliminada";
 "home.undo.progress" = "Progrés de \"%@\" canviat";
-"home.undo.nowWatching" = "\"%@\" ara és a Veient ara";
+"home.undo.nowWatching" = "\"%@\" ha sortit de Llestes per començar i ara és a Veient ara";
 "home.undo.restored" = "\"%@\" restaurada";
 "home.undo.status" = "Estat de \"%@\" canviat";
 "detail.title" = "Info de sèrie";
