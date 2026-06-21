@@ -295,14 +295,14 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Current Series"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Ajustar episodio"].exists)
         XCTAssertTrue(app.staticTexts["S1 E2"].exists)
-        XCTAssertTrue(app.staticTexts["Selecciona el último episodio visto. Guardar aplica el cambio."].exists)
-        XCTAssertTrue(app.buttons["Guardar S1 E2"].exists)
-        XCTAssertTrue(app.buttons["series-progress-editor-save"].exists)
+        XCTAssertTrue(app.staticTexts["Toca el último episodio visto para guardarlo."].exists)
+        XCTAssertFalse(app.buttons["Guardar S1 E2"].exists)
+        XCTAssertFalse(app.buttons["series-progress-editor-save"].exists)
         XCTAssertTrue(app.buttons["Sin empezar"].exists)
     }
 
     @MainActor
-    func testProgressEditorEpisodeTapKeepsConfirmationVisible() throws {
+    func testProgressEditorEpisodeTapSavesAndReturnsHome() throws {
         continueAfterFailure = false
         let app = makeApp(environment: [
             "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
@@ -314,11 +314,10 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Ajustar episodio"].waitForExistence(timeout: 10))
         app.buttons["Episodio 3"].tap()
 
-        XCTAssertTrue(app.staticTexts["S1 E3"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Selecciona el último episodio visto. Guardar aplica el cambio."].exists)
-        XCTAssertTrue(app.buttons["Guardar S1 E3"].exists)
-        XCTAssertTrue(app.buttons["series-progress-editor-save"].exists)
-        XCTAssertTrue(app.buttons["Cancelar"].exists)
+        XCTAssertTrue(app.staticTexts["Current Series"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Siguiente S1 E4"].exists)
+        XCTAssertFalse(app.buttons["Cancelar"].exists)
+        XCTAssertFalse(app.buttons["series-progress-editor-save"].exists)
     }
 
     @MainActor
@@ -336,9 +335,9 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Último episodio visto"].exists)
         XCTAssertTrue(app.staticTexts["S1 E1"].exists)
         XCTAssertTrue(app.staticTexts["Al guardar pasará a Viendo ahora. El siguiente será S1 E2."].exists)
-        XCTAssertTrue(app.staticTexts["Selecciona el último episodio visto. Guardar aplica el cambio."].exists)
-        XCTAssertTrue(app.buttons["Guardar S1 E1"].exists)
-        XCTAssertTrue(app.buttons["series-progress-editor-save"].exists)
+        XCTAssertTrue(app.staticTexts["Toca el último episodio visto para guardarlo."].exists)
+        XCTAssertFalse(app.buttons["Guardar S1 E1"].exists)
+        XCTAssertFalse(app.buttons["series-progress-editor-save"].exists)
         XCTAssertTrue(app.buttons["Cancelar"].exists)
     }
 
@@ -354,7 +353,7 @@ final class SeriesAVSmokeUITests: XCTestCase {
         app.launch()
 
         XCTAssertTrue(app.staticTexts["Later List"].waitForExistence(timeout: 10))
-        app.buttons["Guardar S1 E1"].tap()
+        app.buttons["Episodio 1"].tap()
 
         XCTAssertTrue(app.staticTexts["Viendo ahora"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Later List"].exists)
