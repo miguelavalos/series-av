@@ -250,7 +250,8 @@ struct SeriesLibraryTabScreen: View {
                     SeriesLibraryRow(
                         entry: entry,
                         detail: isArchived ? L10n.string("library.archived.detail") : libraryDetail(for: entry),
-                        editProgress: isArchived ? nil : { editorEntry = entry }
+                        openDetail: { detailEntry = entry },
+                        markNext: isArchived ? nil : { markNext(from: entry) }
                     ) {
                         if isArchived {
                             archivedMenu(for: entry)
@@ -278,11 +279,15 @@ struct SeriesLibraryTabScreen: View {
         Divider()
 
         Button {
-            pendingProgressUndo = progressUndo(for: entry)
-            pendingLibraryUndo = nil
-            store.markNextEpisodeWatched(for: entry.id)
+            markNext(from: entry)
         } label: {
             Label(quickProgressTitle(for: entry), systemImage: "checkmark.circle")
+        }
+
+        Button {
+            editorEntry = entry
+        } label: {
+            Label(L10n.string("home.adjust"), systemImage: "scope")
         }
 
         if entry.lastWatchedEpisodeCursor?.canStepBackQuickly == true {
@@ -469,6 +474,12 @@ struct SeriesLibraryTabScreen: View {
         entry.lastWatchedEpisodeCursor?.previousEpisode == nil
             ? L10n.string("home.notStarted")
             : L10n.string("home.previous")
+    }
+
+    private func markNext(from entry: SeriesLibraryEntry) {
+        pendingProgressUndo = progressUndo(for: entry)
+        pendingLibraryUndo = nil
+        store.markNextEpisodeWatched(for: entry.id)
     }
 
     private func progressUndo(

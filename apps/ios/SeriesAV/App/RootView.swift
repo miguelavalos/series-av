@@ -597,22 +597,32 @@ struct SeriesUndoBar: View {
 struct SeriesLibraryRow<MenuContent: View>: View {
     let entry: SeriesLibraryEntry
     let detail: String
-    let editProgress: (() -> Void)?
+    let openDetail: () -> Void
+    let markNext: (() -> Void)?
     @ViewBuilder let menuContent: () -> MenuContent
 
     var body: some View {
         HStack(spacing: 12) {
-            if let editProgress {
-                Button(action: editProgress) {
-                    rowContent
-                }
-                .buttonStyle(.plain)
-                .accessibilityHint(L10n.string("home.adjust"))
-            } else {
+            Button(action: openDetail) {
                 rowContent
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel(entry.title)
+            .accessibilityHint(L10n.string("detail.open"))
 
             Spacer()
+
+            if let markNext {
+                Button(action: markNext) {
+                    Image(systemName: entry.status == .wantToWatch ? "play.fill" : "checkmark")
+                        .font(.system(size: 14, weight: .black))
+                        .foregroundStyle(Color.black.opacity(0.84))
+                        .frame(width: 36, height: 36)
+                        .background(AVBrandColor.accent, in: Circle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(quickProgressAccessibilityLabel)
+            }
 
             Menu {
                 menuContent()
@@ -624,6 +634,11 @@ struct SeriesLibraryRow<MenuContent: View>: View {
             .accessibilityLabel(L10n.string("home.actions"))
         }
         .padding(.vertical, 4)
+    }
+
+    private var quickProgressAccessibilityLabel: String {
+        let actionTitle = entry.status == .wantToWatch ? L10n.string("home.start") : L10n.string("home.next")
+        return "\(actionTitle) \(cursorLabel(entry.nextEpisodeCursor))"
     }
 
     private var rowContent: some View {
