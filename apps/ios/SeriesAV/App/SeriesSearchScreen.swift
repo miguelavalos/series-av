@@ -394,7 +394,6 @@ struct SeriesSearchScreen: View {
                 return
             }
             addedEntry = entry
-            editorEntry = entry
         }
     }
 
@@ -530,6 +529,53 @@ private struct SeriesCatalogResultCard: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
+            Button(action: openDetail) {
+                resultContent
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(preview.title)
+            .accessibilityHint(L10n.string("detail.open"))
+
+            if let libraryEntry {
+                VStack(spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(AVBrandColor.accent)
+
+                    Button {
+                        editProgress(libraryEntry)
+                    } label: {
+                        Image(systemName: "scope")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundStyle(.primary)
+                            .frame(width: 40, height: 40)
+                            .background(Color(.tertiarySystemGroupedBackground), in: Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(L10n.string("home.adjust"))
+                }
+            } else {
+                Button(action: follow) {
+                    Image(systemName: canAddSeries ? "plus" : "sparkles")
+                        .font(.system(size: 17, weight: .black))
+                        .foregroundStyle(canAddSeries ? Color.black.opacity(0.84) : AVBrandColor.accent)
+                        .frame(width: 42, height: 42)
+                        .background(canAddSeries ? AVBrandColor.accent : Color(.tertiarySystemGroupedBackground), in: Circle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(canAddSeries ? L10n.string("search.follow") : L10n.string("add.footer.upgrade"))
+            }
+        }
+        .padding(10)
+        .background(Color(.secondarySystemGroupedBackground).opacity(0.74), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+        }
+    }
+
+    private var resultContent: some View {
+        HStack(alignment: .center, spacing: 12) {
             SeriesSearchPosterView(
                 artwork: preview.artwork,
                 width: 64,
@@ -547,64 +593,9 @@ private struct SeriesCatalogResultCard: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.82)
-
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-
-            if let libraryEntry {
-                VStack(spacing: 8) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(AVBrandColor.accent)
-
-                    detailButton
-
-                    Button {
-                        editProgress(libraryEntry)
-                    } label: {
-                        Image(systemName: "scope")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundStyle(.primary)
-                            .frame(width: 40, height: 40)
-                            .background(Color(.tertiarySystemGroupedBackground), in: Circle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(L10n.string("home.adjust"))
-                }
-            } else {
-                VStack(spacing: 8) {
-                    detailButton
-
-                    Button(action: follow) {
-                        Image(systemName: canAddSeries ? "plus" : "sparkles")
-                            .font(.system(size: 17, weight: .black))
-                            .foregroundStyle(canAddSeries ? Color.black.opacity(0.84) : AVBrandColor.accent)
-                            .frame(width: 42, height: 42)
-                            .background(canAddSeries ? AVBrandColor.accent : Color(.tertiarySystemGroupedBackground), in: Circle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(canAddSeries ? L10n.string("search.follow") : L10n.string("add.footer.upgrade"))
-                }
-            }
         }
-        .padding(10)
-        .background(Color(.secondarySystemGroupedBackground).opacity(0.74), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
-        }
-    }
-
-    private var detailButton: some View {
-        Button(action: openDetail) {
-            Image(systemName: "info.circle")
-                .font(.system(size: 16, weight: .bold))
-                .foregroundStyle(.primary)
-                .frame(width: 40, height: 40)
-                .background(Color(.tertiarySystemGroupedBackground), in: Circle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(L10n.string("detail.open"))
     }
 
     private var metadataText: String {
@@ -626,6 +617,45 @@ private struct SeriesLibrarySearchResultCard: View {
     let markNext: () -> Void
 
     var body: some View {
+        HStack(alignment: .center, spacing: 12) {
+            Button(action: openDetail) {
+                resultContent
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(entry.title)
+            .accessibilityHint(L10n.string("detail.open"))
+
+            VStack(spacing: 8) {
+                Button(action: editProgress) {
+                    Image(systemName: "scope")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(.primary)
+                        .frame(width: 40, height: 40)
+                        .background(Color(.tertiarySystemGroupedBackground), in: Circle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(L10n.string("home.adjust"))
+
+                Button(action: markNext) {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 16, weight: .black))
+                        .foregroundStyle(Color.black.opacity(0.84))
+                        .frame(width: 40, height: 40)
+                        .background(AVBrandColor.accent, in: Circle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(L10n.string("shell.watch.next"))
+            }
+        }
+        .padding(10)
+        .background(Color(.secondarySystemGroupedBackground).opacity(0.74), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+        }
+    }
+
+    private var resultContent: some View {
         HStack(alignment: .center, spacing: 12) {
             SeriesEntryArtworkView(entry: entry, size: 62)
 
@@ -655,44 +685,6 @@ private struct SeriesLibrarySearchResultCard: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .layoutPriority(1)
-
-            VStack(spacing: 8) {
-                Button(action: openDetail) {
-                    Image(systemName: "info.circle")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(.primary)
-                        .frame(width: 40, height: 40)
-                        .background(Color(.tertiarySystemGroupedBackground), in: Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(L10n.string("detail.open"))
-
-                Button(action: editProgress) {
-                    Image(systemName: "scope")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(.primary)
-                        .frame(width: 40, height: 40)
-                        .background(Color(.tertiarySystemGroupedBackground), in: Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(L10n.string("home.adjust"))
-
-                Button(action: markNext) {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 16, weight: .black))
-                        .foregroundStyle(Color.black.opacity(0.84))
-                        .frame(width: 40, height: 40)
-                        .background(AVBrandColor.accent, in: Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(L10n.string("shell.watch.next"))
-            }
-        }
-        .padding(10)
-        .background(Color(.secondarySystemGroupedBackground).opacity(0.74), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
         }
     }
 
