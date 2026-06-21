@@ -295,8 +295,8 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Current Series"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Ajustar episodio"].exists)
         XCTAssertTrue(app.staticTexts["S1 E2"].exists)
-        XCTAssertTrue(app.staticTexts["Selecciona un episodio y guarda para aplicar el cambio."].exists)
-        XCTAssertTrue(app.buttons["Fijar hasta S1 E2"].exists)
+        XCTAssertTrue(app.staticTexts["Tocar un episodio solo lo selecciona. Pulsa Guardar para aplicar."].exists)
+        XCTAssertTrue(app.buttons["Guardar S1 E2"].exists)
         XCTAssertTrue(app.buttons["Sin empezar"].exists)
     }
 
@@ -314,8 +314,8 @@ final class SeriesAVSmokeUITests: XCTestCase {
         app.buttons["Episodio 3"].tap()
 
         XCTAssertTrue(app.staticTexts["S1 E3"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Selecciona un episodio y guarda para aplicar el cambio."].exists)
-        XCTAssertTrue(app.buttons["Fijar hasta S1 E3"].exists)
+        XCTAssertTrue(app.staticTexts["Tocar un episodio solo lo selecciona. Pulsa Guardar para aplicar."].exists)
+        XCTAssertTrue(app.buttons["Guardar S1 E3"].exists)
         XCTAssertTrue(app.buttons["Cancelar"].exists)
     }
 
@@ -334,8 +334,8 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Último episodio visto"].exists)
         XCTAssertTrue(app.staticTexts["S1 E1"].exists)
         XCTAssertTrue(app.staticTexts["Al guardar pasará a Viendo ahora. El siguiente será S1 E2."].exists)
-        XCTAssertTrue(app.staticTexts["Selecciona un episodio y guarda para aplicar el cambio."].exists)
-        XCTAssertTrue(app.buttons["Marcar este episodio visto"].exists)
+        XCTAssertTrue(app.staticTexts["Tocar un episodio solo lo selecciona. Pulsa Guardar para aplicar."].exists)
+        XCTAssertTrue(app.buttons["Guardar S1 E1"].exists)
         XCTAssertTrue(app.buttons["Cancelar"].exists)
     }
 
@@ -351,7 +351,7 @@ final class SeriesAVSmokeUITests: XCTestCase {
         app.launch()
 
         XCTAssertTrue(app.staticTexts["Later List"].waitForExistence(timeout: 10))
-        app.buttons["Marcar este episodio visto"].tap()
+        app.buttons["Guardar S1 E1"].tap()
 
         XCTAssertTrue(app.staticTexts["Viendo ahora"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Later List"].exists)
@@ -412,7 +412,7 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Marcar S1 E3 visto"].exists)
         XCTAssertTrue(app.buttons["Ajustar episodio"].exists)
         XCTAssertTrue(app.buttons["Quitar fijado"].exists)
-        XCTAssertFalse(app.staticTexts["Fijar hasta S1 E3"].exists)
+        XCTAssertFalse(app.staticTexts["Guardar S1 E3"].exists)
     }
 
     @MainActor

@@ -108,7 +108,7 @@
 "home.editor.confirmThrough" = "Définir jusqu'à %@";
 "home.editor.watchedThrough" = "Vu jusqu'à %@";
 "home.editor.startTransition" = "En enregistrant, la série passe dans En cours. Le suivant sera %@.";
-"home.editor.saveHint" = "Sélectionne un épisode, puis enregistre pour appliquer le changement.";
+"home.editor.saveHint" = "Toucher un épisode le sélectionne seulement. Touchez Enregistrer pour appliquer.";
 "home.editor.startPrompt" = "Dernier épisode vu";
 "home.editor.confirmFirstPoint" = "Marquer cet épisode comme vu";
 "home.editor.confirmStart" = "Démarrer depuis ce point";
