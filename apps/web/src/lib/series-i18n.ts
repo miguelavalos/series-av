@@ -42,7 +42,8 @@ const en = {
     language: "Language",
     privacy: "Privacy",
     support: "Support",
-    terms: "Terms"
+    terms: "Terms",
+    website: "Website"
   },
   home: {
     aviBody: [
@@ -163,7 +164,8 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       language: "Idioma",
       privacy: "Privacitat",
       support: "Ajuda",
-      terms: "Condicions"
+      terms: "Condicions",
+      website: "Web"
     },
     home: {
       aviBody: [
@@ -282,7 +284,8 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       language: "Sprache",
       privacy: "Datenschutz",
       support: "Hilfe",
-      terms: "Bedingungen"
+      terms: "Bedingungen",
+      website: "Website"
     },
     home: {
       aviBody: [
@@ -402,7 +405,8 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       language: "Idioma",
       privacy: "Privacidad",
       support: "Ayuda",
-      terms: "Condiciones"
+      terms: "Condiciones",
+      website: "Web"
     },
     home: {
       aviBody: [
@@ -521,7 +525,8 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
       language: "Langue",
       privacy: "Confidentialité",
       support: "Aide",
-      terms: "Conditions"
+      terms: "Conditions",
+      website: "Site web"
     },
     home: {
       aviBody: [
