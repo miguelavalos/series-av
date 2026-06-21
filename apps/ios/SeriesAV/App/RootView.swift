@@ -155,10 +155,10 @@ private struct SeriesWatchingHomeScreen: View {
                 openLibrary: openLibraryTab
             )
 
-            if homeState.secondaryEntries.isEmpty == false {
+            if homeState.readyToStartEntries.isEmpty == false {
                 SeriesWatchingQueueSection(
-                    entries: homeState.secondaryEntries,
-                    title: L10n.string("home.queue.title"),
+                    entries: homeState.readyToStartEntries,
+                    title: L10n.string("home.readyToStart.title"),
                     markNext: { entry in
                         pendingProgressUndo = progressUndo(
                             for: entry,
@@ -194,10 +194,10 @@ private struct SeriesWatchingHomeScreen: View {
                 )
             }
 
-            if homeState.readyToStartEntries.isEmpty == false {
+            if homeState.secondaryEntries.isEmpty == false {
                 SeriesWatchingQueueSection(
-                    entries: homeState.readyToStartEntries,
-                    title: L10n.string("home.readyToStart.title"),
+                    entries: homeState.secondaryEntries,
+                    title: L10n.string("home.queue.title"),
                     markNext: { entry in
                         pendingProgressUndo = progressUndo(
                             for: entry,

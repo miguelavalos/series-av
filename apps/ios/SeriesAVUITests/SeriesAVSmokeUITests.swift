@@ -280,7 +280,7 @@ final class SeriesAVSmokeUITests: XCTestCase {
     }
 
     @MainActor
-    func testSampleHomeShowsReadyToStartBelowWatchingQueue() throws {
+    func testSampleHomeShowsReadyToStartBeforeSecondaryWatchingQueue() throws {
         continueAfterFailure = false
         let app = makeApp(environment: [
             "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
@@ -292,14 +292,18 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Viendo ahora"].exists)
         XCTAssertTrue(app.staticTexts["Siguiente S1 E3"].exists)
 
-        if !app.staticTexts["Listas para empezar"].waitForExistence(timeout: 2) {
+        if !app.staticTexts["También viendo"].waitForExistence(timeout: 2) {
             app.swipeUp()
         }
 
-        XCTAssertTrue(app.staticTexts["También viendo"].waitForExistence(timeout: 5))
+        let readyToStartTitle = app.staticTexts["Listas para empezar"]
+        let secondaryQueueTitle = app.staticTexts["También viendo"]
+        XCTAssertTrue(readyToStartTitle.waitForExistence(timeout: 5))
+        XCTAssertTrue(secondaryQueueTitle.waitForExistence(timeout: 5))
+        XCTAssertLessThan(readyToStartTitle.frame.minY, secondaryQueueTitle.frame.minY)
+
         XCTAssertTrue(app.staticTexts["Slow Weekend Show"].exists)
         XCTAssertTrue(app.staticTexts["S2 E7 → S2 E8"].exists)
-        XCTAssertTrue(app.staticTexts["Listas para empezar"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Later List"].exists)
         XCTAssertTrue(app.staticTexts["Empezar por S1 E1"].exists)
         XCTAssertTrue(app.buttons["Empezar"].exists)
