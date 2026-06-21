@@ -1,6 +1,6 @@
 import { AccountAvProvider } from "@avalsys/account-av-web";
 import { AppsAvWebProvider, applyAppsAvThemePreference, getAppsAvLocaleFromSearch, normalizeAppsAvThemePreference, readAppsAvThemePreference, useAppsAvLocale } from "@avalsys/apps-av-web";
-import { HeadContent, Outlet, Scripts, createRootRoute, useRouterState } from "@tanstack/react-router";
+import { HeadContent, Outlet, Scripts, createRootRoute, redirect, useRouterState } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { getAccountApiBaseUrl, getAccountPublishableKey, isSeriesWebAppComingSoon } from "@/lib/series-config";
 import { localizedSeriesPath, useSeriesAccountLocalization, useSeriesText } from "@/lib/series-i18n";
@@ -11,6 +11,11 @@ const faviconUrl = "https://cdn.avalsys.com/apps-av/series-av/web-v3/favicon-32x
 const appleTouchIconUrl = "https://cdn.avalsys.com/apps-av/series-av/web-v3/apple-touch-icon.png?v=20260619";
 
 export const Route = createRootRoute({
+  beforeLoad: ({ location }) => {
+    if (isSeriesWebAppComingSoon() && location.pathname !== "/") {
+      throw redirect({ href: comingSoonHomeHref(location.searchStr) });
+    }
+  },
   component: RootComponent,
   head: () => ({
     meta: [
@@ -24,6 +29,11 @@ export const Route = createRootRoute({
     ]
   })
 });
+
+function comingSoonHomeHref(searchStr: string) {
+  const lang = new URLSearchParams(searchStr).get("lang");
+  return lang ? `/?lang=${encodeURIComponent(lang)}` : "/";
+}
 
 function RootComponent() {
   return (
