@@ -1481,14 +1481,22 @@ struct SeriesProgressEditorSheet: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                Button {
-                    commitSelectedEpisode()
-                } label: {
-                    Label(confirmActionTitle, systemImage: "checkmark")
-                        .frame(maxWidth: .infinity)
+                VStack(spacing: 8) {
+                    Text(L10n.string("home.editor.saveHint"))
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Button {
+                        commitSelectedEpisode()
+                    } label: {
+                        Label(confirmActionTitle, systemImage: "checkmark")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
                 .padding(.horizontal, 18)
                 .padding(.vertical, 12)
                 .background(.regularMaterial)
