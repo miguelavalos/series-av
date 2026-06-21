@@ -265,6 +265,24 @@ final class SeriesAVSmokeUITests: XCTestCase {
     }
 
     @MainActor
+    func testSampleSearchReadySeriesUsesStartAction() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "search"
+        ])
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Buscar series"].waitForExistence(timeout: 10))
+        app.textFields["Buscar por título"].tap()
+        app.textFields["Buscar por título"].typeText("Later")
+
+        XCTAssertTrue(app.staticTexts["Later List"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Empezar S1 E1"].exists)
+        XCTAssertFalse(app.buttons["Marcar S1 E1 visto"].exists)
+    }
+
+    @MainActor
     func testProgressEditorOpensForSampleCurrentSeries() throws {
         continueAfterFailure = false
         let app = makeApp(environment: [

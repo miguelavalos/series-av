@@ -637,14 +637,14 @@ private struct SeriesLibrarySearchResultCard: View {
                 .accessibilityLabel(L10n.string("home.adjust"))
 
                 Button(action: markNext) {
-                    Image(systemName: "checkmark")
+                    Image(systemName: quickProgressFilledSystemImage(for: entry))
                         .font(.system(size: 16, weight: .black))
                         .foregroundStyle(Color.black.opacity(0.84))
                         .frame(width: 40, height: 40)
                         .background(AVBrandColor.accent, in: Circle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(quickProgressActionTitle(for: entry))
+                .accessibilityLabel(primaryProgressActionTitle(for: entry))
             }
         }
         .padding(10)
