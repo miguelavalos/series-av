@@ -703,15 +703,13 @@ struct SeriesLibraryRow<MenuContent: View>: View {
             Spacer()
 
             if let markNext {
-                Button(action: markNext) {
-                    Image(systemName: quickProgressFilledSystemImage(for: entry))
-                        .font(.system(size: 14, weight: .black))
-                        .foregroundStyle(Color.black.opacity(0.84))
-                        .frame(width: 36, height: 36)
-                        .background(AVBrandColor.accent, in: Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(quickProgressAccessibilityLabel)
+                SeriesCompactIconButton(
+                    systemName: quickProgressFilledSystemImage(for: entry),
+                    style: .accent,
+                    accessibilityLabel: quickProgressAccessibilityLabel,
+                    accessibilityIdentifier: "series-row-\(entry.id)-quick-progress",
+                    action: markNext
+                )
             }
 
             Menu {
@@ -1121,17 +1119,16 @@ private struct SeriesWatchingQueueSection: View {
 
                         Spacer(minLength: 0)
 
-                        Button {
+                        SeriesCompactIconButton(
+                            systemName: quickProgressFilledSystemImage(for: entry),
+                            style: .accent,
+                            size: 36,
+                            iconSize: 14,
+                            accessibilityLabel: primaryActionTitle(for: entry),
+                            accessibilityIdentifier: "series-queue-\(entry.id)-quick-progress"
+                        ) {
                             markNext(entry)
-                        } label: {
-                            Image(systemName: quickProgressFilledSystemImage(for: entry))
-                                .font(.system(size: 14, weight: .black))
-                                .foregroundStyle(Color.black.opacity(0.84))
-                                .frame(width: 34, height: 34)
-                                .background(AVBrandColor.accent, in: Circle())
                         }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel(primaryActionTitle(for: entry))
 
                         SeriesEntryActionsMenu(
                             entry: entry,
@@ -1397,6 +1394,76 @@ private struct SeriesEntryActionsMenu: View {
 
     private var pinTitle: String {
         entry.isPinnedHomeSeries == true ? L10n.string("home.unpin") : L10n.string("home.pin")
+    }
+}
+
+struct SeriesCompactIconButton: View {
+    enum Style {
+        case accent
+        case secondary
+    }
+
+    let systemName: String
+    var style: Style = .secondary
+    var size: CGFloat = 40
+    var iconSize: CGFloat = 16
+    let accessibilityLabel: String
+    var accessibilityIdentifier: String?
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: iconSize, weight: .black))
+                .foregroundStyle(foregroundColor)
+                .frame(width: size, height: size)
+                .background(backgroundColor, in: Circle())
+                .overlay {
+                    Circle().stroke(strokeColor, lineWidth: 1)
+                }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
+        .modifier(SeriesOptionalAccessibilityIdentifier(identifier: accessibilityIdentifier))
+    }
+
+    private var foregroundColor: Color {
+        switch style {
+        case .accent:
+            Color.black.opacity(0.84)
+        case .secondary:
+            Color.primary
+        }
+    }
+
+    private var backgroundColor: Color {
+        switch style {
+        case .accent:
+            AVBrandColor.accent
+        case .secondary:
+            Color(.tertiarySystemGroupedBackground)
+        }
+    }
+
+    private var strokeColor: Color {
+        switch style {
+        case .accent:
+            Color.black.opacity(0.08)
+        case .secondary:
+            Color.primary.opacity(0.08)
+        }
+    }
+}
+
+private struct SeriesOptionalAccessibilityIdentifier: ViewModifier {
+    let identifier: String?
+
+    func body(content: Content) -> some View {
+        if let identifier {
+            content.accessibilityIdentifier(identifier)
+        } else {
+            content
+        }
     }
 }
 

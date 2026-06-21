@@ -542,17 +542,14 @@ private struct SeriesCatalogResultCard: View {
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(AVBrandColor.accent)
 
-                    Button {
+                    SeriesCompactIconButton(
+                        systemName: "scope",
+                        style: .secondary,
+                        accessibilityLabel: L10n.string("home.adjust"),
+                        accessibilityIdentifier: "series-search-\(libraryEntry.id)-edit-progress"
+                    ) {
                         editProgress(libraryEntry)
-                    } label: {
-                        Image(systemName: "scope")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundStyle(.primary)
-                            .frame(width: 40, height: 40)
-                            .background(Color(.tertiarySystemGroupedBackground), in: Circle())
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(L10n.string("home.adjust"))
                 }
             } else {
                 Button(action: follow) {
@@ -626,25 +623,21 @@ private struct SeriesLibrarySearchResultCard: View {
             .accessibilityHint(L10n.string("detail.open"))
 
             VStack(spacing: 8) {
-                Button(action: editProgress) {
-                    Image(systemName: "scope")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(.primary)
-                        .frame(width: 40, height: 40)
-                        .background(Color(.tertiarySystemGroupedBackground), in: Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(L10n.string("home.adjust"))
+                SeriesCompactIconButton(
+                    systemName: "scope",
+                    style: .secondary,
+                    accessibilityLabel: L10n.string("home.adjust"),
+                    accessibilityIdentifier: "series-search-\(entry.id)-edit-progress",
+                    action: editProgress
+                )
 
-                Button(action: markNext) {
-                    Image(systemName: quickProgressFilledSystemImage(for: entry))
-                        .font(.system(size: 16, weight: .black))
-                        .foregroundStyle(Color.black.opacity(0.84))
-                        .frame(width: 40, height: 40)
-                        .background(AVBrandColor.accent, in: Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(primaryProgressActionTitle(for: entry))
+                SeriesCompactIconButton(
+                    systemName: quickProgressFilledSystemImage(for: entry),
+                    style: .accent,
+                    accessibilityLabel: primaryProgressActionTitle(for: entry),
+                    accessibilityIdentifier: "series-search-\(entry.id)-quick-progress",
+                    action: markNext
+                )
             }
         }
         .padding(10)
