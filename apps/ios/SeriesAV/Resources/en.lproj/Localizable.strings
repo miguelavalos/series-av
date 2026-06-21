@@ -63,6 +63,10 @@
 "detail.episodes.retryLater" = "The guide could not be loaded right now.";
 "detail.episodes.untitled" = "Episode";
 "detail.episodes.more" = "%d more episodes";
+"detail.episodes.state.watched" = "Watched";
+"detail.episodes.state.current" = "Current";
+"detail.episodes.state.next" = "Next";
+"detail.episodes.state.pending" = "Later";
 "detail.sources.title" = "Sources";
 "detail.sources.imdb" = "IMDb";
 "detail.sources.wikipedia" = "Wikipedia";

@@ -63,6 +63,10 @@
 "detail.episodes.retryLater" = "No se pudo cargar la guía ahora mismo.";
 "detail.episodes.untitled" = "Episodio";
 "detail.episodes.more" = "%d episodios más";
+"detail.episodes.state.watched" = "Visto";
+"detail.episodes.state.current" = "Actual";
+"detail.episodes.state.next" = "Siguiente";
+"detail.episodes.state.pending" = "Más tarde";
 "detail.sources.title" = "Fuentes";
 "detail.sources.imdb" = "IMDb";
 "detail.sources.wikipedia" = "Wikipedia";

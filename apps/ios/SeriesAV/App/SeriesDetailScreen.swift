@@ -817,6 +817,11 @@ private struct SeriesDetailEpisodeRow: View {
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(.secondary)
                 }
+
+                Text(stateTitle)
+                    .font(.system(size: 11, weight: .black))
+                    .foregroundStyle(stateTitleColor)
+                    .textCase(.uppercase)
             }
 
             Spacer(minLength: 0)
@@ -846,10 +851,30 @@ private struct SeriesDetailEpisodeRow: View {
         switch episode.relativeState {
         case .watched:
             "checkmark"
-        case .current, .next:
-            "checkmark"
+        case .current, .next, .pending:
+            "checkmark.circle.fill"
+        }
+    }
+
+    private var stateTitle: String {
+        switch episode.relativeState {
+        case .watched:
+            L10n.string("detail.episodes.state.watched")
+        case .current:
+            L10n.string("detail.episodes.state.current")
+        case .next:
+            L10n.string("detail.episodes.state.next")
         case .pending:
-            "plus"
+            L10n.string("detail.episodes.state.pending")
+        }
+    }
+
+    private var stateTitleColor: Color {
+        switch episode.relativeState {
+        case .watched:
+            AVBrandColor.textSecondary
+        case .current, .next, .pending:
+            AVBrandColor.accent
         }
     }
 
