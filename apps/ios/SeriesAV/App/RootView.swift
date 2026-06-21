@@ -1072,7 +1072,9 @@ private struct SeriesWatchingQueueSection: View {
                             Text(queueProgress(for: entry))
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundStyle(.secondary)
-                                .lineLimit(2)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.76)
+                                .allowsTightening(true)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                         .layoutPriority(1)
@@ -1101,7 +1103,9 @@ private struct SeriesWatchingQueueSection: View {
                             delete: { delete(entry) }
                         )
                     }
-                    .padding(10)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 12)
+                    .frame(minHeight: 68)
                     .background(Color(.secondarySystemGroupedBackground).opacity(0.72), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                     .overlay {
                         RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -1118,7 +1122,7 @@ private struct SeriesWatchingQueueSection: View {
         guard entry.status != .wantToWatch else {
             return String(format: L10n.string("home.queue.wantToWatch.progress"), cursorLabel(entry.nextEpisodeCursor))
         }
-        return String(format: L10n.string("home.queue.progress"), entry.progressLabel, cursorLabel(entry.nextEpisodeCursor))
+        return "\(entry.progressLabel) → \(cursorLabel(entry.nextEpisodeCursor))"
     }
 
     private func primaryActionTitle(for entry: SeriesLibraryEntry) -> String {

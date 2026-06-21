@@ -280,7 +280,7 @@ final class SeriesAVSmokeUITests: XCTestCase {
 
         XCTAssertTrue(app.staticTexts["También viendo"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Slow Weekend Show"].exists)
-        XCTAssertTrue(app.staticTexts["S2 E7 visto, S2 E8 siguiente"].exists)
+        XCTAssertTrue(app.staticTexts["S2 E7 → S2 E8"].exists)
         XCTAssertTrue(app.staticTexts["Listas para empezar"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Later List"].exists)
         XCTAssertTrue(app.staticTexts["Empezar por S1 E1"].exists)
