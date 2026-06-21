@@ -258,6 +258,8 @@ final class SeriesAVSmokeUITests: XCTestCase {
 
         XCTAssertTrue(app.staticTexts["Por ver · 1"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Later List"].exists)
+        XCTAssertTrue(app.buttons["Empezar S1 E1"].exists)
+        XCTAssertFalse(app.buttons["Marcar S1 E1 visto"].exists)
         XCTAssertFalse(app.staticTexts["Current Series"].exists)
         XCTAssertFalse(app.staticTexts["Slow Weekend Show"].exists)
     }

@@ -704,7 +704,7 @@ struct SeriesLibraryRow<MenuContent: View>: View {
 
             if let markNext {
                 Button(action: markNext) {
-                    Image(systemName: "checkmark")
+                    Image(systemName: quickProgressFilledSystemImage(for: entry))
                         .font(.system(size: 14, weight: .black))
                         .foregroundStyle(Color.black.opacity(0.84))
                         .frame(width: 36, height: 36)
@@ -727,7 +727,7 @@ struct SeriesLibraryRow<MenuContent: View>: View {
     }
 
     private var quickProgressAccessibilityLabel: String {
-        quickProgressActionTitle(for: entry)
+        primaryProgressActionTitle(for: entry)
     }
 
     private var rowContent: some View {
@@ -2185,4 +2185,19 @@ func cursorLabel(_ cursor: SeriesEpisodeCursor) -> String {
 
 func quickProgressActionTitle(for entry: SeriesLibraryEntry) -> String {
     String(format: L10n.string("home.action.markEpisodeWatched"), cursorLabel(entry.nextEpisodeCursor))
+}
+
+func primaryProgressActionTitle(for entry: SeriesLibraryEntry) -> String {
+    if entry.status == .wantToWatch {
+        return "\(L10n.string("home.start")) \(cursorLabel(entry.nextEpisodeCursor))"
+    }
+    return quickProgressActionTitle(for: entry)
+}
+
+func quickProgressMenuSystemImage(for entry: SeriesLibraryEntry) -> String {
+    entry.status == .wantToWatch ? "play.circle" : "checkmark.circle"
+}
+
+func quickProgressFilledSystemImage(for entry: SeriesLibraryEntry) -> String {
+    entry.status == .wantToWatch ? "play.fill" : "checkmark"
 }

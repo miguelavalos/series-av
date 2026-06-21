@@ -299,7 +299,7 @@ struct SeriesLibraryTabScreen: View {
         Button {
             markNext(from: entry)
         } label: {
-            Label(quickProgressTitle(for: entry), systemImage: "checkmark.circle")
+            Label(quickProgressTitle(for: entry), systemImage: quickProgressMenuSystemImage(for: entry))
         }
 
         Button {
@@ -486,7 +486,7 @@ struct SeriesLibraryTabScreen: View {
     }
 
     private func quickProgressTitle(for entry: SeriesLibraryEntry) -> String {
-        quickProgressActionTitle(for: entry)
+        primaryProgressActionTitle(for: entry)
     }
 
     private func previousProgressTitle(for entry: SeriesLibraryEntry) -> String {
