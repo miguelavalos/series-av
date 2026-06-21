@@ -869,15 +869,12 @@ private struct SeriesDetailEpisodeRow: View {
     }
 
     private var actionBadge: some View {
-        Label(actionTitle, systemImage: stateIconName)
-            .font(.system(size: 11, weight: .black))
+        Image(systemName: stateIconName)
+            .font(.system(size: 13, weight: .black))
             .foregroundStyle(stateIconColor)
-            .lineLimit(1)
-            .minimumScaleFactor(0.72)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 6)
-            .frame(maxWidth: 124, alignment: .trailing)
-            .background(stateIconBackground, in: Capsule())
+            .frame(width: 32, height: 32)
+            .background(stateIconBackground, in: Circle())
+            .accessibilityHidden(true)
     }
 
     private var stateIconName: String {

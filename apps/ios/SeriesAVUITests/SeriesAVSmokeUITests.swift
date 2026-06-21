@@ -373,6 +373,7 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Marcar S1 E3 visto"].exists)
         XCTAssertTrue(app.buttons["Ajustar episodio"].exists)
         XCTAssertTrue(app.buttons["Quitar fijado"].exists)
+        XCTAssertFalse(app.staticTexts["Fijar hasta S1 E3"].exists)
     }
 
     @MainActor
