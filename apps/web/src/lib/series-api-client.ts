@@ -229,7 +229,8 @@ export class SeriesApiClient {
   async pullLibrary(token: string): Promise<{ document: SeriesLibrarySyncDocument; etag: string | null }> {
     const response = await fetch(`${this.baseUrl}/v1/apps/seriesav/data/seriesLibrary`, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        "x-appsav-app-id": "seriesav"
       }
     });
     if (!response.ok) {
@@ -263,6 +264,7 @@ export class SeriesApiClient {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
+        "x-appsav-app-id": "seriesav",
         ...(expectedEtag ? { "If-Match": expectedEtag } : {})
       },
       method: "PUT"
