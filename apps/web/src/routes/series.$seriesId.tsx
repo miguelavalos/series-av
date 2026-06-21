@@ -341,33 +341,47 @@ function EpisodeGuide({
           const cursor = { episodeNumber: episode.episodeNumber, seasonNumber: episode.seasonNumber };
           const isWatched = progress ? compareEpisodeCursors(cursor, progress) <= 0 : false;
           const isCurrent = progress ? compareEpisodeCursors(cursor, nextEpisodeCursor(progress)) === 0 : episode.seasonNumber === 1 && episode.episodeNumber === 1;
-          return (
-            <div key={`${episode.seasonNumber}-${episode.episodeNumber}`} className={isWatched ? "rounded-lg border border-[#9ac76f] bg-[#f2fadf] p-3" : "rounded-lg border border-[#d7c494] bg-white/60 p-3"}>
-              <div className="flex items-start gap-3">
-                <div className={isWatched ? "flex h-10 w-12 shrink-0 items-center justify-center rounded-lg bg-[#5a8f2f] text-sm font-black text-white" : "flex h-10 w-12 shrink-0 items-center justify-center rounded-lg bg-[#ead6a5] text-sm font-black text-[#112a55]"}>
-                  E{episode.episodeNumber}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-[#112a55]">
+          const episodeContent = (
+            <div className="flex items-start gap-3">
+              <div className={isWatched ? "flex h-10 w-12 shrink-0 items-center justify-center rounded-lg bg-[#5a8f2f] text-sm font-black text-white" : "flex h-10 w-12 shrink-0 items-center justify-center rounded-lg bg-[#ead6a5] text-sm font-black text-[#112a55]"}>
+                E{episode.episodeNumber}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <p className="min-w-0 flex-1 text-sm font-bold text-[#112a55]">
                     {cursorLabel(cursor)} · {episode.title?.trim() || libraryLabels.episode}
                   </p>
-                  <p className="mt-1 text-xs font-medium text-[#53617a]">
-                    {episode.airDate ?? episode.relativeState}
-                    {isCurrent ? ` · ${labels.nextEpisode}` : ""}
-                  </p>
                   {entry ? (
-                    <Button
-                      size="sm"
-                      variant={isWatched ? "ghost" : "outline"}
-                      className="mt-3 rounded-full border-[#c8ad72] bg-[#fff8df]/80 text-[#112a55]"
-                      onClick={() => markWatchedThrough(entry.entryId, cursor)}
-                    >
-                      <CheckCircle2 className="size-4" /> {labels.markWatchedThrough} {cursorLabel(cursor)}
-                    </Button>
+                    <span className={isWatched ? "inline-flex shrink-0 items-center gap-1 rounded-full bg-[#5a8f2f] px-2 py-1 text-xs font-bold text-white" : "inline-flex shrink-0 items-center gap-1 rounded-full border border-[#c8ad72] bg-[#fff8df]/80 px-2 py-1 text-xs font-bold text-[#112a55]"}>
+                      <CheckCircle2 className="size-3.5" aria-hidden="true" />
+                      {isWatched ? labels.watched : labels.markHere}
+                    </span>
                   ) : null}
                 </div>
+                <p className="mt-1 text-xs font-medium text-[#53617a]">
+                  {episode.airDate ?? episode.relativeState}
+                  {isCurrent ? ` · ${labels.nextEpisode}` : ""}
+                </p>
               </div>
             </div>
+          );
+
+          return (
+            entry ? (
+              <button
+                key={`${episode.seasonNumber}-${episode.episodeNumber}`}
+                type="button"
+                className={isWatched ? "rounded-lg border border-[#9ac76f] bg-[#f2fadf] p-3 text-left transition hover:border-[#5a8f2f] hover:bg-[#edf7d8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5a8f2f]" : "rounded-lg border border-[#d7c494] bg-white/60 p-3 text-left transition hover:border-[#c8ad72] hover:bg-[#fff8df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5a8f2f]"}
+                aria-label={`${labels.markWatchedThrough} ${cursorLabel(cursor)}`}
+                onClick={() => markWatchedThrough(entry.entryId, cursor)}
+              >
+                {episodeContent}
+              </button>
+            ) : (
+              <div key={`${episode.seasonNumber}-${episode.episodeNumber}`} className="rounded-lg border border-[#d7c494] bg-white/60 p-3">
+                {episodeContent}
+              </div>
+            )
           );
         })}
       </div>
@@ -500,6 +514,7 @@ const detailLabels = {
     followToTrack: "Segueix la sèrie per marcar progrés per episodi.",
     follow: "Seguir",
     limitReached: "Límit assolit",
+    markHere: "Marcar",
     markNext: "Marcar següent",
     markWatchedThrough: "Marcar fins a",
     nextEpisode: "Següent",
@@ -512,6 +527,7 @@ const detailLabels = {
     sourceWikipedia: "Viquipèdia",
     sourceWeb: "Cerca web",
     sourcesTitle: "Fonts",
+    watched: "Vist",
     watchedThrough: "Vist fins a"
   },
   de: {
@@ -523,6 +539,7 @@ const detailLabels = {
     followToTrack: "Folge der Serie, um den Fortschritt pro Folge zu markieren.",
     follow: "Folgen",
     limitReached: "Limit erreicht",
+    markHere: "Markieren",
     markNext: "Nächste markieren",
     markWatchedThrough: "Gesehen bis",
     nextEpisode: "Nächste",
@@ -535,6 +552,7 @@ const detailLabels = {
     sourceWikipedia: "Wikipedia",
     sourceWeb: "Websuche",
     sourcesTitle: "Quellen",
+    watched: "Gesehen",
     watchedThrough: "Gesehen bis"
   },
   en: {
@@ -546,6 +564,7 @@ const detailLabels = {
     followToTrack: "Follow this series to mark episode progress.",
     follow: "Follow",
     limitReached: "Limit reached",
+    markHere: "Mark",
     markNext: "Mark next",
     markWatchedThrough: "Watched through",
     nextEpisode: "Next",
@@ -558,6 +577,7 @@ const detailLabels = {
     sourceWikipedia: "Wikipedia",
     sourceWeb: "Web search",
     sourcesTitle: "Sources",
+    watched: "Watched",
     watchedThrough: "Watched through"
   },
   es: {
@@ -569,6 +589,7 @@ const detailLabels = {
     followToTrack: "Sigue esta serie para marcar el progreso por episodio.",
     follow: "Seguir",
     limitReached: "Límite alcanzado",
+    markHere: "Marcar",
     markNext: "Marcar siguiente",
     markWatchedThrough: "Visto hasta",
     nextEpisode: "Siguiente",
@@ -581,6 +602,7 @@ const detailLabels = {
     sourceWikipedia: "Wikipedia",
     sourceWeb: "Buscar en web",
     sourcesTitle: "Fuentes",
+    watched: "Visto",
     watchedThrough: "Visto hasta"
   },
   fr: {
@@ -592,6 +614,7 @@ const detailLabels = {
     followToTrack: "Suivez cette série pour marquer la progression par épisode.",
     follow: "Suivre",
     limitReached: "Limite atteinte",
+    markHere: "Marquer",
     markNext: "Marquer la suite",
     markWatchedThrough: "Vu jusqu'à",
     nextEpisode: "Suivant",
@@ -604,6 +627,7 @@ const detailLabels = {
     sourceWikipedia: "Wikipédia",
     sourceWeb: "Recherche web",
     sourcesTitle: "Sources",
+    watched: "Vu",
     watchedThrough: "Vu jusqu'à"
   }
 } as const;
