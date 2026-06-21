@@ -72,15 +72,15 @@ function HomeContent() {
 
   return (
     <section className="grid gap-8">
-      <section className="relative isolate overflow-hidden rounded-lg border border-[#d7c494] bg-[#fff8df] shadow-lg shadow-[#172f5c]/8">
+      <section className="series-home-hero relative isolate overflow-hidden rounded-lg border border-[#d7c494] bg-[#fff8df] shadow-lg shadow-[#172f5c]/8">
         <img className="absolute bottom-0 right-0 z-[-2] hidden h-full w-[22rem] object-cover object-center opacity-30 xl:block" src={seriesBrandAssets.guestHomeShelf} alt="" />
-        <div className="absolute inset-0 z-[-1] bg-[linear-gradient(90deg,#fff8df_0%,#fff8df_68%,rgba(255,248,223,0.72)_100%)]" />
+        <div className="series-home-hero-overlay absolute inset-0 z-[-1] bg-[linear-gradient(90deg,#fff8df_0%,#fff8df_68%,rgba(255,248,223,0.72)_100%)]" />
         <div className="grid gap-6 p-6 sm:p-8 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-end">
           <div className="flex max-w-3xl flex-col justify-between gap-8 self-stretch">
             <div>
               <img className="h-auto w-48 max-w-full" src={seriesBrandAssets.logo} alt="Series AV" />
-              <h1 className="mt-7 max-w-2xl text-4xl font-semibold leading-tight text-[#112a55] sm:text-5xl">{current && !shouldShowCurrentSkeleton ? labels.continueWatching : text.home.title}</h1>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-[#334766]">{current && currentTitle && !shouldShowCurrentSkeleton ? labels.ready(currentTitle, cursorLabel(next ?? { episodeNumber: 1, seasonNumber: 1 })) : text.home.body}</p>
+              <h1 className="series-home-hero-title mt-7 max-w-2xl text-4xl font-semibold leading-tight text-[#112a55] sm:text-5xl">{current && !shouldShowCurrentSkeleton ? labels.continueWatching : text.home.title}</h1>
+              <p className="series-home-hero-body mt-5 max-w-2xl text-base leading-7 text-[#334766]">{current && currentTitle && !shouldShowCurrentSkeleton ? labels.ready(currentTitle, cursorLabel(next ?? { episodeNumber: 1, seasonNumber: 1 })) : text.home.body}</p>
               <div className="mt-7 flex flex-wrap gap-3">
                 <Button asChild className="h-11 rounded-full bg-[#112a55] px-5 text-white hover:bg-[#19396f]">
                   <Link to={localizedSeriesPath(current ? `/series/${encodeURIComponent(current.seriesId)}` : "/search", locale)}>
@@ -133,12 +133,12 @@ function HomeContent() {
 
 function HomeSignal({ icon, label, value }: { icon: ReactNode; label: string; value: ReactNode }) {
   return (
-    <div className="rounded-[1rem] border border-[#d7c494] bg-white/58 p-4 text-[#112a55] backdrop-blur">
+    <div className="series-home-signal rounded-[1rem] border border-[#d7c494] bg-white/58 p-4 text-[#112a55] backdrop-blur">
       <div className="flex items-center gap-2 text-sm font-semibold">
         <span className="text-[#5a8f2f]">{icon}</span>
         {label}
       </div>
-      <div className="mt-2 text-sm text-[#53617a]">{value}</div>
+      <div className="series-home-signal-value mt-2 text-sm text-[#53617a]">{value}</div>
     </div>
   );
 }

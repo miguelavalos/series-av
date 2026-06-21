@@ -283,6 +283,31 @@ body {
   border-color: rgb(208 190 137 / 0.38) !important;
 }
 
+.series-home-hero {
+  background-color: #fff8df !important;
+}
+
+.series-home-hero-overlay {
+  background: linear-gradient(90deg, #fff8df 0%, #fff8df 68%, rgb(255 248 223 / 72%) 100%) !important;
+}
+
+.series-home-hero-title {
+  color: #112a55 !important;
+}
+
+.series-home-hero-body {
+  color: #334766 !important;
+}
+
+.series-home-signal {
+  background-color: rgb(255 255 255 / 68%) !important;
+  color: #112a55 !important;
+}
+
+.series-home-signal-value {
+  color: #53617a !important;
+}
+
 :root[data-series-theme="dark"] [class*="bg-[#112a55]"],
 :root[data-series-theme="dark"] [class*="bg-[#10284f]"] {
   background-color: #10284f !important;
