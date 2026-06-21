@@ -71,7 +71,7 @@ function HomeContent() {
   });
 
   return (
-    <section className="grid gap-8">
+    <section className="grid min-w-0 gap-8">
       <section className="series-home-hero relative isolate overflow-hidden rounded-lg border border-[#d7c494] bg-[#fff8df] shadow-lg shadow-[#172f5c]/8">
         <img className="absolute bottom-0 right-0 z-[-2] hidden h-full w-[22rem] object-cover object-center opacity-30 xl:block" src={seriesBrandAssets.guestHomeShelf} alt="" />
         <div className="series-home-hero-overlay absolute inset-0 z-[-1] bg-[linear-gradient(90deg,#fff8df_0%,#fff8df_68%,rgba(255,248,223,0.72)_100%)]" />
@@ -284,9 +284,9 @@ function HomeDiscoverySection({
   }
 
   return (
-    <section>
+    <section className="min-w-0">
       <h2 className="mb-3 text-sm font-bold uppercase text-[#53617a]">{title}</h2>
-      <div className="flex snap-x gap-4 overflow-x-auto pb-2">
+      <div className="flex min-w-0 max-w-full snap-x gap-4 overflow-x-auto pb-2">
         {results.slice(0, 8).map((result) => (
           <HomeDiscoveryCard key={seriesIdFor(result)} labels={labels} locale={locale} result={result} />
         ))}
