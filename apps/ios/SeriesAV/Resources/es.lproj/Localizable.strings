@@ -36,6 +36,7 @@
 "home.previous" = "Atrás";
 "home.next" = "Visto";
 "home.start" = "Empezar";
+"home.action.markEpisodeWatched" = "Marcar %@ visto";
 "home.adjust" = "Ajustar episodio";
 "home.chooseEpisode" = "Elegir episodio";
 "home.notStarted" = "Sin empezar";

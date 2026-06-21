@@ -644,7 +644,7 @@ private struct SeriesLibrarySearchResultCard: View {
                         .background(AVBrandColor.accent, in: Circle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(L10n.string("shell.watch.next"))
+                .accessibilityLabel(quickProgressActionTitle(for: entry))
             }
         }
         .padding(10)

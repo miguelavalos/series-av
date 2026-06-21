@@ -36,6 +36,7 @@
 "home.previous" = "Enrere";
 "home.next" = "Vist";
 "home.start" = "Començar";
+"home.action.markEpisodeWatched" = "Marcar %@ vist";
 "home.adjust" = "Ajustar episodi";
 "home.chooseEpisode" = "Triar episodi";
 "home.notStarted" = "Sense començar";

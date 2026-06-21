@@ -325,7 +325,7 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["S2 E7 → S2 E8"].exists)
         XCTAssertTrue(app.staticTexts["Later List"].exists)
         XCTAssertTrue(app.staticTexts["Empezar por S1 E1"].exists)
-        XCTAssertTrue(app.buttons["Empezar"].exists)
+        XCTAssertTrue(app.buttons["Marcar S1 E1 visto"].exists)
         XCTAssertFalse(app.staticTexts["Sigue tu primera serie"].exists)
     }
 

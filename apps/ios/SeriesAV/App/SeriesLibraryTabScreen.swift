@@ -483,8 +483,7 @@ struct SeriesLibraryTabScreen: View {
     }
 
     private func quickProgressTitle(for entry: SeriesLibraryEntry) -> String {
-        let actionTitle = entry.status == .wantToWatch ? L10n.string("home.start") : L10n.string("home.next")
-        return "\(actionTitle) \(cursorLabel(entry.nextEpisodeCursor))"
+        quickProgressActionTitle(for: entry)
     }
 
     private func previousProgressTitle(for entry: SeriesLibraryEntry) -> String {

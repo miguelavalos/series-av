@@ -36,6 +36,7 @@
 "home.previous" = "Back";
 "home.next" = "Watched";
 "home.start" = "Start";
+"home.action.markEpisodeWatched" = "Mark %@ watched";
 "home.adjust" = "Adjust episode";
 "home.chooseEpisode" = "Choose episode";
 "home.notStarted" = "Not started";

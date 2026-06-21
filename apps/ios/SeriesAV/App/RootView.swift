@@ -704,8 +704,7 @@ struct SeriesLibraryRow<MenuContent: View>: View {
     }
 
     private var quickProgressAccessibilityLabel: String {
-        let actionTitle = entry.status == .wantToWatch ? L10n.string("home.start") : L10n.string("home.next")
-        return "\(actionTitle) \(cursorLabel(entry.nextEpisodeCursor))"
+        quickProgressActionTitle(for: entry)
     }
 
     private var rowContent: some View {
@@ -1131,7 +1130,7 @@ private struct SeriesWatchingQueueSection: View {
     }
 
     private func primaryActionTitle(for entry: SeriesLibraryEntry) -> String {
-        entry.status == .wantToWatch ? L10n.string("home.start") : L10n.string("shell.watch.next")
+        quickProgressActionTitle(for: entry)
     }
 }
 
@@ -2134,4 +2133,11 @@ private struct SeriesEmptyPosterPlaceholder: View {
 
 func cursorLabel(_ cursor: SeriesEpisodeCursor) -> String {
     "S\(cursor.seasonNumber) E\(cursor.episodeNumber)"
+}
+
+func quickProgressActionTitle(for entry: SeriesLibraryEntry) -> String {
+    if entry.status == .wantToWatch {
+        return String(format: L10n.string("home.action.markEpisodeWatched"), cursorLabel(entry.nextEpisodeCursor))
+    }
+    return "\(L10n.string("shell.watch.next")) \(cursorLabel(entry.nextEpisodeCursor))"
 }

@@ -36,6 +36,7 @@
 "home.previous" = "Zurück";
 "home.next" = "Gesehen";
 "home.start" = "Starten";
+"home.action.markEpisodeWatched" = "%@ als gesehen markieren";
 "home.adjust" = "Folge anpassen";
 "home.chooseEpisode" = "Folge wählen";
 "home.notStarted" = "Nicht begonnen";

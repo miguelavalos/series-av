@@ -121,7 +121,7 @@ enum SeriesDetailPresentationBuilder {
     }
 
     static func nextActionTitle(for entry: SeriesLibraryEntry) -> String {
-        entry.status == .wantToWatch ? L10n.string("home.start") : L10n.string("shell.watch.next")
+        quickProgressActionTitle(for: entry)
     }
 
     static func detailStatusIcon(_ status: SeriesLibraryEntryStatus) -> String {
