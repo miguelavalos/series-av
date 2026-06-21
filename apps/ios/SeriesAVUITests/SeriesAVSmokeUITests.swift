@@ -126,9 +126,9 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Por ver · Empezar por S1 E1"].exists)
 
         app.buttons["Inicio"].tap()
-        XCTAssertTrue(app.staticTexts["Listas para empezar"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Empezar por S1 E1"].exists)
-        XCTAssertTrue(app.buttons["Empezar"].exists)
+        XCTAssertTrue(app.staticTexts["Lista para empezar"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Siguiente S1 E1"].exists)
+        XCTAssertTrue(app.buttons["Empezar, S1 E1"].exists)
         XCTAssertEqual(app.staticTexts.matching(NSPredicate(format: "label == %@", "The Last of Us")).count, 1)
         XCTAssertFalse(app.staticTexts["Sigue tu primera serie"].exists)
     }
