@@ -295,8 +295,9 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Current Series"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Ajustar episodio"].exists)
         XCTAssertTrue(app.staticTexts["S1 E2"].exists)
-        XCTAssertTrue(app.staticTexts["Tocar un episodio solo lo selecciona. Pulsa Guardar para aplicar."].exists)
+        XCTAssertTrue(app.staticTexts["Selecciona el último episodio visto. Guardar aplica el cambio."].exists)
         XCTAssertTrue(app.buttons["Guardar S1 E2"].exists)
+        XCTAssertTrue(app.buttons["series-progress-editor-save"].exists)
         XCTAssertTrue(app.buttons["Sin empezar"].exists)
     }
 
@@ -314,8 +315,9 @@ final class SeriesAVSmokeUITests: XCTestCase {
         app.buttons["Episodio 3"].tap()
 
         XCTAssertTrue(app.staticTexts["S1 E3"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Tocar un episodio solo lo selecciona. Pulsa Guardar para aplicar."].exists)
+        XCTAssertTrue(app.staticTexts["Selecciona el último episodio visto. Guardar aplica el cambio."].exists)
         XCTAssertTrue(app.buttons["Guardar S1 E3"].exists)
+        XCTAssertTrue(app.buttons["series-progress-editor-save"].exists)
         XCTAssertTrue(app.buttons["Cancelar"].exists)
     }
 
@@ -334,8 +336,9 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Último episodio visto"].exists)
         XCTAssertTrue(app.staticTexts["S1 E1"].exists)
         XCTAssertTrue(app.staticTexts["Al guardar pasará a Viendo ahora. El siguiente será S1 E2."].exists)
-        XCTAssertTrue(app.staticTexts["Tocar un episodio solo lo selecciona. Pulsa Guardar para aplicar."].exists)
+        XCTAssertTrue(app.staticTexts["Selecciona el último episodio visto. Guardar aplica el cambio."].exists)
         XCTAssertTrue(app.buttons["Guardar S1 E1"].exists)
+        XCTAssertTrue(app.buttons["series-progress-editor-save"].exists)
         XCTAssertTrue(app.buttons["Cancelar"].exists)
     }
 

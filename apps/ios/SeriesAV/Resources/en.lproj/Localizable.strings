@@ -110,7 +110,7 @@
 "home.editor.confirmThrough" = "Set through %@";
 "home.editor.watchedThrough" = "Watched through %@";
 "home.editor.startTransition" = "Saving moves it to Watching now. Next up will be %@.";
-"home.editor.saveHint" = "Tapping an episode only selects it. Tap Save to apply.";
+"home.editor.saveHint" = "Select the last episode watched. Save applies the change.";
 "home.editor.startPrompt" = "Last episode watched";
 "home.editor.confirmFirstPoint" = "Mark this episode watched";
 "home.editor.confirmStart" = "Start from this point";

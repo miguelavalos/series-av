@@ -1516,11 +1516,13 @@ struct SeriesProgressEditorSheet: View {
                     Button {
                         commitSelectedEpisode()
                     } label: {
-                        Label(confirmActionTitle, systemImage: "checkmark")
+                        Label(L10n.string("common.save"), systemImage: "checkmark")
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
+                    .accessibilityLabel(confirmActionTitle)
+                    .accessibilityIdentifier("series-progress-editor-save")
                 }
                 .padding(.horizontal, 18)
                 .padding(.vertical, 12)
