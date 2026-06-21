@@ -12,6 +12,8 @@ struct SeriesLibraryTabScreen: View {
     @State private var detailEntry: SeriesLibraryEntry?
     @State private var pendingLibraryUndo: PendingLibraryMutationUndo?
     @State private var pendingProgressUndo: PendingProgressUndo?
+    @State private var pendingDeleteConfirmation: PendingLibraryDeleteConfirmation?
+    @State private var isConfirmingDelete = false
 
     init(store: SeriesLibraryStore, accessController: SeriesAccessController? = nil) {
         self.store = store
@@ -124,6 +126,21 @@ struct SeriesLibraryTabScreen: View {
                 shareInviteClient: shareInviteClient
             )
             .presentationDetents([.large])
+        }
+        .confirmationDialog(
+            L10n.string("detail.delete.confirm.title"),
+            isPresented: $isConfirmingDelete,
+            titleVisibility: .visible
+        ) {
+            if let pendingDeleteConfirmation {
+                Button(L10n.string("detail.delete.confirm.action"), role: .destructive) {
+                    confirmDelete(pendingDeleteConfirmation)
+                }
+            }
+
+            Button(L10n.string("common.cancel"), role: .cancel) {}
+        } message: {
+            Text(L10n.string("detail.delete.confirm.detail"))
         }
         .safeAreaInset(edge: .bottom) {
             if let pendingLibraryUndo {
@@ -324,14 +341,8 @@ struct SeriesLibraryTabScreen: View {
         Divider()
 
         Button(role: .destructive) {
-            pendingLibraryUndo = PendingLibraryMutationUndo(
-                entryId: entry.id,
-                title: entry.title,
-                messageKey: "home.undo.deleted",
-                action: .restoreActive
-            )
-            pendingProgressUndo = nil
-            store.delete(entry.id)
+            pendingDeleteConfirmation = PendingLibraryDeleteConfirmation(entry: entry, action: .restoreActive)
+            isConfirmingDelete = true
         } label: {
             Label(L10n.string("home.delete"), systemImage: "trash")
         }
@@ -363,17 +374,23 @@ struct SeriesLibraryTabScreen: View {
         Divider()
 
         Button(role: .destructive) {
-            pendingLibraryUndo = PendingLibraryMutationUndo(
-                entryId: entry.id,
-                title: entry.title,
-                messageKey: "home.undo.deleted",
-                action: .restoreArchived
-            )
-            pendingProgressUndo = nil
-            store.delete(entry.id)
+            pendingDeleteConfirmation = PendingLibraryDeleteConfirmation(entry: entry, action: .restoreArchived)
+            isConfirmingDelete = true
         } label: {
             Label(L10n.string("home.delete"), systemImage: "trash")
         }
+    }
+
+    private func confirmDelete(_ confirmation: PendingLibraryDeleteConfirmation) {
+        pendingLibraryUndo = PendingLibraryMutationUndo(
+            entryId: confirmation.entryId,
+            title: confirmation.title,
+            messageKey: "home.undo.deleted",
+            action: confirmation.action
+        )
+        pendingProgressUndo = nil
+        store.delete(confirmation.entryId)
+        pendingDeleteConfirmation = nil
     }
 
     private func applyLibraryUndo(_ undo: PendingLibraryMutationUndo) {
@@ -517,5 +534,21 @@ struct SeriesLibraryTabScreen: View {
         default:
             return filterTitle(filter)
         }
+    }
+}
+
+private struct PendingLibraryDeleteConfirmation: Identifiable {
+    let entryId: String
+    let title: String
+    let action: PendingLibraryMutationUndoAction
+
+    var id: String {
+        entryId
+    }
+
+    init(entry: SeriesLibraryEntry, action: PendingLibraryMutationUndoAction) {
+        self.entryId = entry.id
+        self.title = entry.title
+        self.action = action
     }
 }

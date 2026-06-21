@@ -1300,6 +1300,8 @@ private struct SeriesEntryActionsMenu: View {
     let archive: () -> Void
     let delete: () -> Void
 
+    @State private var isConfirmingDelete = false
+
     var body: some View {
         Menu {
             if let openDetail {
@@ -1330,7 +1332,9 @@ private struct SeriesEntryActionsMenu: View {
 
             Divider()
 
-            Button(role: .destructive, action: delete) {
+            Button(role: .destructive) {
+                isConfirmingDelete = true
+            } label: {
                 Label(L10n.string("home.delete"), systemImage: "trash")
             }
         } label: {
@@ -1339,6 +1343,16 @@ private struct SeriesEntryActionsMenu: View {
         }
         .buttonStyle(.bordered)
         .accessibilityLabel(L10n.string("home.actions"))
+        .confirmationDialog(
+            L10n.string("detail.delete.confirm.title"),
+            isPresented: $isConfirmingDelete,
+            titleVisibility: .visible
+        ) {
+            Button(L10n.string("detail.delete.confirm.action"), role: .destructive, action: delete)
+            Button(L10n.string("common.cancel"), role: .cancel) {}
+        } message: {
+            Text(L10n.string("detail.delete.confirm.detail"))
+        }
     }
 
     private var pinTitle: String {
