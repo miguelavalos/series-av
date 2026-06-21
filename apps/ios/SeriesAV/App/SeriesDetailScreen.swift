@@ -809,7 +809,7 @@ private struct SeriesDetailEpisodeRow: View {
                 rowContent
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(String(format: L10n.string("home.editor.confirmThrough"), cursorLabel(episode.cursor)))
+            .accessibilityLabel(actionTitle)
         } else {
             rowContent
         }
@@ -821,6 +821,10 @@ private struct SeriesDetailEpisodeRow: View {
             return L10n.string("detail.episodes.untitled")
         }
         return title
+    }
+
+    private var actionTitle: String {
+        String(format: L10n.string("home.editor.confirmThrough"), cursorLabel(episode.cursor))
     }
 
     private var rowContent: some View {
@@ -853,7 +857,7 @@ private struct SeriesDetailEpisodeRow: View {
             Spacer(minLength: 0)
 
             if markWatchedThrough != nil {
-                stateIcon
+                actionBadge
             }
         }
         .padding(10)
@@ -864,13 +868,16 @@ private struct SeriesDetailEpisodeRow: View {
         )
     }
 
-    private var stateIcon: some View {
-        Image(systemName: stateIconName)
-            .font(.system(size: stateIconSize, weight: .black))
+    private var actionBadge: some View {
+        Label(actionTitle, systemImage: stateIconName)
+            .font(.system(size: 11, weight: .black))
             .foregroundStyle(stateIconColor)
-            .frame(width: 34, height: 34)
-            .background(stateIconBackground, in: Circle())
-            .accessibilityHidden(true)
+            .lineLimit(1)
+            .minimumScaleFactor(0.72)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
+            .frame(maxWidth: 124, alignment: .trailing)
+            .background(stateIconBackground, in: Capsule())
     }
 
     private var stateIconName: String {
@@ -901,15 +908,6 @@ private struct SeriesDetailEpisodeRow: View {
             AVBrandColor.textSecondary
         case .current, .next, .pending:
             AVBrandColor.accent
-        }
-    }
-
-    private var stateIconSize: CGFloat {
-        switch effectiveRelativeState {
-        case .watched:
-            13
-        case .current, .next, .pending:
-            15
         }
     }
 
