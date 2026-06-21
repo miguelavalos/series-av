@@ -279,16 +279,24 @@ private struct SeriesUpcomingEpisodeRow: View {
                 Button {
                     markWatchedThrough(entry, episode.cursor)
                 } label: {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 14, weight: .black))
+                    Label(actionTitle, systemImage: "checkmark")
+                        .font(.system(size: 11, weight: .black))
                         .foregroundStyle(Color.black.opacity(0.84))
-                        .frame(width: 34, height: 34)
-                        .background(AVBrandColor.accent, in: Circle())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .frame(maxWidth: 124, alignment: .trailing)
+                        .background(AVBrandColor.accent, in: Capsule())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(String(format: L10n.string("home.editor.confirmThrough"), cursorLabel(episode.cursor)))
+                .accessibilityLabel(actionTitle)
             }
         }
+    }
+
+    private var actionTitle: String {
+        String(format: L10n.string("home.editor.confirmThrough"), cursorLabel(episode.cursor))
     }
 }
 
