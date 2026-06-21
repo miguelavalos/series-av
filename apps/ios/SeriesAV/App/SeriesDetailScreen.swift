@@ -810,6 +810,7 @@ private struct SeriesDetailEpisodeRow: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(actionTitle)
+            .accessibilityIdentifier(actionIdentifier)
         } else {
             rowContent
         }
@@ -825,6 +826,10 @@ private struct SeriesDetailEpisodeRow: View {
 
     private var actionTitle: String {
         String(format: L10n.string("detail.episodes.action.setPoint.accessibility"), cursorLabel(episode.cursor))
+    }
+
+    private var actionIdentifier: String {
+        "series-detail-episode-\(episode.cursor.seasonNumber)-\(episode.cursor.episodeNumber)-set-progress"
     }
 
     private var rowContent: some View {
