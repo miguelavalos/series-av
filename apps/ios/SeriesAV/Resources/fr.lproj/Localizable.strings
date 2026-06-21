@@ -80,6 +80,9 @@
 "detail.share.create" = "Partager le lien";
 "detail.share.creating" = "Création du lien";
 "detail.share.message" = "Je te recommande \"%@\" sur Series AV : %@";
+"detail.delete.confirm.title" = "Supprimer la série";
+"detail.delete.confirm.detail" = "Cette série quittera votre bibliothèque locale. Vous pourrez annuler juste après.";
+"detail.delete.confirm.action" = "Supprimer la série";
 "detail.privateNote.title" = "Note privée";
 "detail.privateNote.empty" = "Ajoute une note privée rien que pour toi.";
 "detail.privateNote.edit" = "Modifier la note privée";

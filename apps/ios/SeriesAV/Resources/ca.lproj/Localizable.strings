@@ -80,6 +80,9 @@
 "detail.share.create" = "Compartir enllaç";
 "detail.share.creating" = "Creant enllaç";
 "detail.share.message" = "Et recomano \"%@\" a Series AV: %@";
+"detail.delete.confirm.title" = "Eliminar sèrie";
+"detail.delete.confirm.detail" = "La sèrie sortirà de la biblioteca local. Ho podràs desfer just després.";
+"detail.delete.confirm.action" = "Eliminar sèrie";
 "detail.privateNote.title" = "Nota privada";
 "detail.privateNote.empty" = "Afegeix una nota privada només per a tu.";
 "detail.privateNote.edit" = "Edita la nota privada";

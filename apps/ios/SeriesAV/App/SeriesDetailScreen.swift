@@ -33,6 +33,7 @@ struct SeriesDetailScreen: View {
     @State private var displayedPrivateNote: String?
     @State private var displayedLastWatchedEpisodeCursor: SeriesEpisodeCursor?
     @State private var isShowingShareComposer = false
+    @State private var isConfirmingDelete = false
     @State private var inAppBrowserDestination: SeriesInAppBrowserDestination?
     @State private var shareSheetItem: SeriesShareSheetItem?
 
@@ -162,6 +163,22 @@ struct SeriesDetailScreen: View {
                 .controlSize(.large)
                 .padding(24)
                 .presentationDetents([.height(140)])
+            }
+            .confirmationDialog(
+                L10n.string("detail.delete.confirm.title"),
+                isPresented: $isConfirmingDelete,
+                titleVisibility: .visible
+            ) {
+                if let entry, let delete {
+                    Button(L10n.string("detail.delete.confirm.action"), role: .destructive) {
+                        delete(entry)
+                        dismiss()
+                    }
+                }
+
+                Button(L10n.string("common.cancel"), role: .cancel) {}
+            } message: {
+                Text(L10n.string("detail.delete.confirm.detail"))
             }
         }
     }
@@ -322,8 +339,7 @@ struct SeriesDetailScreen: View {
 
                         if let delete {
                             Button(role: .destructive) {
-                                delete(entry)
-                                dismiss()
+                                isConfirmingDelete = true
                             } label: {
                                 Label(L10n.string("home.delete"), systemImage: "trash")
                                     .frame(maxWidth: .infinity)
