@@ -644,6 +644,12 @@ export function useSeriesProductConfig(): AppsAvProductConfig {
 
   return useMemo(() => ({
     ...seriesProductConfig,
+    links: Object.fromEntries(
+      Object.entries(seriesProductConfig.links).map(([key, link]) => [
+        key,
+        link ? { ...link, href: localizedExternalUrl(link.href, locale) ?? link.href } : link
+      ])
+    ) as AppsAvProductConfig["links"],
     assistant: seriesProductConfig.assistant
       ? {
         ...seriesProductConfig.assistant,
