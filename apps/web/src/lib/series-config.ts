@@ -10,8 +10,8 @@ export const seriesProductConfig: AppsAvProductConfig = {
     name: "Avi"
   },
   iconSrc: "https://cdn.avalsys.com/apps-av/series-av/web-v3/series-av-icon.png",
-  logoSrc: "https://cdn.avalsys.com/apps-av/series-av/web-v3/series-av-logo.png",
-  logoDarkSrc: "https://cdn.avalsys.com/apps-av/series-av/web-v3/series-av-logo-dark.png",
+  logoSrc: "https://cdn.avalsys.com/apps-av/series-av/web-v3/series-av-wordmark.png",
+  logoDarkSrc: "https://cdn.avalsys.com/apps-av/series-av/web-v3/series-av-wordmark.png",
   name: "Series AV",
   links: {
     deleteAccount: externalLink(accountManagementUrl("/account/delete"), "Delete account"),

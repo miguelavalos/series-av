@@ -26,6 +26,11 @@ export function SeriesLoginPage() {
 
   return (
     <div className="series-paper min-h-screen overflow-hidden px-4 pt-4 sm:px-6">
+      <header className="mx-auto mb-4 flex max-w-7xl items-center px-1">
+        <div className="rounded-2xl border border-[#d7c494]/72 bg-[#fff8df]/88 px-3 py-2 shadow-sm shadow-[#172f5c]/8 backdrop-blur">
+          <img className="h-8 w-auto max-w-[168px] object-contain sm:h-9 sm:max-w-[190px]" src={seriesBrandAssets.wordmark} alt="Series AV" />
+        </div>
+      </header>
       <main className="series-guest-shell mx-auto min-h-[calc(100vh-6rem)] w-full max-w-7xl overflow-hidden rounded-[1.75rem] border border-[#d7c494] bg-[#fff6da]/88 shadow-2xl shadow-[#172f5c]/16 backdrop-blur">
         <img className="series-guest-backdrop" src={seriesBrandAssets.guestHomeShelf} alt="" />
         <div className="series-guest-overlay" />
