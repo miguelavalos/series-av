@@ -22,6 +22,7 @@ const uiText = {
     confirmTrash: "Vols eliminar aquesta serie de la biblioteca?",
     episode: "Episodi",
     loadingTitle: "Carregant sèrie",
+    markNext: "Marcar següent",
     more: "Més",
     next: "Següent",
     noEpisodeSet: "Cap episodi fixat",
@@ -40,6 +41,7 @@ const uiText = {
     confirmTrash: "Diese Serie aus der Bibliothek löschen?",
     episode: "Folge",
     loadingTitle: "Serie wird geladen",
+    markNext: "Nächste markieren",
     more: "Mehr",
     next: "Weiter",
     noEpisodeSet: "Keine Folge gesetzt",
@@ -58,6 +60,7 @@ const uiText = {
     confirmTrash: "Delete this series from your library?",
     episode: "Episode",
     loadingTitle: "Loading series",
+    markNext: "Mark next",
     more: "More",
     next: "Next",
     noEpisodeSet: "No episode set",
@@ -76,6 +79,7 @@ const uiText = {
     confirmTrash: "¿Eliminar esta serie de tu biblioteca?",
     episode: "Episodio",
     loadingTitle: "Cargando serie",
+    markNext: "Marcar siguiente",
     more: "Más",
     next: "Siguiente",
     noEpisodeSet: "Sin episodio",
@@ -94,6 +98,7 @@ const uiText = {
     confirmTrash: "Supprimer cette série de votre bibliothèque ?",
     episode: "Épisode",
     loadingTitle: "Chargement de la série",
+    markNext: "Marquer la suite",
     more: "Plus",
     next: "Suivant",
     noEpisodeSet: "Aucun épisode",
@@ -106,7 +111,7 @@ const uiText = {
     trash: "Supprimer",
     unpin: "Désépingler"
   }
-} satisfies Record<AppsAvLocale, { archive: string; clear: string; confirmTrash: string; episode: string; loadingTitle: string; more: string; next: string; noEpisodeSet: string; notStarted: string; pin: string; pinned: string; previous: string; restore: string; status: Record<SeriesLibraryEntryStatus, string>; trash: string; unpin: string }>;
+} satisfies Record<AppsAvLocale, { archive: string; clear: string; confirmTrash: string; episode: string; loadingTitle: string; markNext: string; more: string; next: string; noEpisodeSet: string; notStarted: string; pin: string; pinned: string; previous: string; restore: string; status: Record<SeriesLibraryEntryStatus, string>; trash: string; unpin: string }>;
 
 export function SeriesArtwork({ entry, size = "md" }: { entry: Pick<SeriesLibraryEntry, "displayArtworkRef" | "fallbackVisualSeed" | "title"> & { seriesId?: string }; size?: "sm" | "md" | "lg" | "xl" }) {
   const classes = {
@@ -151,8 +156,14 @@ export function SeriesEntryRow({ entry, locale, showArchive = true }: { entry: S
             {entry.isPinnedHomeSeries ? <Pin className="size-4 text-[#5a8f2f]" aria-label={labels.pinned} /> : null}
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            <Button size="sm" className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" onClick={() => library.markNextEpisodeWatched(entry.entryId)}>
-              <StepForward className="size-4" /> {labels.next}
+            <Button
+              size="icon"
+              className="h-9 w-9 rounded-full bg-[#112a55] text-white hover:bg-[#19396f]"
+              aria-label={`${labels.markNext} ${cursorLabel(next)}`}
+              title={`${labels.markNext} ${cursorLabel(next)}`}
+              onClick={() => library.markNextEpisodeWatched(entry.entryId)}
+            >
+              <StepForward className="size-4" />
             </Button>
             <details className="group relative">
               <summary className="flex h-9 cursor-pointer list-none items-center gap-2 rounded-full border border-[#c8ad72] bg-white/70 px-3 text-sm font-medium text-[#112a55] hover:bg-white [&::-webkit-details-marker]:hidden">
