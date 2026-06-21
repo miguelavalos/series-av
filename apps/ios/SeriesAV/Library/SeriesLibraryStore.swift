@@ -103,11 +103,20 @@ final class SeriesLibraryStore {
         return entry
     }
 
-    func markWatchedThrough(_ cursor: SeriesEpisodeCursor, for entryId: String, at date: Date = Date()) {
+    func markWatchedThrough(
+        _ cursor: SeriesEpisodeCursor,
+        for entryId: String,
+        pinOnHomeWhenStarting: Bool = false,
+        at date: Date = Date()
+    ) {
         guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
             return
         }
+        let wasReadyToStart = entries[index].status == .wantToWatch
         entries[index].markWatchedThrough(cursor, at: date)
+        if pinOnHomeWhenStarting, wasReadyToStart, entries[index].isPinnedHomeSeries != true {
+            entries[index].isPinnedHomeSeries = true
+        }
         persist()
     }
 
@@ -119,12 +128,20 @@ final class SeriesLibraryStore {
         persist()
     }
 
-    func markNextEpisodeWatched(for entryId: String, at date: Date = Date()) {
+    func markNextEpisodeWatched(
+        for entryId: String,
+        pinOnHomeWhenStarting: Bool = false,
+        at date: Date = Date()
+    ) {
         guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
             return
         }
 
+        let wasReadyToStart = entries[index].status == .wantToWatch
         entries[index].markWatchedThrough(entries[index].nextEpisodeCursor, at: date)
+        if pinOnHomeWhenStarting, wasReadyToStart, entries[index].isPinnedHomeSeries != true {
+            entries[index].isPinnedHomeSeries = true
+        }
         persist()
     }
 

@@ -447,23 +447,21 @@ private struct SeriesWatchingHomeScreen: View {
     }
 
     private func markNextEpisodeWatchedKeepingStartedSeriesOnHome(_ entry: SeriesLibraryEntry) {
-        store.markNextEpisodeWatched(for: entry.id)
-        keepStartedSeriesOnHomeIfNeeded(entry)
+        store.markNextEpisodeWatched(
+            for: entry.id,
+            pinOnHomeWhenStarting: entry.status == .wantToWatch
+        )
     }
 
     private func markWatchedThroughKeepingStartedSeriesOnHome(
         _ cursor: SeriesEpisodeCursor,
         for entry: SeriesLibraryEntry
     ) {
-        store.markWatchedThrough(cursor, for: entry.id)
-        keepStartedSeriesOnHomeIfNeeded(entry)
-    }
-
-    private func keepStartedSeriesOnHomeIfNeeded(_ entry: SeriesLibraryEntry) {
-        guard entry.status == .wantToWatch, entry.isPinnedHomeSeries != true else {
-            return
-        }
-        store.setPinned(true, for: entry.id)
+        store.markWatchedThrough(
+            cursor,
+            for: entry.id,
+            pinOnHomeWhenStarting: entry.status == .wantToWatch
+        )
     }
 
     private func addDiscoverySeries(_ preview: SeriesHomeDiscoveryPreview) {
@@ -1573,24 +1571,11 @@ struct SeriesProgressEditorSheet: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                VStack(spacing: 8) {
-                    Text(L10n.string("home.editor.saveHint"))
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Button {
-                        commitSelectedEpisode()
-                    } label: {
-                        Label(L10n.string("common.save"), systemImage: "checkmark")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
-                    .accessibilityLabel(confirmActionTitle)
-                    .accessibilityIdentifier("series-progress-editor-save")
-                }
+                Text(L10n.string("home.editor.saveHint"))
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 18)
                 .padding(.vertical, 12)
                 .background(.regularMaterial)
@@ -1687,7 +1672,7 @@ struct SeriesProgressEditorSheet: View {
                 LazyVStack(spacing: 8) {
                     ForEach(loadedGuide.items(in: selectedSeasonNumber), id: \.cursor) { item in
                         episodeGuideRow(item) {
-                            selectEpisode(item.episodeNumber)
+                            selectEpisode(item.episodeNumber, commitsSelection: true)
                         }
                     }
                 }
@@ -1698,7 +1683,7 @@ struct SeriesProgressEditorSheet: View {
                             title: episodeChipTitle(for: episode),
                             episode: episode
                         ) {
-                            selectEpisode(episode)
+                            selectEpisode(episode, commitsSelection: true)
                         }
                     }
 
@@ -1796,10 +1781,6 @@ struct SeriesProgressEditorSheet: View {
         case .generic, .unavailable:
             L10n.string("home.editor.footer")
         }
-    }
-
-    private var confirmActionTitle: String {
-        String(format: L10n.string("home.quickProgress.save"), selectedCursorLabel)
     }
 
     private func episodeChipTitle(for episode: Int) -> String {
@@ -1956,9 +1937,12 @@ struct SeriesProgressEditorSheet: View {
         }
     }
 
-    private func selectEpisode(_ episode: Int) {
+    private func selectEpisode(_ episode: Int, commitsSelection: Bool = false) {
         selectedEpisodeNumber = episode
         if loadedGuide != nil {
+            if commitsSelection {
+                commitSelectedEpisode()
+            }
             return
         }
         if episode > Self.defaultEpisodeCount {
@@ -1968,6 +1952,9 @@ struct SeriesProgressEditorSheet: View {
             visibleEpisodeCount = max(visibleEpisodeCount, Self.defaultEpisodeCount * 2)
         } else {
             visibleEpisodeCount = Self.defaultEpisodeCount
+        }
+        if commitsSelection {
+            commitSelectedEpisode()
         }
     }
 

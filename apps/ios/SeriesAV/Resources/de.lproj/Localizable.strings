@@ -110,7 +110,7 @@
 "home.editor.confirmThrough" = "Bis %@ setzen";
 "home.editor.watchedThrough" = "Gesehen bis %@";
 "home.editor.startTransition" = "Beim Speichern wechselt die Serie zu Wird gerade gesehen. Als Nächstes kommt %@.";
-"home.editor.saveHint" = "Wähle die zuletzt gesehene Folge. Speichern übernimmt die Änderung.";
+"home.editor.saveHint" = "Tippe auf die zuletzt gesehene Folge, um sie zu speichern.";
 "home.editor.startPrompt" = "Zuletzt gesehene Folge";
 "home.editor.confirmFirstPoint" = "Diese Folge als gesehen markieren";
 "home.editor.confirmStart" = "Ab diesem Punkt starten";

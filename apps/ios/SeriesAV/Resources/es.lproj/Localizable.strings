@@ -110,7 +110,7 @@
 "home.editor.confirmThrough" = "Fijar hasta %@";
 "home.editor.watchedThrough" = "Quedará visto hasta %@";
 "home.editor.startTransition" = "Al guardar pasará a Viendo ahora. El siguiente será %@.";
-"home.editor.saveHint" = "Selecciona el último episodio visto. Guardar aplica el cambio.";
+"home.editor.saveHint" = "Toca el último episodio visto para guardarlo.";
 "home.editor.startPrompt" = "Último episodio visto";
 "home.editor.confirmFirstPoint" = "Marcar este episodio visto";
 "home.editor.confirmStart" = "Empezar desde este punto";

@@ -53,6 +53,57 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertEqual(store.entries[0].lastWatchedEpisodeCursor, SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 1))
     }
 
+    func testMarkNextCanPinReadyToStartSeriesOnHomeAtomically() {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = SeriesLibraryStore(entries: [
+            SeriesLibraryEntry(
+                entryId: "entry",
+                seriesId: "entry",
+                title: "Ready",
+                status: .wantToWatch,
+                addedAt: date,
+                updatedAt: date,
+                lastInteractedAt: date
+            )
+        ])
+
+        store.markNextEpisodeWatched(
+            for: "entry",
+            pinOnHomeWhenStarting: true,
+            at: date.addingTimeInterval(10)
+        )
+
+        XCTAssertEqual(store.entries[0].status, .watching)
+        XCTAssertEqual(store.entries[0].lastWatchedEpisodeCursor, SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 1))
+        XCTAssertEqual(store.entries[0].isPinnedHomeSeries, true)
+    }
+
+    func testMarkWatchedThroughCanPinReadyToStartSeriesOnHomeAtomically() {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = SeriesLibraryStore(entries: [
+            SeriesLibraryEntry(
+                entryId: "entry",
+                seriesId: "entry",
+                title: "Ready",
+                status: .wantToWatch,
+                addedAt: date,
+                updatedAt: date,
+                lastInteractedAt: date
+            )
+        ])
+
+        store.markWatchedThrough(
+            SeriesEpisodeCursor(seasonNumber: 2, episodeNumber: 4),
+            for: "entry",
+            pinOnHomeWhenStarting: true,
+            at: date.addingTimeInterval(10)
+        )
+
+        XCTAssertEqual(store.entries[0].status, .watching)
+        XCTAssertEqual(store.entries[0].lastWatchedEpisodeCursor, SeriesEpisodeCursor(seasonNumber: 2, episodeNumber: 4))
+        XCTAssertEqual(store.entries[0].isPinnedHomeSeries, true)
+    }
+
     func testUpsertDeduplicatesByCanonicalSeriesId() {
         let date = Date(timeIntervalSince1970: 1_800_000_000)
         let store = SeriesLibraryStore(entries: [
