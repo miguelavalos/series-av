@@ -68,9 +68,11 @@
 "detail.episodes.untitled" = "Folge";
 "detail.episodes.more" = "%d weitere Folgen";
 "detail.episodes.state.watched" = "Gesehen";
-"detail.episodes.state.current" = "Aktuell";
+"detail.episodes.state.current" = "Zuletzt gesehen";
 "detail.episodes.state.next" = "Nächste";
-"detail.episodes.state.pending" = "Später";
+"detail.episodes.state.pending" = "Offen";
+"detail.episodes.action.setPoint" = "Setzen";
+"detail.episodes.action.setPoint.accessibility" = "Zuletzt gesehen auf %@ setzen";
 "detail.sources.title" = "Quellen";
 "detail.sources.imdb" = "IMDb";
 "detail.sources.wikipedia" = "Wikipedia";

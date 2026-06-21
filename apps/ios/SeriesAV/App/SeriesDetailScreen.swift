@@ -824,7 +824,7 @@ private struct SeriesDetailEpisodeRow: View {
     }
 
     private var actionTitle: String {
-        String(format: L10n.string("home.editor.confirmThrough"), cursorLabel(episode.cursor))
+        String(format: L10n.string("detail.episodes.action.setPoint.accessibility"), cursorLabel(episode.cursor))
     }
 
     private var rowContent: some View {
@@ -869,11 +869,13 @@ private struct SeriesDetailEpisodeRow: View {
     }
 
     private var actionBadge: some View {
-        Image(systemName: stateIconName)
-            .font(.system(size: 13, weight: .black))
+        Label(L10n.string("detail.episodes.action.setPoint"), systemImage: stateIconName)
+            .font(.system(size: 11, weight: .black))
+            .labelStyle(.titleAndIcon)
             .foregroundStyle(stateIconColor)
-            .frame(width: 32, height: 32)
-            .background(stateIconBackground, in: Circle())
+            .padding(.horizontal, 10)
+            .frame(minHeight: 32)
+            .background(stateIconBackground, in: Capsule())
             .accessibilityHidden(true)
     }
 
@@ -881,8 +883,12 @@ private struct SeriesDetailEpisodeRow: View {
         switch effectiveRelativeState {
         case .watched:
             "checkmark"
-        case .current, .next, .pending:
+        case .current:
             "checkmark.circle.fill"
+        case .next:
+            "play.circle.fill"
+        case .pending:
+            "circle.dashed"
         }
     }
 

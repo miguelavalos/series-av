@@ -412,6 +412,10 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Marcar S1 E3 visto"].exists)
         XCTAssertTrue(app.buttons["Ajustar episodio"].exists)
         XCTAssertTrue(app.buttons["Quitar fijado"].exists)
+        app.swipeUp()
+        XCTAssertTrue(app.staticTexts["Episodios"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Último visto"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Fijar último visto en S1 E2"].exists)
         XCTAssertFalse(app.staticTexts["Guardar S1 E3"].exists)
     }
 
