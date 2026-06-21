@@ -72,10 +72,10 @@ function HomeContent() {
 
   return (
     <section className="grid gap-8">
-      <section className="relative isolate overflow-hidden rounded-[1.5rem] border border-[#d7c494] bg-[#fff8df] shadow-xl shadow-[#172f5c]/10">
-        <img className="absolute inset-y-0 right-0 z-[-2] hidden h-full w-[48%] object-cover object-center opacity-95 lg:block" src={seriesBrandAssets.guestHomeShelf} alt="" />
-        <div className="absolute inset-0 z-[-1] bg-[linear-gradient(90deg,#fff8df_0%,rgba(255,248,223,0.96)_45%,rgba(255,248,223,0.42)_100%)]" />
-        <div className="grid min-h-[26rem] gap-6 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_17rem] lg:items-end">
+      <section className="relative isolate overflow-hidden rounded-lg border border-[#d7c494] bg-[#fff8df] shadow-lg shadow-[#172f5c]/8">
+        <img className="absolute bottom-0 right-0 z-[-2] hidden h-full w-[22rem] object-cover object-center opacity-30 xl:block" src={seriesBrandAssets.guestHomeShelf} alt="" />
+        <div className="absolute inset-0 z-[-1] bg-[linear-gradient(90deg,#fff8df_0%,#fff8df_68%,rgba(255,248,223,0.72)_100%)]" />
+        <div className="grid gap-6 p-6 sm:p-8 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-end">
           <div className="flex max-w-3xl flex-col justify-between gap-8 self-stretch">
             <div>
               <img className="h-auto w-48 max-w-full" src={seriesBrandAssets.logo} alt="Series AV" />
@@ -93,7 +93,7 @@ function HomeContent() {
                 </Button>
               </div>
             </div>
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-3 xl:max-w-3xl">
               <HomeSignal icon={<BookOpenCheck className="size-4" />} label={labels.active} value={String(library.snapshot.activeEntries.length)} />
               <HomeSignal icon={<StepForward className="size-4" />} label={libraryLabels.status.watching} value={String(library.snapshot.watchingEntries.length)} />
               <HomeSignal icon={<Sparkles className="size-4" />} label={labels.sync} value={<CompactSyncStatus labels={labels.syncStatus} syncState={library.syncState} />} />
@@ -286,7 +286,7 @@ function HomeDiscoverySection({
   return (
     <section>
       <h2 className="mb-3 text-sm font-bold uppercase text-[#53617a]">{title}</h2>
-      <div className="flex gap-4 overflow-x-auto pb-2">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {results.slice(0, 8).map((result) => (
           <HomeDiscoveryCard key={seriesIdFor(result)} labels={labels} locale={locale} result={result} />
         ))}
@@ -303,7 +303,7 @@ function HomeDiscoveryCard({ labels, locale, result }: { labels: (typeof homeLab
   const artwork = artworkFor(result);
 
   return (
-    <Card className="w-[18rem] shrink-0 gap-0 overflow-hidden rounded-[1rem] border-[#d7c494] bg-[#fff8df] py-0 shadow-sm shadow-[#172f5c]/8">
+    <Card className="min-w-0 gap-0 overflow-hidden rounded-lg border-[#d7c494] bg-[#fff8df] py-0 shadow-sm shadow-[#172f5c]/8">
       <Link
         to={localizedSeriesPath(`/series/${encodeURIComponent(seriesId)}`, locale)}
         className="block aspect-[16/10] bg-[#ead6a5]"
