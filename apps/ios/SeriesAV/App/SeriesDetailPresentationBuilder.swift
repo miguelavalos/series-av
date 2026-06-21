@@ -121,7 +121,7 @@ enum SeriesDetailPresentationBuilder {
     }
 
     static func nextActionTitle(for entry: SeriesLibraryEntry) -> String {
-        quickProgressActionTitle(for: entry)
+        primaryProgressActionTitle(for: entry)
     }
 
     static func detailStatusIcon(_ status: SeriesLibraryEntryStatus) -> String {

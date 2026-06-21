@@ -244,7 +244,7 @@ struct SeriesDetailScreen: View {
                         Button {
                             markNext?(entry)
                         } label: {
-                            trackingActionLabel(nextActionTitle(for: entry), systemImage: "checkmark")
+                            trackingActionLabel(nextActionTitle(for: entry), systemImage: quickProgressFilledSystemImage(for: entry))
                         }
                         .buttonStyle(.borderedProminent)
                         .controlSize(.regular)
