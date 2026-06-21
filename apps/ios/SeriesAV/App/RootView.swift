@@ -1384,6 +1384,19 @@ struct SeriesProgressEditorSheet: View {
                     }
                 }
             }
+            .safeAreaInset(edge: .bottom) {
+                Button {
+                    commitSelectedEpisode()
+                } label: {
+                    Label(confirmActionTitle, systemImage: "checkmark")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 12)
+                .background(.regularMaterial)
+            }
             .task(id: entry.seriesId) {
                 await loadEpisodeGuide()
             }
@@ -1476,7 +1489,7 @@ struct SeriesProgressEditorSheet: View {
                 LazyVStack(spacing: 8) {
                     ForEach(loadedGuide.items(in: selectedSeasonNumber), id: \.cursor) { item in
                         episodeGuideRow(item) {
-                            commitEpisode(item.episodeNumber)
+                            selectEpisode(item.episodeNumber)
                         }
                     }
                 }
@@ -1487,7 +1500,7 @@ struct SeriesProgressEditorSheet: View {
                             title: episodeChipTitle(for: episode),
                             episode: episode
                         ) {
-                            commitEpisode(episode)
+                            selectEpisode(episode)
                         }
                     }
 
@@ -1578,6 +1591,12 @@ struct SeriesProgressEditorSheet: View {
         case .generic, .unavailable:
             L10n.string("home.editor.footer")
         }
+    }
+
+    private var confirmActionTitle: String {
+        entry.lastWatchedEpisodeCursor == nil
+            ? L10n.string("home.editor.confirmStart")
+            : L10n.string("home.editor.confirm")
     }
 
     private func episodeChipTitle(for episode: Int) -> String {
@@ -1749,9 +1768,8 @@ struct SeriesProgressEditorSheet: View {
         }
     }
 
-    private func commitEpisode(_ episode: Int) {
-        selectEpisode(episode)
-        markWatchedThrough(SeriesEpisodeCursor(seasonNumber: selectedSeasonNumber, episodeNumber: episode))
+    private func commitSelectedEpisode() {
+        markWatchedThrough(selectedCursor)
         dismiss()
     }
 
