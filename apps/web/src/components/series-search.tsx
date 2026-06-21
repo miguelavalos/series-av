@@ -116,6 +116,7 @@ function SearchResultCard({ locale, result }: { locale: ReturnType<typeof useApp
             className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]"
             disabled={Boolean(existing) || !library.canAddSeries}
             onClick={() => {
+              rememberSeriesCatalogItem(result);
               library.addCatalogSeries({
                 displayArtworkRef: artwork,
                 fallbackVisualSeed: result.title,
