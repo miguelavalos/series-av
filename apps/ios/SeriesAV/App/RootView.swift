@@ -1382,11 +1382,15 @@ struct SeriesStatusButtons: View {
                 Button {
                     setStatus(status)
                 } label: {
-                    Label(statusTitle(status), systemImage: statusIcon(status, isSelected: false))
+                    Label(statusActionTitle(status), systemImage: statusIcon(status, isSelected: false))
                 }
             }
         }
     }
+}
+
+func statusActionTitle(_ status: SeriesLibraryEntryStatus) -> String {
+    String(format: L10n.string("library.status.action"), statusTitle(status))
 }
 
 func statusTitle(_ status: SeriesLibraryEntryStatus) -> String {

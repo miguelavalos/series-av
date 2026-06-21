@@ -142,6 +142,7 @@
 "library.status.wantToWatch" = "Per veure";
 "library.status.watching" = "Veient";
 "library.status.watched" = "Vista";
+"library.status.action" = "Canviar a %@";
 "upcoming.title" = "Pròxims";
 "upcoming.subtitle" = "Els següents episodis amb data de les teves sèries desades.";
 "upcoming.loading" = "Cercant pròxims episodis";

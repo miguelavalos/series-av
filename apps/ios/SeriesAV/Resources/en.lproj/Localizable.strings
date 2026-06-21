@@ -142,6 +142,7 @@
 "library.status.wantToWatch" = "To watch";
 "library.status.watching" = "Watching";
 "library.status.watched" = "Watched";
+"library.status.action" = "Change to %@";
 "upcoming.title" = "Upcoming";
 "upcoming.subtitle" = "Next dated episodes from your saved series.";
 "upcoming.loading" = "Checking upcoming episodes";

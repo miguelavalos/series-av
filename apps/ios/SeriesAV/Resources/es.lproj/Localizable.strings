@@ -142,6 +142,7 @@
 "library.status.wantToWatch" = "Por ver";
 "library.status.watching" = "Viendo";
 "library.status.watched" = "Vista";
+"library.status.action" = "Cambiar a %@";
 "upcoming.title" = "Próximos";
 "upcoming.subtitle" = "Los siguientes episodios con fecha de tus series guardadas.";
 "upcoming.loading" = "Buscando próximos episodios";
