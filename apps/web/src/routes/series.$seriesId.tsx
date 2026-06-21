@@ -215,7 +215,15 @@ function SeriesDetailHero({
                   <RotateCcw className="size-4" /> {libraryLabels.restore}
                 </Button>
               )}
-              <Button variant="ghost" className="rounded-full text-red-700 hover:bg-red-50 hover:text-red-800" onClick={() => library.deleteEntry(entry.entryId)}>
+              <Button
+                variant="ghost"
+                className="rounded-full text-red-700 hover:bg-red-50 hover:text-red-800"
+                onClick={() => {
+                  if (window.confirm(libraryLabels.confirmTrash)) {
+                    library.deleteEntry(entry.entryId);
+                  }
+                }}
+              >
                 <Trash2 className="size-4" /> {libraryLabels.trash}
               </Button>
             </>

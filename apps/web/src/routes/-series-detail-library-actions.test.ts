@@ -10,6 +10,7 @@ describe("Series detail library actions", () => {
     expect(source).toContain("library.restore(entry.entryId)");
     expect(source).toContain("library.deleteEntry(entry.entryId)");
     expect(source).toContain("libraryLabels.archive");
+    expect(source).toContain("window.confirm(libraryLabels.confirmTrash)");
     expect(source).toContain("libraryLabels.trash");
   });
 });

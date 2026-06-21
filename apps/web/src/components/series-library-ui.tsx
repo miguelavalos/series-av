@@ -19,6 +19,7 @@ const uiText = {
   ca: {
     archive: "Arxiva",
     clear: "Neteja",
+    confirmTrash: "Vols eliminar aquesta serie de la biblioteca?",
     episode: "Episodi",
     loadingTitle: "Carregant sèrie",
     more: "Més",
@@ -36,6 +37,7 @@ const uiText = {
   de: {
     archive: "Archivieren",
     clear: "Leeren",
+    confirmTrash: "Diese Serie aus der Bibliothek löschen?",
     episode: "Folge",
     loadingTitle: "Serie wird geladen",
     more: "Mehr",
@@ -53,6 +55,7 @@ const uiText = {
   en: {
     archive: "Archive",
     clear: "Clear",
+    confirmTrash: "Delete this series from your library?",
     episode: "Episode",
     loadingTitle: "Loading series",
     more: "More",
@@ -70,6 +73,7 @@ const uiText = {
   es: {
     archive: "Archivar",
     clear: "Borrar",
+    confirmTrash: "¿Eliminar esta serie de tu biblioteca?",
     episode: "Episodio",
     loadingTitle: "Cargando serie",
     more: "Más",
@@ -87,6 +91,7 @@ const uiText = {
   fr: {
     archive: "Archiver",
     clear: "Effacer",
+    confirmTrash: "Supprimer cette série de votre bibliothèque ?",
     episode: "Épisode",
     loadingTitle: "Chargement de la série",
     more: "Plus",
@@ -101,7 +106,7 @@ const uiText = {
     trash: "Supprimer",
     unpin: "Désépingler"
   }
-} satisfies Record<AppsAvLocale, { archive: string; clear: string; episode: string; loadingTitle: string; more: string; next: string; noEpisodeSet: string; notStarted: string; pin: string; pinned: string; previous: string; restore: string; status: Record<SeriesLibraryEntryStatus, string>; trash: string; unpin: string }>;
+} satisfies Record<AppsAvLocale, { archive: string; clear: string; confirmTrash: string; episode: string; loadingTitle: string; more: string; next: string; noEpisodeSet: string; notStarted: string; pin: string; pinned: string; previous: string; restore: string; status: Record<SeriesLibraryEntryStatus, string>; trash: string; unpin: string }>;
 
 export function SeriesArtwork({ entry, size = "md" }: { entry: Pick<SeriesLibraryEntry, "displayArtworkRef" | "fallbackVisualSeed" | "title"> & { seriesId?: string }; size?: "sm" | "md" | "lg" | "xl" }) {
   const classes = {
@@ -176,7 +181,14 @@ export function SeriesEntryRow({ entry, locale, showArchive = true }: { entry: S
                     <Archive className="size-4" /> {labels.archive}
                   </MenuButton>
                 ) : null}
-                <MenuButton danger onClick={() => library.deleteEntry(entry.entryId)}>
+                <MenuButton
+                  danger
+                  onClick={() => {
+                    if (window.confirm(labels.confirmTrash)) {
+                      library.deleteEntry(entry.entryId);
+                    }
+                  }}
+                >
                   <Trash2 className="size-4" /> {labels.trash}
                 </MenuButton>
               </div>
