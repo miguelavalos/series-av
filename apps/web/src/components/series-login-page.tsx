@@ -13,45 +13,50 @@ export function SeriesLoginPage({ comingSoon = false }: { comingSoon?: boolean }
 
   return (
     <div className="series-paper min-h-screen overflow-hidden px-4 pt-4 sm:px-6">
-      <main className="series-guest-shell mx-auto min-h-[32rem] w-full max-w-6xl overflow-hidden rounded-[1.75rem] border border-[#d7c494] bg-[#fff6da]/88 shadow-2xl shadow-[#172f5c]/16 backdrop-blur">
+      <main className="series-guest-shell mx-auto min-h-[31rem] w-full max-w-6xl overflow-hidden rounded-lg border border-[#d7c494] bg-[#fff6da]/88 shadow-2xl shadow-[#172f5c]/16 backdrop-blur">
         <img className="series-guest-backdrop" src={seriesBrandAssets.guestHomeShelf} alt="" />
         <div className="series-guest-overlay" />
 
         <section className="series-guest-copy relative z-10">
-          <div>
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <img className="h-auto w-48 sm:w-64" src={seriesBrandAssets.logo} alt="Series AV" />
-            <p className="mt-4 max-w-sm text-sm leading-6 text-[#314568]">
-              {text.login.intro}
-            </p>
+            {!comingSoon ? (
+              <Button asChild className="h-11 rounded-full bg-[#112a55] px-5 text-white shadow-lg shadow-[#112a55]/18 hover:bg-[#19396f]">
+                <Link to={localizedSeriesPath("/sign-in", locale)}>
+                  {text.login.cta}
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </Link>
+              </Button>
+            ) : null}
           </div>
 
-          <div className="max-w-xl">
+          <div className="max-w-2xl">
+            <p className="mb-4 max-w-sm text-sm font-semibold leading-6 text-[#5a8f2f]">
+              {text.login.intro}
+            </p>
             <h1 className="series-guest-title max-w-full text-[2.35rem] font-semibold leading-[1.03] text-[#112a55] sm:text-5xl xl:text-6xl">
               {text.login.heroTitle}
             </h1>
-            <p className="series-guest-body mt-6 text-base leading-7 text-[#334766]">
+            <p className="series-guest-body mt-5 max-w-xl text-base leading-7 text-[#334766]">
               {text.login.heroBody}
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              {comingSoon ? (
+            {comingSoon ? (
+              <div className="mt-6 flex flex-wrap gap-3">
                 <Button disabled className="h-12 rounded-full bg-[#112a55] px-5 text-white shadow-lg shadow-[#112a55]/18 disabled:opacity-100">
                   {comingSoonLabel(locale)}
                 </Button>
-              ) : (
-                <Button asChild className="h-12 rounded-full bg-[#112a55] px-5 text-white shadow-lg shadow-[#112a55]/18 hover:bg-[#19396f]">
-                  <Link to={localizedSeriesPath("/sign-in", locale)}>
-                    {text.login.cta}
-                    <ArrowRight className="size-4" aria-hidden="true" />
-                  </Link>
-                </Button>
-              )}
-            </div>
+              </div>
+            ) : null}
           </div>
 
-          <div className="grid gap-3 text-sm text-[#334766] sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
-            <LoginMetric icon={<Search className="size-4" aria-hidden="true" />} label={text.login.search} />
-            <LoginMetric icon={<Sparkles className="size-4" aria-hidden="true" />} label={text.login.aviGuidance} />
-            <LoginMetric icon={<BookOpenCheck className="size-4" aria-hidden="true" />} label={text.login.notebook} />
+          <div className="rounded-lg border border-[#d7c494] bg-[#fff8df]/74 p-4 shadow-sm shadow-[#172f5c]/5">
+            <p className="text-sm font-bold text-[#112a55]">{text.login.cardTitle}</p>
+            <p className="mt-2 text-sm leading-6 text-[#334766]">{text.login.cardBody}</p>
+            <div className="mt-4 grid gap-2 text-sm text-[#334766] sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+              <LoginMetric icon={<Search className="size-4" aria-hidden="true" />} label={text.login.search} />
+              <LoginMetric icon={<Sparkles className="size-4" aria-hidden="true" />} label={text.login.aviGuidance} />
+              <LoginMetric icon={<BookOpenCheck className="size-4" aria-hidden="true" />} label={text.login.notebook} />
+            </div>
           </div>
         </section>
 
