@@ -279,7 +279,7 @@ private struct SeriesUpcomingEpisodeRow: View {
                 Button {
                     markWatchedThrough(entry, episode.cursor)
                 } label: {
-                    Label(actionTitle, systemImage: "checkmark")
+                    Label(actionBadgeTitle, systemImage: "checkmark")
                         .font(.system(size: 11, weight: .black))
                         .foregroundStyle(Color.black.opacity(0.84))
                         .lineLimit(1)
@@ -291,12 +291,21 @@ private struct SeriesUpcomingEpisodeRow: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(actionTitle)
+                .accessibilityIdentifier(actionIdentifier)
             }
         }
     }
 
+    private var actionBadgeTitle: String {
+        L10n.string("detail.episodes.action.setPoint")
+    }
+
     private var actionTitle: String {
-        String(format: L10n.string("home.editor.confirmThrough"), cursorLabel(episode.cursor))
+        String(format: L10n.string("detail.episodes.action.setPoint.accessibility"), cursorLabel(episode.cursor))
+    }
+
+    private var actionIdentifier: String {
+        "series-upcoming-episode-\(episode.cursor.seasonNumber)-\(episode.cursor.episodeNumber)-set-progress"
     }
 }
 
