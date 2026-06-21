@@ -47,7 +47,7 @@
 "home.delete" = "Supprimer";
 "home.undo" = "Annuler";
 "home.undo.added" = "\"%@\" suivie";
-"home.undo.archived" = "\"%@\" archivée";
+"home.undo.archived" = "\"%@\" archivée dans Bibliothèque > Archive";
 "home.undo.deleted" = "\"%@\" supprimée";
 "home.undo.progress" = "Progression de \"%@\" modifiée";
 "home.undo.nowWatching" = "\"%@\" est maintenant dans En cours";

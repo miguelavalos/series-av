@@ -47,7 +47,7 @@
 "home.delete" = "Eliminar";
 "home.undo" = "Deshacer";
 "home.undo.added" = "\"%@\" seguida";
-"home.undo.archived" = "\"%@\" archivada";
+"home.undo.archived" = "\"%@\" archivada en Biblioteca > Archivo";
 "home.undo.deleted" = "\"%@\" eliminada";
 "home.undo.progress" = "Progreso de \"%@\" cambiado";
 "home.undo.nowWatching" = "\"%@\" ahora está en Viendo ahora";
