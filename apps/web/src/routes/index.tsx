@@ -11,7 +11,7 @@ import { SeriesLoginPage } from "@/components/series-login-page";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SeriesApiClient, rememberSeriesCatalogItem, type SeriesSearchResult } from "@/lib/series-api-client";
-import { getSeriesApiBaseUrl } from "@/lib/series-config";
+import { getSeriesApiBaseUrl, isSeriesWebAppComingSoon } from "@/lib/series-config";
 import { visibleSeriesTitle } from "@/lib/series-display";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
 import { cursorLabel, nextEpisodeCursor, progressLabel } from "@/lib/series-library";
@@ -22,6 +22,10 @@ export const Route = createFileRoute("/")({
 });
 
 function IndexRoute() {
+  if (isSeriesWebAppComingSoon()) {
+    return <SeriesLoginPage comingSoon />;
+  }
+
   return (
     <>
       <SignedOut>

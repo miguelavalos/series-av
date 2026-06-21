@@ -48,6 +48,10 @@ export function getAccountPublishableKey() {
   return import.meta.env.VITE_ACCOUNTAV_PUBLISHABLE_KEY as string | undefined;
 }
 
+export function isSeriesWebAppComingSoon() {
+  return import.meta.env.VITE_SERIESAV_WEBAPP_COMING_SOON === "true";
+}
+
 function requiredUrl(value: string | undefined, key: string) {
   const normalized = trimTrailingSlash(value);
   if (!normalized) {

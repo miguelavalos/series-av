@@ -2,7 +2,7 @@ import { AccountAvProvider } from "@avalsys/account-av-web";
 import { AppsAvWebProvider, applyAppsAvThemePreference, getAppsAvLocaleFromSearch, normalizeAppsAvThemePreference, readAppsAvThemePreference, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { HeadContent, Outlet, Scripts, createRootRoute, useRouterState } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { getAccountApiBaseUrl, getAccountPublishableKey } from "@/lib/series-config";
+import { getAccountApiBaseUrl, getAccountPublishableKey, isSeriesWebAppComingSoon } from "@/lib/series-config";
 import { localizedSeriesPath, useSeriesAccountLocalization, useSeriesText } from "@/lib/series-i18n";
 import { SeriesLibraryProvider } from "@/lib/series-library-provider";
 import "../styles.css";
@@ -52,6 +52,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
       <body>
         <AppsAvWebProvider initialLocale={initialLocale}>
+          <ComingSoonRouteGate />
           <AccountBoundary>{children}</AccountBoundary>
         </AppsAvWebProvider>
         <Scripts />
@@ -61,6 +62,19 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 }
 
 const seriesThemeStorageKey = "series-av.theme";
+
+function ComingSoonRouteGate() {
+  const locale = useAppsAvLocale();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+
+  useEffect(() => {
+    if (isSeriesWebAppComingSoon() && pathname !== "/") {
+      window.location.replace(localizedSeriesPath("/", locale));
+    }
+  }, [locale, pathname]);
+
+  return null;
+}
 
 function AccountBoundary({ children }: Readonly<{ children: ReactNode }>) {
   const publishableKey = getAccountPublishableKey();

@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { seriesBrandAssets } from "@/lib/series-config";
 import { localizedSeriesPath, useSeriesProductConfig, useSeriesText } from "@/lib/series-i18n";
 
-export function SeriesLoginPage() {
+export function SeriesLoginPage({ comingSoon = false }: { comingSoon?: boolean }) {
   const locale = useAppsAvLocale();
   const text = useSeriesText();
   const productConfig = useSeriesProductConfig();
@@ -47,12 +47,18 @@ export function SeriesLoginPage() {
                 {text.login.heroBody}
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Button asChild className="h-12 rounded-full bg-[#112a55] px-5 text-white shadow-lg shadow-[#112a55]/18 hover:bg-[#19396f]">
-                  <Link to={localizedSeriesPath("/sign-in", locale)}>
-                    {text.login.cta}
-                    <ArrowRight className="size-4" aria-hidden="true" />
-                  </Link>
-                </Button>
+                {comingSoon ? (
+                  <Button disabled className="h-12 rounded-full bg-[#112a55] px-5 text-white shadow-lg shadow-[#112a55]/18 disabled:opacity-100">
+                    {comingSoonLabel(locale)}
+                  </Button>
+                ) : (
+                  <Button asChild className="h-12 rounded-full bg-[#112a55] px-5 text-white shadow-lg shadow-[#112a55]/18 hover:bg-[#19396f]">
+                    <Link to={localizedSeriesPath("/sign-in", locale)}>
+                      {text.login.cta}
+                      <ArrowRight className="size-4" aria-hidden="true" />
+                    </Link>
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -86,6 +92,10 @@ export function SeriesLoginPage() {
       <AvAppFooter className="mt-4 border-transparent bg-transparent px-0 pb-4 pt-2" labels={text.footer} product={productConfig} />
     </div>
   );
+}
+
+function comingSoonLabel(locale: ReturnType<typeof useAppsAvLocale>) {
+  return ({ ca: "Properament", de: "Demnächst", en: "Coming soon", es: "Próximamente", fr: "Prochainement" } as const)[locale] ?? "Coming soon";
 }
 
 function LoginMetric({ icon, label }: { icon: ReactNode; label: string }) {
