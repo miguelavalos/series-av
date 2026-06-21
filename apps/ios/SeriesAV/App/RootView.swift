@@ -837,14 +837,19 @@ private struct SeriesCurrentWatchingCard: View {
                 HStack(spacing: 7) {
                     Image(systemName: "play.circle.fill")
                         .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(AVBrandColor.accent)
                     Text(String(format: L10n.string("home.current.nextEpisode"), cursorLabel(entry.nextEpisodeCursor)))
                         .font(.system(size: 14, weight: .black, design: .rounded))
                         .monospacedDigit()
+                        .foregroundStyle(heroTitleColor.opacity(0.82))
                 }
-                .foregroundStyle(AVBrandColor.accent)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
-                .background(AVBrandColor.accent.opacity(colorScheme == .dark ? 0.18 : 0.14), in: Capsule())
+                .background(heroControlSurface, in: Capsule())
+                .overlay {
+                    Capsule()
+                        .stroke(heroControlStroke, lineWidth: 1)
+                }
             }
             .layoutPriority(1)
 
