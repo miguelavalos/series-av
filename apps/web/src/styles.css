@@ -283,27 +283,39 @@ body {
   border-color: rgb(208 190 137 / 0.38) !important;
 }
 
+:root[data-series-theme="dark"] .series-home-hero,
+:root:not([data-series-theme="light"]) .series-home-hero,
 .series-home-hero {
   background-color: #fff8df !important;
 }
 
+:root[data-series-theme="dark"] .series-home-hero-overlay,
+:root:not([data-series-theme="light"]) .series-home-hero-overlay,
 .series-home-hero-overlay {
   background: linear-gradient(90deg, #fff8df 0%, #fff8df 68%, rgb(255 248 223 / 72%) 100%) !important;
 }
 
+:root[data-series-theme="dark"] .series-home-hero-title,
+:root:not([data-series-theme="light"]) .series-home-hero-title,
 .series-home-hero-title {
   color: #112a55 !important;
 }
 
+:root[data-series-theme="dark"] .series-home-hero-body,
+:root:not([data-series-theme="light"]) .series-home-hero-body,
 .series-home-hero-body {
   color: #334766 !important;
 }
 
+:root[data-series-theme="dark"] .series-home-signal,
+:root:not([data-series-theme="light"]) .series-home-signal,
 .series-home-signal {
   background-color: rgb(255 255 255 / 68%) !important;
   color: #112a55 !important;
 }
 
+:root[data-series-theme="dark"] .series-home-signal-value,
+:root:not([data-series-theme="light"]) .series-home-signal-value,
 .series-home-signal-value {
   color: #53617a !important;
 }
