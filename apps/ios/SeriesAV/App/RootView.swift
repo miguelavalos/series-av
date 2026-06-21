@@ -1657,7 +1657,7 @@ struct SeriesProgressEditorSheet: View {
     private var confirmActionTitle: String {
         entry.lastWatchedEpisodeCursor == nil
             ? L10n.string("home.editor.confirmStart")
-            : L10n.string("home.editor.confirm")
+            : String(format: L10n.string("home.editor.confirmThrough"), selectedCursorLabel)
     }
 
     private func episodeChipTitle(for episode: Int) -> String {

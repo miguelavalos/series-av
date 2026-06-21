@@ -31,6 +31,7 @@ struct SeriesDetailScreen: View {
     @State private var displayedPinnedOverride: Bool?
     @State private var hasDisplayedPrivateNoteOverride = false
     @State private var displayedPrivateNote: String?
+    @State private var displayedLastWatchedEpisodeCursor: SeriesEpisodeCursor?
     @State private var isShowingShareComposer = false
     @State private var inAppBrowserDestination: SeriesInAppBrowserDestination?
     @State private var shareSheetItem: SeriesShareSheetItem?
@@ -65,6 +66,7 @@ struct SeriesDetailScreen: View {
         self.episodeGuideClient = episodeGuideClient
         self.detailClient = detailClient
         self.shareInviteClient = shareInviteClient
+        _displayedLastWatchedEpisodeCursor = State(initialValue: entry?.lastWatchedEpisodeCursor)
     }
 
     var body: some View {
@@ -113,9 +115,11 @@ struct SeriesDetailScreen: View {
                     SeriesProgressEditorSheet(
                         entry: entry,
                         markWatchedThrough: { cursor in
+                            displayedLastWatchedEpisodeCursor = cursor
                             markWatchedThrough(entry, cursor)
                         },
                         clearProgress: {
+                            displayedLastWatchedEpisodeCursor = nil
                             clearProgress(entry)
                         }
                     )
@@ -387,6 +391,7 @@ struct SeriesDetailScreen: View {
                             ForEach(episodes.prefix(8), id: \.cursor) { episode in
                                 SeriesDetailEpisodeRow(
                                     episode: episode,
+                                    displayedLastWatchedEpisodeCursor: displayedLastWatchedEpisodeCursor,
                                     markWatchedThrough: markEpisodeWatchedThroughAction(for: episode)
                                 )
                             }
@@ -536,8 +541,8 @@ struct SeriesDetailScreen: View {
         }
 
         return {
+            displayedLastWatchedEpisodeCursor = episode.cursor
             markWatchedThrough(entry, episode.cursor)
-            dismiss()
         }
     }
 
@@ -775,6 +780,7 @@ private enum SeriesDetailGuideState {
 
 private struct SeriesDetailEpisodeRow: View {
     let episode: SeriesEpisodeGuideItem
+    let displayedLastWatchedEpisodeCursor: SeriesEpisodeCursor?
     let markWatchedThrough: (() -> Void)?
 
     var body: some View {
@@ -848,7 +854,7 @@ private struct SeriesDetailEpisodeRow: View {
     }
 
     private var stateIconName: String {
-        switch episode.relativeState {
+        switch effectiveRelativeState {
         case .watched:
             "checkmark"
         case .current, .next, .pending:
@@ -857,7 +863,7 @@ private struct SeriesDetailEpisodeRow: View {
     }
 
     private var stateTitle: String {
-        switch episode.relativeState {
+        switch effectiveRelativeState {
         case .watched:
             L10n.string("detail.episodes.state.watched")
         case .current:
@@ -870,7 +876,7 @@ private struct SeriesDetailEpisodeRow: View {
     }
 
     private var stateTitleColor: Color {
-        switch episode.relativeState {
+        switch effectiveRelativeState {
         case .watched:
             AVBrandColor.textSecondary
         case .current, .next, .pending:
@@ -879,7 +885,7 @@ private struct SeriesDetailEpisodeRow: View {
     }
 
     private var stateIconSize: CGFloat {
-        switch episode.relativeState {
+        switch effectiveRelativeState {
         case .watched:
             13
         case .current, .next, .pending:
@@ -888,7 +894,7 @@ private struct SeriesDetailEpisodeRow: View {
     }
 
     private var stateIconColor: Color {
-        switch episode.relativeState {
+        switch effectiveRelativeState {
         case .watched:
             AVBrandColor.textSecondary
         case .current, .next, .pending:
@@ -897,7 +903,7 @@ private struct SeriesDetailEpisodeRow: View {
     }
 
     private var stateIconBackground: Color {
-        switch episode.relativeState {
+        switch effectiveRelativeState {
         case .watched:
             Color(.secondarySystemGroupedBackground)
         case .current, .next, .pending:
@@ -906,7 +912,7 @@ private struct SeriesDetailEpisodeRow: View {
     }
 
     private var cursorColor: Color {
-        switch episode.relativeState {
+        switch effectiveRelativeState {
         case .watched:
             AVBrandColor.textSecondary
         case .current, .next, .pending:
@@ -915,7 +921,7 @@ private struct SeriesDetailEpisodeRow: View {
     }
 
     private var rowBackground: Color {
-        switch episode.relativeState {
+        switch effectiveRelativeState {
         case .watched:
             Color(.tertiarySystemGroupedBackground).opacity(0.44)
         case .current, .next:
@@ -926,7 +932,7 @@ private struct SeriesDetailEpisodeRow: View {
     }
 
     private var rowBorderColor: Color {
-        switch episode.relativeState {
+        switch effectiveRelativeState {
         case .current, .next:
             AVBrandColor.accent.opacity(0.34)
         case .watched, .pending:
@@ -935,12 +941,29 @@ private struct SeriesDetailEpisodeRow: View {
     }
 
     private var rowBorderWidth: CGFloat {
-        switch episode.relativeState {
+        switch effectiveRelativeState {
         case .current, .next:
             1
         case .watched, .pending:
             0
         }
+    }
+
+    private var effectiveRelativeState: SeriesEpisodeGuideRelativeState {
+        guard let displayedLastWatchedEpisodeCursor else {
+            return episode.cursor == SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 1) ? .next : .pending
+        }
+
+        if episode.cursor < displayedLastWatchedEpisodeCursor {
+            return .watched
+        }
+        if episode.cursor == displayedLastWatchedEpisodeCursor {
+            return .current
+        }
+        if episode.cursor == displayedLastWatchedEpisodeCursor.nextEpisode {
+            return .next
+        }
+        return .pending
     }
 }
 

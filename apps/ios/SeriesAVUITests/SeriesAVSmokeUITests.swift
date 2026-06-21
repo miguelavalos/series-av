@@ -262,6 +262,24 @@ final class SeriesAVSmokeUITests: XCTestCase {
     }
 
     @MainActor
+    func testProgressEditorEpisodeTapKeepsConfirmationVisible() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "home",
+            "SERIESAV_UI_TESTS_SHOW_PROGRESS_EDITOR": "1"
+        ])
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Ajustar episodio"].waitForExistence(timeout: 10))
+        app.buttons["Episodio 3"].tap()
+
+        XCTAssertTrue(app.staticTexts["S1 E3"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Fijar hasta S1 E3"].exists)
+        XCTAssertTrue(app.buttons["Cancelar"].exists)
+    }
+
+    @MainActor
     func testSampleHomeShowsReadyToStartBelowWatchingQueue() throws {
         continueAfterFailure = false
         let app = makeApp(environment: [
