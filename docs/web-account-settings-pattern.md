@@ -17,6 +17,11 @@ The Apple app exposes an in-app versus system-browser preference. On web this is
 represented as read-only browser behavior because the browser controls external
 link handling.
 
+Settings choice controls use shared `@avalsys/apps-av-web` primitives:
+`SettingsOptionButtonGroup` for compact modes and `SettingsSelect` for larger
+option lists such as source search engines. Do not add Series-local form styling
+unless the control is domain-specific.
+
 ## Account
 
 Section order:

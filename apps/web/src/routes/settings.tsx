@@ -5,6 +5,7 @@ import {
   SettingsOptionButtonGroup,
   SettingsProfileScaffold,
   SettingsSectionCard,
+  SettingsSelect,
   useAppsAvLocale,
   appsAvLocaleNames,
   appsAvExternalSearchEngines,
@@ -94,20 +95,15 @@ function SettingsRoute() {
             <SettingsInfoRow icon={<RotateCcw className="size-5" />} title={labels.series.reversibleTitle} detail={labels.series.reversibleDetail} />
             <SettingsInfoRow icon={<ExternalLink className="size-5" />} title={labels.series.webOpenModeTitle} detail={labels.series.webOpenModeDetail} />
             <SettingsInfoRow icon={<Search className="size-5" />} title={labels.series.searchEngineTitle} detail={labels.series.searchEngineDetail} />
-            <label className="grid gap-2">
-              <span className="sr-only">{labels.series.searchEngineTitle}</span>
-              <select
-                className="h-12 w-full rounded-lg border border-[#d7c494] bg-[#fff8df]/80 px-4 text-sm font-semibold text-[#112a55] outline-none transition focus:border-[#112a55] focus:ring-2 focus:ring-[#112a55]/20"
-                value={searchEngine}
-                onChange={(event) => setSearchEngine(event.target.value as AppsAvExternalSearchEngine)}
-              >
-                {appsAvExternalSearchEngines.map((engine) => (
-                  <option key={engine} value={engine}>
-                    {labels.series.searchEngineOptions[engine]}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <SettingsSelect
+              ariaLabel={labels.series.searchEngineTitle}
+              selectedId={searchEngine}
+              onSelect={(id) => setSearchEngine(id as AppsAvExternalSearchEngine)}
+              options={appsAvExternalSearchEngines.map((engine) => ({
+                id: engine,
+                label: labels.series.searchEngineOptions[engine]
+              }))}
+            />
           </SettingsSectionCard>
 
           <SettingsSectionCard title={labels.local.title} subtitle={labels.local.subtitle}>
