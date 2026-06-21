@@ -863,7 +863,7 @@ private struct SeriesCurrentWatchingCard: View {
                     .background(AVBrandColor.accent, in: Circle())
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("\(primaryActionTitle), \(cursorLabel(entry.nextEpisodeCursor))")
+            .accessibilityLabel(primaryActionAccessibilityLabel)
 
             Button {
                 isShowingProgressSelector = true
@@ -936,7 +936,15 @@ private struct SeriesCurrentWatchingCard: View {
     }
 
     private var primaryActionTitle: String {
-        entry.status == .wantToWatch ? L10n.string("home.start") : L10n.string("home.next")
+        entry.status == .wantToWatch
+            ? L10n.string("home.start")
+            : String(format: L10n.string("home.action.markEpisodeWatched"), cursorLabel(entry.nextEpisodeCursor))
+    }
+
+    private var primaryActionAccessibilityLabel: String {
+        entry.status == .wantToWatch
+            ? "\(primaryActionTitle), \(cursorLabel(entry.nextEpisodeCursor))"
+            : primaryActionTitle
     }
 
     private var primaryIconName: String {
@@ -2136,8 +2144,5 @@ func cursorLabel(_ cursor: SeriesEpisodeCursor) -> String {
 }
 
 func quickProgressActionTitle(for entry: SeriesLibraryEntry) -> String {
-    if entry.status == .wantToWatch {
-        return String(format: L10n.string("home.action.markEpisodeWatched"), cursorLabel(entry.nextEpisodeCursor))
-    }
-    return "\(L10n.string("shell.watch.next")) \(cursorLabel(entry.nextEpisodeCursor))"
+    String(format: L10n.string("home.action.markEpisodeWatched"), cursorLabel(entry.nextEpisodeCursor))
 }

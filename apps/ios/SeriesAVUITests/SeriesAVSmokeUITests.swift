@@ -330,6 +330,28 @@ final class SeriesAVSmokeUITests: XCTestCase {
     }
 
     @MainActor
+    func testSampleDetailTrackingActionsUseVisibleActionLabels() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "home"
+        ])
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Current Series"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["Marcar S1 E3 visto"].exists)
+
+        app.buttons["Acciones de serie"].firstMatch.tap()
+        XCTAssertTrue(app.buttons["Ver info"].waitForExistence(timeout: 5))
+        app.buttons["Ver info"].tap()
+
+        XCTAssertTrue(app.staticTexts["Seguimiento"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["Marcar S1 E3 visto"].exists)
+        XCTAssertTrue(app.buttons["Ajustar episodio"].exists)
+        XCTAssertTrue(app.buttons["Quitar fijado"].exists)
+    }
+
+    @MainActor
     func testLocalizedHomeSearchAndLibraryRenderWithLargeDynamicType() throws {
         continueAfterFailure = false
 

@@ -240,27 +240,24 @@ struct SeriesDetailScreen: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
-                    HStack(spacing: 10) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 138), spacing: 10)], spacing: 10) {
                         Button {
                             markNext?(entry)
                         } label: {
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 18, weight: .black))
-                                .frame(width: 50, height: 50)
+                            trackingActionLabel(nextActionTitle(for: entry), systemImage: "checkmark")
                         }
-                        .buttonStyle(.plain)
-                        .foregroundStyle(Color.black.opacity(0.84))
-                        .background(AVBrandColor.accent, in: Circle())
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.regular)
+                        .tint(AVBrandColor.accent)
                         .accessibilityLabel(nextActionTitle(for: entry))
 
                         Button {
                             isShowingProgressEditor = true
                         } label: {
-                            Image(systemName: "scope")
-                                .frame(width: 44, height: 44)
+                            trackingActionLabel(L10n.string("home.adjust"), systemImage: "scope")
                         }
                         .buttonStyle(.bordered)
-                        .controlSize(.large)
+                        .controlSize(.regular)
                         .accessibilityLabel(L10n.string("home.adjust"))
 
                         if let setPinned {
@@ -269,11 +266,10 @@ struct SeriesDetailScreen: View {
                                 displayedPinnedOverride = nextPinned
                                 setPinned(entry, nextPinned)
                             } label: {
-                                Image(systemName: currentIsPinned ? "pin.slash" : "pin")
-                                    .frame(width: 44, height: 44)
+                                trackingActionLabel(pinTitle, systemImage: currentIsPinned ? "pin.slash" : "pin")
                             }
                             .buttonStyle(.bordered)
-                            .controlSize(.large)
+                            .controlSize(.regular)
                             .accessibilityLabel(pinTitle)
                         }
                     }
@@ -457,6 +453,14 @@ struct SeriesDetailScreen: View {
             .font(.system(size: 13, weight: .black))
             .foregroundStyle(AVBrandColor.textSecondary)
             .textCase(.uppercase)
+    }
+
+    private func trackingActionLabel(_ title: String, systemImage: String) -> some View {
+        Label(title, systemImage: systemImage)
+            .font(.system(size: 13, weight: .black))
+            .lineLimit(1)
+            .minimumScaleFactor(0.78)
+            .frame(maxWidth: .infinity, minHeight: 38)
     }
 
     @MainActor
