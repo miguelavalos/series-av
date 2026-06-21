@@ -2,7 +2,7 @@ import { AppExternalLinkPanel, AppSegmentedControl, appsAvExternalSearchUrl, app
 import { useAccountSession, useAccountToken } from "@avalsys/account-av-web";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Plus, RotateCcw, Search, StepBack, StepForward } from "lucide-react";
+import { Archive, ArrowLeft, BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Plus, RotateCcw, Search, StepBack, StepForward, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { SeriesAppShell } from "@/components/series-app-shell";
@@ -206,6 +206,18 @@ function SeriesDetailHero({
                 </>
               ) : null}
               <StatusButtons entry={entry} locale={locale} />
+              {!entry.archivedAt ? (
+                <Button variant="outline" className="rounded-full border-[#c8ad72] bg-white/60" onClick={() => library.archive(entry.entryId)}>
+                  <Archive className="size-4" /> {libraryLabels.archive}
+                </Button>
+              ) : (
+                <Button variant="outline" className="rounded-full border-[#c8ad72] bg-white/60" onClick={() => library.restore(entry.entryId)}>
+                  <RotateCcw className="size-4" /> {libraryLabels.restore}
+                </Button>
+              )}
+              <Button variant="ghost" className="rounded-full text-red-700 hover:bg-red-50 hover:text-red-800" onClick={() => library.deleteEntry(entry.entryId)}>
+                <Trash2 className="size-4" /> {libraryLabels.trash}
+              </Button>
             </>
           ) : (
             <Button
