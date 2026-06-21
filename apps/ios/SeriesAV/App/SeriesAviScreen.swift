@@ -38,12 +38,11 @@ struct SeriesAviScreen: View {
                 togglePinned: togglePinnedCurrent
             )
 
-            SeriesAviPreparationCard(openSearch: openSearch)
-
-            SeriesAviLibraryGuidanceCard(
+            SeriesAviQuickActionsCard(
                 activeCount: store.activeEntries.count,
                 watchingCount: store.watchingEntries.count,
                 archivedCount: store.archivedEntries.count,
+                openSearch: openSearch,
                 openLibrary: openLibrary
             )
 
@@ -53,8 +52,6 @@ struct SeriesAviScreen: View {
                     startSignInFlow: startSignInFlow
                 )
             }
-
-            SeriesAviTrackingHelpCard()
         }
         .safeAreaInset(edge: .bottom) {
             if let pendingProgressUndo {
@@ -149,32 +146,75 @@ struct SeriesAviScreen: View {
     }
 }
 
-private struct SeriesAviPreparationCard: View {
+private struct SeriesAviQuickActionsCard: View {
+    let activeCount: Int
+    let watchingCount: Int
+    let archivedCount: Int
     let openSearch: () -> Void
+    let openLibrary: () -> Void
 
     var body: some View {
         AVAviGuidanceCard(
             title: L10n.string("avi.prepare.title"),
             detail: L10n.string("avi.prepare.detail")
         ) {
-            AVAviInfoRow(
-                title: L10n.string("avi.prepare.search.title"),
-                detail: L10n.string("avi.prepare.search.detail"),
-                systemImage: "magnifyingglass"
-            )
-            AVAviInfoRow(
-                title: L10n.string("avi.prepare.progress.title"),
-                detail: L10n.string("avi.prepare.progress.detail"),
-                systemImage: "scope"
-            )
-            AVAviActionInfoRow(
-                title: L10n.string("avi.prepare.action.title"),
-                detail: L10n.string("avi.prepare.action.detail"),
-                systemImage: "plus.app",
-                buttonTitle: L10n.string("avi.prepare.action.button"),
-                action: openSearch
-            )
+            HStack(spacing: 10) {
+                SeriesAviIconActionButton(
+                    systemImage: "magnifyingglass",
+                    accessibilityLabel: L10n.string("search.title"),
+                    action: openSearch
+                )
+
+                SeriesAviIconActionButton(
+                    systemImage: "rectangle.stack.fill",
+                    accessibilityLabel: L10n.string("library.title"),
+                    action: openLibrary
+                )
+            }
+
+            HStack(spacing: 8) {
+                SeriesAviMetricPill(
+                    title: L10n.string("library.filter.watching"),
+                    value: watchingCount,
+                    systemImage: "play.circle.fill"
+                )
+                SeriesAviMetricPill(
+                    title: L10n.string("library.filter.all"),
+                    value: activeCount,
+                    systemImage: "rectangle.stack.fill"
+                )
+                SeriesAviMetricPill(
+                    title: L10n.string("library.filter.archived.short"),
+                    value: archivedCount,
+                    systemImage: "archivebox"
+                )
+            }
         }
+    }
+}
+
+private struct SeriesAviMetricPill: View {
+    let title: String
+    let value: Int
+    let systemImage: String
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: systemImage)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(AVBrandColor.accent)
+
+            Text("\(value)")
+                .font(.system(size: 13, weight: .black, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(AVBrandColor.textPrimary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 8)
+        .background(Color(.tertiarySystemGroupedBackground), in: Capsule())
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(title): \(value)")
     }
 }
 
@@ -216,25 +256,28 @@ private struct SeriesAviCurrentFocusCard: View {
                     systemImage: "play.circle.fill"
                 )
 
-                AVAviActionButton(
-                    title: "\(currentEntry.status == .wantToWatch ? L10n.string("avi.action.start") : L10n.string("avi.action.next")) \(cursorLabel(currentEntry.nextEpisodeCursor))",
-                    systemImage: "checkmark.circle",
-                    action: currentEntry.status == .wantToWatch ? startWatching : markNext
-                )
+                HStack(spacing: 10) {
+                    SeriesAviIconActionButton(
+                        systemImage: currentEntry.status == .wantToWatch ? "play.fill" : "checkmark",
+                        isPrimary: true,
+                        accessibilityLabel: "\(currentEntry.status == .wantToWatch ? L10n.string("avi.action.start") : L10n.string("avi.action.next")) \(cursorLabel(currentEntry.nextEpisodeCursor))",
+                        action: currentEntry.status == .wantToWatch ? startWatching : markNext
+                    )
 
-                if currentEntry.lastWatchedEpisodeCursor?.canStepBackQuickly == true {
-                    AVAviActionButton(
-                        title: L10n.string("avi.action.previous"),
-                        systemImage: "arrow.uturn.backward.circle",
-                        action: markPrevious
+                    if currentEntry.lastWatchedEpisodeCursor?.canStepBackQuickly == true {
+                        SeriesAviIconActionButton(
+                            systemImage: "arrow.uturn.backward",
+                            accessibilityLabel: L10n.string("avi.action.previous"),
+                            action: markPrevious
+                        )
+                    }
+
+                    SeriesAviIconActionButton(
+                        systemImage: currentEntry.isPinnedHomeSeries == true ? "pin.slash" : "pin",
+                        accessibilityLabel: currentEntry.isPinnedHomeSeries == true ? L10n.string("avi.action.unpin") : L10n.string("avi.action.pin"),
+                        action: togglePinned
                     )
                 }
-
-                AVAviActionButton(
-                    title: currentEntry.isPinnedHomeSeries == true ? L10n.string("avi.action.unpin") : L10n.string("avi.action.pin"),
-                    systemImage: currentEntry.isPinnedHomeSeries == true ? "pin.slash" : "pin",
-                    action: togglePinned
-                )
             } else {
                 AVAviInfoRow(
                     title: L10n.string("avi.current.empty.title"),
@@ -257,62 +300,21 @@ private struct SeriesAviCurrentFocusCard: View {
     }
 }
 
-private struct SeriesAviLibraryGuidanceCard: View {
-    let activeCount: Int
-    let watchingCount: Int
-    let archivedCount: Int
-    let openLibrary: () -> Void
+private struct SeriesAviIconActionButton: View {
+    let systemImage: String
+    var isPrimary = false
+    let accessibilityLabel: String
+    let action: () -> Void
 
     var body: some View {
-        AVAviGuidanceCard(
-            title: L10n.string("library.title"),
-            detail: L10n.string("avi.library.detail")
-        ) {
-            AVAviInfoRow(
-                title: L10n.string("library.filter.watching"),
-                detail: "\(watchingCount)",
-                systemImage: "play.circle.fill"
-            )
-            AVAviInfoRow(
-                title: L10n.string("library.filter.all"),
-                detail: "\(activeCount)",
-                systemImage: "rectangle.stack.fill"
-            )
-            AVAviInfoRow(
-                title: L10n.string("library.filter.archived"),
-                detail: "\(archivedCount)",
-                systemImage: "archivebox"
-            )
-            AVAviActionButton(
-                title: L10n.string("library.title"),
-                systemImage: "rectangle.stack.fill",
-                action: openLibrary
-            )
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.system(size: isPrimary ? 18 : 16, weight: .black))
+                .foregroundStyle(isPrimary ? Color.black.opacity(0.84) : AVBrandColor.textPrimary)
+                .frame(width: isPrimary ? 48 : 44, height: isPrimary ? 48 : 44)
+                .background(isPrimary ? AVBrandColor.accent : Color(.tertiarySystemGroupedBackground), in: Circle())
         }
-    }
-}
-
-private struct SeriesAviTrackingHelpCard: View {
-    var body: some View {
-        AVAviGuidanceCard(
-            title: L10n.string("avi.help.title"),
-            detail: L10n.string("avi.help.detail")
-        ) {
-            AVAviInfoRow(
-                title: L10n.string("avi.help.next.title"),
-                detail: L10n.string("avi.help.next.detail"),
-                systemImage: "checkmark.circle"
-            )
-            AVAviInfoRow(
-                title: L10n.string("avi.help.previous.title"),
-                detail: L10n.string("avi.help.previous.detail"),
-                systemImage: "arrow.uturn.backward.circle"
-            )
-            AVAviInfoRow(
-                title: L10n.string("avi.help.pin.title"),
-                detail: L10n.string("avi.help.pin.detail"),
-                systemImage: "pin"
-            )
-        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
     }
 }
