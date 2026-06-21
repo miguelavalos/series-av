@@ -387,7 +387,8 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["S2 E7 → S2 E8"].exists)
         XCTAssertTrue(app.staticTexts["Later List"].exists)
         XCTAssertTrue(app.staticTexts["Empezar por S1 E1"].exists)
-        XCTAssertTrue(app.buttons["Marcar S1 E1 visto"].exists)
+        XCTAssertTrue(app.buttons["Empezar S1 E1"].exists)
+        XCTAssertFalse(app.buttons["Marcar S1 E1 visto"].exists)
         XCTAssertFalse(app.staticTexts["Sigue tu primera serie"].exists)
     }
 
@@ -419,12 +420,13 @@ final class SeriesAVSmokeUITests: XCTestCase {
         continueAfterFailure = false
         let app = makeApp(environment: [
             "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
-            "SERIESAV_UI_TESTS_INITIAL_TAB": "library"
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "search"
         ])
         app.launch()
 
-        XCTAssertTrue(app.staticTexts["Biblioteca"].waitForExistence(timeout: 10))
-        app.buttons["Por ver"].tap()
+        XCTAssertTrue(app.staticTexts["Buscar series"].waitForExistence(timeout: 10))
+        app.textFields["Buscar por título"].tap()
+        app.textFields["Buscar por título"].typeText("Later")
         XCTAssertTrue(app.staticTexts["Later List"].waitForExistence(timeout: 5))
         app.buttons["Later List"].tap()
 

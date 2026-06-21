@@ -1124,7 +1124,7 @@ private struct SeriesWatchingQueueSection: View {
                         Button {
                             markNext(entry)
                         } label: {
-                            Image(systemName: "checkmark")
+                            Image(systemName: quickProgressFilledSystemImage(for: entry))
                                 .font(.system(size: 14, weight: .black))
                                 .foregroundStyle(Color.black.opacity(0.84))
                                 .frame(width: 34, height: 34)
@@ -1166,7 +1166,7 @@ private struct SeriesWatchingQueueSection: View {
     }
 
     private func primaryActionTitle(for entry: SeriesLibraryEntry) -> String {
-        quickProgressActionTitle(for: entry)
+        primaryProgressActionTitle(for: entry)
     }
 }
 
