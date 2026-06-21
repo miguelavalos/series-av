@@ -96,7 +96,7 @@ const profileLabels = {
     accountTitle: "El meu compte",
     accountSubtitle: "Gestiona inici de sessió, accés, facturació i seguretat del compte.",
     pro: {
-      accountDetail: "Mantén l'accés Pro vinculat al teu compte d'Apps AV.",
+      accountDetail: "Mantén l'accés Pro vinculat al teu compte.",
       accountTitle: "Compte Pro",
       assistantDetail: "Mantingues la guia de seguiment al costat de la sèrie actual.",
       assistantTitle: "Avi a Home",
@@ -116,7 +116,7 @@ const profileLabels = {
     accountTitle: "Mein Konto",
     accountSubtitle: "Verwalte Anmeldung, Zugriff, Abrechnung und Kontosicherheit.",
     pro: {
-      accountDetail: "Halte Pro-Zugriff mit deinem Apps AV-Konto verknüpft.",
+      accountDetail: "Halte Pro-Zugriff mit deinem Konto verknüpft.",
       accountTitle: "Pro-Konto",
       assistantDetail: "Behalte die Serienhilfe direkt bei deiner aktuellen Serie.",
       assistantTitle: "Avi auf Home",
@@ -136,7 +136,7 @@ const profileLabels = {
     accountTitle: "My account",
     accountSubtitle: "Manage sign-in, access, billing, and account safety.",
     pro: {
-      accountDetail: "Keep Pro access linked to your Apps AV account.",
+      accountDetail: "Keep Pro access linked to your account.",
       accountTitle: "Pro account",
       assistantDetail: "Keep tracking guidance next to your current series.",
       assistantTitle: "Avi on Home",
@@ -156,7 +156,7 @@ const profileLabels = {
     accountTitle: "Mi cuenta",
     accountSubtitle: "Gestiona inicio de sesión, acceso, facturación y seguridad de cuenta.",
     pro: {
-      accountDetail: "Mantén el acceso Pro vinculado a tu cuenta de Apps AV.",
+      accountDetail: "Mantén el acceso Pro vinculado a tu cuenta.",
       accountTitle: "Cuenta Pro",
       assistantDetail: "Mantén la guía de seguimiento junto a tu serie actual.",
       assistantTitle: "Avi en Home",
@@ -176,7 +176,7 @@ const profileLabels = {
     accountTitle: "Mon compte",
     accountSubtitle: "Gérez connexion, accès, facturation et sécurité du compte.",
     pro: {
-      accountDetail: "Gardez l'accès Pro lié à votre compte Apps AV.",
+      accountDetail: "Gardez l'accès Pro lié à votre compte.",
       accountTitle: "Compte Pro",
       assistantDetail: "Garde la guidance de suivi près de ta série actuelle.",
       assistantTitle: "Avi sur Home",

@@ -125,7 +125,7 @@ const en = {
   },
   search: {
     dateUnknown: "Date unknown",
-    description: "Find a title, review its artwork, and prepare it for the signed-in library workflow.",
+    description: "Find a title, review its artwork, and save it to your library when you are ready.",
     emptyBody: "Try a different title.",
     emptyTitle: "No series found",
     errorTitle: "Series search failed",
@@ -247,7 +247,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
     },
     search: {
       dateUnknown: "Data desconeguda",
-      description: "Troba un títol, revisa'n l'art i prepara'l per al flux de biblioteca amb sessió iniciada.",
+      description: "Troba un títol, revisa'n l'art i desa'l a la biblioteca quan ho tinguis clar.",
       emptyBody: "Prova amb un altre títol.",
       emptyTitle: "No s'han trobat sèries",
       errorTitle: "La cerca de sèries ha fallat",
@@ -367,7 +367,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
     },
     search: {
       dateUnknown: "Datum unbekannt",
-      description: "Finde einen Titel, prüfe das Artwork und bereite ihn für den angemeldeten Bibliotheksfluss vor.",
+      description: "Finde einen Titel, prüfe das Artwork und speichere ihn in deiner Bibliothek, wenn du bereit bist.",
       emptyBody: "Versuche es mit einem anderen Titel.",
       emptyTitle: "Keine Serien gefunden",
       errorTitle: "Seriensuche fehlgeschlagen",
@@ -488,7 +488,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
     },
     search: {
       dateUnknown: "Fecha desconocida",
-      description: "Encuentra un título, revisa su arte y prepáralo para el flujo de biblioteca con sesión iniciada.",
+      description: "Encuentra un título, revisa su arte y guárdalo en tu biblioteca cuando lo tengas claro.",
       emptyBody: "Prueba con otro título.",
       emptyTitle: "No se encontraron series",
       errorTitle: "La búsqueda de series falló",
@@ -608,7 +608,7 @@ export const seriesText: Record<AppsAvLocale, typeof en> = {
     },
     search: {
       dateUnknown: "Date inconnue",
-      description: "Trouvez un titre, vérifiez son visuel et préparez-le pour le parcours bibliothèque connecté.",
+      description: "Trouvez un titre, vérifiez son visuel et enregistrez-le dans votre bibliothèque quand il vous convient.",
       emptyBody: "Essayez un autre titre.",
       emptyTitle: "Aucune série trouvée",
       errorTitle: "La recherche de séries a échoué",
