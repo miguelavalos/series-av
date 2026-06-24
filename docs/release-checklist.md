@@ -113,9 +113,9 @@ simulator QA can validate production config, signed Account AV session restore,
 paywall offer loading, restore button visibility, and non-purchase UI behavior,
 but it must not replace a real store purchase/restore validation.
 
-Submission snapshot, 2026-06-21: iOS app version `1.0 (11)` was submitted to
-App Review and is `Pendiente de revisión` in App Store Connect. The subscription
-review screenshot and promotional image were attached before submission.
+Approval snapshot, 2026-06-24: iOS app version `1.0 (11)` has been approved for
+the App Store per operator report. The subscription review screenshot and
+promotional image were attached before submission.
 
 1. Generate production iOS config and run the app:
 
@@ -273,7 +273,7 @@ accepted before submit:
 2. Preview and production signed-in smokes passed.
 3. Store metadata matches the submitted build.
 4. Public/legal/support/delete-account URLs are reachable.
-5. The archive submitted to App Store Connect matches build `1.0 (11)`.
+5. The archive submitted to App Store Connect matches approved build `1.0 (11)`.
 6. App Store Connect submission id:
    `914c99f2-95c6-4b0d-a651-d15433efe639`.
 
