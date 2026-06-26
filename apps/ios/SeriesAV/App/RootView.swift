@@ -1201,6 +1201,9 @@ private struct SeriesWatchingQueueSection: View {
 }
 
 private struct SeriesHomeDiscoveryRail: View {
+    private static let tabletGridSpacing: CGFloat = 14
+    private static let tabletMaxDisplayCount = 18
+
     let title: String
     let previews: [SeriesHomeDiscoveryPreview]
     let isLoading: Bool
@@ -1209,6 +1212,8 @@ private struct SeriesHomeDiscoveryRail: View {
     let limitActionTitle: String
     let addSeries: (SeriesHomeDiscoveryPreview) -> Void
     let showLimitAction: () -> Void
+
+    @State private var tabletGridWidth: CGFloat = 0
 
     var body: some View {
         if isLoading || previews.isEmpty == false {
@@ -1219,13 +1224,21 @@ private struct SeriesHomeDiscoveryRail: View {
 
                 if isTabletLayout {
                     LazyVGrid(
-                        columns: [GridItem(.adaptive(minimum: SeriesHomeDiscoveryCard.itemWidth, maximum: SeriesHomeDiscoveryCard.itemWidth), spacing: 14, alignment: .top)],
+                        columns: [GridItem(.adaptive(minimum: SeriesHomeDiscoveryCard.itemWidth, maximum: SeriesHomeDiscoveryCard.itemWidth), spacing: Self.tabletGridSpacing, alignment: .top)],
                         alignment: .leading,
                         spacing: 18
                     ) {
-                        discoveryCards(skeletonCount: 8, displayPreviews: Array(previews.prefix(16)))
+                        discoveryCards(skeletonCount: tabletSkeletonCount, displayPreviews: tabletDisplayPreviews)
                     }
                     .padding(.vertical, 3)
+                    .background {
+                        GeometryReader { proxy in
+                            Color.clear.preference(key: SeriesHomeDiscoveryRailWidthKey.self, value: proxy.size.width)
+                        }
+                    }
+                    .onPreferenceChange(SeriesHomeDiscoveryRailWidthKey.self) { width in
+                        tabletGridWidth = width
+                    }
                 } else {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(alignment: .top, spacing: 12) {
@@ -1237,6 +1250,35 @@ private struct SeriesHomeDiscoveryRail: View {
             }
             .padding(.top, 6)
         }
+    }
+
+    private var tabletDisplayPreviews: [SeriesHomeDiscoveryPreview] {
+        Array(previews.prefix(tabletDisplayCount(availableCount: previews.count)))
+    }
+
+    private var tabletSkeletonCount: Int {
+        let columns = tabletColumnCount
+        return max(columns, min(Self.tabletMaxDisplayCount, columns * 2))
+    }
+
+    private func tabletDisplayCount(availableCount: Int) -> Int {
+        guard availableCount > 0 else {
+            return 0
+        }
+
+        let cappedCount = min(availableCount, Self.tabletMaxDisplayCount)
+        let columns = tabletColumnCount
+        let completeRowsCount = cappedCount - cappedCount % columns
+        return completeRowsCount >= columns ? completeRowsCount : cappedCount
+    }
+
+    private var tabletColumnCount: Int {
+        guard tabletGridWidth > 0 else {
+            return 4
+        }
+
+        let columnStride = SeriesHomeDiscoveryCard.itemWidth + Self.tabletGridSpacing
+        return max(1, Int((tabletGridWidth + Self.tabletGridSpacing) / columnStride))
     }
 
     @ViewBuilder
@@ -1256,6 +1298,14 @@ private struct SeriesHomeDiscoveryRail: View {
                 )
             }
         }
+    }
+}
+
+private struct SeriesHomeDiscoveryRailWidthKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
     }
 }
 
