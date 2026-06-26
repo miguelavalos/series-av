@@ -158,7 +158,8 @@ struct SeriesAppShellView: View {
             logoAssetName: appExperience.visualAssets?.headerLogoName ?? "HeaderWordmark",
             accessibilityLabel: appExperience.identity.displayName,
             logoWidth: 132,
-            logoHeight: 42
+            logoHeight: 42,
+            logoLeadingCorrection: -3
         )
     }
 
