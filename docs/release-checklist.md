@@ -53,6 +53,10 @@ Use this checklist before uploading the first App Store build and before later p
    `docs/platform/apple-release-machine-setup.md` gate so the Apple Distribution
    private key passes non-interactive `codesign`.
 7. Confirm the shipping version and build number are correct for App Store Connect. `1.0 (1)` is acceptable only if this is the first uploaded build for version `1.0`; otherwise increment `CFBundleVersion`.
+8. After every TestFlight upload, open App Store Connect and confirm the build
+   has completed Apple's processing/encoding step before expecting it to appear
+   in TestFlight. An upload that is only delivered or still processing is not
+   yet addable to TestFlight groups or App Review.
 
 ## Automated And Manual QA
 
