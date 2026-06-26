@@ -1,4 +1,5 @@
 import AVAppShellFoundation
+import AVBrandFoundation
 import AVSettingsFoundation
 import SwiftUI
 
@@ -32,6 +33,43 @@ struct SeriesAppShellView: View {
     }
 
     var body: some View {
+        adaptiveShell
+            .task(id: accessController.accessMode) {
+                scheduleSignedInLibrarySync(after: .milliseconds(150))
+            }
+            .onChange(of: accessController.accountUser?.id) { _, _ in
+                resetLibrarySyncForAccountIdentityChange()
+            }
+            .task(id: scenePhase) {
+                guard scenePhase == .active else {
+                    cancelScheduledLibrarySync()
+                    return
+                }
+                scheduleSignedInLibrarySync(after: .milliseconds(350))
+            }
+            .onChange(of: store.entries) { _, entries in
+                librarySync.localEntriesDidChange(entries, accessController: accessController)
+            }
+            .sheet(isPresented: $isShowingUITestPaywall) {
+                SeriesProPaywallView(
+                    accessController: accessController,
+                    startSignInFlow: startSignInFlow
+                )
+            }
+    }
+
+    @ViewBuilder
+    private var adaptiveShell: some View {
+        SeriesAdaptiveLayoutReader { layout in
+            if layout.layoutClass.isTabletLike {
+                tabletShell
+            } else {
+                compactShell
+            }
+        }
+    }
+
+    private var compactShell: some View {
         AVAppShellConfiguredScaffold(
             selectedTabID: footerSelectedTab,
             tabs: SeriesRootTab.footerTabs.map(\.shellTab),
@@ -57,28 +95,96 @@ struct SeriesAppShellView: View {
                 EmptyView()
             }
         )
-        .task(id: accessController.accessMode) {
-            scheduleSignedInLibrarySync(after: .milliseconds(150))
-        }
-        .onChange(of: accessController.accountUser?.id) { _, _ in
-            resetLibrarySyncForAccountIdentityChange()
-        }
-        .task(id: scenePhase) {
-            guard scenePhase == .active else {
-                cancelScheduledLibrarySync()
-                return
+        .accessibilityIdentifier("series.shell.compact")
+    }
+
+    private var tabletShell: some View {
+        NavigationStack {
+            HStack(spacing: 0) {
+                tabletSidebar
+
+                Divider()
+
+                screen(for: chromeItem == nil ? selectedTab : .profile)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            scheduleSignedInLibrarySync(after: .milliseconds(350))
+            .background(AVBrandSurface.shellBackground.ignoresSafeArea())
+            .accessibilityIdentifier("series.shell.tablet")
         }
-        .onChange(of: store.entries) { _, entries in
-            librarySync.localEntriesDidChange(entries, accessController: accessController)
+    }
+
+    private var tabletSidebar: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            tabletSidebarBrandHeader
+            .padding(.bottom, 12)
+
+            ForEach([SeriesRootTab.home, .library, .search, .avi]) { tab in
+                tabletSidebarButton(
+                    tab: tab,
+                    isSelected: chromeItem == nil && selectedTab == tab
+                )
+            }
+
+            Spacer(minLength: 16)
+
+            tabletChromeButton(
+                title: L10n.string("profile.settingsScreen.title"),
+                systemImage: "gearshape.fill",
+                isSelected: chromeItem == .settings
+            ) {
+                chromeItem = .settings
+                selectedTab = .profile
+            }
+
+            tabletChromeButton(
+                title: L10n.string("profile.accountScreen.title"),
+                systemImage: "person.crop.circle.fill",
+                isSelected: chromeItem == .account
+            ) {
+                chromeItem = .account
+                selectedTab = .profile
+            }
         }
-        .sheet(isPresented: $isShowingUITestPaywall) {
-            SeriesProPaywallView(
-                accessController: accessController,
-                startSignInFlow: startSignInFlow
-            )
+        .padding(.horizontal, AVAppShellTabletSidebarMetric.horizontalPadding)
+        .padding(.vertical, AVAppShellTabletSidebarMetric.verticalPadding)
+        .frame(width: 238, alignment: .topLeading)
+        .frame(maxHeight: .infinity, alignment: .topLeading)
+        .background(.regularMaterial)
+        .accessibilityIdentifier("series.shell.tablet.sidebar")
+    }
+
+    private var tabletSidebarBrandHeader: some View {
+        AVAppShellTabletSidebarBrandHeader(
+            logoAssetName: appExperience.visualAssets?.headerLogoName ?? "HeaderWordmark",
+            accessibilityLabel: appExperience.identity.displayName,
+            logoWidth: 132,
+            logoHeight: 42,
+            logoLeadingCorrection: -3
+        )
+    }
+
+    private func tabletSidebarButton(tab: SeriesRootTab, isSelected: Bool) -> some View {
+        AVAppShellTabletSidebarButton(
+            title: tab.shellTab.title,
+            systemImage: tab.shellTab.systemImage,
+            isSelected: isSelected
+        ) {
+            chromeItem = nil
+            selectedTab = tab
         }
+        .accessibilityIdentifier("series.sidebar.\(tab.rawValue)")
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(tab.shellTab.title)
+    }
+
+    private func tabletChromeButton(title: String, systemImage: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        AVAppShellTabletSidebarButton(
+            title: title,
+            systemImage: systemImage,
+            isSelected: isSelected,
+            fontSize: 15,
+            action: action
+        )
     }
 
     private func scheduleSignedInLibrarySync(after delay: Duration? = nil) {

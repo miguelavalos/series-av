@@ -1,8 +1,11 @@
 import AVAppShellFoundation
 import AVBrandFoundation
 import SwiftUI
+import UIKit
 
 struct SeriesSearchScreen: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
     @Bindable var store: SeriesLibraryStore
     let accessController: SeriesAccessController
     let startSignInFlow: () -> Void
@@ -19,11 +22,16 @@ struct SeriesSearchScreen: View {
     @State private var catalogLoadState = SeriesCatalogLoadState()
     @State private var detailSelection: SeriesSearchDetailSelection?
 
+    private var isTabletLayout: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad && horizontalSizeClass != .compact
+    }
+
     var body: some View {
         AVAppShellScrollableScreenScaffold(
             alignment: .leading,
             spacing: 22,
-            bottomPadding: 236
+            bottomPadding: isTabletLayout ? 56 : 236,
+            maxContentWidth: 1120
         ) {
             AVBrandSurface.shellBackground
         } content: {
@@ -141,6 +149,14 @@ struct SeriesSearchScreen: View {
         return catalogResults.filter {
             !localTitles.contains(SeriesLibraryIdentity.normalizedSearchText($0.title))
         }
+    }
+
+    private var displayedCatalogResults: [SeriesCatalogPreview] {
+        let results = visibleCatalogResults
+        guard isTabletLayout, trimmedQuery.isEmpty, results.count > 1, results.count % 2 != 0 else {
+            return results
+        }
+        return Array(results.dropLast())
     }
 
     private var searchRefreshKey: String {
@@ -307,42 +323,50 @@ struct SeriesSearchScreen: View {
             }
 
             if trimmedQuery.isEmpty == false && localMatches.isEmpty == false {
-                ForEach(localMatches) { entry in
-                    SeriesLibrarySearchResultCard(
-                        entry: entry,
-                        openDetail: { detailSelection = SeriesSearchDetailSelection(entry: entry) },
-                        editProgress: { editorEntry = entry },
-                        markNext: { store.markNextEpisodeWatched(for: entry.id) }
-                    )
+                LazyVGrid(columns: searchGridColumns, alignment: .leading, spacing: 10) {
+                    ForEach(localMatches) { entry in
+                        SeriesLibrarySearchResultCard(
+                            entry: entry,
+                            openDetail: { detailSelection = SeriesSearchDetailSelection(entry: entry) },
+                            editProgress: { editorEntry = entry },
+                            markNext: { store.markNextEpisodeWatched(for: entry.id) }
+                        )
+                    }
                 }
             }
 
             if isSearchingCatalog {
                 SeriesCatalogResultsSkeleton()
-            } else if localMatches.isEmpty && visibleCatalogResults.isEmpty {
+            } else if localMatches.isEmpty && displayedCatalogResults.isEmpty {
                 ContentUnavailableView(
                     L10n.string("library.search.empty.title"),
                     systemImage: "magnifyingglass",
                     description: Text(L10n.string("library.search.empty.subtitle"))
                 )
             } else {
-                ForEach(visibleCatalogResults) { preview in
-                    SeriesCatalogResultCard(
-                        preview: preview,
-                        libraryEntry: libraryEntry(for: preview),
-                        canAddSeries: canAddSeries,
-                        openDetail: {
-                            detailSelection = SeriesSearchDetailSelection(
-                                catalogItem: preview.catalogItem,
-                                entry: libraryEntry(for: preview)
-                            )
-                        },
-                        follow: { follow(preview) },
-                        editProgress: { entry in editorEntry = entry }
-                    )
+                LazyVGrid(columns: searchGridColumns, alignment: .leading, spacing: 10) {
+                    ForEach(displayedCatalogResults) { preview in
+                        SeriesCatalogResultCard(
+                            preview: preview,
+                            libraryEntry: libraryEntry(for: preview),
+                            canAddSeries: canAddSeries,
+                            openDetail: {
+                                detailSelection = SeriesSearchDetailSelection(
+                                    catalogItem: preview.catalogItem,
+                                    entry: libraryEntry(for: preview)
+                                )
+                            },
+                            follow: { follow(preview) },
+                            editProgress: { entry in editorEntry = entry }
+                        )
+                    }
                 }
             }
         }
+    }
+
+    private var searchGridColumns: [GridItem] {
+        [GridItem(.adaptive(minimum: 360), spacing: 10)]
     }
 
     private var resultsTitle: String {
@@ -353,9 +377,9 @@ struct SeriesSearchScreen: View {
         if trimmedQuery.isEmpty {
             return isSearchingCatalog
                 ? L10n.string("search.collection.updating")
-                : formattedCollectionCount(catalogResults.count)
+                : formattedCollectionCount(displayedCatalogResults.count)
         }
-        let count = localMatches.count + visibleCatalogResults.count
+        let count = localMatches.count + displayedCatalogResults.count
         return formattedResultsCount(count)
     }
 
@@ -444,7 +468,12 @@ struct SeriesSearchScreen: View {
         }
 
         let client = SeriesCatalogSearchClient()
-        let response = try? await client.popular(locale: Locale.current.identifier, surface: "search", limit: 12)
+        let response = try? await client.popular(
+            locale: Locale.current.identifier,
+            surface: "search",
+            genre: collection.genreQuery,
+            limit: isTabletLayout ? 18 : 12
+        )
 
         guard trimmedQuery.isEmpty, selectedCollection == collection else {
             return
@@ -452,7 +481,6 @@ struct SeriesSearchScreen: View {
 
         remoteCollectionKey = collectionKey
         remoteCollectionResults = (response?.results ?? [])
-            .filter { collection == .popular || $0.genres.contains { SeriesLibraryIdentity.normalizedSearchText($0).contains(collection.cacheKey) } }
             .map { SeriesCatalogPreview(catalogItem: $0, collections: [collection]) }
     }
 }
@@ -763,6 +791,10 @@ private enum SeriesSearchCollection: CaseIterable {
         case .animation:
             return "animation"
         }
+    }
+
+    var genreQuery: String? {
+        self == .popular ? nil : cacheKey
     }
 }
 
