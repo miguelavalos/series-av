@@ -3,8 +3,11 @@ import AVBrandFoundation
 import AVExternalLinkFoundation
 import AVSettingsFoundation
 import SwiftUI
+import UIKit
 
 struct SeriesProfileScreen: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
     let mode: AVAppShellChromeItem
     @Bindable var store: SeriesLibraryStore
     @Bindable var librarySync: SeriesLibrarySyncCoordinator
@@ -32,7 +35,8 @@ struct SeriesProfileScreen: View {
             title: screenTitle,
             subtitle: screenSubtitle,
             backgroundStyle: AnyShapeStyle(AVBrandSurface.shellBackground),
-            showsTopSafeAreaShield: true
+            showsTopSafeAreaShield: true,
+            showsChrome: !isTabletLayout
         ) {
             AVAppShellConfiguredBrandHeader(
                 activeItem: mode,
@@ -72,6 +76,10 @@ struct SeriesProfileScreen: View {
             .presentationDetents([.medium])
             .presentationDragIndicator(.visible)
         }
+    }
+
+    private var isTabletLayout: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad && horizontalSizeClass != .compact
     }
 
     private var screenTitle: String {
@@ -320,21 +328,25 @@ struct SeriesProfileScreen: View {
     private var proActionButton: some View {
         switch accessController.accessMode {
         case .guest:
-            AVSettingsButton(
-                title: L10n.string("profile.pro.signIn"),
-                style: .primary,
-                action: {
-                    startSignInFlow()
-                }
-            )
+            tabletAlignedSettingsButton {
+                AVSettingsButton(
+                    title: L10n.string("profile.pro.signIn"),
+                    style: .primary,
+                    action: {
+                        startSignInFlow()
+                    }
+                )
+            }
             .disabled(!accessController.accountIsAvailable)
             .accessibilityIdentifier("profile.pro.signIn")
         case .signedInFree:
-            AVSettingsButton(
-                title: L10n.string("profile.pro.upgrade"),
-                style: .primary,
-                action: { isShowingProPaywall = true }
-            )
+            tabletAlignedSettingsButton {
+                AVSettingsButton(
+                    title: L10n.string("profile.pro.upgrade"),
+                    style: .primary,
+                    action: { isShowingProPaywall = true }
+                )
+            }
             .accessibilityIdentifier("profile.pro.upgrade")
         case .signedInPro:
             VStack(alignment: .leading, spacing: 12) {
@@ -344,11 +356,13 @@ struct SeriesProfileScreen: View {
                     detail: L10n.string("profile.pro.active.detail")
                 )
 
-                AVSettingsButton(
-                    title: L10n.string("profile.pro.manage"),
-                    style: .secondary,
-                    action: openAppleSubscriptionManagement
-                )
+                tabletAlignedSettingsButton {
+                    AVSettingsButton(
+                        title: L10n.string("profile.pro.manage"),
+                        style: .secondary,
+                        action: openAppleSubscriptionManagement
+                    )
+                }
                 .accessibilityIdentifier("profile.pro.manage")
             }
         }
@@ -373,27 +387,37 @@ struct SeriesProfileScreen: View {
     @ViewBuilder
     private var accountActionButton: some View {
         if accessController.isSignedIn {
-            AVSettingsButton(
-                title: isSigningOut ? L10n.string("profile.actions.signingOut") : L10n.string("profile.actions.signOut"),
-                style: .secondary,
-                isLoading: isSigningOut,
-                action: signOut
-            )
+            tabletAlignedSettingsButton {
+                AVSettingsButton(
+                    title: isSigningOut ? L10n.string("profile.actions.signingOut") : L10n.string("profile.actions.signOut"),
+                    style: .secondary,
+                    isLoading: isSigningOut,
+                    action: signOut
+                )
+            }
             .disabled(isSigningOut)
             .accessibilityIdentifier("profile.account.signOut")
         } else {
-            AVSettingsButton(
-                title: accessController.accountIsAvailable
-                    ? L10n.string("profile.account.connect")
-                    : L10n.string("profile.account.connectUnavailable"),
-                style: .primary,
-                action: {
-                    startSignInFlow()
-                }
-            )
+            tabletAlignedSettingsButton {
+                AVSettingsButton(
+                    title: accessController.accountIsAvailable
+                        ? L10n.string("profile.account.connect")
+                        : L10n.string("profile.account.connectUnavailable"),
+                    style: .primary,
+                    action: {
+                        startSignInFlow()
+                    }
+                )
+            }
             .disabled(!accessController.accountIsAvailable)
             .accessibilityIdentifier("profile.account.signIn")
         }
+    }
+
+    private func tabletAlignedSettingsButton<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        content()
+            .frame(maxWidth: isTabletLayout ? 340 : .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var languageSelector: some View {

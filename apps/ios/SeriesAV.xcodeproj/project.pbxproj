@@ -50,6 +50,7 @@
 		A0CA52CBB01A3578A1F75CE6 /* SeriesAVAPIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A739BAB1FD09E7206A78B9 /* SeriesAVAPIClientTests.swift */; };
 		A14CE6F47C0607F670434388 /* AVProductAccountFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 197D8D418F464FA352F78772 /* AVProductAccountFoundation */; };
 		AAFA14FB0414B5EDE57EBA93 /* SeriesAppExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1957FAE6E3298FDB2C8536F6 /* SeriesAppExperience.swift */; };
+		ABF111220000000000000001 /* SeriesAdaptiveLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF111210000000000000001 /* SeriesAdaptiveLayout.swift */; };
 		B04B4F18E3187D0804B79BCF /* SeriesDetailPresentationBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE128B612294FB1028077612 /* SeriesDetailPresentationBuilderTests.swift */; };
 		B5255448167E43828252DB71 /* SeriesAuthOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AF87B75A9721D260B4C3E1 /* SeriesAuthOnboardingView.swift */; };
 		BA243CAA0B49EFED0D7B6F21 /* SeriesProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39E85DD4C7D5EBBF8721E3A /* SeriesProfileScreen.swift */; };
@@ -136,6 +137,7 @@
 		A61DC73A0BB4050ACCFE55FB /* SeriesShareInviteDeepLinkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesShareInviteDeepLinkTests.swift; sourceTree = "<group>"; };
 		A6E1160762AEF2A117BAE4A3 /* SeriesLibraryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesLibraryModels.swift; sourceTree = "<group>"; };
 		A865AC1F3DD7487D0EF5BB4A /* SeriesStartupSyncPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesStartupSyncPolicyTests.swift; sourceTree = "<group>"; };
+		ABF111210000000000000001 /* SeriesAdaptiveLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAdaptiveLayout.swift; sourceTree = "<group>"; };
 		ACDE5B246EE20134733B58AA /* SeriesAccountDeletionScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccountDeletionScreen.swift; sourceTree = "<group>"; };
 		AE24F5B52463208C5E876228 /* SeriesAVAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVAPIClient.swift; sourceTree = "<group>"; };
 		B39E85DD4C7D5EBBF8721E3A /* SeriesProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesProfileScreen.swift; sourceTree = "<group>"; };
@@ -216,6 +218,7 @@
 				72139F60FD554069885EE731 /* PrivacyInfo.xcprivacy */,
 				145DE7E7B082B7D92C440A5B /* RootView.swift */,
 				557E2299A00C28395D71C339 /* SeriesAppBootstrapView.swift */,
+				ABF111210000000000000001 /* SeriesAdaptiveLayout.swift */,
 				1957FAE6E3298FDB2C8536F6 /* SeriesAppExperience.swift */,
 				C64880B2D57EC391A9D4D766 /* SeriesAppPreferences.swift */,
 				887A34EB62001F540D97883D /* SeriesAppShellView.swift */,
@@ -529,6 +532,7 @@
 				190C3AD6D65815C057B5FE9C /* SeriesAccountDeletionViewModel.swift in Sources */,
 				06222EBFC1E985565D6B452D /* SeriesAppBootstrapView.swift in Sources */,
 				4635329479183AA26672A051 /* SeriesAppDataSyncClient.swift in Sources */,
+				ABF111220000000000000001 /* SeriesAdaptiveLayout.swift in Sources */,
 				AAFA14FB0414B5EDE57EBA93 /* SeriesAppExperience.swift in Sources */,
 				9A9910A6DD514535A83D6C1C /* SeriesAppPreferences.swift in Sources */,
 				CA067A25B1C6C592C7DBC4A1 /* SeriesAppShellView.swift in Sources */,
@@ -675,7 +679,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "$(SERIESAV_BUNDLE_IDENTIFIER).uitests";
 				PRODUCT_MODULE_NAME = SeriesAVUITests;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = SeriesAV;
 			};
 			name = Debug;
@@ -750,7 +754,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "$(SERIESAV_BUNDLE_IDENTIFIER).uitests";
 				PRODUCT_MODULE_NAME = SeriesAVUITests;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = SeriesAV;
 			};
 			name = Release;
@@ -768,7 +772,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "$(SERIESAV_BUNDLE_IDENTIFIER).tests";
 				PRODUCT_MODULE_NAME = SeriesAVTests;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SeriesAV.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SeriesAV";
 			};
 			name = Debug;
@@ -786,7 +790,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "$(SERIESAV_BUNDLE_IDENTIFIER).tests";
 				PRODUCT_MODULE_NAME = SeriesAVTests;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SeriesAV.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SeriesAV";
 			};
 			name = Release;
@@ -810,7 +814,7 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = NO;
 				SUPPORTS_MACCATALYST = NO;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -833,7 +837,7 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = NO;
 				SUPPORTS_MACCATALYST = NO;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

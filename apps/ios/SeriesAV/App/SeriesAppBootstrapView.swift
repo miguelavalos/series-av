@@ -129,6 +129,7 @@ struct SeriesAppBootstrapView: View {
         automaticGuestOnboardingIsPresented = false
         postAuthenticationSplashIsPresented = true
         authenticationWasSkipped = true
+        selectedTab = .home
         accessController.skipForNow()
         Task {
             try? await Task.sleep(for: splashPolicy.displayDuration)

@@ -189,6 +189,38 @@ final class SeriesAVSmokeUITests: XCTestCase {
     }
 
     @MainActor
+    func testCompactShellRemainsAvailableForNarrowLayouts() throws {
+        continueAfterFailure = false
+        XCUIDevice.shared.orientation = .portrait
+        let app = makeApp()
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Sigue tu primera serie"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.otherElements["series.shell.compact"].exists)
+        XCTAssertFalse(app.otherElements["series.shell.tablet"].exists)
+        XCTAssertTrue(app.staticTexts["Populares"].exists)
+    }
+
+    @MainActor
+    func testTabletShellAppearsForWideLayouts() throws {
+        continueAfterFailure = false
+        XCUIDevice.shared.orientation = .landscapeLeft
+        let app = makeApp()
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Sigue tu primera serie"].waitForExistence(timeout: 10))
+
+        let windowWidth = app.windows.firstMatch.frame.width
+        guard windowWidth >= 820 else {
+            throw XCTSkip("Runner delivered compact width \(windowWidth); tablet shell is only expected in regular-width iPad layouts.")
+        }
+
+        XCTAssertTrue(app.descendants(matching: .any)["series.sidebar.home"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["series.sidebar.search"].exists)
+        XCTAssertFalse(app.otherElements["series.shell.compact"].exists)
+    }
+
+    @MainActor
     func testSignedInFreePaywallShowsPriceRestoreAndTerms() throws {
         continueAfterFailure = false
         let app = makeApp(environment: [

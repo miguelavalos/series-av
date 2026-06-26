@@ -179,13 +179,16 @@ struct SeriesCatalogSearchClient: Sendable {
         return try await request(path: "/v1/series/search", queryItems: items)
     }
 
-    func popular(locale: String? = nil, surface: String = "home", limit: Int = 12) async throws -> SeriesCatalogSearchResponse {
+    func popular(locale: String? = nil, surface: String = "home", genre: String? = nil, limit: Int = 12) async throws -> SeriesCatalogSearchResponse {
         var items = [
             URLQueryItem(name: "surface", value: surface),
             URLQueryItem(name: "limit", value: String(limit))
         ]
         if let locale, locale.isEmpty == false {
             items.append(URLQueryItem(name: "locale", value: locale))
+        }
+        if let genre, genre.isEmpty == false {
+            items.append(URLQueryItem(name: "genre", value: genre))
         }
         return try await request(path: "/v1/series/popular", queryItems: items)
     }

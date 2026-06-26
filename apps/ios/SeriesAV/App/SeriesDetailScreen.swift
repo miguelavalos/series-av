@@ -6,6 +6,7 @@ import SwiftUI
 struct SeriesDetailScreen: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @EnvironmentObject private var externalLinkPreferences: AppExternalLinkPreferencesController
 
     let catalogItem: SeriesCatalogItem?
@@ -73,15 +74,10 @@ struct SeriesDetailScreen: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    header
-                    sourcesSection
-                    trackingSection
-                    privateNoteSection
-                    libraryManagementSection
-                    guideSection
-                }
-                .padding(18)
+                detailContent
+                    .padding(18)
+                    .frame(maxWidth: usesWideLayout ? 1180 : .infinity, alignment: .topLeading)
+                    .frame(maxWidth: .infinity, alignment: .top)
             }
             .background(AVBrandSurface.shellBackground.ignoresSafeArea())
             .navigationTitle(L10n.string("detail.title"))
@@ -181,6 +177,40 @@ struct SeriesDetailScreen: View {
                 Text(L10n.string("detail.delete.confirm.detail"))
             }
         }
+    }
+
+    @ViewBuilder
+    private var detailContent: some View {
+        if usesWideLayout {
+            HStack(alignment: .top, spacing: 18) {
+                VStack(alignment: .leading, spacing: 18) {
+                    header
+                    trackingSection
+                    sourcesSection
+                }
+                .frame(maxWidth: 430, alignment: .topLeading)
+
+                VStack(alignment: .leading, spacing: 18) {
+                    guideSection
+                    privateNoteSection
+                    libraryManagementSection
+                }
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+            }
+        } else {
+            VStack(alignment: .leading, spacing: 18) {
+                header
+                sourcesSection
+                trackingSection
+                privateNoteSection
+                libraryManagementSection
+                guideSection
+            }
+        }
+    }
+
+    private var usesWideLayout: Bool {
+        horizontalSizeClass == .regular
     }
 
     private var header: some View {
@@ -701,6 +731,8 @@ private struct SeriesPrivateNoteEditorSheet: View {
                 Spacer(minLength: 0)
             }
             .padding(20)
+            .frame(maxWidth: 640, alignment: .topLeading)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(AVBrandSurface.shellBackground.ignoresSafeArea())
             .navigationTitle(L10n.string("detail.privateNote.title"))
             .navigationBarTitleDisplayMode(.inline)
@@ -796,6 +828,8 @@ private struct SeriesShareInviteComposerSheet: View {
                 Spacer(minLength: 0)
             }
             .padding(20)
+            .frame(maxWidth: 620, alignment: .topLeading)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(AVBrandSurface.shellBackground.ignoresSafeArea())
             .navigationTitle(L10n.string("detail.share"))
             .navigationBarTitleDisplayMode(.inline)

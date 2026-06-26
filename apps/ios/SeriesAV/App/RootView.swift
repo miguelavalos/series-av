@@ -3,6 +3,7 @@ import AVAppShellFoundation
 import AVBrandFoundation
 import AVSettingsFoundation
 import SwiftUI
+import UIKit
 
 struct RootView: View {
     @Bindable var store: SeriesLibraryStore
@@ -51,6 +52,8 @@ enum SeriesLibraryFilter: String, CaseIterable {
 }
 
 private struct SeriesWatchingHomeScreen: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
     @Bindable var store: SeriesLibraryStore
     let activeSeriesLimit: Int?
     let accessController: SeriesAccessController
@@ -82,15 +85,20 @@ private struct SeriesWatchingHomeScreen: View {
         )
     }
 
+    private var isTabletLayout: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad && horizontalSizeClass != .compact
+    }
+
     var body: some View {
         AVAppShellScrollableScreenScaffold(
             alignment: .leading,
-            spacing: 22,
-            bottomPadding: 176
+            spacing: isTabletLayout ? 26 : 22,
+            bottomPadding: isTabletLayout ? 56 : 176,
+            maxContentWidth: isTabletLayout ? 1120 : 760
         ) {
             AVBrandSurface.shellBackground
         } content: {
-            homeHeader
+            homeHeader(isTabletLike: isTabletLayout)
 
             if let currentEntry = homeState.currentEntry {
                 SeriesCurrentWatchingCard(
@@ -233,83 +241,43 @@ private struct SeriesWatchingHomeScreen: View {
                 )
             }
 
-            SeriesHomeDiscoveryRail(
-                title: L10n.string("home.rail.popular"),
-                previews: homeState.visiblePopularPreviews,
-                isLoading: isLoadingHomeDiscovery,
-                canAddSeries: canAddSeries,
-                limitActionTitle: limitActionTitle,
-                addSeries: addDiscoverySeries,
-                showLimitAction: showLimitAction
+        SeriesHomeDiscoveryRail(
+            title: L10n.string("home.rail.popular"),
+            previews: homeState.visiblePopularPreviews,
+            isLoading: isLoadingHomeDiscovery,
+            isTabletLayout: isTabletLayout,
+            canAddSeries: canAddSeries,
+            limitActionTitle: limitActionTitle,
+            addSeries: addDiscoverySeries,
+            showLimitAction: showLimitAction
             )
 
-            SeriesHomeDiscoveryRail(
-                title: L10n.string("upcoming.home.title"),
-                previews: homeState.visibleUpcomingPreviews,
-                isLoading: isLoadingHomeDiscovery,
-                canAddSeries: canAddSeries,
-                limitActionTitle: limitActionTitle,
-                addSeries: addDiscoverySeries,
-                showLimitAction: showLimitAction
+        SeriesHomeDiscoveryRail(
+            title: L10n.string("upcoming.home.title"),
+            previews: homeState.visibleUpcomingPreviews,
+            isLoading: isLoadingHomeDiscovery,
+            isTabletLayout: isTabletLayout,
+            canAddSeries: canAddSeries,
+            limitActionTitle: limitActionTitle,
+            addSeries: addDiscoverySeries,
+            showLimitAction: showLimitAction
             )
 
-            SeriesHomeDiscoveryRail(
-                title: L10n.string("home.rail.recommended"),
-                previews: homeState.visibleRecommendedPreviews,
-                isLoading: isLoadingHomeDiscovery,
-                canAddSeries: canAddSeries,
-                limitActionTitle: limitActionTitle,
-                addSeries: addDiscoverySeries,
-                showLimitAction: showLimitAction
+        SeriesHomeDiscoveryRail(
+            title: L10n.string("home.rail.recommended"),
+            previews: homeState.visibleRecommendedPreviews,
+            isLoading: isLoadingHomeDiscovery,
+            isTabletLayout: isTabletLayout,
+            canAddSeries: canAddSeries,
+            limitActionTitle: limitActionTitle,
+            addSeries: addDiscoverySeries,
+            showLimitAction: showLimitAction
             )
         }
         .safeAreaInset(edge: .bottom) {
-            VStack(spacing: 10) {
-                if let pendingProgressUndo {
-                    SeriesUndoBar(
-                        title: String(format: L10n.string(pendingProgressUndo.messageKey), pendingProgressUndo.title),
-                        undo: {
-                            store.restoreProgress(
-                                status: pendingProgressUndo.status,
-                                lastWatchedEpisodeCursor: pendingProgressUndo.lastWatchedEpisodeCursor,
-                                isPinnedHomeSeries: pendingProgressUndo.isPinnedHomeSeries,
-                                for: pendingProgressUndo.entryId
-                            )
-                            self.pendingProgressUndo = nil
-                        },
-                        dismiss: {
-                            self.pendingProgressUndo = nil
-                        }
-                    )
-                } else if let pendingUndo {
-                    SeriesUndoBar(
-                        title: String(format: L10n.string(pendingUndo.messageKey), pendingUndo.title),
-                        undo: {
-                            if pendingUndo.messageKey == "home.undo.added" {
-                                store.delete(pendingUndo.entryId)
-                            } else {
-                                store.restore(pendingUndo.entryId)
-                            }
-                            self.pendingUndo = nil
-                        },
-                        dismiss: {
-                            self.pendingUndo = nil
-                        }
-                    )
-                }
-
-                if homeState.currentEntry == nil {
-                    Button(action: openSearch) {
-                        Label(L10n.string("home.add"), systemImage: "magnifyingglass")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
-                }
+            if !isTabletLayout {
+                mobileHomeBottomBar
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
-            .background(.regularMaterial)
         }
         .sheet(item: $editorEntry) { entry in
             SeriesProgressEditorSheet(
@@ -484,9 +452,9 @@ private struct SeriesWatchingHomeScreen: View {
     private func refreshHomeDiscovery() async {
         isLoadingHomeDiscovery = true
         let client = SeriesCatalogSearchClient()
-        async let popular = try? client.popular(locale: Locale.current.identifier, surface: "home", limit: 10)
-        async let upcoming = try? client.popular(locale: Locale.current.identifier, surface: "upcoming", limit: 10)
-        async let recommended = try? client.popular(locale: Locale.current.identifier, surface: "avi", limit: 10)
+        async let popular = try? client.popular(locale: Locale.current.identifier, surface: "home", limit: 18)
+        async let upcoming = try? client.popular(locale: Locale.current.identifier, surface: "upcoming", limit: 18)
+        async let recommended = try? client.popular(locale: Locale.current.identifier, surface: "avi", limit: 18)
 
         popularPreviews = (await popular)?.results.map { SeriesHomeDiscoveryPreview(catalogItem: $0) } ?? []
         upcomingPreviews = (await upcoming)?.results.map { SeriesHomeDiscoveryPreview(catalogItem: $0) } ?? []
@@ -557,25 +525,92 @@ private struct SeriesWatchingHomeScreen: View {
         }
     }
 
-    private var homeHeader: some View {
-        AVAppShellHomeHeader(
-            title: L10n.string("home.header.title"),
-            subtitle: L10n.string("home.header.subtitle")
-        ) {
-            AVAppShellConfiguredBrandHeader(
-                activeItem: nil,
-                openSettings: openSettings,
-                openAccount: openAccount
-            )
-        } content: {
-            SeriesHomeAviBrief(
-                currentEntry: homeState.currentEntry,
-                watchingCount: homeState.watchingCount,
-                wantToWatchCount: homeState.wantToWatchCount,
-                openAvi: openAvi
-            )
+    @ViewBuilder
+    private func homeHeader(isTabletLike: Bool) -> some View {
+        if isTabletLike {
+            VStack(alignment: .leading, spacing: 18) {
+                AVAppShellScreenHeader(
+                    title: L10n.string("home.header.title"),
+                    subtitle: L10n.string("home.header.subtitle")
+                )
+
+                SeriesHomeAviBrief(
+                    currentEntry: homeState.currentEntry,
+                    watchingCount: homeState.watchingCount,
+                    wantToWatchCount: homeState.wantToWatchCount,
+                    openAvi: openAvi
+                )
+            }
+            .padding(.bottom, 8)
+        } else {
+            AVAppShellHomeHeader(
+                title: L10n.string("home.header.title"),
+                subtitle: L10n.string("home.header.subtitle")
+            ) {
+                AVAppShellConfiguredBrandHeader(
+                    activeItem: nil,
+                    openSettings: openSettings,
+                    openAccount: openAccount
+                )
+            } content: {
+                SeriesHomeAviBrief(
+                    currentEntry: homeState.currentEntry,
+                    watchingCount: homeState.watchingCount,
+                    wantToWatchCount: homeState.wantToWatchCount,
+                    openAvi: openAvi
+                )
+            }
+            .padding(.bottom, 8)
         }
-        .padding(.bottom, 8)
+    }
+
+    private var mobileHomeBottomBar: some View {
+        VStack(spacing: 10) {
+            if let pendingProgressUndo {
+                SeriesUndoBar(
+                    title: String(format: L10n.string(pendingProgressUndo.messageKey), pendingProgressUndo.title),
+                    undo: {
+                        store.restoreProgress(
+                            status: pendingProgressUndo.status,
+                            lastWatchedEpisodeCursor: pendingProgressUndo.lastWatchedEpisodeCursor,
+                            isPinnedHomeSeries: pendingProgressUndo.isPinnedHomeSeries,
+                            for: pendingProgressUndo.entryId
+                        )
+                        self.pendingProgressUndo = nil
+                    },
+                    dismiss: {
+                        self.pendingProgressUndo = nil
+                    }
+                )
+            } else if let pendingUndo {
+                SeriesUndoBar(
+                    title: String(format: L10n.string(pendingUndo.messageKey), pendingUndo.title),
+                    undo: {
+                        if pendingUndo.messageKey == "home.undo.added" {
+                            store.delete(pendingUndo.entryId)
+                        } else {
+                            store.restore(pendingUndo.entryId)
+                        }
+                        self.pendingUndo = nil
+                    },
+                    dismiss: {
+                        self.pendingUndo = nil
+                    }
+                )
+            }
+
+            if homeState.currentEntry == nil {
+                Button(action: openSearch) {
+                    Label(L10n.string("home.add"), systemImage: "magnifyingglass")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .background(.regularMaterial)
     }
 
 }
@@ -1169,6 +1204,7 @@ private struct SeriesHomeDiscoveryRail: View {
     let title: String
     let previews: [SeriesHomeDiscoveryPreview]
     let isLoading: Bool
+    let isTabletLayout: Bool
     let canAddSeries: Bool
     let limitActionTitle: String
     let addSeries: (SeriesHomeDiscoveryPreview) -> Void
@@ -1181,28 +1217,44 @@ private struct SeriesHomeDiscoveryRail: View {
                     .font(.system(size: 17, weight: .black, design: .rounded))
                     .foregroundStyle(.primary)
 
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(alignment: .top, spacing: 12) {
-                        if isLoading && previews.isEmpty {
-                            ForEach(0..<4, id: \.self) { index in
-                                SeriesHomeDiscoverySkeletonCard(seed: index)
-                            }
-                        } else {
-                            ForEach(previews) { preview in
-                                SeriesHomeDiscoveryCard(
-                                    preview: preview,
-                                    canAddSeries: canAddSeries,
-                                    limitActionTitle: limitActionTitle,
-                                    addSeries: { addSeries(preview) },
-                                    showLimitAction: showLimitAction
-                                )
-                            }
-                        }
+                if isTabletLayout {
+                    LazyVGrid(
+                        columns: [GridItem(.adaptive(minimum: SeriesHomeDiscoveryCard.itemWidth, maximum: SeriesHomeDiscoveryCard.itemWidth), spacing: 14, alignment: .top)],
+                        alignment: .leading,
+                        spacing: 18
+                    ) {
+                        discoveryCards(skeletonCount: 8, displayPreviews: Array(previews.prefix(16)))
                     }
                     .padding(.vertical, 3)
+                } else {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(alignment: .top, spacing: 12) {
+                            discoveryCards(skeletonCount: 4, displayPreviews: previews)
+                        }
+                        .padding(.vertical, 3)
+                    }
                 }
             }
             .padding(.top, 6)
+        }
+    }
+
+    @ViewBuilder
+    private func discoveryCards(skeletonCount: Int, displayPreviews: [SeriesHomeDiscoveryPreview]) -> some View {
+        if isLoading && previews.isEmpty {
+            ForEach(0..<skeletonCount, id: \.self) { index in
+                SeriesHomeDiscoverySkeletonCard(seed: index)
+            }
+        } else {
+            ForEach(displayPreviews) { preview in
+                SeriesHomeDiscoveryCard(
+                    preview: preview,
+                    canAddSeries: canAddSeries,
+                    limitActionTitle: limitActionTitle,
+                    addSeries: { addSeries(preview) },
+                    showLimitAction: showLimitAction
+                )
+            }
         }
     }
 }
@@ -1559,6 +1611,8 @@ struct SeriesProgressEditorSheet: View {
                     clearProgressAction
                 }
                 .padding(18)
+                .frame(maxWidth: 680, alignment: .topLeading)
+                .frame(maxWidth: .infinity, alignment: .top)
             }
             .background(AVBrandSurface.shellBackground.ignoresSafeArea())
             .navigationTitle(entry.title)

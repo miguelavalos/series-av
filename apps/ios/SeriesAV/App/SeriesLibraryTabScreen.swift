@@ -23,7 +23,8 @@ struct SeriesLibraryTabScreen: View {
     var body: some View {
         AVAppShellScrollableScreenScaffold(
             alignment: .leading,
-            spacing: 22
+            spacing: 22,
+            maxContentWidth: 1120
         ) {
             AVBrandSurface.shellBackground
         } content: {
@@ -156,6 +157,8 @@ struct SeriesLibraryTabScreen: View {
                 )
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
+                .frame(maxWidth: 680)
+                .frame(maxWidth: .infinity)
                 .background(.regularMaterial)
             } else if let pendingProgressUndo {
                 SeriesUndoBar(
@@ -175,6 +178,8 @@ struct SeriesLibraryTabScreen: View {
                 )
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
+                .frame(maxWidth: 680)
+                .frame(maxWidth: .infinity)
                 .background(.regularMaterial)
             }
         }
@@ -264,26 +269,30 @@ struct SeriesLibraryTabScreen: View {
                     .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(AVBrandColor.textSecondary)
 
-                ForEach(entries) { entry in
-                    SeriesLibraryRow(
-                        entry: entry,
-                        detail: isArchived ? L10n.string("library.archived.detail") : libraryDetail(for: entry),
-                        openDetail: { detailEntry = entry },
-                        markNext: isArchived ? nil : { markNext(from: entry) }
-                    ) {
-                        if isArchived {
-                            archivedMenu(for: entry)
-                        } else {
-                            activeMenu(for: entry)
+                LazyVGrid(columns: libraryGridColumns, alignment: .leading, spacing: 10) {
+                    ForEach(entries) { entry in
+                        SeriesLibraryRow(
+                            entry: entry,
+                            detail: isArchived ? L10n.string("library.archived.detail") : libraryDetail(for: entry),
+                            openDetail: { detailEntry = entry },
+                            markNext: isArchived ? nil : { markNext(from: entry) }
+                        ) {
+                            if isArchived {
+                                archivedMenu(for: entry)
+                            } else {
+                                activeMenu(for: entry)
+                            }
                         }
-                    }
-
-                    if entry.id != entries.last?.id {
-                        Divider()
+                        .padding(10)
+                        .background(Color(.secondarySystemGroupedBackground).opacity(0.62), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                     }
                 }
             }
         }
+    }
+
+    private var libraryGridColumns: [GridItem] {
+        [GridItem(.adaptive(minimum: 360), spacing: 10)]
     }
 
     @ViewBuilder
