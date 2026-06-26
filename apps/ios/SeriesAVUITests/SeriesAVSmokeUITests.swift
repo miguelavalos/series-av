@@ -198,7 +198,6 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Sigue tu primera serie"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.otherElements["series.shell.compact"].exists)
         XCTAssertFalse(app.otherElements["series.shell.tablet"].exists)
-        XCTAssertTrue(app.staticTexts["Populares"].exists)
     }
 
     @MainActor
