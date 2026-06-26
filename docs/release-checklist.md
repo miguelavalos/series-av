@@ -48,7 +48,11 @@ Use this checklist before uploading the first App Store build and before later p
    loading and shell flows, a Release simulator build, and a screenshot evidence
    capture from the Release/prod Search screen. It does not replace signed
    device/TestFlight purchase, restore, Apple auth, or real Universal Link QA.
-6. Confirm the shipping version and build number are correct for App Store Connect. `1.0 (1)` is acceptable only if this is the first uploaded build for version `1.0`; otherwise increment `CFBundleVersion`.
+6. Before unattended App Store Connect export/upload from a new or recently
+   reconfigured Mac, complete the private
+   `docs/platform/apple-release-machine-setup.md` gate so the Apple Distribution
+   private key passes non-interactive `codesign`.
+7. Confirm the shipping version and build number are correct for App Store Connect. `1.0 (1)` is acceptable only if this is the first uploaded build for version `1.0`; otherwise increment `CFBundleVersion`.
 
 ## Automated And Manual QA
 

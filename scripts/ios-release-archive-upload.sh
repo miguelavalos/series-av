@@ -22,6 +22,10 @@ Reproducible Series AV iOS release workflow:
 3. verifies bundle id, signing metadata, build, app dSYM, and optional Sentry dSYM;
 4. uploads to App Store Connect only when --upload is passed.
 
+Before unattended --upload from a new/reconfigured Mac, complete the private
+apple-release-machine setup so the Distribution key can codesign without a
+password prompt.
+
 Without --upload, this leaves a verified .xcarchive ready for upload.
 USAGE
 }
