@@ -121,9 +121,10 @@ simulator QA can validate production config, signed Account AV session restore,
 paywall offer loading, restore button visibility, and non-purchase UI behavior,
 but it must not replace a real store purchase/restore validation.
 
-Approval snapshot, 2026-06-24: iOS app version `1.0 (11)` has been approved for
-the App Store per operator report. The subscription review screenshot and
-promotional image were attached before submission.
+Approval snapshot, 2026-06-28: iOS/iPadOS app version `1.0.1 (12)` has been
+approved for the App Store per operator report. This update adds iPad support
+and bug fixes. The subscription review screenshot and promotional image were
+attached before the original `1.0 (11)` submission.
 
 1. Generate production iOS config and run the app:
 

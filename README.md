@@ -122,8 +122,8 @@ For simulator or physical iPhone installs, follow [docs/install-ios.md](docs/ins
 
 ## Open product work
 
-1. Monitor App Store review for submitted iOS version `1.0 (11)`, submission
-   `914c99f2-95c6-4b0d-a651-d15433efe639`.
+1. Treat iOS/iPadOS version `1.0.1 (12)` as the current public App Store
+   baseline for client compatibility work.
 2. After approval or a safe store test path is available, complete purchase,
    restore, RevenueCat webhook, and Apps AV entitlement validation for
    `seriesav_pro_monthly`.
