@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { seriesBrandAssets } from "@/lib/series-config";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
 import { seriesLibraryUiText } from "@/components/series-library-ui";
-import { cursorLabel, nextEpisodeCursor, progressLabel } from "@/lib/series-library";
+import { canMarkNextEpisodeFromKnownGuide, cursorLabel, nextEpisodeCursor, progressLabel } from "@/lib/series-library";
 import { localizedSeriesPath, useSeriesText } from "@/lib/series-i18n";
 
 export const Route = createFileRoute("/avi")({
@@ -21,6 +21,7 @@ function AviRoute() {
   const library = useSeriesLibrary();
   const current = library.snapshot.homeEntries[0] ?? null;
   const next = current ? nextEpisodeCursor(current.lastWatchedEpisodeCursor) : null;
+  const canMarkCurrentNext = current ? canMarkNextEpisodeFromKnownGuide(current) : false;
   const labels = aviLabels[locale];
   const libraryLabels = seriesLibraryUiText(locale);
 
@@ -44,7 +45,7 @@ function AviRoute() {
                 <div className="flex flex-wrap gap-3">
                   {current ? (
                     <>
-                      <Button className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" onClick={() => library.markNextEpisodeWatched(current.entryId)}>
+                      <Button className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" disabled={!canMarkCurrentNext} onClick={() => library.markNextEpisodeWatched(current.entryId)}>
                         <StepForward className="size-4" /> {labels.markNext}
                       </Button>
                       <Button variant="outline" className="rounded-full border-[#c8ad72] bg-[#fff8df]/76" onClick={() => library.setPinned(current.entryId, current.isPinnedHomeSeries !== true)}>

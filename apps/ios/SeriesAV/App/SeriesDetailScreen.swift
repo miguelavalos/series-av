@@ -24,6 +24,7 @@ struct SeriesDetailScreen: View {
     private let episodeGuideClient: SeriesEpisodeGuideClient
     private let detailClient: SeriesDetailClient
     private let shareInviteClient: SeriesShareInviteClient?
+    private let guideFeedbackClient: SeriesGuideFeedbackClient
 
     @State private var guideState: SeriesDetailGuideState = .loading
     @State private var resolvedCatalogItem: SeriesCatalogItem?
@@ -37,6 +38,7 @@ struct SeriesDetailScreen: View {
     @State private var isConfirmingDelete = false
     @State private var inAppBrowserDestination: SeriesInAppBrowserDestination?
     @State private var shareSheetItem: SeriesShareSheetItem?
+    @State private var feedbackState: SeriesGuideFeedbackSubmissionState = .idle
 
     init(
         catalogItem: SeriesCatalogItem? = nil,
@@ -52,7 +54,8 @@ struct SeriesDetailScreen: View {
         delete: ((SeriesLibraryEntry) -> Void)? = nil,
         episodeGuideClient: SeriesEpisodeGuideClient = SeriesEpisodeGuideClient(apiClient: SeriesAVAPIClient()),
         detailClient: SeriesDetailClient = SeriesDetailClient(),
-        shareInviteClient: SeriesShareInviteClient? = nil
+        shareInviteClient: SeriesShareInviteClient? = nil,
+        guideFeedbackClient: SeriesGuideFeedbackClient = SeriesGuideFeedbackClient()
     ) {
         self.catalogItem = catalogItem
         self.entry = entry
@@ -68,6 +71,7 @@ struct SeriesDetailScreen: View {
         self.episodeGuideClient = episodeGuideClient
         self.detailClient = detailClient
         self.shareInviteClient = shareInviteClient
+        self.guideFeedbackClient = guideFeedbackClient
         _displayedLastWatchedEpisodeCursor = State(initialValue: entry?.lastWatchedEpisodeCursor)
     }
 
@@ -192,6 +196,7 @@ struct SeriesDetailScreen: View {
 
                 VStack(alignment: .leading, spacing: 18) {
                     guideSection
+                    guideFeedbackSection
                     privateNoteSection
                     libraryManagementSection
                 }
@@ -205,6 +210,7 @@ struct SeriesDetailScreen: View {
                 privateNoteSection
                 libraryManagementSection
                 guideSection
+                guideFeedbackSection
             }
         }
     }
@@ -234,19 +240,27 @@ struct SeriesDetailScreen: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
-                    if let summary = effectiveCatalogItem?.summary?.trimmingCharacters(in: .whitespacesAndNewlines),
-                       summary.isEmpty == false {
-                        Text(summary)
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(AVBrandColor.textSecondary)
-                            .lineLimit(4)
-                            .fixedSize(horizontal: false, vertical: true)
-                    } else {
-                        Text(L10n.string("detail.summary.unavailable"))
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(AVBrandColor.textSecondary)
+                    Text(spoilerFreeSummaryText)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(AVBrandColor.textSecondary)
+                        .lineLimit(4)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    if shouldShowProviderNumberingNote {
+                        Label(L10n.string("detail.numbering.providerNote"), systemImage: "number")
+                            .font(.system(size: 11, weight: .black))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.82)
                             .fixedSize(horizontal: false, vertical: true)
                     }
+
+                    Label(guideCoverageText, systemImage: guideCoverageSystemImage)
+                        .font(.system(size: 11, weight: .black))
+                        .foregroundStyle(AVBrandColor.accent)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.82)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .layoutPriority(1)
             }
@@ -279,6 +293,8 @@ struct SeriesDetailScreen: View {
                         .buttonStyle(.borderedProminent)
                         .controlSize(.regular)
                         .tint(AVBrandColor.accent)
+                        .disabled(canMarkNextEpisode(from: entry) == false)
+                        .opacity(canMarkNextEpisode(from: entry) ? 1 : 0.42)
                         .accessibilityLabel(nextActionTitle(for: entry))
 
                         Button {
@@ -429,18 +445,20 @@ struct SeriesDetailScreen: View {
                             description: Text(L10n.string("detail.episodes.unavailable.detail"))
                         )
                     } else {
+                        let visibleEpisodes = focusedEpisodes(from: episodes)
                         VStack(spacing: 8) {
-                            ForEach(episodes.prefix(8), id: \.cursor) { episode in
+                            ForEach(visibleEpisodes, id: \.cursor) { episode in
                                 SeriesDetailEpisodeRow(
                                     episode: episode,
+                                    absoluteEpisodeNumber: absoluteEpisodeNumber(for: episode.cursor, in: episodes),
                                     displayedLastWatchedEpisodeCursor: displayedLastWatchedEpisodeCursor,
                                     markWatchedThrough: markEpisodeWatchedThroughAction(for: episode)
                                 )
                             }
                         }
 
-                        if episodes.count > 8 {
-                            Text(String(format: L10n.string("detail.episodes.more"), episodes.count - 8))
+                        if episodes.count > visibleEpisodes.count {
+                            Text(String(format: L10n.string("detail.episodes.more"), episodes.count - visibleEpisodes.count))
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundStyle(.secondary)
                         }
@@ -451,6 +469,39 @@ struct SeriesDetailScreen: View {
                         systemImage: "wifi.exclamationmark",
                         description: Text(L10n.string("detail.episodes.retryLater"))
                     )
+                }
+            }
+        }
+    }
+
+    private var guideFeedbackSection: some View {
+        AVAppShellCard {
+            VStack(alignment: .leading, spacing: 12) {
+                sectionTitle(L10n.string("detail.guideFeedback.title"))
+
+                Text(L10n.string("detail.guideFeedback.detail"))
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Button {
+                    Task {
+                        await submitGuideFeedback()
+                    }
+                } label: {
+                    Label(guideFeedbackActionTitle, systemImage: guideFeedbackActionIcon)
+                        .font(.system(size: 13, weight: .black))
+                        .frame(maxWidth: .infinity, minHeight: 42)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
+                .disabled(seriesId.isEmpty || feedbackState == .sending)
+
+                if let message = guideFeedbackStatusMessage {
+                    Text(message)
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(feedbackState == .failed ? Color.red : Color.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
@@ -565,6 +616,120 @@ struct SeriesDetailScreen: View {
         presentation.metadataText
     }
 
+    private var spoilerFreeSummaryText: String {
+        if let summary = effectiveCatalogItem?.summary?.trimmingCharacters(in: .whitespacesAndNewlines),
+           summary.isEmpty == false {
+            return summary
+        }
+
+        if let latestKnownEpisodeCursor {
+            return String(
+                format: L10n.string("detail.summary.guideOnly"),
+                knownEpisodeLabel(
+                    cursor: latestKnownEpisodeCursor,
+                    absoluteEpisodeNumber: effectiveCatalogItem?.knownEpisodeCount ?? entry?.knownEpisodeCount
+                )
+            )
+        }
+
+        switch guideState {
+        case .loaded(let episodes) where episodes.isEmpty == false:
+            return String(
+                format: L10n.string("detail.summary.guideCountOnly"),
+                episodes.count
+            )
+        case .loading:
+            return L10n.string("detail.summary.loadingGuide")
+        case .loaded, .failed:
+            return L10n.string("detail.summary.noGuide")
+        }
+    }
+
+    private var shouldShowProviderNumberingNote: Bool {
+        guard let latestKnownEpisodeCursor,
+              let knownEpisodeCount = effectiveCatalogItem?.knownEpisodeCount ?? entry?.knownEpisodeCount else {
+            return false
+        }
+        return knownEpisodeCount != latestKnownEpisodeCursor.episodeNumber
+    }
+
+    private var latestKnownEpisodeCursor: SeriesEpisodeCursor? {
+        if let latestKnownEpisodeCursor = effectiveCatalogItem?.latestKnownEpisodeCursor ?? entry?.latestKnownEpisodeCursor {
+            return latestKnownEpisodeCursor
+        }
+        guard case .loaded(let episodes) = guideState else {
+            return nil
+        }
+        return episodes
+            .map(\.cursor)
+            .max()
+    }
+
+    private var guideFeedbackActionTitle: String {
+        switch feedbackState {
+        case .idle, .failed:
+            L10n.string("detail.guideFeedback.action")
+        case .sending:
+            L10n.string("detail.guideFeedback.sending")
+        case .sent:
+            L10n.string("detail.guideFeedback.sent")
+        }
+    }
+
+    private var guideFeedbackActionIcon: String {
+        switch feedbackState {
+        case .idle, .failed:
+            "exclamationmark.bubble"
+        case .sending:
+            "hourglass"
+        case .sent:
+            "checkmark.circle.fill"
+        }
+    }
+
+    private var guideFeedbackStatusMessage: String? {
+        switch feedbackState {
+        case .idle, .sending:
+            nil
+        case .sent:
+            L10n.string("detail.guideFeedback.sent.detail")
+        case .failed:
+            L10n.string("detail.guideFeedback.failed")
+        }
+    }
+
+    private var guideCoverageText: String {
+        if let latestKnownEpisodeCursor {
+            return String(
+                format: L10n.string("detail.guideCoverage.latest"),
+                knownEpisodeLabel(
+                    cursor: latestKnownEpisodeCursor,
+                    absoluteEpisodeNumber: effectiveCatalogItem?.knownEpisodeCount ?? entry?.knownEpisodeCount
+                )
+            )
+        }
+
+        switch guideState {
+        case .loaded(let episodes) where episodes.isEmpty == false:
+            return String(format: L10n.string("detail.guideCoverage.count"), episodes.count)
+        case .loading:
+            return L10n.string("detail.guideCoverage.loading")
+        case .loaded, .failed:
+            return L10n.string("detail.guideCoverage.unavailable")
+        }
+    }
+
+    private var guideCoverageSystemImage: String {
+        switch guideState {
+        case .loading:
+            "hourglass"
+        case .loaded(let episodes) where episodes.isEmpty == false:
+            "checkmark.seal.fill"
+        default:
+            latestKnownEpisodeCursor == nil ? "exclamationmark.triangle.fill" : "checkmark.seal.fill"
+        }
+    }
+
     private var effectiveCatalogItem: SeriesCatalogItem? {
         catalogItem ?? resolvedCatalogItem
     }
@@ -579,6 +744,13 @@ struct SeriesDetailScreen: View {
 
     private func nextActionTitle(for entry: SeriesLibraryEntry) -> String {
         SeriesDetailPresentationBuilder.nextActionTitle(for: entry)
+    }
+
+    private func canMarkNextEpisode(from entry: SeriesLibraryEntry) -> Bool {
+        guard let latestKnownEpisodeCursor = latestKnownEpisodeCursor else {
+            return true
+        }
+        return entry.nextEpisodeCursor <= latestKnownEpisodeCursor
     }
 
     private func detailStatusIcon(_ status: SeriesLibraryEntryStatus) -> String {
@@ -596,6 +768,43 @@ struct SeriesDetailScreen: View {
         }
     }
 
+    private func focusedEpisodes(from episodes: [SeriesEpisodeGuideItem]) -> [SeriesEpisodeGuideItem] {
+        let sortedEpisodes = episodes.sorted {
+            if $0.seasonNumber == $1.seasonNumber {
+                return $0.episodeNumber < $1.episodeNumber
+            }
+            return $0.seasonNumber < $1.seasonNumber
+        }
+        let limit = min(14, sortedEpisodes.count)
+        guard limit > 0 else { return [] }
+
+        let focusCursor = displayedLastWatchedEpisodeCursor?.nextEpisode ?? displayedLastWatchedEpisodeCursor
+        let focusIndex = focusCursor.flatMap { cursor in
+            sortedEpisodes.firstIndex { $0.cursor >= cursor }
+        } ?? sortedEpisodes.firstIndex { $0.relativeState == .next || $0.relativeState == .current }
+
+        guard let focusIndex else {
+            return Array(sortedEpisodes.prefix(limit))
+        }
+
+        let preferredLeadCount = 4
+        let lowerBound = max(0, min(focusIndex - preferredLeadCount, sortedEpisodes.count - limit))
+        let upperBound = min(sortedEpisodes.count, lowerBound + limit)
+        return Array(sortedEpisodes[lowerBound..<upperBound])
+    }
+
+    private func absoluteEpisodeNumber(for cursor: SeriesEpisodeCursor, in episodes: [SeriesEpisodeGuideItem]) -> Int? {
+        episodes
+            .sorted {
+                if $0.seasonNumber == $1.seasonNumber {
+                    return $0.episodeNumber < $1.episodeNumber
+                }
+                return $0.seasonNumber < $1.seasonNumber
+            }
+            .firstIndex { $0.cursor == cursor }
+            .map { $0 + 1 }
+    }
+
     private func openSource(_ url: URL) {
         switch externalLinkPreferences.webOpenMode {
         case .inApp:
@@ -603,6 +812,44 @@ struct SeriesDetailScreen: View {
         case .system:
             openURL(url)
         }
+    }
+
+    @MainActor
+    private func submitGuideFeedback() async {
+        guard seriesId.isEmpty == false else { return }
+        feedbackState = .sending
+
+        do {
+            _ = try await guideFeedbackClient.report(
+                SeriesGuideFeedbackRequest(
+                    seriesId: seriesId,
+                    title: title,
+                    reason: defaultGuideFeedbackReason,
+                    note: nil,
+                    userCursor: displayedLastWatchedEpisodeCursor,
+                    latestKnownEpisodeCursor: latestKnownEpisodeCursor,
+                    knownEpisodeCount: effectiveCatalogItem?.knownEpisodeCount ?? entry?.knownEpisodeCount,
+                    appLocale: Locale.current.identifier
+                )
+            )
+            feedbackState = .sent
+        } catch {
+            feedbackState = .failed
+        }
+    }
+
+    private var defaultGuideFeedbackReason: SeriesGuideFeedbackReason {
+        guard let displayedLastWatchedEpisodeCursor,
+              let latestKnownEpisodeCursor else {
+            return .other
+        }
+        if displayedLastWatchedEpisodeCursor > latestKnownEpisodeCursor {
+            return .missingEpisodes
+        }
+        if shouldShowProviderNumberingNote {
+            return .wrongNumbering
+        }
+        return .other
     }
 
     private func loadEpisodeGuide() async {
@@ -686,6 +933,13 @@ private struct SeriesShareSheetItem: Identifiable {
 
 private enum SeriesShareInviteComposerError: Error {
     case missingClient
+}
+
+private enum SeriesGuideFeedbackSubmissionState: Equatable {
+    case idle
+    case sending
+    case sent
+    case failed
 }
 
 private struct SeriesPrivateNoteEditorSheet: View {
@@ -872,6 +1126,7 @@ private enum SeriesDetailGuideState {
 
 private struct SeriesDetailEpisodeRow: View {
     let episode: SeriesEpisodeGuideItem
+    let absoluteEpisodeNumber: Int?
     let displayedLastWatchedEpisodeCursor: SeriesEpisodeCursor?
     let markWatchedThrough: (() -> Void)?
 
@@ -906,11 +1161,11 @@ private struct SeriesDetailEpisodeRow: View {
 
     private var rowContent: some View {
         HStack(alignment: .top, spacing: 10) {
-            Text(cursorLabel(episode.cursor))
+            Text(episodeNumberLabel)
                 .font(.system(size: 13, weight: .black, design: .rounded))
                 .foregroundStyle(cursorColor)
                 .monospacedDigit()
-                .frame(width: 54, alignment: .leading)
+                .frame(width: 108, alignment: .leading)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(episodeTitle)
@@ -943,6 +1198,13 @@ private struct SeriesDetailEpisodeRow: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .strokeBorder(rowBorderColor, lineWidth: rowBorderWidth)
         )
+    }
+
+    private var episodeNumberLabel: String {
+        guard let absoluteEpisodeNumber else {
+            return cursorLabel(episode.cursor)
+        }
+        return "E\(absoluteEpisodeNumber) · \(cursorLabel(episode.cursor))"
     }
 
     private var actionBadge: some View {

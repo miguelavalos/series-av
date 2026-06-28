@@ -120,6 +120,8 @@ function SearchResultCard({ locale, result }: { locale: ReturnType<typeof useApp
               library.addCatalogSeries({
                 displayArtworkRef: artwork,
                 fallbackVisualSeed: result.title,
+                knownEpisodeCount: result.knownEpisodeCount,
+                latestKnownEpisodeCursor: result.latestKnownEpisodeCursor,
                 seriesId,
                 title: result.title
               });

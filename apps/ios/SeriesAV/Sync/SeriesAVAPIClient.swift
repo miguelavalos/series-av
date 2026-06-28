@@ -350,6 +350,71 @@ struct SeriesShareInviteAcceptResponse: Codable, Equatable, Sendable {
     var generatedAt: Date
 }
 
+enum SeriesGuideFeedbackReason: String, Codable, Equatable, Sendable {
+    case missingEpisodes
+    case wrongNumbering
+    case wrongDates
+    case duplicateEpisodes
+    case other
+}
+
+struct SeriesGuideFeedbackRequest: Codable, Equatable, Sendable {
+    var seriesId: String
+    var title: String?
+    var reason: SeriesGuideFeedbackReason
+    var note: String?
+    var userCursor: SeriesEpisodeCursor?
+    var latestKnownEpisodeCursor: SeriesEpisodeCursor?
+    var knownEpisodeCount: Int?
+    var appLocale: String?
+}
+
+struct SeriesGuideFeedbackResponse: Codable, Equatable, Sendable {
+    var reportId: String
+    var status: String
+    var generatedAt: Date
+}
+
+struct SeriesGuideFeedbackClient: Sendable {
+    var apiClient: SeriesAVAPIClient
+    var encoder: JSONEncoder
+    var decoder: JSONDecoder
+
+    init(
+        apiClient: SeriesAVAPIClient = SeriesAVAPIClient(),
+        encoder: JSONEncoder = SeriesGuideFeedbackClient.makeEncoder(),
+        decoder: JSONDecoder = SeriesGuideFeedbackClient.makeDecoder()
+    ) {
+        self.apiClient = apiClient
+        self.encoder = encoder
+        self.decoder = decoder
+    }
+
+    func report(_ request: SeriesGuideFeedbackRequest) async throws -> SeriesGuideFeedbackResponse {
+        let body = try encoder.encode(request)
+        let (data, _) = try await apiClient.requestData(
+            path: "/v1/series/guide-feedback",
+            method: "POST",
+            body: body,
+            headers: ["Content-Type": "application/json"],
+            requiresAuth: false
+        )
+        return try decoder.decode(SeriesGuideFeedbackResponse.self, from: data)
+    }
+
+    private static func makeEncoder() -> JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        return encoder
+    }
+
+    private static func makeDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .seriesAVISO8601
+        return decoder
+    }
+}
+
 struct SeriesShareInviteClient: Sendable {
     var apiClient: SeriesAVAPIClient
     var encoder: JSONEncoder

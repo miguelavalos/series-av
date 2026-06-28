@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { isPlaceholderSeriesTitle, visibleSeriesTitle } from "@/lib/series-display";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
-import { cursorLabel, nextEpisodeCursor, progressLabel, type SeriesLibraryEntry, type SeriesLibraryEntryStatus } from "@/lib/series-library";
+import { canMarkNextEpisodeFromKnownGuide, cursorLabel, nextEpisodeCursor, progressLabel, type SeriesLibraryEntry, type SeriesLibraryEntryStatus } from "@/lib/series-library";
 import { localizedSeriesPath } from "@/lib/series-i18n";
 import type { AppsAvLocale } from "@avalsys/apps-av-web";
 
@@ -138,6 +138,7 @@ export function SeriesEntryRow({ entry, locale, showArchive = true }: { entry: S
   const next = nextEpisodeCursor(entry.lastWatchedEpisodeCursor);
   const labels = uiText[locale];
   const title = visibleSeriesTitle(entry.title, entry.seriesId);
+  const canMarkNext = canMarkNextEpisodeFromKnownGuide(entry);
 
   return (
     <Card className="gap-0 rounded-lg border-[#d7c494] bg-[#fff8df]/88 p-4 py-4 shadow-sm shadow-[#172f5c]/6">
@@ -161,6 +162,7 @@ export function SeriesEntryRow({ entry, locale, showArchive = true }: { entry: S
               className="h-9 w-9 rounded-full bg-[#112a55] text-white hover:bg-[#19396f]"
               aria-label={`${labels.markNext} ${cursorLabel(next)}`}
               title={`${labels.markNext} ${cursorLabel(next)}`}
+              disabled={!canMarkNext}
               onClick={() => library.markNextEpisodeWatched(entry.entryId)}
             >
               <StepForward className="size-4" />

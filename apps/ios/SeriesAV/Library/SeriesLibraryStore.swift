@@ -95,6 +95,8 @@ final class SeriesLibraryStore {
             lastWatchedEpisodeCursor: nil,
             displayArtworkRef: catalogItem.displayArtworkRef,
             fallbackVisualSeed: title,
+            latestKnownEpisodeCursor: catalogItem.latestKnownEpisodeCursor,
+            knownEpisodeCount: catalogItem.knownEpisodeCount,
             addedAt: date,
             updatedAt: date,
             lastInteractedAt: date
@@ -134,6 +136,9 @@ final class SeriesLibraryStore {
         at date: Date = Date()
     ) {
         guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
+            return
+        }
+        guard entries[index].canMarkNextEpisodeFromKnownGuide else {
             return
         }
 
@@ -215,6 +220,48 @@ final class SeriesLibraryStore {
            fallbackVisualSeed.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false {
             entries[index].fallbackVisualSeed = fallbackVisualSeed.trimmingCharacters(in: .whitespacesAndNewlines)
         }
+        entries[index].updatedAt = date
+        persist()
+        return true
+    }
+
+    @discardableResult
+    func updateCatalogMetadata(
+        for entryId: String,
+        displayArtworkRef: String?,
+        fallbackVisualSeed: String?,
+        latestKnownEpisodeCursor: SeriesEpisodeCursor?,
+        knownEpisodeCount: Int?,
+        at date: Date = Date()
+    ) -> Bool {
+        guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
+            return false
+        }
+
+        var didUpdate = false
+        let normalizedArtworkRef = displayArtworkRef?.trimmingCharacters(in: .whitespacesAndNewlines)
+        if entries[index].displayArtworkRef?.isEmpty != false, normalizedArtworkRef?.isEmpty == false {
+            entries[index].displayArtworkRef = normalizedArtworkRef
+            didUpdate = true
+        }
+        if entries[index].fallbackVisualSeed?.isEmpty != false,
+           let fallbackVisualSeed,
+           fallbackVisualSeed.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false {
+            entries[index].fallbackVisualSeed = fallbackVisualSeed.trimmingCharacters(in: .whitespacesAndNewlines)
+            didUpdate = true
+        }
+        if entries[index].latestKnownEpisodeCursor != latestKnownEpisodeCursor {
+            entries[index].latestKnownEpisodeCursor = latestKnownEpisodeCursor
+            didUpdate = true
+        }
+        if entries[index].knownEpisodeCount != knownEpisodeCount {
+            entries[index].knownEpisodeCount = knownEpisodeCount
+            didUpdate = true
+        }
+        guard didUpdate else {
+            return false
+        }
+
         entries[index].updatedAt = date
         persist()
         return true
