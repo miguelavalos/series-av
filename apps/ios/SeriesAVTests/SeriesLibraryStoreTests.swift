@@ -78,6 +78,52 @@ final class SeriesLibraryStoreTests: XCTestCase {
         XCTAssertEqual(store.entries[0].isPinnedHomeSeries, true)
     }
 
+    func testMarkNextDoesNotAdvanceBeyondKnownEpisodeGuide() {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = SeriesLibraryStore(entries: [
+            SeriesLibraryEntry(
+                entryId: "one-piece",
+                seriesId: "thetvdb:81797",
+                title: "One Piece",
+                status: .watching,
+                lastWatchedEpisodeCursor: SeriesEpisodeCursor(seasonNumber: 23, episodeNumber: 14),
+                latestKnownEpisodeCursor: SeriesEpisodeCursor(seasonNumber: 23, episodeNumber: 14),
+                knownEpisodeCount: 1168,
+                addedAt: date,
+                updatedAt: date,
+                lastInteractedAt: date
+            )
+        ])
+
+        store.markNextEpisodeWatched(for: "one-piece", at: date.addingTimeInterval(10))
+
+        XCTAssertEqual(store.entries[0].lastWatchedEpisodeCursor, SeriesEpisodeCursor(seasonNumber: 23, episodeNumber: 14))
+        XCTAssertEqual(store.entries[0].updatedAt, date)
+    }
+
+    func testMarkNextAllowsAdvancingToLastKnownEpisode() {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = SeriesLibraryStore(entries: [
+            SeriesLibraryEntry(
+                entryId: "one-piece",
+                seriesId: "thetvdb:81797",
+                title: "One Piece",
+                status: .watching,
+                lastWatchedEpisodeCursor: SeriesEpisodeCursor(seasonNumber: 23, episodeNumber: 13),
+                latestKnownEpisodeCursor: SeriesEpisodeCursor(seasonNumber: 23, episodeNumber: 14),
+                knownEpisodeCount: 1168,
+                addedAt: date,
+                updatedAt: date,
+                lastInteractedAt: date
+            )
+        ])
+
+        store.markNextEpisodeWatched(for: "one-piece", at: date.addingTimeInterval(10))
+
+        XCTAssertEqual(store.entries[0].lastWatchedEpisodeCursor, SeriesEpisodeCursor(seasonNumber: 23, episodeNumber: 14))
+        XCTAssertEqual(store.entries[0].updatedAt, date.addingTimeInterval(10))
+    }
+
     func testMarkWatchedThroughCanPinReadyToStartSeriesOnHomeAtomically() {
         let date = Date(timeIntervalSince1970: 1_800_000_000)
         let store = SeriesLibraryStore(entries: [

@@ -61,6 +61,8 @@ struct SeriesLibraryEntry: Codable, Identifiable, Equatable, Sendable {
     var privateNote: String? = nil
     var displayArtworkRef: String?
     var fallbackVisualSeed: String?
+    var latestKnownEpisodeCursor: SeriesEpisodeCursor? = nil
+    var knownEpisodeCount: Int? = nil
     var archivedAt: Date?
     var deletedAt: Date?
     var addedAt: Date
@@ -78,6 +80,13 @@ struct SeriesLibraryEntry: Codable, Identifiable, Equatable, Sendable {
 
     var nextEpisodeCursor: SeriesEpisodeCursor {
         lastWatchedEpisodeCursor?.nextEpisode ?? SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 1)
+    }
+
+    var canMarkNextEpisodeFromKnownGuide: Bool {
+        guard let latestKnownEpisodeCursor else {
+            return true
+        }
+        return nextEpisodeCursor <= latestKnownEpisodeCursor
     }
 
     mutating func markWatchedThrough(_ cursor: SeriesEpisodeCursor, at date: Date = Date()) {
@@ -163,6 +172,8 @@ struct SeriesCatalogItem: Codable, Identifiable, Equatable, Sendable {
     var genres: [String]
     var displayArtwork: DisplayArtwork
     var displayBackdrop: DisplayArtwork?
+    var latestKnownEpisodeCursor: SeriesEpisodeCursor?
+    var knownEpisodeCount: Int?
     var episodeGuideState: String
     var visibility: String
     var enrichmentStatus: String

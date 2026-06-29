@@ -51,6 +51,25 @@ enum SeriesLibraryFilter: String, CaseIterable {
     case archived
 }
 
+private struct SeriesHomeDetailSelection: Identifiable {
+    let catalogItem: SeriesCatalogItem?
+    let entry: SeriesLibraryEntry?
+
+    init(catalogItem: SeriesCatalogItem?, entry: SeriesLibraryEntry?) {
+        self.catalogItem = catalogItem
+        self.entry = entry
+    }
+
+    init(entry: SeriesLibraryEntry) {
+        self.catalogItem = nil
+        self.entry = entry
+    }
+
+    var id: String {
+        entry?.seriesId ?? catalogItem?.seriesId ?? UUID().uuidString
+    }
+}
+
 private struct SeriesWatchingHomeScreen: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -65,7 +84,7 @@ private struct SeriesWatchingHomeScreen: View {
     let startSignInFlow: () -> Void
 
     @State private var editorEntry: SeriesLibraryEntry?
-    @State private var detailEntry: SeriesLibraryEntry?
+    @State private var detailSelection: SeriesHomeDetailSelection?
     @State private var isShowingProPaywall = false
     @State private var pendingUndo: PendingLibraryUndo?
     @State private var pendingProgressUndo: PendingProgressUndo?
@@ -136,7 +155,7 @@ private struct SeriesWatchingHomeScreen: View {
                         store.setPinned(currentEntry.isPinnedHomeSeries != true, for: currentEntry.id)
                     },
                     openDetail: {
-                        detailEntry = currentEntry
+                        detailSelection = SeriesHomeDetailSelection(entry: currentEntry)
                     },
                     setStatus: { status in
                         pendingProgressUndo = progressUndo(for: currentEntry, messageKey: "home.undo.status")
@@ -182,7 +201,7 @@ private struct SeriesWatchingHomeScreen: View {
                         store.setPinned(entry.isPinnedHomeSeries != true, for: entry.id)
                     },
                     openDetail: { entry in
-                        detailEntry = entry
+                        detailSelection = SeriesHomeDetailSelection(entry: entry)
                     },
                     setStatus: { entry, status in
                         pendingProgressUndo = progressUndo(for: entry, messageKey: "home.undo.status")
@@ -221,7 +240,7 @@ private struct SeriesWatchingHomeScreen: View {
                         store.setPinned(entry.isPinnedHomeSeries != true, for: entry.id)
                     },
                     openDetail: { entry in
-                        detailEntry = entry
+                        detailSelection = SeriesHomeDetailSelection(entry: entry)
                     },
                     setStatus: { entry, status in
                         pendingProgressUndo = progressUndo(for: entry, messageKey: "home.undo.status")
@@ -249,6 +268,9 @@ private struct SeriesWatchingHomeScreen: View {
             canAddSeries: canAddSeries,
             limitActionTitle: limitActionTitle,
             addSeries: addDiscoverySeries,
+            openDetail: { preview in
+                detailSelection = SeriesHomeDetailSelection(catalogItem: preview.catalogItem, entry: nil)
+            },
             showLimitAction: showLimitAction
             )
 
@@ -260,6 +282,9 @@ private struct SeriesWatchingHomeScreen: View {
             canAddSeries: canAddSeries,
             limitActionTitle: limitActionTitle,
             addSeries: addDiscoverySeries,
+            openDetail: { preview in
+                detailSelection = SeriesHomeDetailSelection(catalogItem: preview.catalogItem, entry: nil)
+            },
             showLimitAction: showLimitAction
             )
 
@@ -271,6 +296,9 @@ private struct SeriesWatchingHomeScreen: View {
             canAddSeries: canAddSeries,
             limitActionTitle: limitActionTitle,
             addSeries: addDiscoverySeries,
+            openDetail: { preview in
+                detailSelection = SeriesHomeDetailSelection(catalogItem: preview.catalogItem, entry: nil)
+            },
             showLimitAction: showLimitAction
             )
         }
@@ -298,9 +326,19 @@ private struct SeriesWatchingHomeScreen: View {
             )
             .presentationDetents([.large])
         }
-        .sheet(item: $detailEntry) { entry in
+        .sheet(item: $detailSelection) { selection in
             SeriesDetailScreen(
-                entry: entry,
+                catalogItem: selection.catalogItem,
+                entry: selection.entry,
+                canFollow: canAddSeries,
+                follow: selection.entry == nil ? {
+                    if canAddSeries, let catalogItem = selection.catalogItem {
+                        _ = store.addCatalogSeries(catalogItem)
+                        detailSelection = nil
+                    } else {
+                        showLimitAction()
+                    }
+                } : nil,
                 markNext: { entry in
                     pendingProgressUndo = progressUndo(
                         for: entry,
@@ -386,13 +424,13 @@ private struct SeriesWatchingHomeScreen: View {
         return SeriesShareInviteClient(apiClient: accessController.authenticatedAPIClient())
     }
 
-    private var missingArtworkEntries: [SeriesLibraryEntry] {
-        store.activeEntries.filter { $0.displayArtworkRef?.isEmpty != false }
+    private var entriesNeedingCatalogMetadata: [SeriesLibraryEntry] {
+        store.activeEntries.filter { $0.displayArtworkRef?.isEmpty != false || $0.latestKnownEpisodeCursor == nil || $0.knownEpisodeCount == nil }
     }
 
     private var missingArtworkSignature: String {
-        missingArtworkEntries
-            .map { "\($0.entryId):\($0.seriesId):\($0.title)" }
+        entriesNeedingCatalogMetadata
+            .map { "\($0.entryId):\($0.seriesId):\($0.title):\($0.displayArtworkRef ?? "-"):\(String(describing: $0.latestKnownEpisodeCursor)):\(String(describing: $0.knownEpisodeCount))" }
             .joined(separator: "|")
     }
 
@@ -464,14 +502,16 @@ private struct SeriesWatchingHomeScreen: View {
     }
 
     private func reconcileMissingArtwork(from previews: [SeriesHomeDiscoveryPreview]) {
-        for entry in missingArtworkEntries {
+        for entry in entriesNeedingCatalogMetadata {
             guard let preview = previews.first(where: { SeriesLibraryIdentity.sameSeries(entry, $0.catalogItem) }) else {
                 continue
             }
-            store.updateArtworkIfMissing(
+            store.updateCatalogMetadata(
                 for: entry.entryId,
                 displayArtworkRef: preview.catalogItem.displayArtworkRef,
-                fallbackVisualSeed: preview.title
+                fallbackVisualSeed: preview.title,
+                latestKnownEpisodeCursor: preview.catalogItem.latestKnownEpisodeCursor,
+                knownEpisodeCount: preview.catalogItem.knownEpisodeCount
             )
         }
     }
@@ -484,23 +524,20 @@ private struct SeriesWatchingHomeScreen: View {
         artworkReconciliationSignature = signature
 
         let client = SeriesCatalogSearchClient()
-        for entry in missingArtworkEntries.prefix(6) {
-            guard entry.displayArtworkRef?.isEmpty != false else {
-                continue
-            }
-
+        for entry in entriesNeedingCatalogMetadata.prefix(6) {
             let normalizedTitle = SeriesLibraryIdentity.normalizedSearchText(entry.title)
             guard let response = try? await client.search(query: entry.title, locale: Locale.current.identifier, limit: 4),
                   let catalogItem = response.results.first(where: { SeriesLibraryIdentity.sameSeries(entry, $0) })
-                    ?? response.results.first(where: { SeriesLibraryIdentity.normalizedSearchText($0.title) == normalizedTitle }),
-                  catalogItem.displayArtworkRef?.isEmpty == false else {
+                    ?? response.results.first(where: { SeriesLibraryIdentity.normalizedSearchText($0.title) == normalizedTitle }) else {
                 continue
             }
 
-            store.updateArtworkIfMissing(
+            store.updateCatalogMetadata(
                 for: entry.entryId,
                 displayArtworkRef: catalogItem.displayArtworkRef,
-                fallbackVisualSeed: catalogItem.title
+                fallbackVisualSeed: catalogItem.title,
+                latestKnownEpisodeCursor: catalogItem.latestKnownEpisodeCursor,
+                knownEpisodeCount: catalogItem.knownEpisodeCount
             )
         }
     }
@@ -741,6 +778,7 @@ struct SeriesLibraryRow<MenuContent: View>: View {
                     style: .accent,
                     accessibilityLabel: quickProgressAccessibilityLabel,
                     accessibilityIdentifier: "series-row-\(entry.id)-quick-progress",
+                    isDisabled: !entry.canMarkNextEpisodeFromKnownGuide,
                     action: markNext
                 )
             }
@@ -923,6 +961,8 @@ private struct SeriesCurrentWatchingCard: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(primaryActionAccessibilityLabel)
+            .disabled(!entry.canMarkNextEpisodeFromKnownGuide)
+            .opacity(entry.canMarkNextEpisodeFromKnownGuide ? 1 : 0.42)
 
             Button {
                 isShowingProgressSelector = true
@@ -1131,26 +1171,37 @@ private struct SeriesWatchingQueueSection: View {
             VStack(spacing: 6) {
                 ForEach(entries) { entry in
                     HStack(spacing: 12) {
-                        SeriesEntryArtworkView(entry: entry, size: 42)
-                            .accessibilityHidden(true)
+                        Button {
+                            openDetail(entry)
+                        } label: {
+                            HStack(spacing: 12) {
+                                SeriesEntryArtworkView(entry: entry, size: 42)
+                                    .accessibilityHidden(true)
 
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(entry.title)
-                                .font(.system(size: 15, weight: .semibold))
-                                .lineLimit(2)
-                                .minimumScaleFactor(0.82)
-                                .fixedSize(horizontal: false, vertical: true)
-                            Text(queueProgress(for: entry))
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.76)
-                                .allowsTightening(true)
-                                .fixedSize(horizontal: false, vertical: true)
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(entry.title)
+                                        .font(.system(size: 15, weight: .semibold))
+                                        .lineLimit(2)
+                                        .minimumScaleFactor(0.82)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                    Text(queueProgress(for: entry))
+                                        .font(.system(size: 12, weight: .medium))
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.76)
+                                        .allowsTightening(true)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                .layoutPriority(1)
+
+                                Spacer(minLength: 0)
+                            }
                         }
-                        .layoutPriority(1)
-
-                        Spacer(minLength: 0)
+                        .buttonStyle(.plain)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
+                        .accessibilityLabel(entry.title)
+                        .accessibilityHint(L10n.string("detail.open"))
 
                         SeriesCompactIconButton(
                             systemName: quickProgressFilledSystemImage(for: entry),
@@ -1158,7 +1209,8 @@ private struct SeriesWatchingQueueSection: View {
                             size: 36,
                             iconSize: 14,
                             accessibilityLabel: primaryActionTitle(for: entry),
-                            accessibilityIdentifier: "series-queue-\(entry.id)-quick-progress"
+                            accessibilityIdentifier: "series-queue-\(entry.id)-quick-progress",
+                            isDisabled: !entry.canMarkNextEpisodeFromKnownGuide
                         ) {
                             markNext(entry)
                         }
@@ -1211,6 +1263,7 @@ private struct SeriesHomeDiscoveryRail: View {
     let canAddSeries: Bool
     let limitActionTitle: String
     let addSeries: (SeriesHomeDiscoveryPreview) -> Void
+    let openDetail: (SeriesHomeDiscoveryPreview) -> Void
     let showLimitAction: () -> Void
 
     @State private var tabletGridWidth: CGFloat = 0
@@ -1294,6 +1347,7 @@ private struct SeriesHomeDiscoveryRail: View {
                     canAddSeries: canAddSeries,
                     limitActionTitle: limitActionTitle,
                     addSeries: { addSeries(preview) },
+                    openDetail: { openDetail(preview) },
                     showLimitAction: showLimitAction
                 )
             }
@@ -1347,16 +1401,28 @@ private struct SeriesHomeDiscoveryCard: View {
     let canAddSeries: Bool
     let limitActionTitle: String
     let addSeries: () -> Void
+    let openDetail: () -> Void
     let showLimitAction: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 9) {
-            ZStack(alignment: .bottomTrailing) {
-                SeriesHomePreviewArtwork(preview: preview, width: Self.artworkWidth, height: 132)
-
-                actionButton
-                    .padding(7)
+        ZStack(alignment: .topLeading) {
+            Button(action: openDetail) {
+                cardContent
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel(preview.title)
+            .accessibilityHint(L10n.string("detail.open"))
+
+            actionButton
+                .padding(.leading, Self.artworkWidth - 41)
+                .padding(.top, 91)
+        }
+        .frame(width: Self.itemWidth, alignment: .leading)
+    }
+
+    private var cardContent: some View {
+        VStack(alignment: .leading, spacing: 9) {
+            SeriesHomePreviewArtwork(preview: preview, width: Self.artworkWidth, height: 132)
 
             Text(preview.title)
                 .font(.system(size: preview.titleFontSize, weight: .black, design: .rounded))
@@ -1367,13 +1433,12 @@ private struct SeriesHomeDiscoveryCard: View {
                 .frame(width: Self.artworkWidth, height: 36, alignment: .topLeading)
 
             Text(preview.metadataText)
-            .font(.system(size: 11, weight: .bold))
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-            .minimumScaleFactor(0.82)
-            .frame(width: Self.artworkWidth, alignment: .leading)
+                .font(.system(size: 11, weight: .bold))
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.82)
+                .frame(width: Self.artworkWidth, alignment: .leading)
         }
-        .frame(width: Self.itemWidth, alignment: .leading)
     }
 
     @ViewBuilder
@@ -1509,6 +1574,7 @@ struct SeriesCompactIconButton: View {
     var iconSize: CGFloat = 16
     let accessibilityLabel: String
     var accessibilityIdentifier: String?
+    var isDisabled = false
     let action: () -> Void
 
     var body: some View {
@@ -1523,6 +1589,8 @@ struct SeriesCompactIconButton: View {
                 }
         }
         .buttonStyle(.plain)
+        .disabled(isDisabled)
+        .opacity(isDisabled ? 0.42 : 1)
         .accessibilityLabel(accessibilityLabel)
         .modifier(SeriesOptionalAccessibilityIdentifier(identifier: accessibilityIdentifier))
     }
@@ -1718,6 +1786,13 @@ struct SeriesProgressEditorSheet: View {
                             .foregroundStyle(AVBrandColor.accent)
                             .lineLimit(2)
                             .fixedSize(horizontal: false, vertical: true)
+
+                        Label(editorGuideCoverageText, systemImage: editorGuideCoverageSystemImage)
+                            .font(.system(size: 11, weight: .black))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.82)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
                 .layoutPriority(1)
@@ -1780,6 +1855,13 @@ struct SeriesProgressEditorSheet: View {
                         }
                     }
                 }
+
+                if shouldShowProviderNumberingNote {
+                    Label(L10n.string("detail.numbering.providerNote"), systemImage: "number")
+                        .font(.system(size: 11, weight: .black))
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             } else {
                 LazyVGrid(columns: episodeColumns, alignment: .leading, spacing: 8) {
                     ForEach(episodeNumbers, id: \.self) { episode in
@@ -1798,6 +1880,10 @@ struct SeriesProgressEditorSheet: View {
                         }
                     }
                 }
+            }
+
+            if isProgressAheadOfGuide {
+                guideMismatchNotice
             }
         }
     }
@@ -1876,6 +1962,68 @@ struct SeriesProgressEditorSheet: View {
         loadedGuide == nil && visibleEpisodeCount < Self.maxEpisodeCount
     }
 
+    private var isProgressAheadOfGuide: Bool {
+        guard let latestCursor = loadedGuide?.latestCursor else {
+            return false
+        }
+        return selectedCursor > latestCursor
+    }
+
+    private var shouldShowProviderNumberingNote: Bool {
+        guard let latestCursor = loadedGuide?.latestCursor,
+              let absoluteEpisodeNumber = loadedGuide?.absoluteEpisodeNumber(for: latestCursor) else {
+            return false
+        }
+        return absoluteEpisodeNumber != latestCursor.episodeNumber
+    }
+
+    private var guideMismatchNotice: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 15, weight: .bold))
+                .foregroundStyle(.orange)
+
+            Text(String(format: L10n.string("home.editor.guideMismatch"), selectedCursorLabel, knownEpisodeLabel(cursor: loadedGuide?.latestCursor ?? selectedCursor, absoluteEpisodeNumber: loadedGuide?.latestCursor.flatMap { loadedGuide?.absoluteEpisodeNumber(for: $0) })))
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.orange.opacity(0.10), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private var editorGuideCoverageText: String {
+        switch episodeGuideState {
+        case .loaded(let guide):
+            if let latestCursor = guide.latestCursor {
+                return String(
+                    format: L10n.string("home.editor.guideCoverage.latest"),
+                    knownEpisodeLabel(
+                        cursor: latestCursor,
+                        absoluteEpisodeNumber: guide.absoluteEpisodeNumber(for: latestCursor)
+                    )
+                )
+            }
+            return L10n.string("home.editor.guideCoverage.unavailable")
+        case .loading:
+            return L10n.string("home.editor.guideCoverage.loading")
+        case .generic, .unavailable:
+            return L10n.string("home.editor.guideCoverage.generic")
+        }
+    }
+
+    private var editorGuideCoverageSystemImage: String {
+        switch episodeGuideState {
+        case .loaded(let guide) where guide.latestCursor != nil:
+            "checkmark.seal.fill"
+        case .loading:
+            "hourglass"
+        default:
+            "exclamationmark.triangle.fill"
+        }
+    }
+
     private var explanationText: String {
         switch episodeGuideState {
         case .loaded:
@@ -1903,14 +2051,23 @@ struct SeriesProgressEditorSheet: View {
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
                         .fill(isSelected ? AVBrandColor.accent : Color(.tertiarySystemGroupedBackground))
 
-                    Text("E\(item.episodeNumber)")
+                    Text(loadedGuide?.absoluteEpisodeNumber(for: item.cursor).map { "E\($0)" } ?? "E\(item.episodeNumber)")
                         .font(.system(size: 15, weight: .black, design: .rounded))
                         .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.68)
                         .foregroundStyle(isSelected ? Color.black.opacity(0.84) : Color.primary)
                 }
-                .frame(width: 48, height: 44)
+                .frame(width: 58, height: 44)
 
                 VStack(alignment: .leading, spacing: 4) {
+                    if loadedGuide?.absoluteEpisodeNumber(for: item.cursor) != nil {
+                        Text(cursorLabel(item.cursor))
+                            .font(.system(size: 11, weight: .black, design: .rounded))
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                    }
+
                     Text(episodeTitle(for: item))
                         .font(.system(size: 14, weight: .bold, design: .rounded))
                         .foregroundStyle(.primary)
@@ -2086,9 +2243,11 @@ struct SeriesProgressEditorSheet: View {
                 return
             }
 
-            let clampedCursor = guide.clampedCursor(selectedCursor)
-            selectedSeasonNumber = clampedCursor.seasonNumber
-            selectedEpisodeNumber = clampedCursor.episodeNumber
+            if !guide.contains(selectedCursor), let latestCursor = guide.latestCursor, selectedCursor <= latestCursor {
+                let clampedCursor = guide.clampedCursor(selectedCursor)
+                selectedSeasonNumber = clampedCursor.seasonNumber
+                selectedEpisodeNumber = clampedCursor.episodeNumber
+            }
             episodeGuideState = .loaded(guide)
         } catch {
             episodeGuideState = .unavailable
@@ -2121,6 +2280,10 @@ private struct SeriesProgressEpisodeGuide: Equatable {
         Array(Set(items.map(\.seasonNumber))).sorted()
     }
 
+    var latestCursor: SeriesEpisodeCursor? {
+        items.last?.cursor
+    }
+
     func episodeNumbers(in season: Int) -> [Int] {
         items
             .filter { $0.seasonNumber == season }
@@ -2133,6 +2296,10 @@ private struct SeriesProgressEpisodeGuide: Equatable {
 
     func item(for cursor: SeriesEpisodeCursor) -> SeriesEpisodeGuideItem? {
         items.first { $0.seasonNumber == cursor.seasonNumber && $0.episodeNumber == cursor.episodeNumber }
+    }
+
+    func absoluteEpisodeNumber(for cursor: SeriesEpisodeCursor) -> Int? {
+        index(for: cursor).map { $0 + 1 }
     }
 
     func contains(_ cursor: SeriesEpisodeCursor) -> Bool {
@@ -2341,6 +2508,13 @@ private struct SeriesEmptyPosterPlaceholder: View {
 
 func cursorLabel(_ cursor: SeriesEpisodeCursor) -> String {
     "S\(cursor.seasonNumber) E\(cursor.episodeNumber)"
+}
+
+func knownEpisodeLabel(cursor: SeriesEpisodeCursor, absoluteEpisodeNumber: Int?) -> String {
+    guard let absoluteEpisodeNumber else {
+        return cursorLabel(cursor)
+    }
+    return "E\(absoluteEpisodeNumber) · \(cursorLabel(cursor))"
 }
 
 func quickProgressActionTitle(for entry: SeriesLibraryEntry) -> String {

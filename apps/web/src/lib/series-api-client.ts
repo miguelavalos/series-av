@@ -16,6 +16,11 @@ export interface SeriesSearchResult {
   providerRefs?: SeriesProviderRef[];
   externalLinks?: SeriesExternalLink[];
   seriesId?: string;
+  knownEpisodeCount?: number | null;
+  latestKnownEpisodeCursor?: {
+    episodeNumber: number;
+    seasonNumber: number;
+  } | null;
   startYear?: number | null;
   statusText?: string | null;
   summary?: string | null;
@@ -96,6 +101,29 @@ export interface SeriesEpisodeGuideItem {
   seasonNumber: number;
   supportedActions: string[];
   title?: string | null;
+}
+
+export interface SeriesGuideFeedbackRequest {
+  appLocale?: string;
+  knownEpisodeCount?: number | null;
+  latestKnownEpisodeCursor?: {
+    episodeNumber: number;
+    seasonNumber: number;
+  } | null;
+  note?: string | null;
+  reason: "missingEpisodes" | "wrongNumbering" | "wrongDates" | "duplicateEpisodes" | "other";
+  seriesId: string;
+  title?: string | null;
+  userCursor?: {
+    episodeNumber: number;
+    seasonNumber: number;
+  } | null;
+}
+
+export interface SeriesGuideFeedbackResponse {
+  generatedAt: string;
+  reportId: string;
+  status: "received";
 }
 
 export interface SeriesLibrarySyncDocument {
@@ -201,6 +229,29 @@ export class SeriesApiClient {
       throw new Error(`Series share invite creation failed with ${response.status}.`);
     }
     return response.json() as Promise<SeriesShareInviteCreateResponse>;
+  }
+
+  async reportGuideFeedback(input: SeriesGuideFeedbackRequest): Promise<SeriesGuideFeedbackResponse> {
+    const response = await fetch(`${this.baseUrl}/v1/series/guide-feedback`, {
+      body: JSON.stringify({
+        appLocale: input.appLocale,
+        knownEpisodeCount: input.knownEpisodeCount ?? undefined,
+        latestKnownEpisodeCursor: input.latestKnownEpisodeCursor ?? undefined,
+        note: input.note ?? undefined,
+        reason: input.reason,
+        seriesId: input.seriesId,
+        title: input.title ?? undefined,
+        userCursor: input.userCursor ?? undefined
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      method: "POST"
+    });
+    if (!response.ok) {
+      throw new Error(`Series guide feedback failed with ${response.status}.`);
+    }
+    return response.json() as Promise<SeriesGuideFeedbackResponse>;
   }
 
   async shareInvite(token: string): Promise<SeriesShareInviteResponse> {

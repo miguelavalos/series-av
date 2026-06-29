@@ -1,8 +1,8 @@
 import { AppExternalLinkPanel, AppSegmentedControl, appsAvExternalSearchUrl, appsAvImdbSearchUrl, ErrorState, type AppExternalLinkItem, useAppsAvLocale } from "@avalsys/apps-av-web";
 import { useAccountSession, useAccountToken } from "@avalsys/account-av-web";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Archive, ArrowLeft, BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Plus, RotateCcw, Search, StepBack, StepForward, Trash2 } from "lucide-react";
+import { Archive, ArrowLeft, BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Flag, Plus, RotateCcw, Search, StepBack, StepForward, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
 import { SeriesAppShell } from "@/components/series-app-shell";
@@ -14,7 +14,7 @@ import { getSeriesApiBaseUrl } from "@/lib/series-config";
 import { isPlaceholderSeriesTitle, normalizeSeriesId } from "@/lib/series-display";
 import { readSeriesExternalSearchEngine } from "@/lib/series-external-preferences";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
-import { compareEpisodeCursors, cursorLabel, nextEpisodeCursor, progressLabel, type SeriesEpisodeCursor, type SeriesLibraryEntry } from "@/lib/series-library";
+import { canMarkNextEpisodeFromKnownGuide, compareEpisodeCursors, cursorLabel, nextEpisodeCursor, progressLabel, type SeriesEpisodeCursor, type SeriesLibraryEntry } from "@/lib/series-library";
 import { localizedSeriesPath, useSeriesApiLocale, useSeriesText } from "@/lib/series-i18n";
 
 export const Route = createFileRoute("/series/$seriesId")({
@@ -87,6 +87,8 @@ function SeriesDetailRoute() {
     library.updateCatalogMetadataIfPlaceholder(entry.entryId, {
       displayArtworkRef: catalogArtworkRef,
       fallbackVisualSeed: catalog.title,
+      knownEpisodeCount: catalog.knownEpisodeCount,
+      latestKnownEpisodeCursor: catalog.latestKnownEpisodeCursor,
       seriesId,
       title: catalog.title
     });
@@ -123,7 +125,7 @@ function SeriesDetailRoute() {
               ) : null}
             </div>
 
-            {isCatalogResolving ? <SeriesDetailHeroSkeleton /> : <SeriesDetailHero artwork={artwork} catalog={catalog} catalogArtworkRef={catalogArtworkRef} detailUnavailable={detail.isError} entry={entry} labels={labels} library={library} libraryLabels={libraryLabels} locale={locale} seriesId={seriesId} sourceLinks={sourceLinks} title={title} unknownDate={text.search.dateUnknown} noOverview={text.search.noOverview} />}
+            {isCatalogResolving ? <SeriesDetailHeroSkeleton /> : <SeriesDetailHero artwork={artwork} catalog={catalog} catalogArtworkRef={catalogArtworkRef} client={client} detailUnavailable={detail.isError} entry={entry} labels={labels} library={library} libraryLabels={libraryLabels} locale={locale} seriesId={seriesId} sourceLinks={sourceLinks} title={title} unknownDate={text.search.dateUnknown} noOverview={text.search.noOverview} />}
           </Card>
 
           <Card className="gap-4 rounded-lg border-[#d7c494] bg-[#fff8df]/88 p-5 py-5 text-[#112a55] shadow-sm shadow-[#172f5c]/6 sm:p-6">
@@ -144,6 +146,7 @@ function SeriesDetailHero({
   artwork,
   catalog,
   catalogArtworkRef,
+  client,
   detailUnavailable,
   entry,
   labels,
@@ -159,6 +162,7 @@ function SeriesDetailHero({
   artwork: Pick<SeriesLibraryEntry, "displayArtworkRef" | "fallbackVisualSeed" | "title"> & { seriesId?: string };
   catalog: SeriesSearchResult | null | undefined;
   catalogArtworkRef: string | null;
+  client: SeriesApiClient;
   detailUnavailable: boolean;
   entry: SeriesLibraryEntry | null;
   labels: (typeof detailLabels)[keyof typeof detailLabels];
@@ -171,6 +175,32 @@ function SeriesDetailHero({
   title: string;
   unknownDate: string;
 }) {
+  const canMarkEntryNext = entry ? canMarkNextEpisodeFromKnownGuide(entry) : false;
+  const guideFeedback = useMutation({
+    mutationFn: () =>
+      client.reportGuideFeedback({
+        appLocale: locale,
+        knownEpisodeCount: catalog?.knownEpisodeCount ?? entry?.knownEpisodeCount ?? null,
+        latestKnownEpisodeCursor: catalog?.latestKnownEpisodeCursor ?? entry?.latestKnownEpisodeCursor ?? null,
+        note: labels.guideFeedbackNote,
+        reason: "missingEpisodes",
+        seriesId,
+        title,
+        userCursor: entry?.lastWatchedEpisodeCursor ?? null
+      })
+  });
+  const guideFeedbackStatus = guideFeedback.isSuccess
+    ? labels.guideFeedbackSent
+    : guideFeedback.isError
+    ? labels.guideFeedbackFailed
+    : labels.guideFeedbackDetail;
+  const guideCoverageText = guideCoverageLabel({
+    count: catalog?.knownEpisodeCount ?? entry?.knownEpisodeCount ?? null,
+    cursor: catalog?.latestKnownEpisodeCursor ?? entry?.latestKnownEpisodeCursor ?? null,
+    labels
+  });
+  const hasKnownGuideCoverage = Boolean(catalog?.latestKnownEpisodeCursor ?? entry?.latestKnownEpisodeCursor ?? catalog?.knownEpisodeCount ?? entry?.knownEpisodeCount);
+
   return (
     <div className="grid gap-6 lg:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[13.5rem_minmax(0,1fr)]">
       <SeriesArtwork entry={artwork} size="xl" />
@@ -189,10 +219,32 @@ function SeriesDetailHero({
           <AppExternalLinkPanel links={sourceLinks} title={labels.sourcesTitle} />
         </div>
 
+        <div className="mt-5 rounded-lg border border-[#d7c494] bg-white/55 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-sm font-bold uppercase tracking-wide text-[#53617a]">{labels.guideFeedbackTitle}</p>
+              <p className={`mt-1 flex items-center gap-2 text-sm font-black ${hasKnownGuideCoverage ? "text-[#5a8f2f]" : "text-[#b15b22]"}`}>
+                {hasKnownGuideCoverage ? <CheckCircle2 className="size-4 shrink-0" aria-hidden="true" /> : <Flag className="size-4 shrink-0" aria-hidden="true" />}
+                <span>{guideCoverageText}</span>
+              </p>
+              <p className="mt-1 text-sm font-semibold text-[#334766]">{guideFeedbackStatus}</p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-full border-[#c8ad72] bg-[#fff8df]/80"
+              disabled={guideFeedback.isPending || guideFeedback.isSuccess}
+              onClick={() => guideFeedback.mutate()}
+            >
+              <Flag className="size-4" /> {guideFeedback.isPending ? labels.guideFeedbackSending : labels.guideFeedbackAction}
+            </Button>
+          </div>
+        </div>
+
         <div className="mt-6 flex flex-wrap gap-2">
           {entry ? (
             <>
-              <Button className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" onClick={() => library.markNextEpisodeWatched(entry.entryId)}>
+              <Button className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" disabled={!canMarkEntryNext} onClick={() => library.markNextEpisodeWatched(entry.entryId)}>
                 <StepForward className="size-4" /> {labels.markNext} {cursorLabel(nextEpisodeCursor(entry.lastWatchedEpisodeCursor))}
               </Button>
               {entry.lastWatchedEpisodeCursor ? (
@@ -235,6 +287,8 @@ function SeriesDetailHero({
                 library.addCatalogSeries({
                   displayArtworkRef: catalogArtworkRef,
                   fallbackVisualSeed: title,
+                  knownEpisodeCount: catalog?.knownEpisodeCount,
+                  latestKnownEpisodeCursor: catalog?.latestKnownEpisodeCursor,
                   seriesId,
                   title
                 })
@@ -504,6 +558,29 @@ function wikipediaSearchUrl(query: string) {
   return normalizedQuery ? `https://www.wikipedia.org/search-redirect.php?search=${encodeURIComponent(normalizedQuery)}` : null;
 }
 
+function guideCoverageLabel({
+  count,
+  cursor,
+  labels
+}: {
+  count: number | null | undefined;
+  cursor: SeriesEpisodeCursor | null | undefined;
+  labels: (typeof detailLabels)[keyof typeof detailLabels];
+}) {
+  if (cursor) {
+    return labels.guideCoverageLatest.replace(
+      "{episode}",
+      count && count !== cursor.episodeNumber ? `E${count} · ${cursorLabel(cursor)}` : cursorLabel(cursor)
+    );
+  }
+
+  if (count) {
+    return labels.guideCoverageCount.replace("{count}", String(count));
+  }
+
+  return labels.guideCoverageUnavailable;
+}
+
 const detailLabels = {
   ca: {
     episodeGuide: "Guia d'episodis",
@@ -514,6 +591,16 @@ const detailLabels = {
     followToTrack: "Segueix la sèrie per marcar progrés per episodi.",
     follow: "Seguir",
     limitReached: "Límit assolit",
+    guideFeedbackAction: "Reportar guia",
+    guideFeedbackDetail: "Avisa si falten episodis, dates o numeració. Enviarem només dades de guia, sense espòilers.",
+    guideFeedbackFailed: "No s'ha pogut enviar. Torna-ho a provar.",
+    guideFeedbackNote: "Web report: episode guide may be incomplete.",
+    guideFeedbackSending: "Enviant",
+    guideFeedbackSent: "Rebut. Ho farem servir per prioritzar l'enriquiment d'aquesta sèrie.",
+    guideFeedbackTitle: "Guia d'episodis",
+    guideCoverageCount: "Guia amb {count} episodis coneguts",
+    guideCoverageLatest: "Guia actualitzada fins a {episode}",
+    guideCoverageUnavailable: "Guia pendent de revisar",
     markHere: "Marcar",
     markNext: "Marcar següent",
     markWatchedThrough: "Marcar fins a",
@@ -539,6 +626,16 @@ const detailLabels = {
     followToTrack: "Folge der Serie, um den Fortschritt pro Folge zu markieren.",
     follow: "Folgen",
     limitReached: "Limit erreicht",
+    guideFeedbackAction: "Guide melden",
+    guideFeedbackDetail: "Melde fehlende Episoden, Daten oder Nummerierung. Wir senden nur Guide-Daten, keine Spoiler.",
+    guideFeedbackFailed: "Konnte nicht gesendet werden. Versuche es erneut.",
+    guideFeedbackNote: "Web report: episode guide may be incomplete.",
+    guideFeedbackSending: "Senden",
+    guideFeedbackSent: "Erhalten. Wir nutzen das, um die Anreicherung dieser Serie zu priorisieren.",
+    guideFeedbackTitle: "Episoden-Guide",
+    guideCoverageCount: "Guide enthält {count} bekannte Folgen",
+    guideCoverageLatest: "Guide aktualisiert bis {episode}",
+    guideCoverageUnavailable: "Guide wartet auf Prüfung",
     markHere: "Markieren",
     markNext: "Nächste markieren",
     markWatchedThrough: "Gesehen bis",
@@ -564,6 +661,16 @@ const detailLabels = {
     followToTrack: "Follow this series to mark episode progress.",
     follow: "Follow",
     limitReached: "Limit reached",
+    guideFeedbackAction: "Report guide",
+    guideFeedbackDetail: "Report missing episodes, dates, or numbering. We send guide data only, with no spoilers.",
+    guideFeedbackFailed: "Could not send it. Try again.",
+    guideFeedbackNote: "Web report: episode guide may be incomplete.",
+    guideFeedbackSending: "Sending",
+    guideFeedbackSent: "Received. We will use it to prioritize enrichment for this series.",
+    guideFeedbackTitle: "Episode guide",
+    guideCoverageCount: "Guide has {count} known episodes",
+    guideCoverageLatest: "Guide updated through {episode}",
+    guideCoverageUnavailable: "Guide pending review",
     markHere: "Mark",
     markNext: "Mark next",
     markWatchedThrough: "Watched through",
@@ -589,6 +696,16 @@ const detailLabels = {
     followToTrack: "Sigue esta serie para marcar el progreso por episodio.",
     follow: "Seguir",
     limitReached: "Límite alcanzado",
+    guideFeedbackAction: "Reportar guía",
+    guideFeedbackDetail: "Avisa si faltan episodios, fechas o numeración. Enviaremos solo datos de guía, sin spoilers.",
+    guideFeedbackFailed: "No se pudo enviar. Inténtalo de nuevo.",
+    guideFeedbackNote: "Web report: episode guide may be incomplete.",
+    guideFeedbackSending: "Enviando",
+    guideFeedbackSent: "Recibido. Lo usaremos para priorizar el enriquecimiento de esta serie.",
+    guideFeedbackTitle: "Guía de episodios",
+    guideCoverageCount: "Guía con {count} episodios conocidos",
+    guideCoverageLatest: "Guía actualizada hasta {episode}",
+    guideCoverageUnavailable: "Guía pendiente de revisar",
     markHere: "Marcar",
     markNext: "Marcar siguiente",
     markWatchedThrough: "Visto hasta",
@@ -614,6 +731,16 @@ const detailLabels = {
     followToTrack: "Suivez cette série pour marquer la progression par épisode.",
     follow: "Suivre",
     limitReached: "Limite atteinte",
+    guideFeedbackAction: "Signaler le guide",
+    guideFeedbackDetail: "Signalez les épisodes, dates ou numéros manquants. Nous envoyons uniquement des données de guide, sans spoilers.",
+    guideFeedbackFailed: "Impossible de l'envoyer. Réessayez.",
+    guideFeedbackNote: "Web report: episode guide may be incomplete.",
+    guideFeedbackSending: "Envoi",
+    guideFeedbackSent: "Reçu. Nous l'utiliserons pour prioriser l'enrichissement de cette série.",
+    guideFeedbackTitle: "Guide des épisodes",
+    guideCoverageCount: "Guide avec {count} épisodes connus",
+    guideCoverageLatest: "Guide mis à jour jusqu'à {episode}",
+    guideCoverageUnavailable: "Guide en attente de révision",
     markHere: "Marquer",
     markNext: "Marquer la suite",
     markWatchedThrough: "Vu jusqu'à",

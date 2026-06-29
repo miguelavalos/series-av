@@ -110,6 +110,12 @@ enum SeriesDetailPresentationBuilder {
         if entry.fallbackVisualSeed?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != false {
             entry.fallbackVisualSeed = catalogItem.title
         }
+        if entry.latestKnownEpisodeCursor != catalogItem.latestKnownEpisodeCursor {
+            entry.latestKnownEpisodeCursor = catalogItem.latestKnownEpisodeCursor
+        }
+        if entry.knownEpisodeCount != catalogItem.knownEpisodeCount {
+            entry.knownEpisodeCount = catalogItem.knownEpisodeCount
+        }
         return entry
     }
 

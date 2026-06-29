@@ -14,7 +14,7 @@ import { SeriesApiClient, rememberSeriesCatalogItem, type SeriesSearchResult } f
 import { getSeriesApiBaseUrl, isSeriesWebAppComingSoon, seriesBrandAssets } from "@/lib/series-config";
 import { visibleSeriesTitle } from "@/lib/series-display";
 import { useSeriesLibrary } from "@/lib/series-library-provider";
-import { cursorLabel, nextEpisodeCursor, progressLabel } from "@/lib/series-library";
+import { canMarkNextEpisodeFromKnownGuide, cursorLabel, nextEpisodeCursor, progressLabel } from "@/lib/series-library";
 import { localizedSeriesPath, useSeriesApiLocale, useSeriesText } from "@/lib/series-i18n";
 
 export const Route = createFileRoute("/")({
@@ -51,6 +51,7 @@ function HomeContent() {
   const currentTitle = current ? visibleSeriesTitle(current.title, current.seriesId) : null;
   const shouldShowCurrentSkeleton = Boolean(current && !currentTitle && !library.isInitialSyncComplete && library.syncState === "syncing");
   const next = current ? nextEpisodeCursor(current.lastWatchedEpisodeCursor) : null;
+  const canMarkCurrentNext = current ? canMarkNextEpisodeFromKnownGuide(current) : false;
   const labels = homeLabels[locale];
   const libraryLabels = seriesLibraryUiText(locale);
   const client = useMemo(() => new SeriesApiClient(getSeriesApiBaseUrl()), []);
@@ -111,7 +112,7 @@ function HomeContent() {
                   {progressLabel(current, libraryLabels.notStarted, libraryLabels.noEpisodeSet)} · {libraryLabels.next} {cursorLabel(next ?? { episodeNumber: 1, seasonNumber: 1 })}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <Button className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" onClick={() => library.markNextEpisodeWatched(current.entryId)}>
+                  <Button className="rounded-full bg-[#112a55] text-white hover:bg-[#19396f]" disabled={!canMarkCurrentNext} onClick={() => library.markNextEpisodeWatched(current.entryId)}>
                     <StepForward className="size-4" /> {labels.markNext}
                   </Button>
                   <Button asChild variant="outline" className="rounded-full border-[#c8ad72] bg-white/60">
@@ -329,6 +330,8 @@ function HomeDiscoveryCard({ labels, locale, result }: { labels: (typeof homeLab
               library.addCatalogSeries({
                 displayArtworkRef: artwork,
                 fallbackVisualSeed: result.title,
+                knownEpisodeCount: result.knownEpisodeCount,
+                latestKnownEpisodeCursor: result.latestKnownEpisodeCursor,
                 seriesId,
                 title: result.title
               })

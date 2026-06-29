@@ -15,8 +15,10 @@ export interface SeriesLibraryEntry {
   entryId: string;
   fallbackVisualSeed?: string | null;
   isPinnedHomeSeries?: boolean | null;
+  knownEpisodeCount?: number | null;
   lastInteractedAt: string;
   lastWatchedEpisodeCursor?: SeriesEpisodeCursor | null;
+  latestKnownEpisodeCursor?: SeriesEpisodeCursor | null;
   privateNote?: string | null;
   seriesId: string;
   status: SeriesLibraryEntryStatus;
@@ -42,6 +44,8 @@ export interface SeriesLibraryDocument {
 export interface SeriesCatalogLibraryInput {
   displayArtworkRef?: string | null;
   fallbackVisualSeed?: string | null;
+  knownEpisodeCount?: number | null;
+  latestKnownEpisodeCursor?: SeriesEpisodeCursor | null;
   seriesId: string;
   title: string;
 }
@@ -84,6 +88,13 @@ export function nextEpisodeCursor(cursor?: SeriesEpisodeCursor | null): SeriesEp
   }
   const normalized = createEpisodeCursor(cursor);
   return { episodeNumber: normalized.episodeNumber + 1, seasonNumber: normalized.seasonNumber };
+}
+
+export function canMarkNextEpisodeFromKnownGuide(entry: SeriesLibraryEntry): boolean {
+  if (!entry.latestKnownEpisodeCursor) {
+    return true;
+  }
+  return compareEpisodeCursors(nextEpisodeCursor(entry.lastWatchedEpisodeCursor), entry.latestKnownEpisodeCursor) <= 0;
 }
 
 export function previousEpisodeCursor(cursor?: SeriesEpisodeCursor | null): SeriesEpisodeCursor | null {
@@ -140,8 +151,10 @@ export function createLibraryEntry(input: SeriesCatalogLibraryInput, at = new Da
     entryId: seriesId,
     fallbackVisualSeed: normalizeOptionalString(input.fallbackVisualSeed) ?? title,
     isPinnedHomeSeries: false,
+    knownEpisodeCount: normalizePositiveInteger(input.knownEpisodeCount),
     lastInteractedAt: timestamp,
     lastWatchedEpisodeCursor: null,
+    latestKnownEpisodeCursor: input.latestKnownEpisodeCursor ? createEpisodeCursor(input.latestKnownEpisodeCursor) : null,
     privateNote: null,
     seriesId,
     status: "wantToWatch",
@@ -181,6 +194,9 @@ export function clearProgress(entry: SeriesLibraryEntry, at = new Date()): Serie
 }
 
 export function markNextEpisodeWatched(entry: SeriesLibraryEntry, at = new Date()): SeriesLibraryEntry {
+  if (!canMarkNextEpisodeFromKnownGuide(entry)) {
+    return entry;
+  }
   return markWatchedThrough(entry, nextEpisodeCursor(entry.lastWatchedEpisodeCursor), at);
 }
 
@@ -300,8 +316,16 @@ export function updateCatalogMetadataIfPlaceholder(
   const shouldUpdateTitle = Boolean(title) && isPlaceholderSeriesTitle(entry.title, entry.seriesId);
   const nextArtwork = entry.displayArtworkRef?.trim() ? entry.displayArtworkRef : normalizeOptionalString(input.displayArtworkRef);
   const nextFallback = entry.fallbackVisualSeed?.trim() && !isPlaceholderSeriesTitle(entry.fallbackVisualSeed, entry.seriesId) ? entry.fallbackVisualSeed : normalizeOptionalString(input.fallbackVisualSeed) ?? title;
+  const nextKnownEpisodeCount = normalizePositiveInteger(input.knownEpisodeCount) ?? entry.knownEpisodeCount ?? null;
+  const nextLatestKnownEpisodeCursor = input.latestKnownEpisodeCursor ? createEpisodeCursor(input.latestKnownEpisodeCursor) : entry.latestKnownEpisodeCursor ?? null;
 
-  if (!shouldUpdateTitle && nextArtwork === entry.displayArtworkRef && nextFallback === entry.fallbackVisualSeed) {
+  if (
+    !shouldUpdateTitle &&
+    nextArtwork === entry.displayArtworkRef &&
+    nextFallback === entry.fallbackVisualSeed &&
+    nextKnownEpisodeCount === (entry.knownEpisodeCount ?? null) &&
+    compareOptionalEpisodeCursors(nextLatestKnownEpisodeCursor, entry.latestKnownEpisodeCursor) === 0
+  ) {
     return entry;
   }
 
@@ -309,9 +333,32 @@ export function updateCatalogMetadataIfPlaceholder(
     ...entry,
     displayArtworkRef: nextArtwork,
     fallbackVisualSeed: nextFallback,
+    knownEpisodeCount: nextKnownEpisodeCount,
+    latestKnownEpisodeCursor: nextLatestKnownEpisodeCursor,
     title: shouldUpdateTitle && title ? title : entry.title,
     updatedAt: at.toISOString()
   };
+}
+
+function compareOptionalEpisodeCursors(first?: SeriesEpisodeCursor | null, second?: SeriesEpisodeCursor | null): number {
+  if (!first && !second) {
+    return 0;
+  }
+  if (!first) {
+    return -1;
+  }
+  if (!second) {
+    return 1;
+  }
+  return compareEpisodeCursors(first, second);
+}
+
+function normalizePositiveInteger(value?: number | null): number | null {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return null;
+  }
+  const normalized = Math.trunc(value);
+  return normalized > 0 ? normalized : null;
 }
 
 export function replaceEntry(entries: SeriesLibraryEntry[], entryId: string, update: (entry: SeriesLibraryEntry) => SeriesLibraryEntry): SeriesLibraryEntry[] {

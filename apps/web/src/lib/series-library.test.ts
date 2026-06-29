@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   archiveEntry,
+  canMarkNextEpisodeFromKnownGuide,
   clearProgress,
   createEpisodeCursor,
   createLibraryEntry,
@@ -30,6 +31,39 @@ describe("series library model", () => {
     expect(markNextEpisodeWatched(entry, t1)).toMatchObject({
       lastWatchedEpisodeCursor: { episodeNumber: 1, seasonNumber: 1 },
       status: "watching",
+      updatedAt: t1.toISOString()
+    });
+  });
+
+  it("does not mark next beyond the known episode guide", () => {
+    const entry = entryFixture({
+      entryId: "one-piece",
+      knownEpisodeCount: 1168,
+      lastWatchedEpisodeCursor: { episodeNumber: 14, seasonNumber: 23 },
+      latestKnownEpisodeCursor: { episodeNumber: 14, seasonNumber: 23 },
+      seriesId: "thetvdb:81797",
+      status: "watching",
+      title: "One Piece"
+    });
+
+    expect(canMarkNextEpisodeFromKnownGuide(entry)).toBe(false);
+    expect(markNextEpisodeWatched(entry, t1)).toBe(entry);
+  });
+
+  it("allows marking next up to the last known episode", () => {
+    const entry = entryFixture({
+      entryId: "one-piece",
+      knownEpisodeCount: 1168,
+      lastWatchedEpisodeCursor: { episodeNumber: 13, seasonNumber: 23 },
+      latestKnownEpisodeCursor: { episodeNumber: 14, seasonNumber: 23 },
+      seriesId: "thetvdb:81797",
+      status: "watching",
+      title: "One Piece"
+    });
+
+    expect(canMarkNextEpisodeFromKnownGuide(entry)).toBe(true);
+    expect(markNextEpisodeWatched(entry, t1)).toMatchObject({
+      lastWatchedEpisodeCursor: { episodeNumber: 14, seasonNumber: 23 },
       updatedAt: t1.toISOString()
     });
   });
@@ -104,6 +138,15 @@ describe("series library model", () => {
       status: "wantToWatch",
       title: "Show"
     });
+    expect(createLibraryEntry({
+      knownEpisodeCount: 1168,
+      latestKnownEpisodeCursor: { episodeNumber: 14, seasonNumber: 23 },
+      seriesId: "thetvdb:81797",
+      title: "One Piece"
+    }, t0)).toMatchObject({
+      knownEpisodeCount: 1168,
+      latestKnownEpisodeCursor: { episodeNumber: 14, seasonNumber: 23 }
+    });
   });
 
   it("preserves private notes during library updates", () => {
@@ -122,6 +165,8 @@ describe("series library model", () => {
         {
           displayArtworkRef: "https://poster.test/demon.jpg",
           fallbackVisualSeed: "Demon Slayer: Kimetsu no Yaiba",
+          knownEpisodeCount: 63,
+          latestKnownEpisodeCursor: { episodeNumber: 8, seasonNumber: 5 },
           seriesId: "thetvdb:348545",
           title: "Demon Slayer: Kimetsu no Yaiba"
         },
@@ -130,6 +175,8 @@ describe("series library model", () => {
     ).toMatchObject({
       displayArtworkRef: "https://poster.test/demon.jpg",
       fallbackVisualSeed: "Demon Slayer: Kimetsu no Yaiba",
+      knownEpisodeCount: 63,
+      latestKnownEpisodeCursor: { episodeNumber: 8, seasonNumber: 5 },
       title: "Demon Slayer: Kimetsu no Yaiba",
       updatedAt: t1.toISOString()
     });
@@ -152,8 +199,10 @@ function entryFixture(overrides: Partial<SeriesLibraryEntry> = {}): SeriesLibrar
     entryId: "series-1",
     fallbackVisualSeed: "Series One",
     isPinnedHomeSeries: false,
+    knownEpisodeCount: null,
     lastInteractedAt: t0.toISOString(),
     lastWatchedEpisodeCursor: null,
+    latestKnownEpisodeCursor: null,
     privateNote: null,
     seriesId: "series-1",
     status: "wantToWatch",
