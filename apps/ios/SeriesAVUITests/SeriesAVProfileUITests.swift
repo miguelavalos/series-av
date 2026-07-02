@@ -37,11 +37,21 @@ final class SeriesAVProfileUITests: XCTestCase {
         XCTAssertTrue(app.buttons["paywall.purchase"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["paywall.restore"].exists)
 
+        let redeemButton = app.buttons["paywall.redeemCode"].firstMatch
         let termsButton = app.buttons["paywall.terms"].firstMatch
         let privacyButton = app.buttons["paywall.privacy"].firstMatch
-        for _ in 0..<5 where !termsButton.exists || !privacyButton.exists {
+        for _ in 0..<5 where !redeemButton.exists || !termsButton.exists || !privacyButton.exists {
             app.swipeUp()
         }
+        XCTAssertTrue(redeemButton.waitForExistence(timeout: 3))
+        XCTAssertTrue(redeemButton.isHittable)
+        redeemButton.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["paywall.redeemCode.sheet"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.textFields["paywall.redeemCode.field"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["paywall.redeemCode.claim"].exists)
+        app.buttons["paywall.redeemCode.done"].tap()
+        XCTAssertFalse(app.textFields["paywall.redeemCode.field"].waitForExistence(timeout: 3))
+
         XCTAssertTrue(termsButton.waitForExistence(timeout: 3))
         XCTAssertTrue(privacyButton.waitForExistence(timeout: 3))
     }

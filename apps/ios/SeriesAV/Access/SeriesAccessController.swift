@@ -61,6 +61,7 @@ final class SeriesAccessController {
     private let profileResolver: SeriesAccountProfileResolving
     private let entitlementService: SeriesEntitlementServicing
     private let subscriptionPurchasing: SeriesSubscriptionPurchasing
+    private let promotionCodeRedeemer: SeriesPromotionCodeRedeeming
     private let userDefaults: UserDefaults
     private let guestOnboardingPolicy: SeriesGuestOnboardingPolicy
     private let now: () -> Date
@@ -89,6 +90,7 @@ final class SeriesAccessController {
         profileResolver: SeriesAccountProfileResolving? = nil,
         entitlementService: SeriesEntitlementServicing? = nil,
         subscriptionPurchasing: SeriesSubscriptionPurchasing = RevenueCatSeriesSubscriptionPurchasing(),
+        promotionCodeRedeemer: SeriesPromotionCodeRedeeming? = nil,
         userDefaults: UserDefaults = .standard,
         guestOnboardingPolicy: SeriesGuestOnboardingPolicy = SeriesGuestOnboardingPolicy(),
         now: @escaping () -> Date = Date.init,
@@ -116,6 +118,10 @@ final class SeriesAccessController {
             accessClient: accessClient
         )
         self.subscriptionPurchasing = Self.subscriptionPurchasingForCurrentEnvironment(defaultPurchasing: subscriptionPurchasing)
+        self.promotionCodeRedeemer = promotionCodeRedeemer ?? SeriesPromoCodeClient(
+            baseURL: AppConfig.apiBaseURL,
+            tokenProvider: { try await accountService.getToken() }
+        )
         self.userDefaults = userDefaults
         self.guestOnboardingPolicy = guestOnboardingPolicy
         self.now = now
@@ -304,9 +310,33 @@ final class SeriesAccessController {
         }
     }
 
-    func redeemOfferCode() async {
-        await runSubscriptionOperation(source: .redeemCode) {
-            try await subscriptionPurchasing.redeemOfferCode(for: subscriptionAccountUser)
+    func claimPromotionCode(_ code: String) async throws {
+        let normalizedCode = code.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalizedCode.isEmpty else { return }
+        guard accountUser != nil else {
+            subscriptionError = .missingAccountUser
+            throw SeriesSubscriptionPurchaseError.missingAccountUser
+        }
+
+        isSubscriptionOperationInProgress = true
+        subscriptionError = nil
+        defer {
+            isSubscriptionOperationInProgress = false
+        }
+
+        do {
+            _ = try await promotionCodeRedeemer.redeemPromotionCode(normalizedCode)
+            isWaitingForSubscriptionReconciliation = true
+            subscriptionReconciliationSource = .redeemCode
+            await syncFromAccountProvider()
+            await retrySubscriptionReconciliationIfNeeded()
+        } catch let error as SeriesSubscriptionPurchaseError {
+            subscriptionError = error
+            throw error
+        } catch {
+            let mappedError = SeriesSubscriptionPurchaseError.underlying(error.localizedDescription)
+            subscriptionError = mappedError
+            throw mappedError
         }
     }
 

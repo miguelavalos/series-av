@@ -320,6 +320,13 @@
 "paywall.terms" = "Términos";
 "paywall.privacy" = "Privacidad";
 "paywall.redeemCode" = "Canjear código";
+"paywall.promo.claim" = "Canjear código";
+"paywall.promo.claimed" = "Código canjeado. Actualizando acceso Pro.";
+"paywall.promo.detail" = "Introduce un código promocional de Series AV Pro si te han dado uno.";
+"paywall.promo.optional" = "Los códigos son opcionales y no son necesarios para suscribirte a Pro.";
+"paywall.promo.placeholder" = "Código";
+"paywall.promo.title" = "¿Canjear un código?";
+"promo.error.redeemFailed" = "No se pudo canjear el código.";
 "subscription.error.signInRequired" = "Inicia sesión antes de empezar una suscripción.";
 "subscription.error.configuration" = "Las suscripciones no están configuradas en esta build.";
 "subscription.error.offerUnavailable" = "La oferta Pro no está disponible ahora mismo.";

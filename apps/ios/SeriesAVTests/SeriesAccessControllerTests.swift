@@ -419,6 +419,57 @@ final class SeriesAccessControllerTests: XCTestCase {
         XCTAssertEqual(sleepCalls, [1])
     }
 
+    func testPromotionCodeClaimRefreshesAccessAndClearsReconciliationWhenProArrives() async throws {
+        let entitlementService = SequenceSeriesEntitlementService(accesses: [
+            SeriesResolvedAccess(
+                platformUserId: "apps-av-user-1",
+                planTier: .free,
+                accessMode: .signedInFree,
+                capabilities: .forMode(.signedInFree),
+                limits: .forMode(.signedInFree)
+            ),
+            SeriesResolvedAccess(
+                platformUserId: "apps-av-user-1",
+                planTier: .pro,
+                accessMode: .signedInPro,
+                capabilities: .forMode(.signedInPro),
+                limits: .forMode(.signedInPro)
+            )
+        ])
+        let promotionCodeRedeemer = StubSeriesPromotionCodeRedeemer()
+        let controller = SeriesAccessController(
+            accountService: StubSeriesAVAccountService(
+                restoreResult: .active(SeriesAccountUser(
+                    id: "provider-user-1",
+                    displayName: "Provider User",
+                    emailAddress: "provider@example.com"
+                )),
+                token: "provider-token"
+            ),
+            profileResolver: StubSeriesAccountProfileResolver(user: SeriesAccountUser(
+                id: "apps-av-user-1",
+                displayName: "Apps AV User",
+                emailAddress: "apps@example.com"
+            )),
+            entitlementService: entitlementService,
+            promotionCodeRedeemer: promotionCodeRedeemer,
+            userDefaults: isolatedUserDefaults(),
+            subscriptionReconciliationRetryDelaysNanoseconds: [],
+            sleepNanoseconds: { _ in }
+        )
+
+        await controller.syncFromAccountProvider()
+        try await controller.claimPromotionCode(" series-pro-2026 ")
+
+        XCTAssertEqual(promotionCodeRedeemer.redeemCount, 1)
+        XCTAssertEqual(promotionCodeRedeemer.lastCode, "series-pro-2026")
+        XCTAssertEqual(controller.accessMode, .signedInPro)
+        XCTAssertEqual(controller.planTier, .pro)
+        XCTAssertFalse(controller.isWaitingForSubscriptionReconciliation)
+        XCTAssertNil(controller.subscriptionReconciliationSource)
+        XCTAssertNil(controller.subscriptionError)
+    }
+
     func testSubscriptionOperationsUsePlatformUserIdWhenAvailable() async {
         let subscriptionPurchasing = StubSeriesSubscriptionPurchasing()
         let controller = SeriesAccessController(
@@ -638,11 +689,9 @@ private final class DelayedSeriesEntitlementService: SeriesEntitlementServicing 
 private final class StubSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasing {
     private(set) var purchaseCount = 0
     private(set) var restoreCount = 0
-    private(set) var redeemCount = 0
     private(set) var lastLoadedOfferUser: SeriesAccountUser?
     private(set) var lastPurchasedUser: SeriesAccountUser?
     private(set) var lastRestoredUser: SeriesAccountUser?
-    private(set) var lastRedeemedUser: SeriesAccountUser?
     var offer = SeriesSubscriptionOffer(
         identifier: "$rc_monthly",
         productIdentifier: "com.avalsys.seriesav.pro.monthly",
@@ -675,11 +724,30 @@ private final class StubSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasi
         lastRestoredUser = user
         return SeriesPurchaseOutcome(shouldRefreshAccess: true, customerUserID: user?.id ?? "")
     }
+}
 
-    func redeemOfferCode(for user: SeriesAccountUser?) async throws -> SeriesPurchaseOutcome {
-        try await prepare(for: user)
+@MainActor
+private final class StubSeriesPromotionCodeRedeemer: SeriesPromotionCodeRedeeming {
+    private(set) var redeemCount = 0
+    private(set) var lastCode: String?
+
+    func redeemPromotionCode(_ code: String) async throws -> SeriesPromoCodeRedemptionResponse {
         redeemCount += 1
-        lastRedeemedUser = user
-        return SeriesPurchaseOutcome(shouldRefreshAccess: true, customerUserID: user?.id ?? "")
+        lastCode = code
+        return SeriesPromoCodeRedemptionResponse(
+            appId: "seriesav",
+            userId: "apps-av-user-1",
+            code: "SERIES-PRO-2026",
+            campaignId: "series_pro_test",
+            redemptionId: "promo-redemption-1",
+            entitlement: SeriesPromoCodeEntitlement(
+                appId: "seriesav",
+                userId: "apps-av-user-1",
+                planTier: .pro,
+                accessMode: .signedInPro,
+                status: "active",
+                source: "promo"
+            )
+        )
     }
 }

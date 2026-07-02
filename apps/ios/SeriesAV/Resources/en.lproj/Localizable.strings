@@ -320,6 +320,13 @@
 "paywall.terms" = "Terms";
 "paywall.privacy" = "Privacy";
 "paywall.redeemCode" = "Redeem code";
+"paywall.promo.claim" = "Claim code";
+"paywall.promo.claimed" = "Code redeemed. Refreshing Pro access.";
+"paywall.promo.detail" = "Enter a Series AV Pro promo code if one was provided to you.";
+"paywall.promo.optional" = "Codes are optional and are not required to subscribe to Pro.";
+"paywall.promo.placeholder" = "Code";
+"paywall.promo.title" = "Redeem a code?";
+"promo.error.redeemFailed" = "Promo code could not be redeemed.";
 "subscription.error.signInRequired" = "Sign in before starting a subscription.";
 "subscription.error.configuration" = "Subscriptions are not configured on this build.";
 "subscription.error.offerUnavailable" = "The Pro offer is not available right now.";

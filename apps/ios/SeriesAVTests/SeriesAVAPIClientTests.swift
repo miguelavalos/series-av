@@ -271,6 +271,64 @@ final class SeriesAVAPIClientTests: XCTestCase {
         }
     }
 
+    @MainActor
+    func testPromoCodeRedeemSendsAuthenticatedPostAndDecodesEntitlement() async throws {
+        let response = """
+        {
+          "appId": "seriesav",
+          "userId": "apps-av-user-1",
+          "code": "SERIES-PRO-2026",
+          "campaignId": "series_pro_test",
+          "redemptionId": "promo-redemption-1",
+          "entitlement": {
+            "appId": "seriesav",
+            "userId": "apps-av-user-1",
+            "planTier": "pro",
+            "accessMode": "signedInPro",
+            "status": "active",
+            "source": "promo",
+            "startedAt": "2026-07-02T15:00:00.000Z",
+            "expiresAt": null,
+            "updatedAt": "2026-07-02T15:00:00.000Z"
+          },
+          "generatedAt": "2026-07-02T15:00:01.000Z"
+        }
+        """.data(using: .utf8)!
+        MockSeriesURLProtocol.response = (
+            response,
+            HTTPURLResponse(
+                url: URL(string: "https://api-account-av.test/v1/apps/seriesav/promotions/redeem")!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: nil
+            )!
+        )
+
+        let client = SeriesPromoCodeClient(
+            baseURL: URL(string: "https://api-account-av.test")!,
+            urlSession: Self.mockSession(),
+            tokenProvider: { "account-token" }
+        )
+
+        let result = try await client.redeemPromotionCode("SERIES-PRO-2026")
+
+        let request = try XCTUnwrap(MockSeriesURLProtocol.lastRequest)
+        XCTAssertEqual(request.url?.absoluteString, "https://api-account-av.test/v1/apps/seriesav/promotions/redeem")
+        XCTAssertEqual(request.httpMethod, "POST")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer account-token")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "x-appsav-app-id"), "seriesav")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
+
+        let body = try XCTUnwrap(MockSeriesURLProtocol.lastRequestBody)
+        let payload = try JSONDecoder().decode([String: String].self, from: body)
+        XCTAssertEqual(payload["code"], "SERIES-PRO-2026")
+
+        XCTAssertEqual(result.appId, "seriesav")
+        XCTAssertEqual(result.entitlement.planTier, .pro)
+        XCTAssertEqual(result.entitlement.accessMode, .signedInPro)
+        XCTAssertEqual(result.entitlement.source, "promo")
+    }
+
     private static func mockSession() -> URLSession {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockSeriesURLProtocol.self]

@@ -3,8 +3,6 @@ import OSLog
 
 #if canImport(RevenueCat)
 import RevenueCat
-import StoreKit
-import UIKit
 #endif
 
 struct SeriesSubscriptionOffer: Equatable {
@@ -25,7 +23,6 @@ enum SeriesSubscriptionPurchaseError: LocalizedError, Equatable {
     case offeringUnavailable
     case monthlyPackageUnavailable
     case purchaseCancelled
-    case redemptionUnavailable
     case underlying(String)
 
     var errorDescription: String? {
@@ -40,8 +37,6 @@ enum SeriesSubscriptionPurchaseError: LocalizedError, Equatable {
             L10n.string("subscription.error.productUnavailable")
         case .purchaseCancelled:
             L10n.string("subscription.error.cancelled")
-        case .redemptionUnavailable:
-            L10n.string("subscription.error.redemptionUnavailable")
         case .underlying(let message):
             message
         }
@@ -54,7 +49,6 @@ protocol SeriesSubscriptionPurchasing {
     func loadMonthlyOffer(for user: SeriesAccountUser?) async throws -> SeriesSubscriptionOffer
     func purchaseMonthlyPro(for user: SeriesAccountUser?) async throws -> SeriesPurchaseOutcome
     func restorePurchases(for user: SeriesAccountUser?) async throws -> SeriesPurchaseOutcome
-    func redeemOfferCode(for user: SeriesAccountUser?) async throws -> SeriesPurchaseOutcome
 }
 
 @MainActor
@@ -81,10 +75,6 @@ final class NoopSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasing {
         throw SeriesSubscriptionPurchaseError.missingConfiguration
     }
 
-    func redeemOfferCode(for user: SeriesAccountUser?) async throws -> SeriesPurchaseOutcome {
-        try await prepare(for: user)
-        throw SeriesSubscriptionPurchaseError.missingConfiguration
-    }
 }
 
 @MainActor
@@ -121,10 +111,6 @@ final class UITestSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasing {
         return SeriesPurchaseOutcome(shouldRefreshAccess: false, customerUserID: user?.id ?? "")
     }
 
-    func redeemOfferCode(for user: SeriesAccountUser?) async throws -> SeriesPurchaseOutcome {
-        try await prepare(for: user)
-        return SeriesPurchaseOutcome(shouldRefreshAccess: false, customerUserID: user?.id ?? "")
-    }
 }
 
 #if canImport(RevenueCat)
@@ -206,17 +192,6 @@ final class RevenueCatSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasing
         return SeriesPurchaseOutcome(shouldRefreshAccess: true, customerUserID: userID)
     }
 
-    func redeemOfferCode(for user: SeriesAccountUser?) async throws -> SeriesPurchaseOutcome {
-        let userID = try requireUserID(user)
-        try await prepare(for: user)
-        let scene = try activeWindowScene()
-        purchaseLogger.info("Starting StoreKit offer code redemption userID=\(userID, privacy: .private)")
-        try await AppStore.presentOfferCodeRedeemSheet(in: scene)
-        _ = try await syncPurchases()
-        purchaseLogger.info("Finished StoreKit offer code redemption userID=\(userID, privacy: .private)")
-        return SeriesPurchaseOutcome(shouldRefreshAccess: true, customerUserID: userID)
-    }
-
     private func requireUserID(_ user: SeriesAccountUser?) throws -> String {
         guard let userID = user?.id, !userID.isEmpty else {
             throw SeriesSubscriptionPurchaseError.missingAccountUser
@@ -292,18 +267,6 @@ final class RevenueCatSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasing
         }
     }
 
-    private func syncPurchases() async throws -> CustomerInfo {
-        try await withCheckedThrowingContinuation { continuation in
-            Purchases.shared.syncPurchases { customerInfo, error in
-                if let customerInfo {
-                    continuation.resume(returning: customerInfo)
-                } else {
-                    continuation.resume(throwing: Self.purchaseError(from: error))
-                }
-            }
-        }
-    }
-
     private func logInRevenueCat(_ userID: String) async throws -> CustomerInfo {
         try await withCheckedThrowingContinuation { continuation in
             Purchases.shared.logIn(userID) { customerInfo, _, error in
@@ -321,20 +284,6 @@ final class RevenueCatSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasing
             return .underlying(L10n.string("subscription.error.unknown"))
         }
         return .underlying(error.localizedDescription)
-    }
-
-    private func activeWindowScene() throws -> UIWindowScene {
-        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
-        if let activeScene = scenes.first(where: { $0.activationState == .foregroundActive }) {
-            return activeScene
-        }
-        if let inactiveScene = scenes.first(where: { $0.activationState == .foregroundInactive }) {
-            return inactiveScene
-        }
-        if let scene = scenes.first {
-            return scene
-        }
-        throw SeriesSubscriptionPurchaseError.redemptionUnavailable
     }
 }
 #else

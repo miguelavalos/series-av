@@ -320,6 +320,13 @@
 "paywall.terms" = "Bedingungen";
 "paywall.privacy" = "Datenschutz";
 "paywall.redeemCode" = "Code einlösen";
+"paywall.promo.claim" = "Code einlösen";
+"paywall.promo.claimed" = "Code eingelöst. Pro-Zugriff wird aktualisiert.";
+"paywall.promo.detail" = "Gib einen Series AV Pro Promo-Code ein, falls du einen erhalten hast.";
+"paywall.promo.optional" = "Codes sind optional und nicht erforderlich, um Pro zu abonnieren.";
+"paywall.promo.placeholder" = "Code";
+"paywall.promo.title" = "Code einlösen?";
+"promo.error.redeemFailed" = "Promo-Code konnte nicht eingelöst werden.";
 "subscription.error.signInRequired" = "Melde dich an, bevor du ein Abo startest.";
 "subscription.error.configuration" = "Abos sind in diesem Build nicht konfiguriert.";
 "subscription.error.offerUnavailable" = "Das Pro-Angebot ist im Moment nicht verfügbar.";

@@ -144,6 +144,14 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Sigue más series"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["Iniciar sesión"].exists)
         XCTAssertFalse(app.buttons["Restaurar compras"].exists)
+        let redeemButton = app.buttons["paywall.redeemCode"].firstMatch
+        for _ in 0..<5 where !redeemButton.exists || !redeemButton.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(redeemButton.waitForExistence(timeout: 3))
+        redeemButton.tap()
+        XCTAssertTrue(app.buttons["series.onboarding.auth.apple"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["series.onboarding.auth.google"].exists)
         XCTAssertFalse(
             staticText(
                 matchingLabel: "Series AV Pro es una suscripción mensual con renovación automática. Se te cobrará 4,99 € por cada periodo de 1 mes hasta que canceles en los ajustes del App Store.",

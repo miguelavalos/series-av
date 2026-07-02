@@ -320,6 +320,13 @@
 "paywall.terms" = "Termes";
 "paywall.privacy" = "Privacitat";
 "paywall.redeemCode" = "Bescanviar codi";
+"paywall.promo.claim" = "Bescanvia el codi";
+"paywall.promo.claimed" = "Codi bescanviat. Actualitzant l'acces Pro.";
+"paywall.promo.detail" = "Introdueix un codi promocional de Series AV Pro si te n'han donat un.";
+"paywall.promo.optional" = "Els codis son opcionals i no calen per subscriure't a Pro.";
+"paywall.promo.placeholder" = "Codi";
+"paywall.promo.title" = "Vols bescanviar un codi?";
+"promo.error.redeemFailed" = "No s'ha pogut bescanviar el codi.";
 "subscription.error.signInRequired" = "Inicia sessió abans de començar una subscripció.";
 "subscription.error.configuration" = "Les subscripcions no estan configurades en aquesta build.";
 "subscription.error.offerUnavailable" = "L'oferta Pro no està disponible ara mateix.";
