@@ -309,6 +309,7 @@
 "paywall.restore.loading" = "Restoring…";
 "paywall.status.purchasePending" = "Purchase received. Series AV will unlock Pro after Apps AV confirms your account access.";
 "paywall.status.refreshingAccess" = "Checking your account access with Apps AV.";
+"paywall.status.redeemingCode" = "Checking your code and refreshing Pro access.";
 "paywall.status.restorePending" = "Restore completed. If your App Store account has an active subscription, Series AV will unlock Pro after Apps AV confirms access.";
 "paywall.benefit.sync.title" = "Account access";
 "paywall.benefit.sync" = "Keep Pro access linked to your Apps AV account.";
@@ -318,11 +319,13 @@
 "paywall.benefit.avi" = "Contextual guidance for continuing your current series without losing your place.";
 "paywall.terms" = "Terms";
 "paywall.privacy" = "Privacy";
+"paywall.redeemCode" = "Redeem code";
 "subscription.error.signInRequired" = "Sign in before starting a subscription.";
 "subscription.error.configuration" = "Subscriptions are not configured on this build.";
 "subscription.error.offerUnavailable" = "The Pro offer is not available right now.";
 "subscription.error.productUnavailable" = "The monthly Pro subscription is not available right now.";
 "subscription.error.cancelled" = "Purchase cancelled.";
+"subscription.error.redemptionUnavailable" = "Code redemption is not available right now.";
 "subscription.error.unknown" = "Subscription could not be completed.";
 "tab.home" = "Home";
 "tab.library" = "Library";

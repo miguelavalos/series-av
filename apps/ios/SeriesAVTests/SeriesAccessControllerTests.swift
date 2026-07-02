@@ -638,9 +638,11 @@ private final class DelayedSeriesEntitlementService: SeriesEntitlementServicing 
 private final class StubSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasing {
     private(set) var purchaseCount = 0
     private(set) var restoreCount = 0
+    private(set) var redeemCount = 0
     private(set) var lastLoadedOfferUser: SeriesAccountUser?
     private(set) var lastPurchasedUser: SeriesAccountUser?
     private(set) var lastRestoredUser: SeriesAccountUser?
+    private(set) var lastRedeemedUser: SeriesAccountUser?
     var offer = SeriesSubscriptionOffer(
         identifier: "$rc_monthly",
         productIdentifier: "com.avalsys.seriesav.pro.monthly",
@@ -671,6 +673,13 @@ private final class StubSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasi
         try await prepare(for: user)
         restoreCount += 1
         lastRestoredUser = user
+        return SeriesPurchaseOutcome(shouldRefreshAccess: true, customerUserID: user?.id ?? "")
+    }
+
+    func redeemOfferCode(for user: SeriesAccountUser?) async throws -> SeriesPurchaseOutcome {
+        try await prepare(for: user)
+        redeemCount += 1
+        lastRedeemedUser = user
         return SeriesPurchaseOutcome(shouldRefreshAccess: true, customerUserID: user?.id ?? "")
     }
 }

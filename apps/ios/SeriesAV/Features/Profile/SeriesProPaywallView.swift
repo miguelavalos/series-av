@@ -54,7 +54,7 @@ struct SeriesProPaywallView: View {
             }
 
             AVPaywallBenefitList(items: benefitItems)
-            AVPaywallLegalLinks(links: legalLinkItems)
+            AVPaywallFooterActions(actions: footerActionItems)
         }
         .task {
             await accessController.loadMonthlySubscriptionOffer()
@@ -97,6 +97,16 @@ struct SeriesProPaywallView: View {
         }
     }
 
+    private func redeemOfferCode() {
+        guard !accessController.isSubscriptionOperationInProgress else { return }
+        if accessController.isSignedIn {
+            Task { await accessController.redeemOfferCode() }
+        } else {
+            dismiss()
+            startSignInFlow()
+        }
+    }
+
     private var primaryButtonTitle: String {
         guard accessController.isSignedIn else {
             return L10n.string("profile.pro.signIn")
@@ -130,6 +140,8 @@ struct SeriesProPaywallView: View {
 
     private var reconciliationStatus: String {
         switch accessController.subscriptionReconciliationSource {
+        case .redeemCode:
+            L10n.string("paywall.status.redeemingCode")
         case .restore:
             L10n.string("paywall.status.restorePending")
         case .purchase, .none:
@@ -169,5 +181,27 @@ struct SeriesProPaywallView: View {
                 openURL(AppConfig.privacyURL)
             }
         ]
+    }
+
+    private var footerActionItems: [AVPaywallFooterAction] {
+        var actions = [
+            AVPaywallFooterAction(
+                title: L10n.string("paywall.redeemCode"),
+                accessibilityIdentifier: "paywall.redeemCode",
+                action: redeemOfferCode
+            )
+        ]
+
+        for link in legalLinkItems {
+            actions.append(
+                AVPaywallFooterAction(
+                    title: link.title,
+                    accessibilityIdentifier: link.accessibilityIdentifier,
+                    action: link.action
+                )
+            )
+        }
+
+        return actions
     }
 }

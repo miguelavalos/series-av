@@ -309,6 +309,7 @@
 "paywall.restore.loading" = "Wird wiederhergestellt…";
 "paywall.status.purchasePending" = "Kauf erhalten. Series AV entsperrt Pro, sobald Apps AV deinen Kontozugriff bestätigt.";
 "paywall.status.refreshingAccess" = "Dein Kontozugriff wird mit Apps AV geprüft.";
+"paywall.status.redeemingCode" = "Code wird geprüft und Pro-Zugriff aktualisiert.";
 "paywall.status.restorePending" = "Wiederherstellung abgeschlossen. Wenn dein App Store Konto ein aktives Abo hat, entsperrt Series AV Pro, sobald Apps AV den Zugriff bestätigt.";
 "paywall.benefit.sync.title" = "Kontozugriff";
 "paywall.benefit.sync" = "Halte Pro-Zugriff mit deinem Apps AV-Konto verknüpft.";
@@ -318,11 +319,13 @@
 "paywall.benefit.avi" = "Kontextuelle Hilfe, um die aktuelle Serie ohne Punktverlust fortzusetzen.";
 "paywall.terms" = "Bedingungen";
 "paywall.privacy" = "Datenschutz";
+"paywall.redeemCode" = "Code einlösen";
 "subscription.error.signInRequired" = "Melde dich an, bevor du ein Abo startest.";
 "subscription.error.configuration" = "Abos sind in diesem Build nicht konfiguriert.";
 "subscription.error.offerUnavailable" = "Das Pro-Angebot ist im Moment nicht verfügbar.";
 "subscription.error.productUnavailable" = "Das monatliche Pro-Abo ist im Moment nicht verfügbar.";
 "subscription.error.cancelled" = "Kauf abgebrochen.";
+"subscription.error.redemptionUnavailable" = "Code-Einlösung ist im Moment nicht verfügbar.";
 "subscription.error.unknown" = "Das Abo konnte nicht abgeschlossen werden.";
 "tab.home" = "Home";
 "tab.library" = "Bibliothek";

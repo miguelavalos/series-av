@@ -54,6 +54,7 @@ final class SeriesAccessController {
     enum SubscriptionReconciliationSource: Equatable {
         case purchase
         case restore
+        case redeemCode
     }
 
     private let accountService: SeriesAVAccountServicing
@@ -300,6 +301,12 @@ final class SeriesAccessController {
     func restorePurchases() async {
         await runSubscriptionOperation(source: .restore) {
             try await subscriptionPurchasing.restorePurchases(for: subscriptionAccountUser)
+        }
+    }
+
+    func redeemOfferCode() async {
+        await runSubscriptionOperation(source: .redeemCode) {
+            try await subscriptionPurchasing.redeemOfferCode(for: subscriptionAccountUser)
         }
     }
 
