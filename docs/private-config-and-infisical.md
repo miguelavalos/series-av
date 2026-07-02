@@ -16,14 +16,14 @@ This repository is public and open source. Anything committed here can become pu
 Local development:
 
 ```bash
-bun install
-bun run ios:config
+pnpm install
+vp run ios:config
 ```
 
 Production/App Store preparation:
 
 ```bash
-bun run ios:config:production
+vp run ios:config:production
 ```
 
 The production command must fail if Infisical does not provide required values.

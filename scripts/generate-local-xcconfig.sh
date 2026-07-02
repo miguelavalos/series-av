@@ -26,7 +26,7 @@ eval "$("$repo_root/scripts/resolve-infisical-bootstrap-env.sh" "$profile")"
 varlock_bin="$repo_root/node_modules/.bin/varlock"
 
 if [ ! -x "$varlock_bin" ]; then
-  echo "varlock CLI is required. Run 'bun install' in $repo_root." >&2
+  echo "varlock CLI is required. Run 'pnpm install' in $repo_root." >&2
   exit 1
 fi
 

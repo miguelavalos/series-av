@@ -4,22 +4,25 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "./scripts/run-with-varlock.sh vite dev --host 0.0.0.0 --port 5193",
-    "dev:preview": "./scripts/run-with-varlock.sh --profile preview vite dev --host 0.0.0.0 --port 5193",
-    "build": "./scripts/run-with-varlock.sh vite build",
-    "build:preview": "./scripts/run-with-varlock.sh --profile preview vite build",
-    "build:production": "./scripts/run-with-varlock.sh --profile production vite build",
-    "deploy:preview": "bun run build:preview && bash ../../../../private/avalsys-suite/scripts/wrangler-account.sh deploy --config wrangler.preview.jsonc",
-    "deploy:production": "bun run build:production && bash ../../../../private/avalsys-suite/scripts/wrangler-account.sh deploy --config wrangler.production.jsonc",
-    "deploy:preview:dry-run": "bun run build:preview && bash ../../../../private/avalsys-suite/scripts/wrangler-account.sh deploy --dry-run --config wrangler.preview.jsonc",
-    "deploy:production:dry-run": "bun run build:production && bash ../../../../private/avalsys-suite/scripts/wrangler-account.sh deploy --dry-run --config wrangler.production.jsonc",
+    "dev": "./scripts/run-with-varlock.sh vp dev --host 0.0.0.0 --port 5193",
+    "dev:preview": "./scripts/run-with-varlock.sh --profile preview vp dev --host 0.0.0.0 --port 5193",
+    "build": "./scripts/run-with-varlock.sh vp build",
+    "build:preview": "./scripts/run-with-varlock.sh --profile preview vp build",
+    "build:production": "./scripts/run-with-varlock.sh --profile production vp build",
+    "deploy:preview": "vp run build:preview && bash ../../../../private/avalsys-suite/scripts/wrangler-account.sh deploy --config wrangler.preview.jsonc",
+    "deploy:production": "vp run build:production && bash ../../../../private/avalsys-suite/scripts/wrangler-account.sh deploy --config wrangler.production.jsonc",
+    "deploy:preview:dry-run": "vp run build:preview && bash ../../../../private/avalsys-suite/scripts/wrangler-account.sh deploy --dry-run --config wrangler.preview.jsonc",
+    "deploy:production:dry-run": "vp run build:production && bash ../../../../private/avalsys-suite/scripts/wrangler-account.sh deploy --dry-run --config wrangler.production.jsonc",
     "qa:shared": "node scripts/qa-shared-web.mjs",
-    "test": "vitest run",
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "test": "vp test",
+    "typecheck": "vp exec tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@avalsys/account-av-web": "file:../../../account-av/web",
     "@avalsys/apps-av-web": "file:../../../apps-av/web",
+    "@clerk/clerk-react": "^5.0.0",
+    "@radix-ui/react-dialog": "1.1.18",
+    "@radix-ui/react-slot": "1.3.0",
     "@clerk/localizations": "^4.9.0",
     "@tailwindcss/vite": "^4.3.1",
     "@tanstack/react-query": "^5.101.0",
@@ -29,7 +32,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.20.0",
-    "radix-ui": "^1.6.0",
     "react": "~19.2.3",
     "react-dom": "~19.2.3",
     "sonner": "^2.0.7",
@@ -42,6 +44,6 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "vite-plus": "0.2.2"
   }
 }

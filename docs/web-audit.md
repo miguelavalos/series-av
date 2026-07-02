@@ -107,7 +107,7 @@ web visual audit.
   navigation. This exposed and fixed Search using the shared AppShell without
   the current route path.
 - Series AV now configures the shared Apps AV web smoke QA runner for the
-  signed-out contract across `en`, `es`, `fr`, `de`, and `ca`: `bun run --cwd
+  signed-out contract across `en`, `es`, `fr`, `de`, and `ca`: `vp run --cwd
   apps/web qa:shared`. It checks public `/`, public `/sign-in`, protected route
   gates including a concrete Detail route, locale preservation on product-owned
   links, HTML language, runtime-error markers, and guest-copy absence against
@@ -137,14 +137,14 @@ web visual audit.
   `Failed to fetch`, no guest copy, and no console errors on
   `/series/thetvdb%3A348545?lang=es`.
 - Validation run after implementation:
-  - `bun run --cwd apps/web test`
-  - `bun run --cwd apps/web typecheck`
-  - `bun run --cwd apps/web build`
-  - `bun run --cwd apps/web qa:shared`
-  - `SERIESAV_WEB_QA_BASE_URL=https://app.series-av-preview.avalsys.com bun run --cwd apps/web qa:shared`
-  - `SERIESAV_WEB_QA_BASE_URL=https://app.series-av.avalsys.com bun run --cwd apps/web qa:shared`
-  - `bun run --cwd services/series-api deploy:production`
-  - `bun run smoke:series-api:production`
+  - `vp run --filter ./apps/web test`
+  - `vp run --filter ./apps/web typecheck`
+  - `vp run --filter ./apps/web build`
+  - `vp run --filter ./apps/web qa:shared`
+  - `SERIESAV_WEB_QA_BASE_URL=https://app.series-av-preview.avalsys.com vp run --filter ./apps/web qa:shared`
+  - `SERIESAV_WEB_QA_BASE_URL=https://app.series-av.avalsys.com vp run --filter ./apps/web qa:shared`
+  - `vp run --dir services/series-api deploy:production`
+  - `vp run smoke:series-api:production`
 - Commercial desktop and mobile browser QA passed.
 - Web app desktop and mobile browser QA passed.
 - Protected app routes require sign-in and keep `?lang` on redirects.

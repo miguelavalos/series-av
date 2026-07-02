@@ -45,7 +45,7 @@ esac
 
 local_config="$repo_root/apps/ios/Config/Local.xcconfig"
 if [ ! -f "$local_config" ]; then
-  echo "Missing $local_config. Run bun run ios:config or bun run ios:config:production first." >&2
+  echo "Missing $local_config. Run vp run ios:config or vp run ios:config:production first." >&2
   exit 1
 fi
 

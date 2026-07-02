@@ -4,11 +4,11 @@ Use this checklist before uploading the first App Store build and before later p
 
 ## Repository Hygiene
 
-1. Run `bun install`.
+1. Run `pnpm install`.
 2. Run:
 
    ```bash
-   bun run config:hygiene
+   vp run config:hygiene
    ```
 
 3. Confirm these files are not present in the public repo workspace:
@@ -24,23 +24,23 @@ Use this checklist before uploading the first App Store build and before later p
 1. Generate local config outside git:
 
    ```bash
-   bun run ios:config
+   vp run ios:config
    ```
 
 2. Build for simulator:
 
    ```bash
-   bun run typecheck
+   vp run typecheck
    ```
 
-3. Build a signed simulator or device candidate from Xcode before validating Sign in with Apple. The `bun run typecheck` simulator artifact intentionally disables code signing and cannot be used to approve Apple auth.
+3. Build a signed simulator or device candidate from Xcode before validating Sign in with Apple. The `vp run typecheck` simulator artifact intentionally disables code signing and cannot be used to approve Apple auth.
 4. Build a release candidate locally from Xcode before archiving for App Store Connect.
 5. Before any TestFlight/App Store archive or upload, run the production
    simulator release gate:
 
    ```bash
-   bun run ios:config:production
-   bun run ios:release:simulator
+   vp run ios:config:production
+   vp run ios:release:simulator
    ```
 
    This gate validates public config hygiene, production runtime config,
@@ -129,7 +129,7 @@ attached before the original `1.0 (11)` submission.
 1. Generate production iOS config and run the app:
 
    ```bash
-   bun run ios:config:production
+   vp run ios:config:production
    ```
 
 2. Sign in with a safe production Account AV account and confirm Account AV
@@ -182,15 +182,15 @@ Additional local simulator evidence, 2026-06-17:
    final submission:
 
    ```bash
-   bun run verify:cloudflare:signed-in:preview:prompt -- --mode signedInFree
-   bun run verify:cloudflare:signed-in:preview:prompt -- --mode signedInPro
+   vp run verify:cloudflare:signed-in:preview:prompt -- --mode signedInFree
+   vp run verify:cloudflare:signed-in:preview:prompt -- --mode signedInPro
    ```
 
 2. Re-run production smoke against a safe real account before final submission:
 
    ```bash
-   bun run verify:cloudflare:signed-in:production:prompt -- --mode signedInFree --skip-preflight
-   bun run verify:cloudflare:signed-in:production:prompt -- --mode signedInPro --skip-preflight
+   vp run verify:cloudflare:signed-in:production:prompt -- --mode signedInFree --skip-preflight
+   vp run verify:cloudflare:signed-in:production:prompt -- --mode signedInPro --skip-preflight
    ```
 
 3. Confirm `signedInFree` and `signedInPro` capability boundaries still match the shipped product copy.
@@ -250,8 +250,8 @@ Current external setup snapshot, 2026-06-21:
    preview and production before any App Store/TestFlight submission:
 
    ```bash
-   bun run series-av:subscription:readiness:preview
-   bun run series-av:subscription:readiness:production
+   vp run series-av:subscription:readiness:preview
+   vp run series-av:subscription:readiness:production
    ```
 
 2. Confirm Infisical provides `SERIESAV_REVENUECAT_PUBLIC_API_KEY`,

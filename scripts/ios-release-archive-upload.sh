@@ -127,9 +127,9 @@ fi
 
 if [ "$skip_preflight" -eq 0 ] && [ "$use_existing_archive" -eq 0 ]; then
   run_step "Generate production iOS config"
-  (cd "$repo_root" && bun run ios:config:production)
+  (cd "$repo_root" && vp run ios:config:production)
   run_step "Run production iOS preflight"
-  (cd "$repo_root" && bun run ios:preflight:production)
+  (cd "$repo_root" && vp run ios:preflight:production)
 fi
 
 if [ "$use_existing_archive" -eq 0 ]; then
@@ -173,6 +173,6 @@ Verified archive is ready.
   archive: $archive_path
 
 To upload this exact archive, rerun:
-  bun run ios:release:upload -- --archive "$archive_path" --upload --skip-preflight
+  vp run ios:release:upload -- --archive "$archive_path" --upload --skip-preflight
 REPORT
 fi

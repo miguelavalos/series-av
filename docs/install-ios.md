@@ -5,14 +5,14 @@ This guide covers local iOS development for the SwiftUI app.
 ## Prerequisites
 
 1. Xcode installed from the Mac App Store or Apple Developer.
-2. Bun 1.3.13 or later available locally.
+2. Vite+/pnpm 1.3.13 or later available locally.
 3. A local `.infisical/bootstrap.env`.
 
 ## Setup
 
 ```bash
-bun install
-bun run ios:config
+pnpm install
+vp run ios:config
 ```
 
 `ACCOUNTAV_PUBLISHABLE_KEY` is required for generated native iOS config.
@@ -40,22 +40,22 @@ separate metered action surface in the iOS client.
 Generate the Swift iOS local config from Infisical before building:
 
 ```bash
-bun run ios:config
-bun run ios:preflight
+vp run ios:config
+vp run ios:preflight
 ```
 
 For preview Account AV validation against Cloudflare preview:
 
 ```bash
-bun run ios:config:preview
-bun run ios:preflight:preview
+vp run ios:config:preview
+vp run ios:preflight:preview
 ```
 
 For production/App Store preparation:
 
 ```bash
-bun run ios:config:production
-bun run ios:preflight:production
+vp run ios:config:production
+vp run ios:preflight:production
 ```
 
 Series AV Pro is a paid/subscription V1. Before TestFlight or App Store
@@ -63,8 +63,8 @@ submission, the private suite readiness checks must also pass for preview and
 production:
 
 ```bash
-bun run series-av:subscription:readiness:preview
-bun run series-av:subscription:readiness:production
+vp run series-av:subscription:readiness:preview
+vp run series-av:subscription:readiness:production
 ```
 
 Those checks validate the Infisical-backed RevenueCat client values and the
@@ -104,8 +104,8 @@ simulator, archiving, or testing Clerk/Account AV sign-in.
 Use this sequence when testing native Account AV sign-in from the simulator:
 
 ```bash
-bun run ios:config
-bun run ios:preflight
+vp run ios:config
+vp run ios:preflight
 ```
 
 Then run the app from Xcode or a signed simulator build. The dev preflight must
@@ -121,8 +121,8 @@ resolve:
 - a concrete Apple development team
 - `SeriesAV/App/SeriesAV.entitlements` with Keychain access groups
 
-For preview Cloudflare validation, use `bun run ios:config:preview` and
-`bun run ios:preflight:preview`. The preview preflight must resolve the same
+For preview Cloudflare validation, use `vp run ios:config:preview` and
+`vp run ios:preflight:preview`. The preview preflight must resolve the same
 development bundle id and test Clerk key, but the Account AV API must be
 `https://api-account-av-preview.avalsys.com` and the Series AV API must be
 `https://api-series-av-preview.avalsys.com`.
@@ -135,10 +135,10 @@ builds can produce Keychain `-34018` errors and then fail OAuth with
 To build the native project locally:
 
 ```bash
-bun run ios
+vp run ios
 ```
 
-`bun run ios` and `bun run typecheck` compile the simulator app with
+`vp run ios` and `vp run typecheck` compile the simulator app with
 `CODE_SIGNING_ALLOWED=NO` so CI and local compile checks do not depend on a
 developer certificate. Do not use that unsigned build to validate Google or
 Apple sign-in: Account AV native auth requires a signed app with the Keychain
@@ -173,8 +173,8 @@ find . -type d \( -name '.DerivedData*' -o -name '.derived-data*' -o -name 'Deri
 Before archiving or uploading a production build:
 
 ```bash
-bun run ios:config:production
-bun run ios:preflight:production
+vp run ios:config:production
+vp run ios:preflight:production
 ```
 
 The production preflight must resolve:

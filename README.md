@@ -75,12 +75,12 @@ docs/
 ## Local Setup
 
 1. Install dependencies:
-   `bun install`
+   `pnpm install`
 2. Create the local Infisical bootstrap at `.infisical/bootstrap.env`.
 3. Generate the local iOS config:
-   `bun run ios:config`
+   `vp run ios:config`
 4. Build the iOS app:
-   `bun run ios`
+   `vp run ios`
 
 Account sign-in uses the configured Account AV provider. `ACCOUNTAV_PUBLISHABLE_KEY` is required for generated native iOS config.
 
@@ -101,21 +101,21 @@ The local config generator resolves the local Infisical bootstrap first and then
 ## Commands
 
 ```bash
-bun install
-bun run ios:config
-bun run ios
-bun run typecheck
+pnpm install
+vp run ios:config
+vp run ios
+vp run typecheck
 ```
 
 Current local gate:
 
-- `bun run config:hygiene` checks that tracked public config does not expose private values.
-- `bun run typecheck` generates local iOS config and builds the native iOS app for the simulator with code signing disabled.
+- `vp run config:hygiene` checks that tracked public config does not expose private values.
+- `vp run typecheck` generates local iOS config and builds the native iOS app for the simulator with code signing disabled.
 
 Dependency maintenance:
 
 ```bash
-bun run ncu
+vp run ncu
 ```
 
 For simulator or physical iPhone installs, follow [docs/install-ios.md](docs/install-ios.md).

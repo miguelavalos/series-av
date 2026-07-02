@@ -52,7 +52,7 @@ Mandatory rules:
   `scripts/verify-ios-runtime-config.sh production`;
 - before any TestFlight/App Store archive or upload, run the production
   simulator release gate from this repo after generating production config:
-  `bun run ios:release:simulator`;
+  `vp run ios:release:simulator`;
 - before unattended TestFlight/App Store export/upload from a new or recently
   reconfigured Mac, complete the private release-machine setup in
   `private/avalsys-suite/docs/platform/apple-release-machine-setup.md`; the

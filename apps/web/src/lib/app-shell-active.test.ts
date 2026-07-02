@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { isActiveAppShellLink } from "@avalsys/apps-av-web";
 
 describe("shared app shell active links", () => {

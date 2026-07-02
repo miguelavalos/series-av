@@ -47,11 +47,11 @@ echo "==> Evidence: $EVIDENCE_DIR"
 
 echo
 echo "==> Public repo hygiene"
-bun run config:hygiene
+vp run config:hygiene
 
 echo
 echo "==> Production runtime config preflight"
-bun run ios:preflight:production
+vp run ios:preflight:production
 
 echo
 echo "==> Production API smoke for Search dependencies"
