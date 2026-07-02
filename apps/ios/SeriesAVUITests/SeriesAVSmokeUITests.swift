@@ -405,6 +405,11 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Current Series"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Viendo ahora"].exists)
         XCTAssertTrue(app.staticTexts["Siguiente S1 E3"].exists)
+        XCTAssertTrue(app.buttons["home.aviBrief.open"].exists)
+        XCTAssertGreaterThan(
+            app.buttons["home.aviBrief.open"].frame.minY,
+            app.buttons["Marcar S1 E3 visto"].frame.maxY
+        )
 
         if !app.staticTexts["También viendo"].waitForExistence(timeout: 2) {
             app.swipeUp()
@@ -437,23 +442,63 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Current Series"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["Marcar S1 E3 visto"].exists)
 
-        app.buttons["Acciones de serie"].firstMatch.tap()
-        XCTAssertTrue(app.buttons["Ver info"].waitForExistence(timeout: 5))
-        app.buttons["Ver info"].tap()
+        let detailButton = app.buttons["Current Series"].firstMatch
+        XCTAssertTrue(detailButton.waitForExistence(timeout: 5))
+        detailButton.tap()
 
         XCTAssertTrue(app.staticTexts["Seguimiento"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["Marcar S1 E3 visto"].exists)
         XCTAssertTrue(app.buttons["Ajustar episodio"].exists)
         XCTAssertTrue(app.buttons["Quitar fijado"].exists)
         XCTAssertTrue(app.staticTexts["Episodios"].waitForExistence(timeout: 5))
+        XCTAssertLessThan(app.staticTexts["Seguimiento"].frame.minY, app.staticTexts["Episodios"].frame.minY)
+        XCTAssertLessThan(app.staticTexts["Episodios"].frame.minY, app.staticTexts["Fuentes"].frame.minY)
 
         let setProgressButton = app.buttons["series-detail-episode-1-2-set-progress"]
         for _ in 0..<6 where !setProgressButton.exists {
             app.swipeUp()
         }
         XCTAssertTrue(setProgressButton.exists)
-        XCTAssertTrue(app.staticTexts["Fijar"].exists)
+        XCTAssertFalse(app.staticTexts["Fijar"].exists)
         XCTAssertFalse(app.staticTexts["Guardar S1 E3"].exists)
+    }
+
+    @MainActor
+    func testHighSeasonDetailFocusesEpisodeGuideAroundCurrentProgress() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_HIGH_SEASON_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "home"
+        ])
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Re: ZERO, Starting Life in Another World"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Siguiente S4 E6"].exists)
+        XCTAssertTrue(app.buttons["Marcar S4 E6 visto"].exists)
+
+        let detailButton = app.buttons["Re: ZERO, Starting Life in Another World"].firstMatch
+        XCTAssertTrue(detailButton.waitForExistence(timeout: 5))
+        detailButton.tap()
+
+        XCTAssertTrue(app.staticTexts["Seguimiento"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["S4 E5 · Siguiente S4 E6"].exists)
+        XCTAssertLessThan(app.staticTexts["Seguimiento"].frame.minY, app.staticTexts["Episodios"].frame.minY)
+        XCTAssertLessThan(app.staticTexts["Episodios"].frame.minY, app.staticTexts["Fuentes"].frame.minY)
+
+        let currentEpisodeButton = app.buttons["series-detail-episode-4-5-set-progress"]
+        let nextEpisodeButton = app.buttons["series-detail-episode-4-6-set-progress"]
+        let firstEpisodeButton = app.buttons["series-detail-episode-1-1-set-progress"]
+
+        for _ in 0..<8 where !currentEpisodeButton.exists && !firstEpisodeButton.exists {
+            app.swipeUp()
+        }
+
+        XCTAssertTrue(app.staticTexts["Episodios"].exists)
+        XCTAssertTrue(currentEpisodeButton.exists)
+        XCTAssertTrue(nextEpisodeButton.exists)
+        XCTAssertFalse(firstEpisodeButton.exists)
+        XCTAssertTrue(app.staticTexts["Último visto"].exists)
+        XCTAssertTrue(app.staticTexts["Siguiente"].exists)
     }
 
     @MainActor

@@ -95,6 +95,7 @@ struct SeriesAppShellView: View {
                 EmptyView()
             }
         )
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("series.shell.compact")
     }
 

@@ -177,6 +177,13 @@ private struct SeriesWatchingHomeScreen: View {
                 SeriesEmptyWatchingView(openSearch: openSearch)
             }
 
+            SeriesHomeAviBrief(
+                currentEntry: homeState.currentEntry,
+                watchingCount: homeState.watchingCount,
+                wantToWatchCount: homeState.wantToWatchCount,
+                openAvi: openAvi
+            )
+
             SeriesHomeUpcomingEpisodesSection(
                 entries: store.activeEntries,
                 openLibrary: openLibraryTab
@@ -565,19 +572,10 @@ private struct SeriesWatchingHomeScreen: View {
     @ViewBuilder
     private func homeHeader(isTabletLike: Bool) -> some View {
         if isTabletLike {
-            VStack(alignment: .leading, spacing: 18) {
-                AVAppShellScreenHeader(
-                    title: L10n.string("home.header.title"),
-                    subtitle: L10n.string("home.header.subtitle")
-                )
-
-                SeriesHomeAviBrief(
-                    currentEntry: homeState.currentEntry,
-                    watchingCount: homeState.watchingCount,
-                    wantToWatchCount: homeState.wantToWatchCount,
-                    openAvi: openAvi
-                )
-            }
+            AVAppShellScreenHeader(
+                title: L10n.string("home.header.title"),
+                subtitle: L10n.string("home.header.subtitle")
+            )
             .padding(.bottom, 8)
         } else {
             AVAppShellHomeHeader(
@@ -588,13 +586,6 @@ private struct SeriesWatchingHomeScreen: View {
                     activeItem: nil,
                     openSettings: openSettings,
                     openAccount: openAccount
-                )
-            } content: {
-                SeriesHomeAviBrief(
-                    currentEntry: homeState.currentEntry,
-                    watchingCount: homeState.watchingCount,
-                    wantToWatchCount: homeState.wantToWatchCount,
-                    openAvi: openAvi
                 )
             }
             .padding(.bottom, 8)
@@ -661,18 +652,46 @@ private struct SeriesHomeAviBrief: View {
     @Environment(\.avCommonAppExperience) private var appExperience
 
     var body: some View {
-        AVAviHomeBriefCard(
-            identity: appExperience.identity,
-            detail: briefDetail,
-            actionAccessibilityLabel: L10n.string("home.aviBrief.action"),
-            accessibilityIdentifier: "home.aviBrief.open",
-            openAvi: openAvi
-        ) {
-            Image("AviOnboardingCTA")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 50, height: 50)
+        Button(action: openAvi) {
+            HStack(spacing: 12) {
+                Image("AviOnboardingCTA")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 38, height: 38)
+                    .accessibilityHidden(true)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(appExperience.identity.assistantName)
+                        .font(.system(size: 13, weight: .black, design: .rounded))
+                        .foregroundStyle(AVBrandColor.textPrimary)
+
+                    Text(briefDetail)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.82)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .layoutPriority(1)
+
+                Image(systemName: "sparkles")
+                    .font(.system(size: 14, weight: .black))
+                    .foregroundStyle(Color.black.opacity(0.78))
+                    .frame(width: 34, height: 34)
+                    .background(AVBrandColor.accent, in: Circle())
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.secondarySystemGroupedBackground).opacity(0.72), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+            }
         }
+        .buttonStyle(.plain)
+        .accessibilityLabel(L10n.string("home.aviBrief.action"))
+        .accessibilityIdentifier("home.aviBrief.open")
     }
 
     private var briefDetail: String {
@@ -773,11 +792,13 @@ struct SeriesLibraryRow<MenuContent: View>: View {
             Spacer()
 
             if let markNext {
-                SeriesCompactIconButton(
+                SeriesProgressPillButton(
+                    title: compactProgressActionTitle(for: entry),
                     systemName: quickProgressFilledSystemImage(for: entry),
                     style: .accent,
                     accessibilityLabel: quickProgressAccessibilityLabel,
                     accessibilityIdentifier: "series-row-\(entry.id)-quick-progress",
+                    minHeight: 36,
                     isDisabled: !entry.canMarkNextEpisodeFromKnownGuide,
                     action: markNext
                 )
@@ -917,52 +938,56 @@ private struct SeriesCurrentWatchingCard: View {
     }
 
     private var heroMain: some View {
-        HStack(alignment: .bottom, spacing: 14) {
-            VStack(alignment: .leading, spacing: 10) {
-                Text(entry.title)
-                    .font(.system(size: 28, weight: .black, design: .rounded))
-                    .foregroundStyle(heroTitleColor)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.62)
-                    .fixedSize(horizontal: false, vertical: true)
+        Button(action: openDetail) {
+            HStack(alignment: .bottom, spacing: 14) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(entry.title)
+                        .font(.system(size: 28, weight: .black, design: .rounded))
+                        .foregroundStyle(heroTitleColor)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.62)
+                        .fixedSize(horizontal: false, vertical: true)
 
-                HStack(spacing: 7) {
-                    Image(systemName: "play.circle.fill")
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundStyle(AVBrandColor.accent)
-                    Text(String(format: L10n.string("home.current.nextEpisode"), cursorLabel(entry.nextEpisodeCursor)))
-                        .font(.system(size: 14, weight: .black, design: .rounded))
-                        .monospacedDigit()
-                        .foregroundStyle(heroTitleColor.opacity(0.82))
+                    HStack(spacing: 7) {
+                        Image(systemName: "play.circle.fill")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(AVBrandColor.accent)
+                        Text(String(format: L10n.string("home.current.nextEpisode"), cursorLabel(entry.nextEpisodeCursor)))
+                            .font(.system(size: 14, weight: .black, design: .rounded))
+                            .monospacedDigit()
+                            .foregroundStyle(heroTitleColor.opacity(0.82))
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(heroControlSurface, in: Capsule())
+                    .overlay {
+                        Capsule()
+                            .stroke(heroControlStroke, lineWidth: 1)
+                    }
                 }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(heroControlSurface, in: Capsule())
-                .overlay {
-                    Capsule()
-                        .stroke(heroControlStroke, lineWidth: 1)
-                }
+                .layoutPriority(1)
+
+                SeriesEntryArtworkView(entry: entry, size: 70)
+                    .accessibilityHidden(true)
             }
-            .layoutPriority(1)
-
-            SeriesEntryArtworkView(entry: entry, size: 70)
-                .accessibilityHidden(true)
         }
+        .buttonStyle(.plain)
+        .accessibilityLabel(entry.title)
+        .accessibilityHint(L10n.string("detail.open"))
     }
 
     private var heroControls: some View {
         HStack(spacing: 10) {
-            Button(action: primaryAction) {
-                Image(systemName: primaryIconName)
-                    .font(.system(size: 20, weight: .black))
-                    .foregroundStyle(Color.black.opacity(0.84))
-                    .frame(width: 50, height: 50)
-                    .background(AVBrandColor.accent, in: Circle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(primaryActionAccessibilityLabel)
-            .disabled(!entry.canMarkNextEpisodeFromKnownGuide)
-            .opacity(entry.canMarkNextEpisodeFromKnownGuide ? 1 : 0.42)
+            SeriesProgressPillButton(
+                title: primaryActionTitle,
+                systemName: primaryIconName,
+                style: .accent,
+                accessibilityLabel: primaryActionAccessibilityLabel,
+                minHeight: 50,
+                fillsAvailableWidth: true,
+                isDisabled: !entry.canMarkNextEpisodeFromKnownGuide,
+                action: primaryAction
+            )
 
             Button {
                 isShowingProgressSelector = true
@@ -1036,13 +1061,13 @@ private struct SeriesCurrentWatchingCard: View {
 
     private var primaryActionTitle: String {
         entry.status == .wantToWatch
-            ? L10n.string("home.start")
+            ? primaryProgressActionTitle(for: entry)
             : String(format: L10n.string("home.action.markEpisodeWatched"), cursorLabel(entry.nextEpisodeCursor))
     }
 
     private var primaryActionAccessibilityLabel: String {
         entry.status == .wantToWatch
-            ? "\(primaryActionTitle), \(cursorLabel(entry.nextEpisodeCursor))"
+            ? "\(L10n.string("home.start")), \(cursorLabel(entry.nextEpisodeCursor))"
             : primaryActionTitle
     }
 
@@ -1203,13 +1228,13 @@ private struct SeriesWatchingQueueSection: View {
                         .accessibilityLabel(entry.title)
                         .accessibilityHint(L10n.string("detail.open"))
 
-                        SeriesCompactIconButton(
+                        SeriesProgressPillButton(
+                            title: compactProgressActionTitle(for: entry),
                             systemName: quickProgressFilledSystemImage(for: entry),
                             style: .accent,
-                            size: 36,
-                            iconSize: 14,
                             accessibilityLabel: primaryActionTitle(for: entry),
                             accessibilityIdentifier: "series-queue-\(entry.id)-quick-progress",
+                            minHeight: 36,
                             isDisabled: !entry.canMarkNextEpisodeFromKnownGuide
                         ) {
                             markNext(entry)
@@ -1623,6 +1648,73 @@ struct SeriesCompactIconButton: View {
     }
 }
 
+struct SeriesProgressPillButton: View {
+    enum Style {
+        case accent
+        case secondary
+    }
+
+    let title: String
+    let systemName: String
+    var style: Style = .secondary
+    let accessibilityLabel: String
+    var accessibilityIdentifier: String?
+    var minHeight: CGFloat = 40
+    var fillsAvailableWidth = false
+    var isDisabled = false
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Label(title, systemImage: systemName)
+                .font(.system(size: 13, weight: .black, design: .rounded))
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+                .allowsTightening(true)
+                .foregroundStyle(foregroundColor)
+                .frame(maxWidth: fillsAvailableWidth ? .infinity : nil, minHeight: minHeight)
+                .padding(.horizontal, 13)
+                .background(backgroundColor, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(strokeColor, lineWidth: 1)
+                }
+        }
+        .buttonStyle(.plain)
+        .disabled(isDisabled)
+        .opacity(isDisabled ? 0.42 : 1)
+        .accessibilityLabel(accessibilityLabel)
+        .modifier(SeriesOptionalAccessibilityIdentifier(identifier: accessibilityIdentifier))
+    }
+
+    private var foregroundColor: Color {
+        switch style {
+        case .accent:
+            Color.black.opacity(0.84)
+        case .secondary:
+            Color.primary
+        }
+    }
+
+    private var backgroundColor: Color {
+        switch style {
+        case .accent:
+            AVBrandColor.accent
+        case .secondary:
+            Color(.tertiarySystemGroupedBackground)
+        }
+    }
+
+    private var strokeColor: Color {
+        switch style {
+        case .accent:
+            Color.black.opacity(0.08)
+        case .secondary:
+            Color.primary.opacity(0.08)
+        }
+    }
+}
+
 private struct SeriesOptionalAccessibilityIdentifier: ViewModifier {
     let identifier: String?
 
@@ -1896,15 +1988,19 @@ struct SeriesProgressEditorSheet: View {
     }
 
     private var clearProgressAction: some View {
-        Button(role: entry.lastWatchedEpisodeCursor == nil ? nil : .destructive) {
-            clearProgress()
-            dismiss()
-        } label: {
-            Text(L10n.string("home.notStarted"))
-                .frame(maxWidth: .infinity)
+        HStack {
+            Button(role: entry.lastWatchedEpisodeCursor == nil ? nil : .destructive) {
+                clearProgress()
+                dismiss()
+            } label: {
+                Label(L10n.string("home.notStarted"), systemImage: "xmark.circle")
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.regular)
+            .accessibilityLabel(L10n.string("home.notStarted"))
+
+            Spacer(minLength: 0)
         }
-        .buttonStyle(.bordered)
-        .controlSize(.large)
     }
 
     private var selectedCursorLabel: String {
@@ -2526,6 +2622,13 @@ func primaryProgressActionTitle(for entry: SeriesLibraryEntry) -> String {
         return "\(L10n.string("home.start")) \(cursorLabel(entry.nextEpisodeCursor))"
     }
     return quickProgressActionTitle(for: entry)
+}
+
+func compactProgressActionTitle(for entry: SeriesLibraryEntry) -> String {
+    if entry.status == .wantToWatch {
+        return primaryProgressActionTitle(for: entry)
+    }
+    return String(format: L10n.string("home.current.nextEpisode"), cursorLabel(entry.nextEpisodeCursor))
 }
 
 func quickProgressMenuSystemImage(for entry: SeriesLibraryEntry) -> String {

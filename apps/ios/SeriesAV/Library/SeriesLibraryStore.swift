@@ -366,6 +366,11 @@ final class SeriesLibraryStore {
         if SeriesUITestEnvironment.current.shouldResetPersistentState {
             persistence.save([])
         }
+        if SeriesUITestEnvironment.current.shouldUseHighSeasonSampleLibrary {
+            let sampleEntries = SeriesLibraryStore.highSeasonSample().entries
+            persistence.save(sampleEntries)
+            return SeriesLibraryStore(entries: sampleEntries, persistence: persistence)
+        }
         if SeriesUITestEnvironment.current.shouldUseSampleLibrary {
             let sampleEntries = SeriesLibraryStore.sample().entries
             persistence.save(sampleEntries)
@@ -406,6 +411,27 @@ final class SeriesLibraryStore {
                 addedAt: now.addingTimeInterval(-600),
                 updatedAt: now.addingTimeInterval(-600),
                 lastInteractedAt: now.addingTimeInterval(-600)
+            )
+        ])
+    }
+
+    static func highSeasonSample() -> SeriesLibraryStore {
+        let now = Date()
+        return SeriesLibraryStore(entries: [
+            SeriesLibraryEntry(
+                entryId: "thetvdb:305089",
+                seriesId: "thetvdb:305089",
+                title: "Re: ZERO, Starting Life in Another World",
+                status: .watching,
+                lastWatchedEpisodeCursor: SeriesEpisodeCursor(seasonNumber: 4, episodeNumber: 5),
+                isPinnedHomeSeries: true,
+                displayArtworkRef: "https://artworks.thetvdb.com/banners/v4/series/305089/posters/60aa37d7c847b.jpg",
+                fallbackVisualSeed: "Re: ZERO, Starting Life in Another World",
+                latestKnownEpisodeCursor: SeriesEpisodeCursor(seasonNumber: 4, episodeNumber: 19),
+                knownEpisodeCount: 85,
+                addedAt: now,
+                updatedAt: now,
+                lastInteractedAt: now
             )
         ])
     }

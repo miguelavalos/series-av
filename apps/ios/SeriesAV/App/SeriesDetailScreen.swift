@@ -190,26 +190,26 @@ struct SeriesDetailScreen: View {
                 VStack(alignment: .leading, spacing: 18) {
                     header
                     trackingSection
-                    sourcesSection
+                    privateNoteSection
                 }
                 .frame(maxWidth: 430, alignment: .topLeading)
 
                 VStack(alignment: .leading, spacing: 18) {
                     guideSection
-                    guideFeedbackSection
-                    privateNoteSection
+                    sourcesSection
                     libraryManagementSection
+                    guideFeedbackSection
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
             }
         } else {
             VStack(alignment: .leading, spacing: 18) {
                 header
-                sourcesSection
                 trackingSection
-                privateNoteSection
-                libraryManagementSection
                 guideSection
+                privateNoteSection
+                sourcesSection
+                libraryManagementSection
                 guideFeedbackSection
             }
         }
@@ -858,6 +858,12 @@ struct SeriesDetailScreen: View {
             return
         }
 
+        if SeriesUITestEnvironment.current.shouldUseHighSeasonSampleLibrary,
+           seriesId == "thetvdb:305089" {
+            guideState = .loaded(uiTestHighSeasonEpisodeGuide())
+            return
+        }
+
         guideState = .loading
         do {
             let response = try await episodeGuideClient.episodes(
@@ -881,31 +887,53 @@ struct SeriesDetailScreen: View {
     private func uiTestFallbackEpisodeGuide() -> [SeriesEpisodeGuideItem] {
         (1...8).map { episode in
             let cursor = SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: episode)
-            let relativeState: SeriesEpisodeGuideRelativeState
-            if let displayedLastWatchedEpisodeCursor {
-                if cursor < displayedLastWatchedEpisodeCursor {
-                    relativeState = .watched
-                } else if cursor == displayedLastWatchedEpisodeCursor {
-                    relativeState = .current
-                } else if cursor == displayedLastWatchedEpisodeCursor.nextEpisode {
-                    relativeState = .next
-                } else {
-                    relativeState = .pending
-                }
-            } else {
-                relativeState = cursor == SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 1) ? .next : .pending
-            }
-
             return SeriesEpisodeGuideItem(
                 seasonNumber: 1,
                 episodeNumber: episode,
                 title: String(format: L10n.string("home.editor.episode"), episode),
                 airDate: nil,
                 reliability: .partial,
-                relativeState: relativeState,
+                relativeState: uiTestRelativeState(for: cursor),
                 supportedActions: []
             )
         }
+    }
+
+    private func uiTestHighSeasonEpisodeGuide() -> [SeriesEpisodeGuideItem] {
+        let episodeCountsBySeason = [(1, 25), (2, 25), (3, 16), (4, 19)]
+        return episodeCountsBySeason.flatMap { seasonInfo in
+            let season = seasonInfo.0
+            let episodeCount = seasonInfo.1
+            return (1...episodeCount).map { episode in
+                let cursor = SeriesEpisodeCursor(seasonNumber: season, episodeNumber: episode)
+                return SeriesEpisodeGuideItem(
+                    seasonNumber: season,
+                    episodeNumber: episode,
+                    title: String(format: L10n.string("home.editor.episode"), episode),
+                    airDate: nil,
+                    reliability: .reliable,
+                    relativeState: uiTestRelativeState(for: cursor),
+                    supportedActions: []
+                )
+            }
+        }
+    }
+
+    private func uiTestRelativeState(for cursor: SeriesEpisodeCursor) -> SeriesEpisodeGuideRelativeState {
+        guard let displayedLastWatchedEpisodeCursor else {
+            return cursor == SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 1) ? .next : .pending
+        }
+
+        if cursor < displayedLastWatchedEpisodeCursor {
+            return .watched
+        }
+        if cursor == displayedLastWatchedEpisodeCursor {
+            return .current
+        }
+        if cursor == displayedLastWatchedEpisodeCursor.nextEpisode {
+            return .next
+        }
+        return .pending
     }
 
     private func loadCatalogDetailIfNeeded() async {
@@ -1189,7 +1217,7 @@ private struct SeriesDetailEpisodeRow: View {
             Spacer(minLength: 0)
 
             if markWatchedThrough != nil {
-                actionBadge
+                stateIconBadge
             }
         }
         .padding(10)
@@ -1207,14 +1235,15 @@ private struct SeriesDetailEpisodeRow: View {
         return "E\(absoluteEpisodeNumber) · \(cursorLabel(episode.cursor))"
     }
 
-    private var actionBadge: some View {
-        Label(L10n.string("detail.episodes.action.setPoint"), systemImage: stateIconName)
-            .font(.system(size: 11, weight: .black))
-            .labelStyle(.titleAndIcon)
+    private var stateIconBadge: some View {
+        Image(systemName: stateIconName)
+            .font(.system(size: 14, weight: .black))
             .foregroundStyle(stateIconColor)
-            .padding(.horizontal, 10)
-            .frame(minHeight: 32)
-            .background(stateIconBackground, in: Capsule())
+            .frame(width: 32, height: 32)
+            .background(stateIconBackground, in: Circle())
+            .overlay {
+                Circle().stroke(stateIconStrokeColor, lineWidth: 1)
+            }
             .accessibilityHidden(true)
     }
 
@@ -1248,34 +1277,45 @@ private struct SeriesDetailEpisodeRow: View {
         switch effectiveRelativeState {
         case .watched:
             AVBrandColor.textSecondary
-        case .current, .next, .pending:
+        case .current, .next:
             AVBrandColor.accent
+        case .pending:
+            AVBrandColor.textSecondary
         }
     }
 
     private var stateIconColor: Color {
         switch effectiveRelativeState {
-        case .watched:
+        case .watched, .pending:
             AVBrandColor.textSecondary
-        case .current, .next, .pending:
+        case .current, .next:
             Color.black.opacity(0.84)
         }
     }
 
     private var stateIconBackground: Color {
         switch effectiveRelativeState {
-        case .watched:
+        case .watched, .pending:
             Color(.secondarySystemGroupedBackground)
-        case .current, .next, .pending:
+        case .current, .next:
             AVBrandColor.accent
+        }
+    }
+
+    private var stateIconStrokeColor: Color {
+        switch effectiveRelativeState {
+        case .current, .next:
+            Color.black.opacity(0.08)
+        case .watched, .pending:
+            Color.primary.opacity(0.06)
         }
     }
 
     private var cursorColor: Color {
         switch effectiveRelativeState {
-        case .watched:
+        case .watched, .pending:
             AVBrandColor.textSecondary
-        case .current, .next, .pending:
+        case .current, .next:
             AVBrandColor.accent
         }
     }

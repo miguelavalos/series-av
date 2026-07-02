@@ -63,6 +63,10 @@ struct SeriesUITestEnvironment {
         isEnabled && environment["SERIESAV_UI_TESTS_SAMPLE_LIBRARY"] == "1"
     }
 
+    var shouldUseHighSeasonSampleLibrary: Bool {
+        isEnabled && environment["SERIESAV_UI_TESTS_HIGH_SEASON_LIBRARY"] == "1"
+    }
+
     var shouldShowProgressEditor: Bool {
         isEnabled && environment["SERIESAV_UI_TESTS_SHOW_PROGRESS_EDITOR"] == "1"
     }

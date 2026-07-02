@@ -113,7 +113,7 @@ final class SeriesDetailPresentationBuilderTests: XCTestCase {
         XCTAssertEqual(SeriesDetailPresentationBuilder.detailStatusIcon(.watched), "checkmark.circle.fill")
         XCTAssertEqual(
             SeriesDetailPresentationBuilder.nextActionTitle(for: wantToWatch),
-            String(format: L10n.string("home.action.markEpisodeWatched"), "S1 E1")
+            primaryProgressActionTitle(for: wantToWatch)
         )
         XCTAssertEqual(
             SeriesDetailPresentationBuilder.nextActionTitle(for: watching),
