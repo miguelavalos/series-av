@@ -57,6 +57,8 @@ targets:
       - package: AppsAV
         product: AVBrandFoundation
       - package: AppsAV
+        product: AVDiagnosticsFoundation
+      - package: AppsAV
         product: AVSettingsFoundation
       - package: AppsAV
         product: AVExternalLinkFoundation

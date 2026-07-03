@@ -48,6 +48,8 @@ Use this checklist before uploading the first App Store build and before later p
    loading and shell flows, a Release simulator build, and a screenshot evidence
    capture from the Release/prod Search screen. It does not replace signed
    device/TestFlight purchase, restore, Apple auth, or real Universal Link QA.
+   Sentry-enabled archives must run through `vp run ios:release:upload`, which
+   repairs `Sentry.framework.dSYM` before the final archive verification.
 6. Before unattended App Store Connect export/upload from a new or recently
    reconfigured Mac, complete the private
    `docs/platform/apple-release-machine-setup.md` gate so the Apple Distribution
@@ -121,9 +123,10 @@ simulator QA can validate production config, signed Account AV session restore,
 paywall offer loading, restore button visibility, and non-purchase UI behavior,
 but it must not replace a real store purchase/restore validation.
 
-Approval snapshot, 2026-06-28: iOS/iPadOS app version `1.0.1 (12)` has been
-approved for the App Store per operator report. This update adds iPad support
-and bug fixes. The subscription review screenshot and promotional image were
+Approval snapshot, 2026-07-03: iOS/iPadOS app version `1.0.2 (13)` has been
+approved for the App Store per operator report and is the current public
+baseline. Earlier iPad-support version `1.0.1 (12)` was approved on
+2026-06-28. The subscription review screenshot and promotional image were
 attached before the original `1.0 (11)` submission.
 
 1. Generate production iOS config and run the app:
@@ -282,8 +285,10 @@ accepted before submit:
 2. Preview and production signed-in smokes passed.
 3. Store metadata matches the submitted build.
 4. Public/legal/support/delete-account URLs are reachable.
-5. The archive submitted to App Store Connect matches approved build `1.0 (11)`.
-6. App Store Connect submission id:
+5. The original archive submitted to App Store Connect matched approved build
+   `1.0 (11)`. The current public App Store baseline is `1.0.2 (13)` per the
+   2026-07-03 approval snapshot above.
+6. Original App Store Connect submission id:
    `914c99f2-95c6-4b0d-a651-d15433efe639`.
 
 ## Native Test Coverage

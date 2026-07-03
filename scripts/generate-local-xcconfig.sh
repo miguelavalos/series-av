@@ -52,6 +52,7 @@ account_management_url="$(printenv_value ACCOUNTAV_MANAGEMENT_URL)"
 revenuecat_public_api_key="$(printenv_value SERIESAV_REVENUECAT_PUBLIC_API_KEY)"
 revenuecat_offering_id="$(printenv_value SERIESAV_REVENUECAT_OFFERING_ID)"
 revenuecat_monthly_package_id="$(printenv_value SERIESAV_REVENUECAT_MONTHLY_PACKAGE_ID)"
+seriesav_ios_sentry_dsn="$(printenv_value SERIESAV_IOS_SENTRY_DSN)"
 terms_url="$(printenv_value SERIESAV_TERMS_URL)"
 privacy_url="$(printenv_value SERIESAV_PRIVACY_URL)"
 seriesav_web_base_url="$(printenv_value SERIESAV_WEB_BASE_URL)"
@@ -94,6 +95,7 @@ required_values=(
   revenuecat_public_api_key
   revenuecat_offering_id
   revenuecat_monthly_package_id
+  seriesav_ios_sentry_dsn
   support_email
 )
 
@@ -154,6 +156,7 @@ SERIESAV_DELETE_ACCOUNT_URL = $(xcodebuild_url_value "${seriesav_delete_account_
 SERIESAV_REVENUECAT_PUBLIC_API_KEY = $revenuecat_public_api_key
 SERIESAV_REVENUECAT_OFFERING_ID = $revenuecat_offering_id
 SERIESAV_REVENUECAT_MONTHLY_PACKAGE_ID = $revenuecat_monthly_package_id
+SERIESAV_IOS_SENTRY_DSN = $(xcodebuild_url_value "${seriesav_ios_sentry_dsn:-}")
 SERIESAV_TERMS_URL = $(xcodebuild_url_value "${terms_url:-}")
 SERIESAV_PRIVACY_URL = $(xcodebuild_url_value "${privacy_url:-}")
 SERIESAV_WEB_BASE_URL = $(xcodebuild_url_value "${seriesav_web_base_url:-}")

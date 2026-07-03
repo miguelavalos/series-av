@@ -122,10 +122,10 @@ For simulator or physical iPhone installs, follow [docs/install-ios.md](docs/ins
 
 ## Open product work
 
-1. Treat iOS/iPadOS version `1.0.1 (12)` as the current public App Store
+1. Treat iOS/iPadOS version `1.0.2 (13)` as the current public App Store
    baseline for client compatibility work.
-2. After approval or a safe store test path is available, complete purchase,
-   restore, RevenueCat webhook, and Apps AV entitlement validation for
+2. Continue purchase, restore, RevenueCat webhook, and Apps AV entitlement
+   validation for
    `seriesav_pro_monthly`.
 3. Keep the shared RevenueCat project intact. Moments AV and Animate AV
    offerings may exist beside Series AV; Series AV readiness depends on

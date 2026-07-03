@@ -19,8 +19,9 @@ Usage:
 Reproducible Series AV iOS release workflow:
 1. validates generated production config unless skipped;
 2. creates a signed Xcode archive;
-3. verifies bundle id, signing metadata, build, app dSYM, and optional Sentry dSYM;
-4. uploads to App Store Connect only when --upload is passed.
+3. repairs Sentry.framework dSYM when Sentry is embedded;
+4. verifies bundle id, signing metadata, build, app dSYM, and Sentry dSYM;
+5. uploads to App Store Connect only when --upload is passed.
 
 Before unattended --upload from a new/reconfigured Mac, complete the private
 apple-release-machine setup so the Distribution key can codesign without a
@@ -152,6 +153,9 @@ else
   run_step "Use existing iOS archive"
   echo "$archive_path"
 fi
+
+run_step "Repair Sentry.framework dSYM in final archive"
+"$repo_root/scripts/repair-ios-archive-sentry-dsym.sh" --archive "$archive_path"
 
 run_step "Verify final iOS release archive"
 "$repo_root/scripts/check-ios-release-archive.sh" \

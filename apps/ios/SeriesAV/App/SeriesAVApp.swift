@@ -1,3 +1,4 @@
+import AVDiagnosticsFoundation
 import AVSettingsFoundation
 import SwiftUI
 
@@ -10,6 +11,7 @@ struct SeriesAVApp: App {
 
     init() {
         AppConfig.configureAVAccountIfPossible()
+        AVDiagnostics.configure(AppConfig.diagnosticsConfiguration)
     }
 
     var body: some Scene {

@@ -1,4 +1,5 @@
 import AccountAV
+import AVDiagnosticsFoundation
 import Foundation
 
 enum AppConfig {
@@ -74,6 +75,16 @@ enum AppConfig {
         BundleConfig.boolValue(for: "SERIESAV_DEBUG_FORCE_PRO_MODE")
     }
 
+    static var diagnosticsConfiguration: AVDiagnosticsConfiguration {
+        AVDiagnosticsConfiguration(
+            dsn: diagnosticsDSN,
+            environment: diagnosticsEnvironment,
+            releaseName: diagnosticsReleaseName,
+            tracesSampleRate: 0,
+            isEnabled: isDiagnosticsEnabled
+        )
+    }
+
     @MainActor
     static func configureAVAccountIfPossible() {
         AccountAVClerk.configureIfPossible(
@@ -81,6 +92,38 @@ enum AppConfig {
             keychainService: BundleConfig.nonEmptyStringValue(for: "ACCOUNTAV_KEYCHAIN_SERVICE"),
             keychainAccessGroup: BundleConfig.nonEmptyStringValue(for: "ACCOUNTAV_KEYCHAIN_ACCESS_GROUP")
         )
+    }
+
+    private static var diagnosticsEnvironment: AVDiagnosticsEnvironment {
+        switch BundleConfig.stringValue(for: "SERIESAV_CONFIG_ENVIRONMENT").lowercased() {
+        case "prod", "production":
+            return .production
+        case "staging", "preview":
+            return .preview
+        case "dev", "debug":
+            return .debug
+        default:
+            return .debug
+        }
+    }
+
+    private static var diagnosticsReleaseName: String? {
+        let bundleIdentifier = Bundle.main.bundleIdentifier ?? "com.avalsys.seriesav"
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "0"
+        return "\(bundleIdentifier)@\(version)+\(build)"
+    }
+
+    private static var diagnosticsDSN: String {
+        BundleConfig.stringValue(for: "SERIESAV_IOS_SENTRY_DSN")
+    }
+
+    private static var isDiagnosticsEnabled: Bool {
+        #if DEBUG
+        false
+        #else
+        !diagnosticsDSN.isEmpty
+        #endif
     }
 
     private static func configuredURL(for key: String, fallback: String) -> URL {
