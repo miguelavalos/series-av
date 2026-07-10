@@ -110,6 +110,13 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Info de serie"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Seguimiento"].exists)
         XCTAssertTrue(app.staticTexts["Episodios"].exists)
+        let summaryToggle = app.buttons["series-detail-summary-toggle"]
+        XCTAssertTrue(summaryToggle.waitForExistence(timeout: 5))
+        XCTAssertEqual(summaryToggle.label, "Ver más")
+        summaryToggle.tap()
+        XCTAssertEqual(summaryToggle.label, "Ver menos")
+        summaryToggle.tap()
+        XCTAssertEqual(summaryToggle.label, "Ver más")
         app.buttons["Cerrar"].tap()
 
         let firstFollowButton = app.buttons["Seguir serie"].firstMatch
@@ -131,6 +138,29 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Empezar, S1 E1"].exists)
         XCTAssertEqual(app.staticTexts.matching(NSPredicate(format: "label == %@", "The Last of Us")).count, 1)
         XCTAssertFalse(app.staticTexts["Sigue tu primera serie"].exists)
+    }
+
+    @MainActor
+    func testDetailSummaryExpansionRemainsUsableWithAccessibilityTextSize() throws {
+        continueAfterFailure = false
+        let app = makeApp(contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL")
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Sigue tu primera serie"].waitForExistence(timeout: 10))
+        app.buttons["Buscar"].tap()
+
+        let firstResultButton = app.buttons["The Last of Us"].firstMatch
+        XCTAssertTrue(firstResultButton.waitForExistence(timeout: 10))
+        firstResultButton.tap()
+
+        XCTAssertTrue(app.staticTexts["Info de serie"].waitForExistence(timeout: 10))
+        let summaryToggle = app.buttons["series-detail-summary-toggle"]
+        XCTAssertTrue(summaryToggle.waitForExistence(timeout: 5))
+        XCTAssertTrue(summaryToggle.isHittable)
+        XCTAssertEqual(summaryToggle.label, "Ver más")
+
+        summaryToggle.tap()
+        XCTAssertEqual(summaryToggle.label, "Ver menos")
     }
 
     @MainActor
@@ -209,6 +239,132 @@ final class SeriesAVSmokeUITests: XCTestCase {
     }
 
     @MainActor
+    func testEmptyHomeUsesReadableVerticalLayoutAtAccessibilityTextSize() throws {
+        continueAfterFailure = false
+        XCUIDevice.shared.orientation = .portrait
+        let app = makeApp(contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL")
+        app.launch()
+
+        let title = app.staticTexts["Sigue tu primera serie"]
+        let subtitle = app.staticTexts["Elige la serie, fija el último episodio visto y sigue desde Home."]
+        let searchButton = app.buttons["home.empty.search"]
+        XCTAssertTrue(title.waitForExistence(timeout: 10))
+        XCTAssertTrue(subtitle.exists)
+        XCTAssertTrue(searchButton.exists)
+        XCTAssertTrue(searchButton.isHittable)
+        XCTAssertGreaterThan(title.frame.height, 30)
+        XCTAssertGreaterThan(subtitle.frame.height, 40)
+        XCTAssertGreaterThanOrEqual(searchButton.frame.minY, subtitle.frame.maxY)
+        XCTAssertGreaterThanOrEqual(searchButton.frame.height, 56)
+        XCTAssertLessThan(searchButton.frame.height, 100)
+        XCTAssertGreaterThan(searchButton.frame.width, 280)
+        XCTAssertEqual(
+            app.buttons.matching(NSPredicate(format: "label == %@", "Buscar serie")).count,
+            1
+        )
+    }
+
+    @MainActor
+    func testHomeAviBriefUsesReadableCardAtAccessibilityTextSize() throws {
+        continueAfterFailure = false
+        XCUIDevice.shared.orientation = .portrait
+        let app = makeApp(contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL")
+        app.launch()
+
+        let searchButton = app.buttons["home.empty.search"]
+        let aviBrief = app.buttons["home.aviBrief.open"]
+        XCTAssertTrue(searchButton.waitForExistence(timeout: 10))
+        XCTAssertTrue(aviBrief.exists)
+        XCTAssertTrue(aviBrief.isHittable)
+        XCTAssertEqual(
+            aviBrief.value as? String,
+            "Busca una serie, fija el último episodio visto y deja Home lista para seguir."
+        )
+        XCTAssertGreaterThanOrEqual(aviBrief.frame.minY, searchButton.frame.maxY)
+        XCTAssertGreaterThan(aviBrief.frame.height, 100)
+        XCTAssertLessThan(aviBrief.frame.height, 220)
+        XCTAssertGreaterThan(aviBrief.frame.width, 280)
+    }
+
+    @MainActor
+    func testHomeDiscoveryCardsRemainReadableAtAccessibilityTextSize() throws {
+        continueAfterFailure = false
+        XCUIDevice.shared.orientation = .portrait
+        let app = makeApp(contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL")
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Populares"].waitForExistence(timeout: 10))
+
+        let firstCard = app.buttons["The Last of Us"].firstMatch
+        let firstAction = app.buttons["Seguir serie"].firstMatch
+        XCTAssertTrue(firstCard.waitForExistence(timeout: 10))
+        XCTAssertTrue(firstAction.exists)
+
+        for _ in 0..<4 where !firstCard.isHittable || !firstAction.isHittable {
+            app.swipeUp()
+        }
+
+        XCTAssertTrue(firstCard.isHittable)
+        XCTAssertTrue(firstAction.isHittable)
+        XCTAssertEqual(firstCard.value as? String, "2023 · Action")
+        XCTAssertGreaterThan(firstCard.frame.width, 135)
+        XCTAssertGreaterThan(firstCard.frame.height, 280)
+        XCTAssertGreaterThanOrEqual(firstAction.frame.width, 44)
+        XCTAssertGreaterThanOrEqual(firstAction.frame.height, 44)
+        XCTAssertTrue(firstCard.frame.contains(firstAction.frame))
+
+        if app.frame.width > 600 {
+            let secondCard = app.buttons["House of the Dragon"].firstMatch
+            let thirdCard = app.buttons["Fallout"].firstMatch
+            let fourthCard = app.buttons["Daredevil: Born Again"].firstMatch
+            XCTAssertTrue(secondCard.exists)
+            XCTAssertTrue(thirdCard.exists)
+            XCTAssertTrue(fourthCard.exists)
+            XCTAssertLessThan(abs(secondCard.frame.minY - firstCard.frame.minY), 8)
+            XCTAssertLessThan(abs(thirdCard.frame.minY - firstCard.frame.minY), 8)
+            XCTAssertGreaterThan(fourthCard.frame.minY, firstCard.frame.maxY)
+        }
+    }
+
+    @MainActor
+    func testHomeDiscoveryFailureOffersReadableRetryAndRecovers() throws {
+        continueAfterFailure = false
+        XCUIDevice.shared.orientation = .portrait
+        let app = makeApp(
+            environment: ["SERIESAV_UI_TESTS_HOME_DISCOVERY": "failed_once"],
+            contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL"
+        )
+        app.launch()
+
+        let failure = app.otherElements["home.discovery.failure"]
+        let failureMessage = app.staticTexts[
+            "No se pudieron cargar las sugerencias. Comprueba tu conexión."
+        ]
+        let retryButton = app.buttons["home.discovery.retry"]
+        XCTAssertTrue(failure.waitForExistence(timeout: 10))
+        XCTAssertTrue(failureMessage.exists)
+        XCTAssertTrue(retryButton.exists)
+        XCTAssertFalse(app.staticTexts["Populares"].exists)
+
+        for _ in 0..<4 where !retryButton.isHittable {
+            app.swipeUp()
+        }
+
+        XCTAssertTrue(retryButton.isHittable)
+        XCTAssertGreaterThan(failure.frame.height, 100)
+        XCTAssertLessThan(failure.frame.height, 240)
+        XCTAssertGreaterThan(failure.frame.width, 280)
+        XCTAssertGreaterThanOrEqual(retryButton.frame.height, 52)
+        XCTAssertFalse(failureMessage.frame.intersects(retryButton.frame))
+
+        retryButton.tap()
+
+        XCTAssertTrue(app.staticTexts["Populares"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["The Last of Us"].firstMatch.waitForExistence(timeout: 10))
+        XCTAssertFalse(failure.exists)
+    }
+
+    @MainActor
     func testTabletShellAppearsForWideLayouts() throws {
         continueAfterFailure = false
         XCUIDevice.shared.orientation = .landscapeLeft
@@ -225,6 +381,39 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any)["series.sidebar.home"].exists)
         XCTAssertTrue(app.descendants(matching: .any)["series.sidebar.search"].exists)
         XCTAssertFalse(app.otherElements["series.shell.compact"].exists)
+    }
+
+    @MainActor
+    func testTabletSidebarScalesAtAccessibilityTextSize() throws {
+        continueAfterFailure = false
+        XCUIDevice.shared.orientation = .portrait
+        let app = makeApp(contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL")
+        app.launch()
+
+        let windowWidth = app.windows.firstMatch.frame.width
+        guard windowWidth > 600 else {
+            throw XCTSkip("This accessibility sidebar check only applies to iPad.")
+        }
+
+        let sidebarItems = [
+            "series.sidebar.home",
+            "series.sidebar.library",
+            "series.sidebar.search",
+            "series.sidebar.avi",
+            "series.sidebar.settings",
+            "series.sidebar.account"
+        ].map { app.descendants(matching: .any)[$0] }
+
+        XCTAssertTrue(sidebarItems[0].waitForExistence(timeout: 10))
+        for item in sidebarItems {
+            XCTAssertTrue(item.exists)
+            XCTAssertTrue(item.isHittable)
+            XCTAssertGreaterThanOrEqual(item.frame.height, 56)
+            XCTAssertGreaterThan(item.frame.width, 240)
+        }
+
+        XCTAssertTrue(sidebarItems[0].isSelected)
+        XCTAssertLessThan(sidebarItems[0].frame.maxX, app.frame.midX)
     }
 
     @MainActor
@@ -267,6 +456,54 @@ final class SeriesAVSmokeUITests: XCTestCase {
     }
 
     @MainActor
+    func testSettingsHeaderStaysCompactAndTappableOnIPhone() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_INITIAL_CHROME": "settings"
+        ])
+        app.launch()
+
+        guard app.frame.width <= 600 else {
+            throw XCTSkip("This compact header check only applies to iPhone.")
+        }
+
+        let header = app.otherElements["profile.compactBrandHeader"]
+        let title = app.staticTexts["Ajustes"]
+        let settingsButton = app.buttons["header.settings"]
+        let accountButton = app.buttons["header.account"]
+
+        XCTAssertTrue(header.waitForExistence(timeout: 10))
+        XCTAssertTrue(title.exists)
+        XCTAssertTrue(settingsButton.exists)
+        XCTAssertTrue(accountButton.exists)
+        XCTAssertLessThanOrEqual(header.frame.height, 46)
+        XCTAssertLessThanOrEqual(title.frame.minY - header.frame.maxY, 20)
+        XCTAssertGreaterThanOrEqual(settingsButton.frame.width, 44)
+        XCTAssertGreaterThanOrEqual(settingsButton.frame.height, 44)
+        XCTAssertGreaterThanOrEqual(accountButton.frame.width, 44)
+        XCTAssertGreaterThanOrEqual(accountButton.frame.height, 44)
+    }
+
+    @MainActor
+    func testUnavailableAccountUsesCompactStatusInsteadOfDisabledCTAs() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_INITIAL_CHROME": "account"
+        ])
+        app.launch()
+
+        let status = app.descendants(matching: .any)["profile.account.unavailable"]
+        XCTAssertTrue(status.waitForExistence(timeout: 10))
+        XCTAssertEqual(status.label, "El acceso a la cuenta no está disponible ahora")
+        XCTAssertGreaterThanOrEqual(status.frame.height, 44)
+        XCTAssertLessThan(status.frame.height, 70)
+        XCTAssertLessThanOrEqual(status.frame.maxX, app.frame.maxX - 16)
+        XCTAssertTrue(app.staticTexts["Podrás consultar Series AV Pro cuando el acceso a la cuenta vuelva a estar disponible."].exists)
+        XCTAssertFalse(app.buttons["profile.account.signIn"].exists)
+        XCTAssertFalse(app.buttons["profile.pro.signIn"].exists)
+    }
+
+    @MainActor
     func testSampleLibraryRendersPopulatedLibrary() throws {
         continueAfterFailure = false
         let app = makeApp(environment: [
@@ -281,6 +518,122 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Slow Weekend Show"].exists)
         XCTAssertTrue(app.staticTexts["Later List"].exists)
         XCTAssertFalse(app.staticTexts["Sin series todavía"].exists)
+    }
+
+    @MainActor
+    func testSampleLibraryStacksRowActionsBelowReadableInfoOnIPhone() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "library"
+        ])
+        app.launch()
+
+        guard app.frame.width <= 600 else {
+            throw XCTSkip("This compact row check only applies to iPhone.")
+        }
+
+        let title = app.staticTexts["Current Series"]
+        let primaryAction = app.buttons["Marcar S1 E3 visto"]
+        XCTAssertTrue(title.waitForExistence(timeout: 10))
+        XCTAssertTrue(primaryAction.exists)
+        XCTAssertGreaterThan(title.frame.width, 90)
+        XCTAssertGreaterThanOrEqual(primaryAction.frame.minY, title.frame.maxY)
+        XCTAssertGreaterThanOrEqual(primaryAction.frame.height, 44)
+    }
+
+    @MainActor
+    func testSampleLibraryRowsExpandAtAccessibilityTextSize() throws {
+        continueAfterFailure = false
+        let app = makeApp(
+            environment: [
+                "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+                "SERIESAV_UI_TESTS_INITIAL_TAB": "library"
+            ],
+            contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL"
+        )
+        app.launch()
+
+        let detailButton = app.buttons["Current Series"]
+        let primaryAction = app.buttons["Marcar S1 E3 visto"]
+        let managementMenu = app.descendants(matching: .any)["Acciones de serie"].firstMatch
+        XCTAssertTrue(detailButton.waitForExistence(timeout: 10))
+        XCTAssertTrue(primaryAction.exists)
+        XCTAssertTrue(managementMenu.exists)
+        XCTAssertGreaterThan(detailButton.frame.height, 60)
+        XCTAssertGreaterThanOrEqual(primaryAction.frame.minY, detailButton.frame.maxY)
+        XCTAssertGreaterThanOrEqual(primaryAction.frame.height, 52)
+        XCTAssertGreaterThan(primaryAction.frame.width, 250)
+        XCTAssertGreaterThanOrEqual(managementMenu.frame.minY, primaryAction.frame.maxY)
+        XCTAssertGreaterThanOrEqual(managementMenu.frame.height, 44)
+
+        let filterSelector = app.buttons["library.filter.selector"]
+        XCTAssertTrue(filterSelector.exists)
+        XCTAssertTrue(filterSelector.isHittable)
+        XCTAssertGreaterThan(filterSelector.frame.width, 250)
+        XCTAssertEqual(filterSelector.value as? String, "Todo")
+
+        filterSelector.tap()
+        for label in ["Todo", "Viendo", "Por ver", "Vista", "Archivadas"] {
+            XCTAssertTrue(app.buttons[label].waitForExistence(timeout: 5), "Missing accessible filter: \(label)")
+        }
+        let wantToWatchFilter = app.buttons["Por ver"]
+        wantToWatchFilter.tap()
+        XCTAssertEqual(filterSelector.value as? String, "Por ver")
+        XCTAssertTrue(app.staticTexts["Later List"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
+    func testSampleLibraryShowsEveryFilterWithinIPhoneViewport() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "library"
+        ])
+        app.launch()
+
+        guard app.frame.width <= 600 else {
+            throw XCTSkip("This compact filter check only applies to iPhone.")
+        }
+
+        let filterLabels = ["Todo", "Viendo", "Por ver", "Vista", "Archivo"]
+        XCTAssertFalse(app.buttons["library.filter.selector"].exists)
+        for label in filterLabels {
+            let filter = app.buttons[label]
+            XCTAssertTrue(filter.waitForExistence(timeout: 10), "Missing filter: \(label)")
+            XCTAssertTrue(filter.isHittable, "Filter is clipped: \(label)")
+        }
+
+        let firstFilter = app.buttons[filterLabels[0]]
+        let lastFilter = app.buttons[filterLabels[4]]
+        XCTAssertGreaterThanOrEqual(firstFilter.frame.minX, app.frame.minX + 16)
+        XCTAssertLessThanOrEqual(lastFilter.frame.maxX, app.frame.maxX - 16)
+    }
+
+    @MainActor
+    func testSampleLibraryLastActionClearsFloatingFooterAfterScroll() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "library"
+        ])
+        app.launch()
+
+        guard app.frame.width <= 600 else {
+            throw XCTSkip("This floating footer check only applies to iPhone.")
+        }
+
+        let lastAction = app.buttons["Empezar S1 E1"]
+        let footerTab = app.buttons["series.tab.library"]
+        XCTAssertTrue(lastAction.waitForExistence(timeout: 10))
+        XCTAssertTrue(footerTab.exists)
+
+        for _ in 0..<3 where lastAction.frame.maxY >= footerTab.frame.minY - 12 {
+            app.swipeUp()
+        }
+
+        XCTAssertTrue(lastAction.isHittable)
+        XCTAssertLessThanOrEqual(lastAction.frame.maxY, footerTab.frame.minY - 12)
     }
 
     @MainActor
@@ -439,6 +792,53 @@ final class SeriesAVSmokeUITests: XCTestCase {
     }
 
     @MainActor
+    func testHomeOnlyShowsBottomBarWhileUndoIsPending() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "home"
+        ])
+        app.launch()
+
+        let primaryAction = app.buttons["Marcar S1 E3 visto"]
+        let undoBar = app.otherElements["series.undo.bar"]
+        XCTAssertTrue(primaryAction.waitForExistence(timeout: 10))
+        XCTAssertFalse(undoBar.exists)
+
+        primaryAction.tap()
+
+        XCTAssertTrue(undoBar.waitForExistence(timeout: 5))
+        XCTAssertTrue(undoBar.buttons["Deshacer"].exists)
+        XCTAssertTrue(undoBar.buttons["Cerrar"].exists)
+        XCTAssertGreaterThanOrEqual(undoBar.frame.height, 44)
+        undoBar.buttons["Cerrar"].tap()
+        XCTAssertFalse(undoBar.waitForExistence(timeout: 1))
+    }
+
+    @MainActor
+    func testCurrentHeroPrimaryActionIsCompactOnIPad() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "home"
+        ])
+        app.launch()
+
+        guard app.frame.width > 600 else {
+            throw XCTSkip("This width check only applies to iPad.")
+        }
+
+        let currentCard = app.otherElements["home-current-card"]
+        let primaryAction = app.buttons["home-current-primary-action"]
+        XCTAssertTrue(currentCard.waitForExistence(timeout: 10))
+        XCTAssertTrue(primaryAction.exists)
+        XCTAssertTrue(primaryAction.isHittable)
+        XCTAssertGreaterThanOrEqual(primaryAction.frame.height, 44)
+        XCTAssertLessThan(primaryAction.frame.width, currentCard.frame.width * 0.55)
+        XCTAssertLessThan(primaryAction.frame.maxX, currentCard.frame.maxX - 80)
+    }
+
+    @MainActor
     func testSampleDetailTrackingActionsUseVisibleActionLabels() throws {
         continueAfterFailure = false
         let app = makeApp(environment: [
@@ -458,9 +858,19 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Marcar S1 E3 visto"].exists)
         XCTAssertTrue(app.buttons["Ajustar episodio"].exists)
         XCTAssertTrue(app.buttons["Quitar fijado"].exists)
+
+        let primaryAction = app.buttons["series-detail-tracking-primary"]
+        let adjustAction = app.buttons["series-detail-tracking-adjust"]
+        let pinAction = app.buttons["series-detail-tracking-pin"]
+        XCTAssertEqual(primaryAction.frame.midY, adjustAction.frame.midY, accuracy: 2)
+        XCTAssertEqual(primaryAction.frame.midY, pinAction.frame.midY, accuracy: 2)
+        XCTAssertGreaterThanOrEqual(primaryAction.frame.height, 44)
+        XCTAssertGreaterThanOrEqual(adjustAction.frame.height, 44)
+        XCTAssertGreaterThanOrEqual(pinAction.frame.height, 44)
+
         XCTAssertTrue(app.staticTexts["Episodios"].waitForExistence(timeout: 5))
         XCTAssertLessThan(app.staticTexts["Seguimiento"].frame.minY, app.staticTexts["Episodios"].frame.minY)
-        XCTAssertLessThan(app.staticTexts["Episodios"].frame.minY, app.staticTexts["Fuentes"].frame.minY)
+        XCTAssertLessThan(app.staticTexts["Episodios"].frame.minY, app.staticTexts["Más opciones"].frame.minY)
 
         let setProgressButton = app.buttons["series-detail-episode-1-2-set-progress"]
         for _ in 0..<6 where !setProgressButton.exists {
@@ -469,6 +879,407 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(setProgressButton.exists)
         XCTAssertFalse(app.staticTexts["Fijar"].exists)
         XCTAssertFalse(app.staticTexts["Guardar S1 E3"].exists)
+    }
+
+    @MainActor
+    func testSampleDetailTrackingActionsRemainUsableWithAccessibilityTextSize() throws {
+        continueAfterFailure = false
+        let app = makeApp(
+            environment: [
+                "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+                "SERIESAV_UI_TESTS_INITIAL_TAB": "home"
+            ],
+            contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL"
+        )
+        app.launch()
+
+        let detailButton = app.buttons["Current Series"].firstMatch
+        XCTAssertTrue(detailButton.waitForExistence(timeout: 10))
+        detailButton.tap()
+
+        XCTAssertTrue(app.staticTexts["Seguimiento"].waitForExistence(timeout: 10))
+        let primaryAction = app.buttons["series-detail-tracking-primary"]
+        let adjustAction = app.buttons["series-detail-tracking-adjust"]
+        let pinAction = app.buttons["series-detail-tracking-pin"]
+        XCTAssertTrue(primaryAction.isHittable)
+        XCTAssertTrue(adjustAction.isHittable)
+        XCTAssertTrue(pinAction.isHittable)
+        XCTAssertFalse(primaryAction.frame.intersects(adjustAction.frame))
+        XCTAssertFalse(primaryAction.frame.intersects(pinAction.frame))
+        XCTAssertFalse(adjustAction.frame.intersects(pinAction.frame))
+    }
+
+    @MainActor
+    func testFailedEpisodeGuideUsesCompactRetryState() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "home",
+            "SERIESAV_UI_TESTS_EPISODE_GUIDE": "failed_once"
+        ])
+        app.launch()
+
+        let detailButton = app.buttons["Current Series"].firstMatch
+        XCTAssertTrue(detailButton.waitForExistence(timeout: 10))
+        detailButton.tap()
+
+        let guideState = app.otherElements["series-detail-guide-state"]
+        XCTAssertTrue(guideState.waitForExistence(timeout: 10))
+        XCTAssertLessThan(guideState.frame.height, 90)
+        XCTAssertTrue(app.staticTexts["No se pudo cargar la guía ahora mismo."].exists)
+
+        let retryButton = app.buttons["series-detail-guide-retry"]
+        XCTAssertTrue(retryButton.exists)
+        XCTAssertTrue(retryButton.isHittable)
+        XCTAssertGreaterThanOrEqual(retryButton.frame.height, 44)
+        retryButton.tap()
+
+        XCTAssertTrue(app.buttons["series-detail-episode-1-2-set-progress"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.staticTexts["No se pudo cargar la guía ahora mismo."].exists)
+    }
+
+    @MainActor
+    func testFailedEpisodeGuideRetryRemainsUsableWithAccessibilityTextSize() throws {
+        continueAfterFailure = false
+        let app = makeApp(
+            environment: [
+                "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+                "SERIESAV_UI_TESTS_INITIAL_TAB": "home",
+                "SERIESAV_UI_TESTS_EPISODE_GUIDE": "failed_once"
+            ],
+            contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL"
+        )
+        app.launch()
+
+        let detailButton = app.buttons["Current Series"].firstMatch
+        XCTAssertTrue(detailButton.waitForExistence(timeout: 10))
+        detailButton.tap()
+
+        let failureDetail = app.staticTexts["No se pudo cargar la guía ahora mismo."]
+        XCTAssertTrue(failureDetail.waitForExistence(timeout: 10))
+
+        let retryButton = app.buttons["series-detail-guide-retry"]
+        XCTAssertTrue(retryButton.exists)
+        for _ in 0..<4 where !retryButton.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(retryButton.isHittable)
+        XCTAssertGreaterThanOrEqual(retryButton.frame.height, 44)
+        XCTAssertFalse(failureDetail.frame.intersects(retryButton.frame))
+        retryButton.tap()
+
+        XCTAssertTrue(app.buttons["series-detail-episode-1-2-set-progress"].waitForExistence(timeout: 10))
+    }
+
+    @MainActor
+    func testEmptyEpisodeGuideUsesCompactInformationalStateWithoutRetry() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "home",
+            "SERIESAV_UI_TESTS_EPISODE_GUIDE": "empty"
+        ])
+        app.launch()
+
+        let detailButton = app.buttons["Current Series"].firstMatch
+        XCTAssertTrue(detailButton.waitForExistence(timeout: 10))
+        detailButton.tap()
+
+        let guideState = app.otherElements["series-detail-guide-state"]
+        XCTAssertTrue(guideState.waitForExistence(timeout: 10))
+        XCTAssertLessThan(guideState.frame.height, 80)
+        XCTAssertTrue(app.staticTexts["Esta serie todavía no tiene una guía fiable."].exists)
+        XCTAssertFalse(app.buttons["series-detail-guide-retry"].exists)
+    }
+
+    @MainActor
+    func testEmptyPrivateNoteUsesCompactAddRowAndExpandsAfterSaving() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "home",
+            "SERIESAV_UI_TESTS_EPISODE_GUIDE": "empty"
+        ])
+        app.launch()
+
+        let detailButton = app.buttons["Current Series"].firstMatch
+        XCTAssertTrue(detailButton.waitForExistence(timeout: 10))
+        detailButton.tap()
+
+        let addNoteButton = app.buttons["series-detail-private-note-add"]
+        XCTAssertTrue(addNoteButton.waitForExistence(timeout: 10))
+        for _ in 0..<4 where !addNoteButton.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(addNoteButton.isHittable)
+        XCTAssertGreaterThanOrEqual(addNoteButton.frame.height, 44)
+        XCTAssertLessThan(addNoteButton.frame.height, 70)
+        addNoteButton.tap()
+
+        let editor = app.textViews["series-private-note-editor"]
+        XCTAssertTrue(editor.waitForExistence(timeout: 5))
+        editor.tap()
+        editor.typeText("Ver el final con Ana")
+        app.buttons["Guardar"].tap()
+
+        XCTAssertTrue(app.staticTexts["Ver el final con Ana"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["series-detail-private-note-add"].exists)
+        XCTAssertTrue(app.buttons["series-detail-private-note-edit"].isHittable)
+    }
+
+    @MainActor
+    func testEmptyPrivateNoteAddRowRemainsUsableWithAccessibilityTextSize() throws {
+        continueAfterFailure = false
+        let app = makeApp(
+            environment: [
+                "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+                "SERIESAV_UI_TESTS_INITIAL_TAB": "home",
+                "SERIESAV_UI_TESTS_EPISODE_GUIDE": "empty"
+            ],
+            contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL"
+        )
+        app.launch()
+
+        let detailButton = app.buttons["Current Series"].firstMatch
+        XCTAssertTrue(detailButton.waitForExistence(timeout: 10))
+        detailButton.tap()
+
+        let addNoteButton = app.buttons["series-detail-private-note-add"]
+        XCTAssertTrue(addNoteButton.waitForExistence(timeout: 10))
+        for _ in 0..<6 where !addNoteButton.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(addNoteButton.isHittable)
+        XCTAssertGreaterThanOrEqual(addNoteButton.frame.height, 44)
+        addNoteButton.tap()
+
+        XCTAssertTrue(app.textViews["series-private-note-editor"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
+    func testGuideFeedbackIsIntegratedInEpisodeCardAndShowsStatusOnlyAfterSending() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "home",
+            "SERIESAV_UI_TESTS_EPISODE_GUIDE": "empty",
+            "SERIESAV_UI_TESTS_GUIDE_FEEDBACK": "sent"
+        ])
+        app.launch()
+
+        let detailButton = app.buttons["Current Series"].firstMatch
+        XCTAssertTrue(detailButton.waitForExistence(timeout: 10))
+        detailButton.tap()
+
+        let feedbackButton = app.buttons["series-detail-guide-feedback"]
+        XCTAssertTrue(feedbackButton.waitForExistence(timeout: 10))
+        for _ in 0..<6 where !feedbackButton.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(feedbackButton.isHittable)
+        XCTAssertGreaterThanOrEqual(feedbackButton.frame.height, 44)
+        XCTAssertLessThan(feedbackButton.frame.height, 70)
+        let unavailableTitle = app.staticTexts["Guía no disponible"]
+        XCTAssertTrue(unavailableTitle.exists)
+        XCTAssertLessThan(feedbackButton.frame.minY - unavailableTitle.frame.maxY, 100)
+        XCTAssertFalse(app.staticTexts["Recibido. Lo usaremos para priorizar el enriquecimiento de esta serie."].exists)
+        feedbackButton.tap()
+
+        let status = app.staticTexts["series-detail-guide-feedback-status"]
+        XCTAssertTrue(status.waitForExistence(timeout: 5))
+        XCTAssertEqual(feedbackButton.label, "Reportado")
+        XCTAssertFalse(feedbackButton.isEnabled)
+    }
+
+    @MainActor
+    func testGuideFeedbackCompactRowRemainsUsableWithAccessibilityTextSize() throws {
+        continueAfterFailure = false
+        let app = makeApp(
+            environment: [
+                "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+                "SERIESAV_UI_TESTS_INITIAL_TAB": "home",
+                "SERIESAV_UI_TESTS_EPISODE_GUIDE": "empty",
+                "SERIESAV_UI_TESTS_GUIDE_FEEDBACK": "failed"
+            ],
+            contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL"
+        )
+        app.launch()
+
+        let detailButton = app.buttons["Current Series"].firstMatch
+        XCTAssertTrue(detailButton.waitForExistence(timeout: 10))
+        detailButton.tap()
+
+        let feedbackButton = app.buttons["series-detail-guide-feedback"]
+        XCTAssertTrue(feedbackButton.waitForExistence(timeout: 10))
+        for _ in 0..<8 where !feedbackButton.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(feedbackButton.isHittable)
+        XCTAssertGreaterThanOrEqual(feedbackButton.frame.height, 44)
+        feedbackButton.tap()
+
+        XCTAssertTrue(app.staticTexts["No se pudo enviar. Inténtalo de nuevo."].waitForExistence(timeout: 5))
+        XCTAssertTrue(feedbackButton.isEnabled)
+    }
+
+    @MainActor
+    func testSecondaryOptionsGroupsSourcesAndManagementMenus() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "home",
+            "SERIESAV_UI_TESTS_EPISODE_GUIDE": "empty"
+        ])
+        app.launch()
+
+        let detailButton = app.buttons["Current Series"].firstMatch
+        XCTAssertTrue(detailButton.waitForExistence(timeout: 10))
+        detailButton.tap()
+
+        let sourcesMenu = app.buttons["series-detail-sources-menu"]
+        XCTAssertTrue(sourcesMenu.waitForExistence(timeout: 10))
+        for _ in 0..<6 where !sourcesMenu.isHittable {
+            app.swipeUp()
+        }
+        let secondaryOptions = app.otherElements["series-detail-secondary-options"]
+        let managementMenu = app.buttons["series-detail-management-menu"]
+        XCTAssertTrue(secondaryOptions.exists)
+        XCTAssertTrue(app.staticTexts["Más opciones"].exists)
+        XCTAssertTrue(managementMenu.exists)
+        XCTAssertTrue(secondaryOptions.frame.contains(sourcesMenu.frame))
+        XCTAssertTrue(secondaryOptions.frame.contains(managementMenu.frame))
+        XCTAssertLessThan(managementMenu.frame.minY - sourcesMenu.frame.maxY, 12)
+        XCTAssertTrue(sourcesMenu.isHittable)
+        XCTAssertGreaterThanOrEqual(sourcesMenu.frame.height, 44)
+        XCTAssertLessThan(sourcesMenu.frame.height, 70)
+        sourcesMenu.tap()
+
+        XCTAssertTrue(app.buttons["IMDb"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Wikipedia"].exists)
+        XCTAssertTrue(app.buttons["Buscar en web"].exists)
+    }
+
+    @MainActor
+    func testSeriesDetailUsesWidePagePresentationOnIPad() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "home",
+            "SERIESAV_UI_TESTS_EPISODE_GUIDE": "empty"
+        ])
+        app.launch()
+
+        guard app.frame.width > 600 else {
+            throw XCTSkip("This presentation check only applies to iPad.")
+        }
+
+        let detailButton = app.buttons["Current Series"].firstMatch
+        XCTAssertTrue(detailButton.waitForExistence(timeout: 10))
+        detailButton.tap()
+
+        let detailScroll = app.scrollViews["series-detail-scroll"]
+        XCTAssertTrue(detailScroll.waitForExistence(timeout: 10))
+        XCTAssertGreaterThan(detailScroll.frame.width, app.frame.width * 0.75)
+
+        let trackingTitle = app.staticTexts["Seguimiento"]
+        let episodesTitle = app.staticTexts["Episodios"]
+        XCTAssertTrue(trackingTitle.exists)
+        XCTAssertTrue(episodesTitle.exists)
+        XCTAssertGreaterThan(abs(episodesTitle.frame.midX - trackingTitle.frame.midX), 160)
+    }
+
+    @MainActor
+    func testSourcesCompactMenuRemainsUsableWithAccessibilityTextSize() throws {
+        continueAfterFailure = false
+        let app = makeApp(
+            environment: [
+                "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+                "SERIESAV_UI_TESTS_INITIAL_TAB": "home",
+                "SERIESAV_UI_TESTS_EPISODE_GUIDE": "empty"
+            ],
+            contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL"
+        )
+        app.launch()
+
+        let detailButton = app.buttons["Current Series"].firstMatch
+        XCTAssertTrue(detailButton.waitForExistence(timeout: 10))
+        detailButton.tap()
+
+        let sourcesMenu = app.buttons["series-detail-sources-menu"]
+        XCTAssertTrue(sourcesMenu.waitForExistence(timeout: 10))
+        for _ in 0..<8 where !sourcesMenu.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(sourcesMenu.isHittable)
+        XCTAssertGreaterThanOrEqual(sourcesMenu.frame.height, 44)
+        sourcesMenu.tap()
+
+        XCTAssertTrue(app.buttons["IMDb"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Wikipedia"].exists)
+        XCTAssertTrue(app.buttons["Buscar en web"].exists)
+    }
+
+    @MainActor
+    func testLibraryManagementUsesCompactMenuAndKeepsDeleteConfirmation() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "home",
+            "SERIESAV_UI_TESTS_EPISODE_GUIDE": "empty"
+        ])
+        app.launch()
+
+        let detailButton = app.buttons["Current Series"].firstMatch
+        XCTAssertTrue(detailButton.waitForExistence(timeout: 10))
+        detailButton.tap()
+
+        let managementMenu = app.buttons["series-detail-management-menu"]
+        XCTAssertTrue(managementMenu.waitForExistence(timeout: 10))
+        for _ in 0..<6 where !managementMenu.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(managementMenu.isHittable)
+        XCTAssertGreaterThanOrEqual(managementMenu.frame.height, 44)
+        XCTAssertLessThan(managementMenu.frame.height, 70)
+        managementMenu.tap()
+
+        XCTAssertTrue(app.buttons["Archivar serie"].waitForExistence(timeout: 5))
+        let deleteButton = app.buttons["Eliminar serie"]
+        XCTAssertTrue(deleteButton.exists)
+        deleteButton.tap()
+
+        XCTAssertTrue(app.staticTexts["La serie saldrá de tu biblioteca local. Podrás deshacerlo justo después."].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Eliminar serie"].exists)
+    }
+
+    @MainActor
+    func testLibraryManagementCompactMenuRemainsUsableWithAccessibilityTextSize() throws {
+        continueAfterFailure = false
+        let app = makeApp(
+            environment: [
+                "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+                "SERIESAV_UI_TESTS_INITIAL_TAB": "home",
+                "SERIESAV_UI_TESTS_EPISODE_GUIDE": "empty"
+            ],
+            contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL"
+        )
+        app.launch()
+
+        let detailButton = app.buttons["Current Series"].firstMatch
+        XCTAssertTrue(detailButton.waitForExistence(timeout: 10))
+        detailButton.tap()
+
+        let managementMenu = app.buttons["series-detail-management-menu"]
+        XCTAssertTrue(managementMenu.waitForExistence(timeout: 10))
+        for _ in 0..<8 where !managementMenu.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(managementMenu.isHittable)
+        XCTAssertGreaterThanOrEqual(managementMenu.frame.height, 44)
+        managementMenu.tap()
+
+        XCTAssertTrue(app.buttons["Archivar serie"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Eliminar serie"].exists)
     }
 
     @MainActor
@@ -491,7 +1302,7 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Seguimiento"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["S4 E5 · Siguiente S4 E6"].exists)
         XCTAssertLessThan(app.staticTexts["Seguimiento"].frame.minY, app.staticTexts["Episodios"].frame.minY)
-        XCTAssertLessThan(app.staticTexts["Episodios"].frame.minY, app.staticTexts["Fuentes"].frame.minY)
+        XCTAssertLessThan(app.staticTexts["Episodios"].frame.minY, app.staticTexts["Más opciones"].frame.minY)
 
         let currentEpisodeButton = app.buttons["series-detail-episode-4-5-set-progress"]
         let nextEpisodeButton = app.buttons["series-detail-episode-4-6-set-progress"]

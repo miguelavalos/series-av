@@ -39,6 +39,7 @@ struct SeriesDetailScreen: View {
     @State private var inAppBrowserDestination: SeriesInAppBrowserDestination?
     @State private var shareSheetItem: SeriesShareSheetItem?
     @State private var feedbackState: SeriesGuideFeedbackSubmissionState = .idle
+    @State private var uiTestGuideLoadAttempts = 0
 
     init(
         catalogItem: SeriesCatalogItem? = nil,
@@ -83,6 +84,7 @@ struct SeriesDetailScreen: View {
                     .frame(maxWidth: usesWideLayout ? 1180 : .infinity, alignment: .topLeading)
                     .frame(maxWidth: .infinity, alignment: .top)
             }
+            .accessibilityIdentifier("series-detail-scroll")
             .background(AVBrandSurface.shellBackground.ignoresSafeArea())
             .navigationTitle(L10n.string("detail.title"))
             .navigationBarTitleDisplayMode(.inline)
@@ -181,6 +183,7 @@ struct SeriesDetailScreen: View {
                 Text(L10n.string("detail.delete.confirm.detail"))
             }
         }
+        .presentationSizing(.page)
     }
 
     @ViewBuilder
@@ -196,9 +199,7 @@ struct SeriesDetailScreen: View {
 
                 VStack(alignment: .leading, spacing: 18) {
                     guideSection
-                    sourcesSection
-                    libraryManagementSection
-                    guideFeedbackSection
+                    secondaryOptionsSection
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
             }
@@ -208,9 +209,7 @@ struct SeriesDetailScreen: View {
                 trackingSection
                 guideSection
                 privateNoteSection
-                sourcesSection
-                libraryManagementSection
-                guideFeedbackSection
+                secondaryOptionsSection
             }
         }
     }
@@ -240,18 +239,15 @@ struct SeriesDetailScreen: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
-                    Text(spoilerFreeSummaryText)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(AVBrandColor.textSecondary)
-                        .lineLimit(4)
-                        .fixedSize(horizontal: false, vertical: true)
+                    SeriesExpandableSummaryText(
+                        text: spoilerFreeSummaryText,
+                        collapsedLineLimit: 4
+                    )
 
                     if shouldShowProviderNumberingNote {
                         Label(L10n.string("detail.numbering.providerNote"), systemImage: "number")
                             .font(.system(size: 11, weight: .black))
                             .foregroundStyle(.secondary)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.82)
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
@@ -284,41 +280,7 @@ struct SeriesDetailScreen: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 138), spacing: 10)], spacing: 10) {
-                        Button {
-                            markNext?(entry)
-                        } label: {
-                            trackingActionLabel(nextActionTitle(for: entry), systemImage: quickProgressFilledSystemImage(for: entry))
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.regular)
-                        .tint(AVBrandColor.accent)
-                        .disabled(canMarkNextEpisode(from: entry) == false)
-                        .opacity(canMarkNextEpisode(from: entry) ? 1 : 0.42)
-                        .accessibilityLabel(nextActionTitle(for: entry))
-
-                        Button {
-                            isShowingProgressEditor = true
-                        } label: {
-                            trackingActionLabel(L10n.string("home.adjust"), systemImage: "scope")
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.regular)
-                        .accessibilityLabel(L10n.string("home.adjust"))
-
-                        if let setPinned {
-                            Button {
-                                let nextPinned = currentIsPinned == false
-                                displayedPinnedOverride = nextPinned
-                                setPinned(entry, nextPinned)
-                            } label: {
-                                trackingActionLabel(pinTitle, systemImage: currentIsPinned ? "pin.slash" : "pin")
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.regular)
-                            .accessibilityLabel(pinTitle)
-                        }
-                    }
+                    trackingActions(for: entry)
                 } else if let follow {
                     Text(L10n.string("detail.tracking.notFollowed"))
                         .font(.system(size: 14, weight: .medium))
@@ -338,92 +300,152 @@ struct SeriesDetailScreen: View {
         }
     }
 
-    private var sourcesSection: some View {
+    private var secondaryOptionsSection: some View {
         AVAppShellCard {
-            VStack(alignment: .leading, spacing: 12) {
-                sectionTitle(L10n.string("detail.sources.title"))
+            VStack(alignment: .leading, spacing: 0) {
+                sectionTitle(L10n.string("detail.options.title"))
+                    .padding(.bottom, 6)
 
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 130), spacing: 10)], spacing: 10) {
-                    ForEach(sourceLinks) { source in
-                        Button {
-                            openSource(source.url)
-                        } label: {
-                            Label(source.title, systemImage: source.systemImage)
-                                .font(.system(size: 13, weight: .bold))
-                                .frame(maxWidth: .infinity, minHeight: 42)
-                        }
-                        .buttonStyle(.bordered)
-                    }
+                sourcesMenu
+
+                if let entry, archive != nil || delete != nil {
+                    Divider()
+                        .padding(.vertical, 2)
+
+                    libraryManagementMenu(for: entry)
                 }
             }
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("series-detail-secondary-options")
         }
     }
 
-    @ViewBuilder
-    private var libraryManagementSection: some View {
-        if let entry, archive != nil || delete != nil {
-            AVAppShellCard {
-                VStack(alignment: .leading, spacing: 12) {
-                    sectionTitle(L10n.string("library.title"))
-
-                    HStack(spacing: 10) {
-                        if let archive {
-                            Button {
-                                archive(entry)
-                                dismiss()
-                            } label: {
-                                Label(L10n.string("home.archiveSeries"), systemImage: "archivebox")
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.large)
-                        }
-
-                        if delete != nil {
-                            Button(role: .destructive) {
-                                isConfirmingDelete = true
-                            } label: {
-                                Label(L10n.string("home.deleteSeries"), systemImage: "trash")
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.large)
-                        }
-                    }
+    private var sourcesMenu: some View {
+        Menu {
+            ForEach(sourceLinks) { source in
+                Button {
+                    openSource(source.url)
+                } label: {
+                    Label(source.title, systemImage: source.systemImage)
                 }
             }
+        } label: {
+            secondaryOptionLabel(
+                L10n.string("detail.sources.open"),
+                systemImage: "link"
+            )
         }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("series-detail-sources-menu")
+    }
+
+    private func libraryManagementMenu(for entry: SeriesLibraryEntry) -> some View {
+        Menu {
+            if let archive {
+                Button {
+                    archive(entry)
+                    dismiss()
+                } label: {
+                    Label(L10n.string("home.archiveSeries"), systemImage: "archivebox")
+                }
+            }
+
+            if delete != nil {
+                Button(role: .destructive) {
+                    isConfirmingDelete = true
+                } label: {
+                    Label(L10n.string("home.deleteSeries"), systemImage: "trash")
+                }
+            }
+        } label: {
+            secondaryOptionLabel(
+                L10n.string("detail.management.open"),
+                systemImage: "ellipsis.circle"
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("series-detail-management-menu")
+    }
+
+    private func secondaryOptionLabel(_ title: String, systemImage: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: systemImage)
+                .font(.body.weight(.semibold))
+                .foregroundStyle(AVBrandColor.accent)
+                .frame(width: 28, height: 44)
+
+            Text(title)
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(AVBrandColor.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer(minLength: 8)
+
+            Image(systemName: "chevron.up.chevron.down")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.tertiary)
+                .accessibilityHidden(true)
+        }
+        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+        .contentShape(Rectangle())
     }
 
     @ViewBuilder
     private var privateNoteSection: some View {
         if entry != nil, setPrivateNote != nil {
-            AVAppShellCard {
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        sectionTitle(L10n.string("detail.privateNote.title"))
-                        Spacer()
-                        Button {
-                            isShowingPrivateNoteEditor = true
-                        } label: {
-                            Image(systemName: "square.and.pencil")
-                                .frame(width: 36, height: 36)
+            if let note = currentPrivateNote?.trimmingCharacters(in: .whitespacesAndNewlines),
+               note.isEmpty == false {
+                AVAppShellCard {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            sectionTitle(L10n.string("detail.privateNote.title"))
+                            Spacer()
+                            Button {
+                                isShowingPrivateNoteEditor = true
+                            } label: {
+                                Image(systemName: "square.and.pencil")
+                                    .frame(width: 36, height: 36)
+                            }
+                            .buttonStyle(.bordered)
+                            .accessibilityLabel(L10n.string("detail.privateNote.edit"))
+                            .accessibilityIdentifier("series-detail-private-note-edit")
                         }
-                        .buttonStyle(.bordered)
-                        .accessibilityLabel(L10n.string("detail.privateNote.edit"))
-                    }
 
-                    if let note = currentPrivateNote?.trimmingCharacters(in: .whitespacesAndNewlines),
-                       note.isEmpty == false {
                         Text(note)
                             .font(.system(size: 15, weight: .medium))
                             .foregroundStyle(AVBrandColor.textPrimary)
                             .fixedSize(horizontal: false, vertical: true)
-                    } else {
-                        Text(L10n.string("detail.privateNote.empty"))
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(.secondary)
                     }
+                }
+            } else {
+                AVAppShellCard {
+                    Button {
+                        isShowingPrivateNoteEditor = true
+                    } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "note.text.badge.plus")
+                                .font(.body.weight(.semibold))
+                                .foregroundStyle(AVBrandColor.accent)
+                                .frame(width: 28, height: 44)
+
+                            Text(L10n.string("detail.privateNote.add"))
+                                .font(.subheadline.weight(.bold))
+                                .foregroundStyle(AVBrandColor.textPrimary)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            Spacer(minLength: 8)
+
+                            Image(systemName: "chevron.right")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(.tertiary)
+                                .accessibilityHidden(true)
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint(L10n.string("detail.privateNote.empty"))
+                    .accessibilityIdentifier("series-detail-private-note-add")
                 }
             }
         }
@@ -439,10 +461,9 @@ struct SeriesDetailScreen: View {
                     SeriesDetailGuideSkeleton()
                 case .loaded(let episodes):
                     if episodes.isEmpty {
-                        ContentUnavailableView(
-                            L10n.string("detail.episodes.unavailable"),
+                        SeriesDetailGuideUnavailableState(
                             systemImage: "list.bullet.rectangle",
-                            description: Text(L10n.string("detail.episodes.unavailable.detail"))
+                            detail: L10n.string("detail.episodes.unavailable.detail")
                         )
                     } else {
                         let visibleEpisodes = focusedEpisodes(from: episodes)
@@ -464,45 +485,73 @@ struct SeriesDetailScreen: View {
                         }
                     }
                 case .failed:
-                    ContentUnavailableView(
-                        L10n.string("detail.episodes.unavailable"),
+                    SeriesDetailGuideUnavailableState(
                         systemImage: "wifi.exclamationmark",
-                        description: Text(L10n.string("detail.episodes.retryLater"))
+                        detail: L10n.string("detail.episodes.retryLater"),
+                        retryAction: {
+                            Task {
+                                await loadEpisodeGuide()
+                            }
+                        }
                     )
                 }
+
+                Divider()
+
+                guideFeedbackContent
             }
         }
     }
 
-    private var guideFeedbackSection: some View {
-        AVAppShellCard {
-            VStack(alignment: .leading, spacing: 12) {
-                sectionTitle(L10n.string("detail.guideFeedback.title"))
-
-                Text(L10n.string("detail.guideFeedback.detail"))
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Button {
-                    Task {
-                        await submitGuideFeedback()
+    private var guideFeedbackContent: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Button {
+                Task {
+                    await submitGuideFeedback()
+                }
+            } label: {
+                HStack(spacing: 12) {
+                    Group {
+                        if feedbackState == .sending {
+                            ProgressView()
+                                .controlSize(.small)
+                        } else {
+                            Image(systemName: feedbackState == .sent ? "checkmark.circle.fill" : "exclamationmark.bubble")
+                                .font(.body.weight(.semibold))
+                        }
                     }
-                } label: {
-                    Label(guideFeedbackActionTitle, systemImage: guideFeedbackActionIcon)
-                        .font(.system(size: 13, weight: .black))
-                        .frame(maxWidth: .infinity, minHeight: 42)
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
-                .disabled(seriesId.isEmpty || feedbackState == .sending)
+                    .foregroundStyle(feedbackState == .sent ? Color.green : AVBrandColor.accent)
+                    .frame(width: 28, height: 44)
 
-                if let message = guideFeedbackStatusMessage {
-                    Text(message)
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(feedbackState == .failed ? Color.red : Color.secondary)
+                    Text(guideFeedbackActionTitle)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(AVBrandColor.textPrimary)
                         .fixedSize(horizontal: false, vertical: true)
+
+                    Spacer(minLength: 8)
+
+                    if feedbackState == .idle || feedbackState == .failed {
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(.tertiary)
+                            .accessibilityHidden(true)
+                    }
                 }
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .disabled(seriesId.isEmpty || feedbackState == .sending || feedbackState == .sent)
+            .accessibilityHint(L10n.string("detail.guideFeedback.detail"))
+            .accessibilityIdentifier("series-detail-guide-feedback")
+
+            if let message = guideFeedbackStatusMessage {
+                Text(message)
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(feedbackState == .failed ? Color.red : Color.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.leading, 40)
+                    .accessibilityIdentifier("series-detail-guide-feedback-status")
             }
         }
     }
@@ -536,12 +585,88 @@ struct SeriesDetailScreen: View {
             .textCase(.uppercase)
     }
 
-    private func trackingActionLabel(_ title: String, systemImage: String) -> some View {
-        Label(title, systemImage: systemImage)
-            .font(.system(size: 13, weight: .black))
-            .lineLimit(1)
-            .minimumScaleFactor(0.78)
-            .frame(maxWidth: .infinity, minHeight: 38)
+    private func trackingActions(for entry: SeriesLibraryEntry) -> some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 8) {
+                primaryTrackingAction(for: entry, allowsWrapping: false)
+                adjustTrackingAction(expands: false)
+                pinTrackingAction
+            }
+
+            VStack(spacing: 8) {
+                primaryTrackingAction(for: entry, allowsWrapping: true)
+
+                HStack(spacing: 8) {
+                    adjustTrackingAction(expands: true)
+                    pinTrackingAction
+                }
+            }
+        }
+    }
+
+    private func primaryTrackingAction(
+        for entry: SeriesLibraryEntry,
+        allowsWrapping: Bool
+    ) -> some View {
+        Button {
+            markNext?(entry)
+        } label: {
+            Label(
+                compactNextActionTitle(for: entry),
+                systemImage: quickProgressFilledSystemImage(for: entry)
+            )
+            .font(.subheadline.weight(.bold))
+            .lineLimit(allowsWrapping ? 2 : 1)
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: allowsWrapping == false, vertical: false)
+            .frame(maxWidth: .infinity, minHeight: 30)
+        }
+        .buttonStyle(.borderedProminent)
+        .controlSize(.regular)
+        .tint(AVBrandColor.accent)
+        .frame(minHeight: 44)
+        .disabled(canMarkNextEpisode(from: entry) == false)
+        .opacity(canMarkNextEpisode(from: entry) ? 1 : 0.42)
+        .accessibilityLabel(nextActionTitle(for: entry))
+        .accessibilityIdentifier("series-detail-tracking-primary")
+    }
+
+    private func adjustTrackingAction(expands: Bool) -> some View {
+        Button {
+            isShowingProgressEditor = true
+        } label: {
+            Label(L10n.string("detail.tracking.adjustCompact"), systemImage: "scope")
+                .font(.caption.weight(.bold))
+                .lineLimit(1)
+                .fixedSize(horizontal: expands == false, vertical: false)
+                .frame(maxWidth: expands ? .infinity : nil, minHeight: 30)
+        }
+        .buttonStyle(.bordered)
+        .controlSize(.regular)
+        .frame(minHeight: 44)
+        .accessibilityLabel(L10n.string("home.adjust"))
+        .accessibilityIdentifier("series-detail-tracking-adjust")
+    }
+
+    @ViewBuilder
+    private var pinTrackingAction: some View {
+        if let setPinned, let entry {
+            Button {
+                let nextPinned = currentIsPinned == false
+                displayedPinnedOverride = nextPinned
+                setPinned(entry, nextPinned)
+            } label: {
+                Image(systemName: currentIsPinned ? "pin.slash" : "pin")
+                    .font(.body.weight(.bold))
+                    .frame(width: 20, height: 30)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.regular)
+            .frame(minWidth: 44, minHeight: 44)
+            .accessibilityLabel(pinTitle)
+            .accessibilityIdentifier("series-detail-tracking-pin")
+            .help(pinTitle)
+        }
     }
 
     @MainActor
@@ -676,17 +801,6 @@ struct SeriesDetailScreen: View {
         }
     }
 
-    private var guideFeedbackActionIcon: String {
-        switch feedbackState {
-        case .idle, .failed:
-            "exclamationmark.bubble"
-        case .sending:
-            "hourglass"
-        case .sent:
-            "checkmark.circle.fill"
-        }
-    }
-
     private var guideFeedbackStatusMessage: String? {
         switch feedbackState {
         case .idle, .sending:
@@ -744,6 +858,13 @@ struct SeriesDetailScreen: View {
 
     private func nextActionTitle(for entry: SeriesLibraryEntry) -> String {
         SeriesDetailPresentationBuilder.nextActionTitle(for: entry)
+    }
+
+    private func compactNextActionTitle(for entry: SeriesLibraryEntry) -> String {
+        if entry.status == .wantToWatch {
+            return nextActionTitle(for: entry)
+        }
+        return "\(L10n.string("home.next")) \(cursorLabel(entry.nextEpisodeCursor))"
     }
 
     private func canMarkNextEpisode(from entry: SeriesLibraryEntry) -> Bool {
@@ -819,6 +940,12 @@ struct SeriesDetailScreen: View {
         guard seriesId.isEmpty == false else { return }
         feedbackState = .sending
 
+        if let scenario = SeriesUITestEnvironment.current.guideFeedbackScenario {
+            await Task.yield()
+            feedbackState = scenario == "sent" ? .sent : .failed
+            return
+        }
+
         do {
             _ = try await guideFeedbackClient.report(
                 SeriesGuideFeedbackRequest(
@@ -854,6 +981,18 @@ struct SeriesDetailScreen: View {
 
     private func loadEpisodeGuide() async {
         guard seriesId.isEmpty == false else {
+            guideState = .failed
+            return
+        }
+
+        if SeriesUITestEnvironment.current.episodeGuideScenario == "empty" {
+            guideState = .loaded([])
+            return
+        }
+
+        if SeriesUITestEnvironment.current.episodeGuideScenario == "failed_once",
+           uiTestGuideLoadAttempts == 0 {
+            uiTestGuideLoadAttempts += 1
             guideState = .failed
             return
         }
@@ -993,6 +1132,7 @@ private struct SeriesPrivateNoteEditorSheet: View {
 
                 TextEditor(text: $note)
                     .font(.body)
+                    .accessibilityIdentifier("series-private-note-editor")
                     .frame(minHeight: 180)
                     .padding(10)
                     .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
@@ -1143,6 +1283,164 @@ private struct SeriesShareInviteComposerSheet: View {
         } catch {
             errorMessage = L10n.string("detail.share.failed")
         }
+    }
+}
+
+private struct SeriesDetailGuideUnavailableState: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    let systemImage: String
+    let detail: String
+    var retryAction: (() -> Void)? = nil
+
+    var body: some View {
+        Group {
+            if let retryAction,
+               dynamicTypeSize.isAccessibilitySize || horizontalSizeClass == .compact {
+                HStack(alignment: .top, spacing: 8) {
+                    message
+                    Spacer(minLength: 4)
+                    compactRetryButton(action: retryAction)
+                }
+            } else {
+                HStack(alignment: .center, spacing: 10) {
+                    message
+
+                    if let retryAction {
+                        Spacer(minLength: 6)
+                        retryButton(action: retryAction)
+                    }
+                }
+            }
+        }
+        .padding(.vertical, 2)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("series-detail-guide-state")
+    }
+
+    private var message: some View {
+        HStack(alignment: .center, spacing: 10) {
+            Image(systemName: systemImage)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(AVBrandColor.accent)
+                .frame(width: 28, height: 32)
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(L10n.string("detail.episodes.unavailable"))
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(AVBrandColor.textPrimary)
+
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private func retryButton(action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(L10n.string("common.retry"), systemImage: "arrow.clockwise")
+                .font(.caption.weight(.bold))
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(minHeight: 30)
+        }
+        .buttonStyle(.bordered)
+        .controlSize(.regular)
+        .accessibilityIdentifier("series-detail-guide-retry")
+    }
+
+    private func compactRetryButton(action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: "arrow.clockwise")
+                .font(.body.weight(.bold))
+                .frame(width: 44, height: 44)
+        }
+        .buttonStyle(.bordered)
+        .accessibilityLabel(L10n.string("common.retry"))
+        .accessibilityIdentifier("series-detail-guide-retry")
+    }
+}
+
+private struct SeriesExpandableSummaryText: View {
+    let text: String
+    let collapsedLineLimit: Int
+
+    @State private var isExpanded = false
+    @State private var collapsedHeight: CGFloat = 0
+    @State private var fullHeight: CGFloat = 0
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            summaryText(lineLimit: isExpanded ? nil : collapsedLineLimit)
+                .accessibilityIdentifier("series-detail-summary")
+
+            if isTruncated {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        isExpanded.toggle()
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(toggleTitle)
+                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                            .font(.system(size: 9, weight: .black))
+                    }
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(AVBrandColor.accent)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("series-detail-summary-toggle")
+                .accessibilityLabel(toggleTitle)
+            }
+        }
+        .background(alignment: .topLeading) {
+            measurementLayer
+        }
+        .onChange(of: text) {
+            isExpanded = false
+        }
+    }
+
+    private var isTruncated: Bool {
+        fullHeight > collapsedHeight + 0.5
+    }
+
+    private var toggleTitle: String {
+        L10n.string(isExpanded ? "detail.summary.collapse" : "detail.summary.expand")
+    }
+
+    private func summaryText(lineLimit: Int?) -> some View {
+        Text(text)
+            .font(.subheadline.weight(.medium))
+            .foregroundStyle(AVBrandColor.textSecondary)
+            .lineLimit(lineLimit)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var measurementLayer: some View {
+        ZStack(alignment: .topLeading) {
+            summaryText(lineLimit: collapsedLineLimit)
+                .onGeometryChange(for: CGFloat.self) { proxy in
+                    proxy.size.height
+                } action: { newHeight in
+                    collapsedHeight = newHeight
+                }
+
+            summaryText(lineLimit: nil)
+                .onGeometryChange(for: CGFloat.self) { proxy in
+                    proxy.size.height
+                } action: { newHeight in
+                    fullHeight = newHeight
+                }
+        }
+        .hidden()
+        .accessibilityHidden(true)
+        .allowsHitTesting(false)
     }
 }
 

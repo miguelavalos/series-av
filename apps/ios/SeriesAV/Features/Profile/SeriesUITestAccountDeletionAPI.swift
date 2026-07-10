@@ -1,8 +1,13 @@
 import Foundation
 
 @MainActor
-struct SeriesUITestAccountDeletionAPI: AccountDeletionAPI {
+final class SeriesUITestAccountDeletionAPI: AccountDeletionAPI {
     private let scenario: String
+    private var didFailInitialLoad = false
+
+    private init(scenario: String) {
+        self.scenario = scenario
+    }
 
     static func fromEnvironment() -> SeriesUITestAccountDeletionAPI? {
         guard let scenario = SeriesUITestEnvironment.current.accountDeletionScenario else {
@@ -12,19 +17,35 @@ struct SeriesUITestAccountDeletionAPI: AccountDeletionAPI {
     }
 
     func fetchAccountDeletionSummary() async throws -> AccountSummary {
-        SeriesUITestAccountDeletionScenarios.summary(for: scenario)
+        if scenario == "load_error" {
+            throw SeriesAVAPIClientError.requestFailed(statusCode: 503)
+        }
+        if scenario == "load_error_once", !didFailInitialLoad {
+            didFailInitialLoad = true
+            throw SeriesAVAPIClientError.requestFailed(statusCode: 503)
+        }
+        return SeriesUITestAccountDeletionScenarios.summary(for: scenario)
     }
 
     func requestAccountDeletion() async throws -> DeleteAccountRequestResponse {
-        SeriesUITestAccountDeletionScenarios.completedRequestResponse()
+        if scenario == "request_error" {
+            throw SeriesAVAPIClientError.requestFailed(statusCode: 503)
+        }
+        return SeriesUITestAccountDeletionScenarios.completedRequestResponse()
     }
 
     func finalizeAccountDeletion() async throws -> DeleteAccountFinalizeResponse {
-        SeriesUITestAccountDeletionScenarios.completedFinalizeResponse()
+        if scenario == "finalize_error" {
+            throw SeriesAVAPIClientError.requestFailed(statusCode: 503)
+        }
+        return SeriesUITestAccountDeletionScenarios.completedFinalizeResponse()
     }
 
     func unlinkCurrentApp() async throws -> UnlinkAppResponse {
-        SeriesUITestAccountDeletionScenarios.unlinkResponse()
+        if scenario == "unlink_error" {
+            throw SeriesAVAPIClientError.requestFailed(statusCode: 503)
+        }
+        return SeriesUITestAccountDeletionScenarios.unlinkResponse()
     }
 }
 
@@ -85,7 +106,7 @@ private enum SeriesUITestAccountDeletionScenarios {
                     currentJob: nil
                 )
             )
-        case "in_progress":
+        case "in_progress", "finalize_error":
             let job = AccountDeletionJob(id: "series-ui-test-job", status: "readyToFinalize", detail: nil)
             return AccountSummary(
                 id: SeriesUITestEnvironment.accountUserId,

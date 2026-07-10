@@ -9,7 +9,8 @@ final class SeriesAVShellChromeUITests: XCTestCase {
 
         app.buttons["header.account"].tap()
         XCTAssertTrue(app.staticTexts["Cuenta"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["profile.account.signIn"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["profile.account.unavailable"].exists)
+        XCTAssertFalse(app.buttons["profile.account.signIn"].exists)
 
         app.buttons["series.tab.search"].tap()
         XCTAssertTrue(app.staticTexts["Buscar series"].waitForExistence(timeout: 5))

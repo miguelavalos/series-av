@@ -141,22 +141,14 @@ struct SeriesSearchScreen: View {
         return store.searchEntries(matching: trimmedQuery)
     }
 
-    private var visibleCatalogResults: [SeriesCatalogPreview] {
-        let localTitles = Set(localMatches.map { SeriesLibraryIdentity.normalizedSearchText($0.title) })
-        guard localTitles.isEmpty == false else {
-            return catalogResults
-        }
-        return catalogResults.filter {
-            !localTitles.contains(SeriesLibraryIdentity.normalizedSearchText($0.title))
-        }
-    }
-
     private var displayedCatalogResults: [SeriesCatalogPreview] {
-        let results = visibleCatalogResults
-        guard isTabletLayout, trimmedQuery.isEmpty, results.count > 1, results.count % 2 != 0 else {
-            return results
+        let localTitles = Set(localMatches.map { SeriesLibraryIdentity.normalizedSearchText($0.title) })
+        return SeriesSearchResultsPolicy.resultsForDisplay(
+            catalogResults,
+            excludingNormalizedTitles: localTitles
+        ) {
+            SeriesLibraryIdentity.normalizedSearchText($0.title)
         }
-        return Array(results.dropLast())
     }
 
     private var searchRefreshKey: String {
@@ -509,6 +501,21 @@ struct SeriesCatalogLoadState: Equatable {
     }
 }
 
+enum SeriesSearchResultsPolicy {
+    static func resultsForDisplay<Result>(
+        _ catalogResults: [Result],
+        excludingNormalizedTitles localTitles: Set<String>,
+        normalizedTitle: (Result) -> String
+    ) -> [Result] {
+        guard localTitles.isEmpty == false else {
+            return catalogResults
+        }
+        return catalogResults.filter {
+            !localTitles.contains(normalizedTitle($0))
+        }
+    }
+}
+
 private struct SeriesCatalogResultsSkeleton: View {
     var body: some View {
         VStack(spacing: 10) {
@@ -562,6 +569,7 @@ private struct SeriesCatalogResultCard: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(preview.title)
+            .accessibilityValue(accessibilityMetadataText)
             .accessibilityHint(L10n.string("detail.open"))
 
             if let libraryEntry {
@@ -618,6 +626,14 @@ private struct SeriesCatalogResultCard: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.82)
+
+                if let supplementaryMetadataText {
+                    Text(supplementaryMetadataText)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.76)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -632,6 +648,100 @@ private struct SeriesCatalogResultCard: View {
             .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { $0.isEmpty == false }
             .joined(separator: " · ")
+    }
+
+    private var supplementaryMetadataText: String? {
+        guard let catalogItem = preview.catalogItem else { return nil }
+        return SeriesSearchSupplementaryMetadata.text(
+            statusText: catalogItem.statusText,
+            latestKnownEpisodeCursor: catalogItem.latestKnownEpisodeCursor,
+            knownEpisodeCount: catalogItem.knownEpisodeCount
+        )
+    }
+
+    private var accessibilityMetadataText: String {
+        [metadataText, supplementaryMetadataText]
+            .compactMap { $0 }
+            .filter { $0.isEmpty == false }
+            .joined(separator: ", ")
+    }
+}
+
+enum SeriesCatalogAvailabilityStatus: Equatable, Sendable {
+    case running
+    case ended
+    case upcoming
+    case cancelled
+    case hiatus
+
+    init?(providerText: String?) {
+        guard let providerText else { return nil }
+        let normalized = providerText
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+
+        switch normalized {
+        case "running", "continuing", "returning series":
+            self = .running
+        case "ended", "completed":
+            self = .ended
+        case "upcoming", "in development", "pre-production", "planned":
+            self = .upcoming
+        case "cancelled", "canceled":
+            self = .cancelled
+        case "hiatus", "on hiatus":
+            self = .hiatus
+        default:
+            return nil
+        }
+    }
+
+    var localizationKey: String {
+        switch self {
+        case .running:
+            "search.metadata.status.running"
+        case .ended:
+            "search.metadata.status.ended"
+        case .upcoming:
+            "search.metadata.status.upcoming"
+        case .cancelled:
+            "search.metadata.status.cancelled"
+        case .hiatus:
+            "search.metadata.status.hiatus"
+        }
+    }
+}
+
+struct SeriesSearchSupplementaryMetadata {
+    static func text(
+        statusText: String?,
+        latestKnownEpisodeCursor: SeriesEpisodeCursor?,
+        knownEpisodeCount: Int?
+    ) -> String? {
+        var parts: [String] = []
+
+        if let status = SeriesCatalogAvailabilityStatus(providerText: statusText) {
+            parts.append(L10n.string(status.localizationKey))
+        }
+
+        if let latestKnownEpisodeCursor {
+            parts.append(
+                String(
+                    format: L10n.string("search.metadata.throughSeason"),
+                    latestKnownEpisodeCursor.seasonNumber
+                )
+            )
+        }
+
+        if let knownEpisodeCount, knownEpisodeCount > 0 {
+            let key = knownEpisodeCount == 1
+                ? "search.metadata.episodes.one"
+                : "search.metadata.episodes.other"
+            parts.append(String(format: L10n.string(key), knownEpisodeCount))
+        }
+
+        guard parts.isEmpty == false else { return nil }
+        return parts.joined(separator: " · ")
     }
 }
 

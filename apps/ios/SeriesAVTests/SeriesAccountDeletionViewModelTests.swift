@@ -140,9 +140,71 @@ final class SeriesAccountDeletionViewModelTests: XCTestCase {
 
         await viewModel.load()
 
+        XCTAssertEqual(viewModel.errorContext, .load)
+        XCTAssertNotNil(viewModel.errorMessage)
         XCTAssertEqual(viewModel.resolvedEligibility?.status, .unavailable)
         XCTAssertEqual(viewModel.blockers.first?.type, .eligibilityUnavailable)
         XCTAssertFalse(viewModel.canRequestDeletion)
+    }
+
+    func testRequestFailureIsAssociatedWithDeletionAction() async {
+        let viewModel = SeriesAccountDeletionViewModel(
+            api: MockSeriesAccountDeletionAPI(
+                summary: AccountSummary(
+                    deleteAccountEligibility: AccountDeletionEligibility(status: .eligible, blockers: [], currentJob: nil)
+                ),
+                requestError: MockSeriesAccountDeletionAPI.Error.requestFailed
+            ),
+            signOut: {}
+        )
+
+        await viewModel.load()
+        viewModel.confirmationText = "DELETE"
+        await viewModel.requestDeletion()
+
+        XCTAssertEqual(viewModel.errorContext, .requestDeletion)
+        XCTAssertNotNil(viewModel.errorMessage)
+    }
+
+    func testFinalizeFailureIsAssociatedWithFinalizeAction() async {
+        let job = AccountDeletionJob(id: "job-1", status: "readyToFinalize", detail: nil)
+        let viewModel = SeriesAccountDeletionViewModel(
+            api: MockSeriesAccountDeletionAPI(
+                summary: AccountSummary(
+                    currentDeletionJob: job,
+                    deleteAccountEligibility: AccountDeletionEligibility(status: .inProgress, blockers: [], currentJob: job)
+                ),
+                finalizeError: MockSeriesAccountDeletionAPI.Error.finalizeFailed
+            ),
+            signOut: {}
+        )
+
+        await viewModel.load()
+        await viewModel.finalizeDeletion()
+
+        XCTAssertEqual(viewModel.errorContext, .finalizeDeletion)
+        XCTAssertNotNil(viewModel.errorMessage)
+    }
+
+    func testUnlinkFailureIsAssociatedWithUnlinkAction() async {
+        let viewModel = SeriesAccountDeletionViewModel(
+            api: MockSeriesAccountDeletionAPI(
+                summary: AccountSummary(
+                    linkedApps: [
+                        LinkedAccountApp(appId: "seriesav", label: "Series AV"),
+                        LinkedAccountApp(appId: "tuneav", label: "Tune AV")
+                    ]
+                ),
+                unlinkError: MockSeriesAccountDeletionAPI.Error.unlinkFailed
+            ),
+            signOut: {}
+        )
+
+        await viewModel.load()
+        await viewModel.unlinkCurrentApp()
+
+        XCTAssertEqual(viewModel.errorContext, .unlink)
+        XCTAssertNotNil(viewModel.errorMessage)
     }
 
     func testOpenDeletionJobIsInProgressNotUnavailable() {
@@ -276,10 +338,16 @@ final class SeriesAccountDeletionViewModelTests: XCTestCase {
 private struct MockSeriesAccountDeletionAPI: AccountDeletionAPI {
     enum Error: Swift.Error {
         case fetchFailed
+        case requestFailed
+        case finalizeFailed
+        case unlinkFailed
     }
 
     let summary: AccountSummary
     var fetchError: Swift.Error? = nil
+    var requestError: Swift.Error? = nil
+    var finalizeError: Swift.Error? = nil
+    var unlinkError: Swift.Error? = nil
     var requestResponse = DeleteAccountRequestResponse(status: nil, job: nil, deleteAccountEligibility: nil)
     var finalizeResponse = DeleteAccountFinalizeResponse(status: nil, job: nil, deleteAccountEligibility: nil)
     var unlinkResponse = UnlinkAppResponse(
@@ -295,14 +363,23 @@ private struct MockSeriesAccountDeletionAPI: AccountDeletionAPI {
     }
 
     func requestAccountDeletion() async throws -> DeleteAccountRequestResponse {
-        requestResponse
+        if let requestError {
+            throw requestError
+        }
+        return requestResponse
     }
 
     func finalizeAccountDeletion() async throws -> DeleteAccountFinalizeResponse {
-        finalizeResponse
+        if let finalizeError {
+            throw finalizeError
+        }
+        return finalizeResponse
     }
 
     func unlinkCurrentApp() async throws -> UnlinkAppResponse {
-        unlinkResponse
+        if let unlinkError {
+            throw unlinkError
+        }
+        return unlinkResponse
     }
 }

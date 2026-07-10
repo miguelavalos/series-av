@@ -1,6 +1,40 @@
 import CoreGraphics
 import Foundation
 
+enum SeriesHomeDiscoveryLoadState: Equatable {
+    case idle
+    case loading
+    case loaded
+    case failed
+}
+
+struct SeriesHomeDiscoverySnapshot: Equatable {
+    var popular: [SeriesHomeDiscoveryPreview]
+    var upcoming: [SeriesHomeDiscoveryPreview]
+    var recommended: [SeriesHomeDiscoveryPreview]
+
+    var hasContent: Bool {
+        popular.isEmpty == false || upcoming.isEmpty == false || recommended.isEmpty == false
+    }
+}
+
+@MainActor
+enum SeriesHomeDiscoverySessionCache {
+    private static var snapshot: SeriesHomeDiscoverySnapshot?
+
+    static func value() -> SeriesHomeDiscoverySnapshot? {
+        snapshot
+    }
+
+    static func store(_ snapshot: SeriesHomeDiscoverySnapshot) {
+        self.snapshot = snapshot
+    }
+
+    static func reset() {
+        snapshot = nil
+    }
+}
+
 struct SeriesHomeScreenState: Equatable {
     var currentEntry: SeriesLibraryEntry?
     var secondaryEntries: [SeriesLibraryEntry]

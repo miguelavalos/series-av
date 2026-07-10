@@ -1,6 +1,7 @@
-# Series AV iOS Rebuild
+# Series AV iOS
 
-Status: V1 rebuild in TestFlight preparation.
+Status: shipping V1 maintenance and native UI quality improvements. The current
+public App Store baseline is documented in `../../docs/release-checklist.md`.
 
 The previous iOS app has been moved to:
 
@@ -40,6 +41,10 @@ Current scaffold:
 - Runtime config preflight for Account AV, Convex URL, RevenueCat, keychain
   access group, support/legal URLs, and release archive checks.
 - Home, Library, Search, and Avi product tabs using the shared Apps AV shell.
+- Adaptive iPhone tab and iPad sidebar layouts, with Dynamic Type-aware Home,
+  Library, Search, detail, Profile, and account-deletion screens. The implemented
+  UI baseline and remaining review order are documented in
+  `../../docs/ios-ui-quality-review.md`.
 - Search shows popular collections, genre/anime filters, backend-enriched
   signed-in results, and editorial fallback rows. Any catalog or fallback row
   that has an approved provider poster should render it; text fallback artwork
@@ -49,7 +54,12 @@ Current scaffold:
   show local curated results immediately while backend enrichment updates
   posters and identifiers in place. Adding a series from Search or Home
   discovery should immediately open progress adjustment, and exact local/catalog
-  matches should be shown once as the local tracked row.
+  matches should be shown once as the local tracked row. Search cards use
+  normalized catalog status, latest known season, and episode count as compact
+  supplementary metadata when providers return those fields.
+- Home discovery exposes explicit loading and retry states, preserves the latest
+  successful in-session result during refresh failures, and reserves its bottom
+  safe-area bar only for a pending undo action.
 - Episode tracking uses one reversible progress cursor, compact season/episode
   selection, known episode guides when available, and generic large-range
   episode navigation when no guide is available. The progress editor must make
@@ -57,9 +67,11 @@ Current scaffold:
   all previous episodes become watched, following episodes become pending, the
   next episode remains visible, and the primary action should include the exact
   target cursor.
-- Unit-test build coverage for library identity, cursor updates, app-data sync
-  envelopes, access entitlement resolution, account session hydration, and Pro
-  purchase reconciliation.
+- Unit-test build coverage for library identity, cursor updates, safe initial
+  cloud pull/merge behavior, app-data sync envelopes, access entitlement
+  resolution, account session hydration, account-deletion error context, and Pro
+  purchase reconciliation. The focused unit suite passed 120 tests on
+  2026-07-10.
 
 Release/prod runtime config check:
 

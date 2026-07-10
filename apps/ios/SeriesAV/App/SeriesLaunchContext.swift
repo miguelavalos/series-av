@@ -67,6 +67,21 @@ struct SeriesUITestEnvironment {
         isEnabled && environment["SERIESAV_UI_TESTS_HIGH_SEASON_LIBRARY"] == "1"
     }
 
+    var episodeGuideScenario: String? {
+        guard isEnabled else { return nil }
+        return environment["SERIESAV_UI_TESTS_EPISODE_GUIDE"]
+    }
+
+    var guideFeedbackScenario: String? {
+        guard isEnabled else { return nil }
+        return environment["SERIESAV_UI_TESTS_GUIDE_FEEDBACK"]
+    }
+
+    var homeDiscoveryScenario: String? {
+        guard isEnabled else { return nil }
+        return environment["SERIESAV_UI_TESTS_HOME_DISCOVERY"]
+    }
+
     var shouldShowProgressEditor: Bool {
         isEnabled && environment["SERIESAV_UI_TESTS_SHOW_PROGRESS_EDITOR"] == "1"
     }

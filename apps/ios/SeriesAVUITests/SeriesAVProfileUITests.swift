@@ -8,7 +8,43 @@ final class SeriesAVProfileUITests: XCTestCase {
         ])
 
         XCTAssertTrue(app.staticTexts["Series UI Test User"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["series-ui-test@example.test"].exists)
+        XCTAssertTrue(app.staticTexts["Conectado a Account AV."].exists)
+        XCTAssertEqual(
+            app.staticTexts.matching(NSPredicate(format: "label == %@", "series-ui-test@example.test")).count,
+            1
+        )
+        XCTAssertTrue(app.staticTexts["Sesión"].exists)
+        XCTAssertTrue(app.staticTexts["Acceso"].exists)
+        XCTAssertTrue(app.staticTexts["Plan gratuito"].exists)
+        XCTAssertFalse(app.staticTexts["Cuenta conectada"].exists)
+        let accountCard = app.descendants(matching: .any)["profile.account.card"]
+        let signOutButton = app.buttons["profile.account.signOut"]
+        XCTAssertTrue(accountCard.exists)
+        XCTAssertTrue(signOutButton.exists)
+        XCTAssertTrue(signOutButton.isHittable)
+        XCTAssertGreaterThanOrEqual(signOutButton.frame.height, 44)
+        XCTAssertLessThanOrEqual(signOutButton.frame.width, 201.5)
+        XCTAssertLessThan(signOutButton.frame.width, accountCard.frame.width - 32)
+        let upgradeButton = app.buttons["profile.pro.upgrade"]
+        let proBenefits = app.descendants(matching: .any)["profile.pro.benefits"]
+        XCTAssertTrue(upgradeButton.exists)
+        XCTAssertTrue(upgradeButton.isHittable)
+        XCTAssertGreaterThanOrEqual(upgradeButton.frame.height, 44)
+        XCTAssertTrue(proBenefits.exists)
+        XCTAssertLessThan(upgradeButton.frame.minY, proBenefits.frame.minY)
+        if app.frame.width <= 600 {
+            XCTAssertLessThanOrEqual(proBenefits.frame.height, 160)
+        }
+        if app.frame.width <= 600 {
+            let footerTab = app.buttons["series.tab.home"]
+            XCTAssertTrue(footerTab.exists)
+            XCTAssertLessThanOrEqual(upgradeButton.frame.maxY, footerTab.frame.minY - 12)
+        }
+        let safetyAction = app.buttons["profile.safety.delete"]
+        XCTAssertTrue(safetyAction.exists)
+        if app.frame.width <= 600 {
+            XCTAssertLessThanOrEqual(safetyAction.frame.height, 84)
+        }
         XCTAssertFalse(app.descendants(matching: .any)["profile.sync.card"].exists)
     }
 
@@ -56,22 +92,70 @@ final class SeriesAVProfileUITests: XCTestCase {
         XCTAssertTrue(privacyButton.waitForExistence(timeout: 3))
     }
 
-    func testGuestProActionOpensSignInInsteadOfPaywall() {
+    func testGuestUsesSingleAccountActionToOpenSignInInsteadOfPaywall() {
         let app = launchProfileApp(extraEnvironment: [
             "SERIESAV_UI_TESTS_ACCOUNT_MODE": "guest_available"
         ])
 
-        let signInButton = app.buttons["profile.pro.signIn"].firstMatch
-        for _ in 0..<6 where !signInButton.exists || !signInButton.isHittable {
-            app.swipeUp()
-        }
+        let signInButton = app.buttons["profile.account.signIn"]
         XCTAssertTrue(signInButton.waitForExistence(timeout: 5))
         XCTAssertTrue(signInButton.isHittable)
+        let accountCard = app.descendants(matching: .any)["profile.account.card"]
+        XCTAssertTrue(accountCard.exists)
+        XCTAssertLessThan(accountCard.frame.height, 270)
+        XCTAssertTrue(app.descendants(matching: .any)["profile.account.localMode"].exists)
+        XCTAssertTrue(app.staticTexts["Sin una cuenta conectada"].exists)
+        XCTAssertTrue(app.staticTexts["Modo local"].exists)
+        XCTAssertFalse(app.staticTexts["Sesión"].exists)
+        XCTAssertFalse(app.staticTexts["Acceso"].exists)
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@", "Iniciar sesión")).count, 1)
+        XCTAssertFalse(app.buttons["profile.pro.signIn"].exists)
         signInButton.tap()
 
         XCTAssertTrue(app.buttons["series.onboarding.auth.apple"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["series.onboarding.auth.google"].exists)
         XCTAssertFalse(app.descendants(matching: .any)["paywall.sheet"].exists)
+    }
+
+    func testDeleteAccountCanBeCancelledWithoutSigningOut() {
+        let app = launchProfileApp(extraEnvironment: [
+            "SERIESAV_UI_TESTS_ACCOUNT_MODE": "free",
+            "SERIESAV_UI_TEST_ACCOUNT_DELETION": "eligible"
+        ])
+
+        openAccountDeletion(in: app)
+
+        let cancelButton = app.buttons["accountDeletion.cancel"]
+        XCTAssertTrue(cancelButton.waitForExistence(timeout: 3))
+        XCTAssertEqual(cancelButton.label, "Cancelar")
+        cancelButton.tap()
+
+        XCTAssertFalse(app.descendants(matching: .any)["accountDeletion.sheet"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["Series UI Test User"].exists)
+        XCTAssertFalse(app.buttons["profile.account.signIn"].exists)
+    }
+
+    func testDeleteAccountLoadErrorIsExclusiveAndRetryRecovers() {
+        let app = launchProfileApp(extraEnvironment: [
+            "SERIESAV_UI_TESTS_ACCOUNT_MODE": "free",
+            "SERIESAV_UI_TEST_ACCOUNT_DELETION": "load_error_once"
+        ])
+
+        openAccountDeletion(in: app)
+
+        XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.loadError"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.status.error"].exists)
+        XCTAssertTrue(app.buttons["accountDeletion.retry"].exists)
+        XCTAssertTrue(app.buttons["accountDeletion.accountWebsiteLink"].exists)
+        XCTAssertFalse(app.descendants(matching: .any)["accountDeletion.shared"].exists)
+        XCTAssertFalse(app.descendants(matching: .any)["accountDeletion.status.unavailable"].exists)
+        XCTAssertFalse(app.descendants(matching: .any)["accountDeletion.confirm.panel"].exists)
+
+        app.buttons["accountDeletion.retry"].tap()
+
+        XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.status.eligible"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.descendants(matching: .any)["accountDeletion.loadError"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.confirm.panel"].exists)
     }
 
     func testDeleteAccountEligibleFreeSeriesOnlyFlowSignsOutLocally() {
@@ -92,6 +176,59 @@ final class SeriesAVProfileUITests: XCTestCase {
         XCTAssertTrue(app.buttons["profile.account.signIn"].waitForExistence(timeout: 5))
     }
 
+    func testDeleteAccountConfirmationReturnDismissesKeyboard() {
+        let app = launchProfileApp(extraEnvironment: [
+            "SERIESAV_UI_TESTS_ACCOUNT_MODE": "free",
+            "SERIESAV_UI_TEST_ACCOUNT_DELETION": "eligible"
+        ])
+
+        openAccountDeletion(in: app)
+
+        let eligibilityStatus = app.staticTexts["accountDeletion.status.eligible"]
+        XCTAssertTrue(eligibilityStatus.waitForExistence(timeout: 3))
+        XCTAssertFalse(eligibilityStatus.isSelected)
+
+        let confirmation = app.textFields["accountDeletion.confirmation"]
+        XCTAssertEqual(confirmation.label, "Código de confirmación")
+        XCTAssertEqual(confirmation.value as? String, "Vacío")
+        confirmation.tap()
+        confirmation.typeText("DELETE")
+        XCTAssertEqual(confirmation.value as? String, "DELETE")
+
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: 3))
+        let doneKey = keyboard.buttons["Done"]
+        XCTAssertTrue(doneKey.waitForExistence(timeout: 3))
+        doneKey.tap()
+
+        XCTAssertFalse(keyboard.waitForExistence(timeout: 2))
+        XCTAssertTrue(app.buttons["accountDeletion.deleteButton"].isHittable)
+    }
+
+    func testDeleteAccountRequestErrorStaysWithConfirmationAction() {
+        let app = launchProfileApp(extraEnvironment: [
+            "SERIESAV_UI_TESTS_ACCOUNT_MODE": "free",
+            "SERIESAV_UI_TEST_ACCOUNT_DELETION": "request_error"
+        ])
+
+        openAccountDeletion(in: app)
+        XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.status.eligible"].waitForExistence(timeout: 5))
+
+        let confirmationPanel = app.descendants(matching: .any)["accountDeletion.confirm.panel"]
+        let confirmation = app.textFields["accountDeletion.confirmation"]
+        confirmation.tap()
+        confirmation.typeText("DELETE")
+        app.buttons["accountDeletion.deleteButton"].tap()
+
+        let operationError = app.descendants(matching: .any)["accountDeletion.operationError.requestDeletion"]
+        XCTAssertTrue(operationError.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.keyboards.firstMatch.waitForExistence(timeout: 2))
+        XCTAssertFalse(app.descendants(matching: .any)["accountDeletion.status.error"].exists)
+        XCTAssertGreaterThanOrEqual(operationError.frame.minY, confirmationPanel.frame.minY)
+        XCTAssertLessThanOrEqual(operationError.frame.maxY, confirmationPanel.frame.maxY)
+        XCTAssertLessThan(operationError.frame.maxY, confirmation.frame.minY)
+    }
+
     func testDeleteAccountWarnsForLinkedApp() {
         let app = launchProfileApp(extraEnvironment: [
             "SERIESAV_UI_TESTS_ACCOUNT_MODE": "free",
@@ -100,9 +237,24 @@ final class SeriesAVProfileUITests: XCTestCase {
 
         openAccountDeletion(in: app)
 
+        let summary = app.descendants(matching: .any)["accountDeletion.eligible.summary"]
         XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.status.eligible"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.impact.linkedApps"].exists)
-        XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.warning.linkedApp"].exists)
+        XCTAssertTrue(summary.exists)
+        XCTAssertLessThanOrEqual(summary.frame.height, 180)
+        XCTAssertFalse(app.descendants(matching: .any)["accountDeletion.shared"].exists)
+        let impact = app.descendants(matching: .any)["accountDeletion.impact.linkedApps"].firstMatch
+        let warningList = app.descendants(matching: .any)["accountDeletion.warning.list"]
+        let linkedAppWarning = app.descendants(matching: .any)["accountDeletion.warning.linkedApp"]
+        let confirmationPanel = app.descendants(matching: .any)["accountDeletion.confirm.panel"]
+        let confirmation = app.textFields["accountDeletion.confirmation"]
+        XCTAssertTrue(impact.exists)
+        XCTAssertTrue(warningList.exists)
+        XCTAssertTrue(linkedAppWarning.exists)
+        XCTAssertTrue(confirmationPanel.exists)
+        XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.confirm.title"].exists)
+        XCTAssertLessThanOrEqual(warningList.frame.height, 100)
+        XCTAssertLessThan(impact.frame.minY, linkedAppWarning.frame.minY)
+        XCTAssertLessThan(linkedAppWarning.frame.minY, confirmation.frame.minY)
         XCTAssertTrue(app.buttons["accountDeletion.deleteButton"].exists)
     }
 
@@ -116,7 +268,13 @@ final class SeriesAVProfileUITests: XCTestCase {
 
         XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.status.eligible"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.impact.high"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.impact.high.item.access"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.impact.high.item.credits"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.impact.high.item.data"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.impact.high.footer"].exists)
         XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.warning.activeProAccess"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.confirm.panel"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.confirm.title"].exists)
         XCTAssertTrue(app.buttons["accountDeletion.deleteButton"].exists)
     }
 

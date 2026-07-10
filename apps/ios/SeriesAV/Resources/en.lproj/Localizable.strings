@@ -62,6 +62,8 @@
 "detail.summary.guideCountOnly" = "Synopsis unavailable. The guide has %d known episodes.";
 "detail.summary.loadingGuide" = "Synopsis unavailable. Loading the episode guide.";
 "detail.summary.noGuide" = "Synopsis unavailable. The episode guide is not available for this series yet.";
+"detail.summary.expand" = "Show more";
+"detail.summary.collapse" = "Show less";
 "detail.numbering.providerNote" = "Total episode and season numbering may differ: seasons follow the provider guide.";
 "detail.guideCoverage.latest" = "Guide updated through %@";
 "detail.guideCoverage.count" = "Guide has %d known episodes";
@@ -75,6 +77,7 @@
 "detail.guideFeedback.sent.detail" = "Received. We will use it to prioritize enrichment for this series.";
 "detail.guideFeedback.failed" = "Could not send it. Try again.";
 "detail.tracking.title" = "Tracking";
+"detail.tracking.adjustCompact" = "Adjust";
 "detail.tracking.notFollowed" = "This series is not in your library yet.";
 "detail.episodes.title" = "Episodes";
 "detail.episodes.unavailable" = "Guide unavailable";
@@ -94,6 +97,8 @@
 "home.editor.guideCoverage.generic" = "Manual range: guide does not have a reliable limit yet";
 "home.editor.guideCoverage.unavailable" = "Guide pending review";
 "detail.sources.title" = "Sources";
+"detail.options.title" = "More options";
+"detail.sources.open" = "Open source";
 "detail.sources.imdb" = "IMDb";
 "detail.sources.wikipedia" = "Wikipedia";
 "detail.sources.web" = "Web search";
@@ -108,7 +113,9 @@
 "detail.delete.confirm.title" = "Delete series";
 "detail.delete.confirm.detail" = "This series will leave your local library. You can undo it right after.";
 "detail.delete.confirm.action" = "Delete series";
+"detail.management.open" = "Manage series";
 "detail.privateNote.title" = "Private note";
+"detail.privateNote.add" = "Add private note";
 "detail.privateNote.empty" = "Add a private note for yourself.";
 "detail.privateNote.edit" = "Edit private note";
 "detail.privateNote.count" = "%d of %d characters";
@@ -119,6 +126,7 @@
 "home.readyToStart.title" = "Ready to start";
 "home.rail.popular" = "Popular";
 "home.rail.recommended" = "More to track";
+"home.discovery.failure" = "Suggestions could not be loaded. Check your connection.";
 "home.editor.season" = "Season %d";
 "home.editor.season.short" = "Season";
 "home.editor.episode" = "Episode %d";
@@ -156,6 +164,7 @@
 "library.search.empty.title" = "No matches";
 "library.search.empty.subtitle" = "Try another title.";
 "library.filter.title" = "Filter";
+"library.filter.selector.label" = "Filter library";
 "library.filter.all" = "All";
 "library.filter.wantToWatch" = "To watch";
 "library.filter.watching" = "Watching";
@@ -271,21 +280,22 @@
 "profile.pro.avi.title" = "Avi on Home";
 "profile.pro.avi.detail" = "Keep tracking guidance next to your current series.";
 "profile.safety.title" = "Account safety";
-"profile.safety.subtitle" = "Sensitive account actions use Account AV without sending you through a second web sign-in.";
+"profile.safety.subtitle" = "Manage sensitive actions without signing in again on the web.";
 "profile.safety.delete.title" = "Delete Apps AV account";
-"profile.safety.delete.detail" = "Start a guarded in-app deletion request for your shared Apps AV account.";
+"profile.safety.delete.detail" = "Request deletion of your shared Apps AV account.";
 "profile.actions.signingOut" = "Signing out…";
 "profile.actions.signOut" = "Sign out";
 "profile.account.connect" = "Sign in";
 "profile.account.connectUnavailable" = "Account sign-in is not available right now";
 "profile.account.connected" = "Connected to %@.";
-"profile.account.identity.guest" = "Local mode on this device";
+"profile.account.identity.guest" = "No account connected";
 "profile.summary.account.detail.signedIn" = "Signed in";
 "profile.summary.account.detail.guest" = "You are using Series AV in local mode on this device.";
 "profile.summary.plan.detail.guest" = "Local mode";
-"profile.summary.plan.detail.free" = "Connected account";
+"profile.summary.plan.detail.free" = "Free plan";
 "profile.summary.plan.detail.pro" = "Pro";
 "profile.pro.subtitle.guest" = "Sign in to view Series AV Pro.";
+"profile.pro.subtitle.unavailable" = "You can view Series AV Pro when account access is available again.";
 "profile.pro.subtitle.free" = "Upgrade to track more active series and keep Pro access linked to your account.";
 "profile.pro.subtitle.pro" = "Your Pro access is active. Manage billing in your App Store account.";
 "profile.pro.signIn" = "Sign in";
@@ -408,6 +418,14 @@
 
 "accountDeletion.confirm.instructions" = "Type DELETE to confirm you want to delete the shared Apps AV account.";
 
+"accountDeletion.confirm.fieldHint" = "Type DELETE to enable the Delete Apps AV account button.";
+
+"accountDeletion.confirm.fieldLabel" = "Confirmation code";
+
+"accountDeletion.confirm.fieldValueEmpty" = "Empty";
+
+"accountDeletion.confirm.title" = "Final confirmation";
+
 "accountDeletion.deleteButton" = "Delete Apps AV account";
 
 "accountDeletion.deleting" = "Deleting account…";
@@ -430,7 +448,15 @@
 
 "accountDeletion.finalizing" = "Finalizing…";
 
-"accountDeletion.impact.high.detail" = "Deleting this account is permanent. You may lose paid access, subscriptions managed in another provider, unused credits, reserved credits, generated content, and data from every Apps AV app. This cannot be undone. Deletion is still available if you choose to continue.";
+"accountDeletion.impact.high.footer" = "Deletion is permanent. You may continue, but it cannot be undone.";
+
+"accountDeletion.impact.high.intro" = "You may lose:";
+
+"accountDeletion.impact.high.item.access" = "Pro access and subscriptions managed by other providers.";
+
+"accountDeletion.impact.high.item.credits" = "Unused or reserved credits and generated content.";
+
+"accountDeletion.impact.high.item.data" = "Data from every Apps AV app.";
 
 "accountDeletion.impact.high.title" = "Permanent loss of Pro access, credits, and data";
 
@@ -490,6 +516,14 @@
 "search.collection.updating" = "Updating catalog";
 "search.results.count.one" = "%d result";
 "search.results.count.other" = "%d results";
+"search.metadata.status.running" = "Airing";
+"search.metadata.status.ended" = "Ended";
+"search.metadata.status.upcoming" = "Upcoming";
+"search.metadata.status.cancelled" = "Cancelled";
+"search.metadata.status.hiatus" = "On hiatus";
+"search.metadata.throughSeason" = "Through S%d";
+"search.metadata.episodes.one" = "%d episode";
+"search.metadata.episodes.other" = "%d episodes";
 "common.retry" = "Try again";
 "shareInvite.title" = "Series invite";
 "shareInvite.heading" = "Accept shared series";

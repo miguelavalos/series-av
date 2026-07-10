@@ -22,6 +22,7 @@ struct SeriesProfileScreen: View {
     @EnvironmentObject private var themeController: AppThemeController
     @EnvironmentObject private var externalLinkPreferences: AppExternalLinkPreferencesController
     @Environment(\.avCommonAppExperience) private var appExperience
+    @Environment(\.avBrandPalette) private var brandPalette
     @Environment(\.openURL) private var openURL
     @State private var isSigningOut = false
     @State private var signOutErrorMessage = ""
@@ -38,11 +39,7 @@ struct SeriesProfileScreen: View {
             showsTopSafeAreaShield: true,
             showsChrome: !isTabletLayout
         ) {
-            AVAppShellConfiguredBrandHeader(
-                activeItem: mode,
-                openSettings: openSettings,
-                openAccount: openAccount
-            )
+            compactBrandHeader
         } content: {
             switch mode {
             case .settings:
@@ -80,6 +77,72 @@ struct SeriesProfileScreen: View {
 
     private var isTabletLayout: Bool {
         UIDevice.current.userInterfaceIdiom == .pad && horizontalSizeClass != .compact
+    }
+
+    private var compactBrandHeader: some View {
+        AVAppShellBrandHeaderScaffold(
+            spacing: 8,
+            sideSpacerMinLength: 4,
+            logoWidth: 132,
+            logoHeight: 42
+        ) {
+            compactHeaderButton(
+                systemName: "gearshape.fill",
+                accessibilityLabel: L10n.string("profile.settingsScreen.title"),
+                accessibilityIdentifier: "header.settings",
+                isSelected: mode == .settings,
+                fontSize: 15,
+                action: openSettings
+            )
+        } logo: {
+            Image(appExperience.visualAssets?.headerLogoName ?? "HeaderWordmark")
+                .resizable()
+                .scaledToFit()
+                .accessibilityLabel(appExperience.identity.displayName)
+        } trailing: {
+            compactHeaderButton(
+                systemName: "person.crop.circle.fill",
+                accessibilityLabel: L10n.string("profile.accountScreen.title"),
+                accessibilityIdentifier: "header.account",
+                isSelected: mode == .account,
+                fontSize: 16,
+                action: openAccount
+            )
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("profile.compactBrandHeader")
+        .padding(.bottom, -8)
+    }
+
+    private func compactHeaderButton(
+        systemName: String,
+        accessibilityLabel: String,
+        accessibilityIdentifier: String,
+        isSelected: Bool,
+        fontSize: CGFloat,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: fontSize, weight: .semibold))
+                .foregroundStyle(isSelected ? brandPalette.accent : AVBrandColor.textPrimary)
+                .frame(width: 36, height: 36)
+                .background(isSelected ? AVBrandColor.footerGlassSelected : AVBrandColor.elevatedSurface, in: Circle())
+                .overlay {
+                    Circle()
+                        .stroke(
+                            isSelected ? brandPalette.accent.opacity(0.28) : AVBrandColor.borderSubtle.opacity(0.52),
+                            lineWidth: 1
+                        )
+                }
+                .shadow(color: brandPalette.accent.opacity(isSelected ? 0.12 : 0), radius: 8, y: 3)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityValue(isSelected ? "Selected" : "")
+        .accessibilityIdentifier(accessibilityIdentifier)
     }
 
     private var screenTitle: String {
@@ -235,28 +298,39 @@ struct SeriesProfileScreen: View {
             Divider()
                 .overlay(AVBrandColor.borderSubtle)
 
-            VStack(alignment: .leading, spacing: 12) {
-                AVSettingsInfoRow(
-                    systemImage: "person.crop.circle",
-                    title: L10n.string("profile.summary.account.title"),
-                    detail: sessionDetail
-                )
-                if accessController.isSignedIn, let emailAddress = accessController.accountUser?.emailAddress {
+            if accessController.isSignedIn {
+                VStack(alignment: .leading, spacing: 12) {
                     AVSettingsInfoRow(
-                        systemImage: "envelope",
-                        title: L10n.string("profile.account.email.title"),
-                        detail: emailAddress
+                        systemImage: "person.crop.circle",
+                        title: L10n.string("profile.summary.account.title"),
+                        detail: sessionDetail
+                    )
+                    if let emailAddress = accessController.accountUser?.emailAddress {
+                        AVSettingsInfoRow(
+                            systemImage: "envelope",
+                            title: L10n.string("profile.account.email.title"),
+                            detail: emailAddress
+                        )
+                    }
+                    AVSettingsInfoRow(
+                        systemImage: "sparkles.rectangle.stack",
+                        title: L10n.string("profile.summary.plan.title"),
+                        detail: accessDetail
                     )
                 }
+            } else {
                 AVSettingsInfoRow(
-                    systemImage: "sparkles.rectangle.stack",
-                    title: L10n.string("profile.summary.plan.title"),
-                    detail: accessDetail
+                    systemImage: "internaldrive",
+                    title: L10n.string("profile.summary.plan.detail.guest"),
+                    detail: sessionDetail
                 )
+                .accessibilityIdentifier("profile.account.localMode")
             }
 
             accountActionButton
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("profile.account.card")
     }
 
     private var cloudSyncCard: some View {
@@ -303,44 +377,91 @@ struct SeriesProfileScreen: View {
     private var proCard: some View {
         AVSettingsSectionCard(
             title: L10n.string("profile.pro.title"),
-            subtitle: proSubtitle
+            subtitle: proSubtitle,
+            spacing: usesCompactFreeProCard ? 12 : 18,
+            padding: usesCompactFreeProCard ? 18 : 22
         ) {
-            AVSettingsInfoRow(
-                systemImage: "checkmark.seal.fill",
-                title: L10n.string("profile.pro.account.title"),
-                detail: L10n.string("profile.pro.account.detail")
-            )
-            AVSettingsInfoRow(
-                systemImage: "rectangle.stack.badge.person.crop",
-                title: L10n.string("profile.pro.library.title"),
-                detail: L10n.string("profile.pro.library.detail")
-            )
-            AVSettingsInfoRow(
-                systemImage: "sparkles",
-                title: L10n.string("profile.pro.avi.title"),
-                detail: L10n.string("profile.pro.avi.detail")
-            )
-            proActionButton
+            if accessController.accessMode == .signedInFree {
+                proActionButton
+            }
+
+            proBenefits
+
+            if accessController.accessMode != .signedInFree {
+                proActionButton
+            }
         }
+    }
+
+    private var proBenefits: some View {
+        VStack(alignment: .leading, spacing: isTabletLayout ? 18 : 10) {
+            if isTabletLayout {
+                AVSettingsInfoRow(
+                    systemImage: "checkmark.seal.fill",
+                    title: L10n.string("profile.pro.account.title"),
+                    detail: L10n.string("profile.pro.account.detail")
+                )
+                AVSettingsInfoRow(
+                    systemImage: "rectangle.stack.badge.person.crop",
+                    title: L10n.string("profile.pro.library.title"),
+                    detail: L10n.string("profile.pro.library.detail")
+                )
+                AVSettingsInfoRow(
+                    systemImage: "sparkles",
+                    title: L10n.string("profile.pro.avi.title"),
+                    detail: L10n.string("profile.pro.avi.detail")
+                )
+            } else {
+                compactProBenefitRow(
+                    systemImage: "checkmark.seal.fill",
+                    title: L10n.string("profile.pro.account.title"),
+                    detail: L10n.string("profile.pro.account.detail")
+                )
+                compactProBenefitRow(
+                    systemImage: "rectangle.stack.badge.person.crop",
+                    title: L10n.string("profile.pro.library.title"),
+                    detail: L10n.string("profile.pro.library.detail")
+                )
+                compactProBenefitRow(
+                    systemImage: "sparkles",
+                    title: L10n.string("profile.pro.avi.title"),
+                    detail: L10n.string("profile.pro.avi.detail")
+                )
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("profile.pro.benefits")
+    }
+
+    private func compactProBenefitRow(systemImage: String, title: String, detail: String) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: systemImage)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(brandPalette.accent)
+                .frame(width: 18)
+                .accessibilityHidden(true)
+
+            (
+                Text(title)
+                    .fontWeight(.semibold)
+                    .foregroundColor(AVBrandColor.textPrimary)
+                + Text(" · \(detail)")
+                    .foregroundColor(AVBrandColor.textSecondary)
+            )
+            .font(.system(size: 13, weight: .medium))
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .accessibilityElement(children: .combine)
     }
 
     @ViewBuilder
     private var proActionButton: some View {
         switch accessController.accessMode {
         case .guest:
-            tabletAlignedSettingsButton {
-                AVSettingsButton(
-                    title: L10n.string("profile.pro.signIn"),
-                    style: .primary,
-                    action: {
-                        startSignInFlow()
-                    }
-                )
-            }
-            .disabled(!accessController.accountIsAvailable)
-            .accessibilityIdentifier("profile.pro.signIn")
+            EmptyView()
         case .signedInFree:
-            tabletAlignedSettingsButton {
+            tabletAlignedSettingsContent {
                 AVSettingsButton(
                     title: L10n.string("profile.pro.upgrade"),
                     style: .primary,
@@ -356,7 +477,7 @@ struct SeriesProfileScreen: View {
                     detail: L10n.string("profile.pro.active.detail")
                 )
 
-                tabletAlignedSettingsButton {
+                tabletAlignedSettingsContent {
                     AVSettingsButton(
                         title: L10n.string("profile.pro.manage"),
                         style: .secondary,
@@ -374,12 +495,44 @@ struct SeriesProfileScreen: View {
             subtitle: L10n.string("profile.safety.subtitle"),
             spacing: 12
         ) {
-            AVSettingsActionRow(
-                systemImage: "exclamationmark.shield",
-                title: L10n.string("profile.safety.delete.title"),
-                detail: L10n.string("profile.safety.delete.detail"),
-                action: { isShowingAccountDeletion = true }
-            )
+            Button {
+                isShowingAccountDeletion = true
+            } label: {
+                HStack(alignment: .center, spacing: 10) {
+                    Image(systemName: "exclamationmark.shield")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(brandPalette.destructive)
+                        .frame(width: 20)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(L10n.string("profile.safety.delete.title"))
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(AVBrandColor.textPrimary)
+
+                        Text(L10n.string("profile.safety.delete.detail"))
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(AVBrandColor.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(AVBrandColor.textSecondary.opacity(0.7))
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    brandPalette.destructive.opacity(0.045),
+                    in: RoundedRectangle(cornerRadius: AVBrandRadius.row, style: .continuous)
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: AVBrandRadius.row, style: .continuous)
+                        .stroke(brandPalette.destructive.opacity(0.14), lineWidth: 1)
+                }
+            }
+            .buttonStyle(.plain)
             .accessibilityIdentifier("profile.safety.delete")
         }
     }
@@ -387,34 +540,61 @@ struct SeriesProfileScreen: View {
     @ViewBuilder
     private var accountActionButton: some View {
         if accessController.isSignedIn {
-            tabletAlignedSettingsButton {
+            tabletAlignedSettingsContent {
                 AVSettingsButton(
                     title: isSigningOut ? L10n.string("profile.actions.signingOut") : L10n.string("profile.actions.signOut"),
-                    style: .secondary,
+                    style: .destructive,
                     isLoading: isSigningOut,
                     action: signOut
                 )
+                .frame(maxWidth: 200)
             }
             .disabled(isSigningOut)
             .accessibilityIdentifier("profile.account.signOut")
-        } else {
-            tabletAlignedSettingsButton {
+        } else if accessController.accountIsAvailable {
+            tabletAlignedSettingsContent {
                 AVSettingsButton(
-                    title: accessController.accountIsAvailable
-                        ? L10n.string("profile.account.connect")
-                        : L10n.string("profile.account.connectUnavailable"),
+                    title: L10n.string("profile.account.connect"),
                     style: .primary,
                     action: {
                         startSignInFlow()
                     }
                 )
             }
-            .disabled(!accessController.accountIsAvailable)
             .accessibilityIdentifier("profile.account.signIn")
+        } else {
+            accountUnavailableStatus
         }
     }
 
-    private func tabletAlignedSettingsButton<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+    private var accountUnavailableStatus: some View {
+        tabletAlignedSettingsContent {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: "info.circle.fill")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(AVBrandColor.textSecondary)
+                    .frame(width: 20, height: 20)
+
+                Text(L10n.string("profile.account.connectUnavailable"))
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(AVBrandColor.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(AVBrandColor.mutedSurface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(AVBrandColor.borderSubtle, lineWidth: 1)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("profile.account.unavailable")
+        }
+    }
+
+    private func tabletAlignedSettingsContent<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         content()
             .frame(maxWidth: isTabletLayout ? 340 : .infinity, alignment: .leading)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -542,9 +722,7 @@ struct SeriesProfileScreen: View {
 
     private var accountIdentityDetail: String {
         if accessController.isSignedIn {
-            return accessController.accountUser?.emailAddress
-                ?? accessController.accountUser?.id
-                ?? L10n.string("profile.account.connected", appExperience.identity.accountName)
+            return L10n.string("profile.account.connected", appExperience.identity.accountName)
         }
         return L10n.string("profile.account.identity.guest")
     }
@@ -628,12 +806,18 @@ struct SeriesProfileScreen: View {
     private var proSubtitle: String {
         switch accessController.accessMode {
         case .guest:
-            L10n.string("profile.pro.subtitle.guest")
+            accessController.accountIsAvailable
+                ? L10n.string("profile.pro.subtitle.guest")
+                : L10n.string("profile.pro.subtitle.unavailable")
         case .signedInFree:
             L10n.string("profile.pro.subtitle.free")
         case .signedInPro:
             L10n.string("profile.pro.subtitle.pro")
         }
+    }
+
+    private var usesCompactFreeProCard: Bool {
+        accessController.accessMode == .signedInFree && !isTabletLayout
     }
 
     private var settingsLegalLinks: AVAppLegalLinks {

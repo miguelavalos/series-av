@@ -62,6 +62,8 @@
 "detail.summary.guideCountOnly" = "Inhaltsangabe nicht verfügbar. Der Guide enthält %d bekannte Folgen.";
 "detail.summary.loadingGuide" = "Inhaltsangabe nicht verfügbar. Der Episodenguide wird geladen.";
 "detail.summary.noGuide" = "Inhaltsangabe nicht verfügbar. Der Episodenguide ist für diese Serie noch nicht verfügbar.";
+"detail.summary.expand" = "Mehr anzeigen";
+"detail.summary.collapse" = "Weniger anzeigen";
 "detail.numbering.providerNote" = "Gesamtfolge und Staffelnummer können abweichen: Staffeln folgen dem Anbieter-Guide.";
 "detail.guideCoverage.latest" = "Guide aktualisiert bis %@";
 "detail.guideCoverage.count" = "Guide enthält %d bekannte Folgen";
@@ -75,6 +77,7 @@
 "detail.guideFeedback.sent.detail" = "Erhalten. Wir nutzen das, um die Anreicherung dieser Serie zu priorisieren.";
 "detail.guideFeedback.failed" = "Konnte nicht gesendet werden. Versuche es erneut.";
 "detail.tracking.title" = "Tracking";
+"detail.tracking.adjustCompact" = "Anpassen";
 "detail.tracking.notFollowed" = "Diese Serie ist noch nicht in deiner Bibliothek.";
 "detail.episodes.title" = "Folgen";
 "detail.episodes.unavailable" = "Guide nicht verfügbar";
@@ -94,6 +97,8 @@
 "home.editor.guideCoverage.generic" = "Manueller Bereich: Der Guide hat noch keine zuverlässige Grenze";
 "home.editor.guideCoverage.unavailable" = "Guide wartet auf Prüfung";
 "detail.sources.title" = "Quellen";
+"detail.options.title" = "Weitere Optionen";
+"detail.sources.open" = "Quelle öffnen";
 "detail.sources.imdb" = "IMDb";
 "detail.sources.wikipedia" = "Wikipedia";
 "detail.sources.web" = "Websuche";
@@ -108,7 +113,9 @@
 "detail.delete.confirm.title" = "Serie löschen";
 "detail.delete.confirm.detail" = "Diese Serie wird aus deiner lokalen Bibliothek entfernt. Du kannst es direkt danach rückgängig machen.";
 "detail.delete.confirm.action" = "Serie löschen";
+"detail.management.open" = "Serie verwalten";
 "detail.privateNote.title" = "Private Notiz";
+"detail.privateNote.add" = "Private Notiz hinzufügen";
 "detail.privateNote.empty" = "Füge eine private Notiz nur für dich hinzu.";
 "detail.privateNote.edit" = "Private Notiz bearbeiten";
 "detail.privateNote.count" = "%d von %d Zeichen";
@@ -119,6 +126,7 @@
 "home.readyToStart.title" = "Bereit zum Start";
 "home.rail.popular" = "Beliebt";
 "home.rail.recommended" = "Mehr zum Verfolgen";
+"home.discovery.failure" = "Die Vorschläge konnten nicht geladen werden. Prüfe deine Verbindung.";
 "home.editor.season" = "Staffel %d";
 "home.editor.season.short" = "Staffel";
 "home.editor.episode" = "Folge %d";
@@ -156,6 +164,7 @@
 "library.search.empty.title" = "Keine Treffer";
 "library.search.empty.subtitle" = "Versuche einen anderen Titel.";
 "library.filter.title" = "Filter";
+"library.filter.selector.label" = "Bibliothek filtern";
 "library.filter.all" = "Alle";
 "library.filter.wantToWatch" = "Merkliste";
 "library.filter.watching" = "Aktuell";
@@ -271,21 +280,22 @@
 "profile.pro.avi.title" = "Avi auf Home";
 "profile.pro.avi.detail" = "Behalte die Serienhilfe direkt bei deiner aktuellen Serie.";
 "profile.safety.title" = "Kontosicherheit";
-"profile.safety.subtitle" = "Sensible Kontoaktionen nutzen Account AV, ohne dich erneut im Web anzumelden.";
+"profile.safety.subtitle" = "Verwalte sensible Aktionen ohne erneute Web-Anmeldung.";
 "profile.safety.delete.title" = "Apps AV-Konto löschen";
-"profile.safety.delete.detail" = "Starte eine geschützte Anfrage in der App für dein gemeinsames Apps AV-Konto.";
+"profile.safety.delete.detail" = "Beantrage die Löschung deines gemeinsamen Apps AV-Kontos.";
 "profile.actions.signingOut" = "Abmelden…";
 "profile.actions.signOut" = "Abmelden";
 "profile.account.connect" = "Anmelden";
 "profile.account.connectUnavailable" = "Kontozugang ist gerade nicht verfügbar";
 "profile.account.connected" = "Verbunden mit %@.";
-"profile.account.identity.guest" = "Lokaler Modus auf diesem Gerät";
+"profile.account.identity.guest" = "Kein Konto verbunden";
 "profile.summary.account.detail.signedIn" = "Angemeldet";
 "profile.summary.account.detail.guest" = "Du verwendest Series AV im lokalen Modus auf diesem Gerät.";
 "profile.summary.plan.detail.guest" = "Lokaler Modus";
-"profile.summary.plan.detail.free" = "Verbundenes Konto";
+"profile.summary.plan.detail.free" = "Kostenloser Tarif";
 "profile.summary.plan.detail.pro" = "Pro";
 "profile.pro.subtitle.guest" = "Melde dich an, um Series AV Pro zu sehen.";
+"profile.pro.subtitle.unavailable" = "Du kannst Series AV Pro ansehen, sobald der Kontozugang wieder verfügbar ist.";
 "profile.pro.subtitle.free" = "Upgrade, um mehr aktive Serien zu verfolgen und Pro-Zugriff mit deinem Konto zu verbinden.";
 "profile.pro.subtitle.pro" = "Dein Pro-Zugriff ist aktiv. Verwalte die Abrechnung in deinem App Store Konto.";
 "profile.pro.signIn" = "Anmelden";
@@ -408,6 +418,14 @@
 
 "accountDeletion.confirm.instructions" = "Gib DELETE ein, um das Löschen des gemeinsamen Apps AV-Kontos zu bestätigen.";
 
+"accountDeletion.confirm.fieldHint" = "Gib DELETE ein, um die Taste Apps AV-Konto löschen zu aktivieren.";
+
+"accountDeletion.confirm.fieldLabel" = "Bestätigungscode";
+
+"accountDeletion.confirm.fieldValueEmpty" = "Leer";
+
+"accountDeletion.confirm.title" = "Letzte Bestätigung";
+
 "accountDeletion.deleteButton" = "Apps AV-Konto löschen";
 
 "accountDeletion.deleting" = "Konto wird gelöscht…";
@@ -430,7 +448,15 @@
 
 "accountDeletion.finalizing" = "Wird abgeschlossen…";
 
-"accountDeletion.impact.high.detail" = "Das Löschen dieses Kontos ist dauerhaft. Du kannst Pro-Zugriff, bei einem anderen Anbieter verwaltete Abonnements, ungenutzte Credits, reservierte Credits, erzeugte Inhalte und Daten aus allen Apps AV-Apps verlieren. Das kann nicht rückgängig gemacht werden. Die Löschung bleibt verfügbar, wenn du fortfahren möchtest.";
+"accountDeletion.impact.high.footer" = "Die Löschung ist dauerhaft. Du kannst fortfahren, aber sie kann nicht rückgängig gemacht werden.";
+
+"accountDeletion.impact.high.intro" = "Du kannst Folgendes verlieren:";
+
+"accountDeletion.impact.high.item.access" = "Pro-Zugriff und Abonnements bei anderen Anbietern.";
+
+"accountDeletion.impact.high.item.credits" = "Ungenutzte oder reservierte Credits und erzeugte Inhalte.";
+
+"accountDeletion.impact.high.item.data" = "Daten aus allen Apps AV-Apps.";
 
 "accountDeletion.impact.high.title" = "Dauerhafter Verlust von Pro, Credits und Daten";
 
@@ -490,6 +516,14 @@
 "search.collection.updating" = "Katalog wird aktualisiert";
 "search.results.count.one" = "%d Ergebnis";
 "search.results.count.other" = "%d Ergebnisse";
+"search.metadata.status.running" = "Laufend";
+"search.metadata.status.ended" = "Beendet";
+"search.metadata.status.upcoming" = "Demnächst";
+"search.metadata.status.cancelled" = "Abgesetzt";
+"search.metadata.status.hiatus" = "Pausiert";
+"search.metadata.throughSeason" = "Bis S%d";
+"search.metadata.episodes.one" = "%d Folge";
+"search.metadata.episodes.other" = "%d Folgen";
 "common.retry" = "Erneut versuchen";
 "shareInvite.title" = "Series Einladung";
 "shareInvite.heading" = "Geteilte Serie annehmen";

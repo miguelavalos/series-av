@@ -2,6 +2,13 @@ import Foundation
 import OSLog
 import Observation
 
+protocol SeriesLibrarySyncing: Sendable {
+    func pullLibrary() async throws -> SeriesLibraryDocument
+    func pushLibrary(entries: [SeriesLibraryEntry], expectedETag: String?) async throws -> SeriesLibraryDocument
+}
+
+extension SeriesAppDataSyncClient: SeriesLibrarySyncing {}
+
 @MainActor
 @Observable
 final class SeriesLibrarySyncCoordinator {
@@ -15,8 +22,11 @@ final class SeriesLibrarySyncCoordinator {
 
     private static let deviceIdKey = "seriesav.sync.deviceId"
 
+    typealias ClientFactory = @MainActor (SeriesAccessController, String) -> any SeriesLibrarySyncing
+
     private let deviceId: String
     private let debounceNanoseconds: UInt64
+    private let clientFactory: ClientFactory
     private let logger = Logger(subsystem: "com.avalsys.seriesav", category: "library-sync")
 
     private var etag: String?
@@ -26,12 +36,26 @@ final class SeriesLibrarySyncCoordinator {
 
     private(set) var state: State = .disabled
 
+    var shouldRetryAfterFailure: Bool {
+        if case .failed = state {
+            return true
+        }
+        return false
+    }
+
     init(
         userDefaults: UserDefaults = .standard,
-        debounceNanoseconds: UInt64 = 800_000_000
+        debounceNanoseconds: UInt64 = 800_000_000,
+        clientFactory: ClientFactory? = nil
     ) {
         self.deviceId = Self.stableDeviceId(userDefaults: userDefaults)
         self.debounceNanoseconds = debounceNanoseconds
+        self.clientFactory = clientFactory ?? { accessController, deviceId in
+            let apiClient = accessController.authenticatedAppDataAPIClient()
+            return SeriesAppDataSyncClient(deviceId: deviceId) { path, method, body, headers in
+                try await apiClient.requestData(path: path, method: method, body: body, headers: headers)
+            }
+        }
     }
 
     func refresh(accessController: SeriesAccessController, store: SeriesLibraryStore) async {
@@ -147,7 +171,7 @@ final class SeriesLibrarySyncCoordinator {
             state = .idle
         } catch {
             logger.error("Series AV Pro library sync pull failed")
-            hasCompletedInitialPull = true
+            hasCompletedInitialPull = false
             state = Self.syncState(for: error)
         }
     }
@@ -168,11 +192,8 @@ final class SeriesLibrarySyncCoordinator {
         }
     }
 
-    private func makeClient(accessController: SeriesAccessController) -> SeriesAppDataSyncClient {
-        let apiClient = accessController.authenticatedAppDataAPIClient()
-        return SeriesAppDataSyncClient(deviceId: deviceId) { path, method, body, headers in
-            try await apiClient.requestData(path: path, method: method, body: body, headers: headers)
-        }
+    private func makeClient(accessController: SeriesAccessController) -> any SeriesLibrarySyncing {
+        clientFactory(accessController, deviceId)
     }
 
     static func merge(

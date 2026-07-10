@@ -91,7 +91,8 @@ private struct SeriesWatchingHomeScreen: View {
     @State private var popularPreviews: [SeriesHomeDiscoveryPreview] = []
     @State private var upcomingPreviews: [SeriesHomeDiscoveryPreview] = []
     @State private var recommendedPreviews: [SeriesHomeDiscoveryPreview] = []
-    @State private var isLoadingHomeDiscovery = true
+    @State private var homeDiscoveryLoadState: SeriesHomeDiscoveryLoadState = .idle
+    @State private var uiTestHomeDiscoveryLoadAttempts = 0
     @State private var artworkReconciliationSignature = ""
 
     private var homeState: SeriesHomeScreenState {
@@ -122,6 +123,7 @@ private struct SeriesWatchingHomeScreen: View {
             if let currentEntry = homeState.currentEntry {
                 SeriesCurrentWatchingCard(
                     entry: currentEntry,
+                    fillsPrimaryActionWidth: !isTabletLayout,
                     markPrevious: {
                         pendingProgressUndo = progressUndo(for: currentEntry)
                         pendingUndo = nil
@@ -267,6 +269,14 @@ private struct SeriesWatchingHomeScreen: View {
                 )
             }
 
+            if shouldShowHomeDiscoveryFailure {
+                SeriesHomeDiscoveryFailureView {
+                    Task {
+                        await refreshHomeDiscovery(force: true)
+                    }
+                }
+            }
+
         SeriesHomeDiscoveryRail(
             title: L10n.string("home.rail.popular"),
             previews: homeState.visiblePopularPreviews,
@@ -310,7 +320,7 @@ private struct SeriesWatchingHomeScreen: View {
             )
         }
         .safeAreaInset(edge: .bottom) {
-            if !isTabletLayout {
+            if !isTabletLayout && hasPendingHomeUndo {
                 mobileHomeBottomBar
             }
         }
@@ -394,7 +404,7 @@ private struct SeriesWatchingHomeScreen: View {
             )
         }
         .task {
-            await refreshHomeDiscovery()
+            await loadHomeDiscoveryIfNeeded()
         }
         .onAppear {
             if SeriesUITestEnvironment.current.shouldShowProgressEditor, editorEntry == nil {
@@ -494,18 +504,100 @@ private struct SeriesWatchingHomeScreen: View {
         }
     }
 
-    private func refreshHomeDiscovery() async {
-        isLoadingHomeDiscovery = true
+    private var isLoadingHomeDiscovery: Bool {
+        homeDiscoveryLoadState == .loading
+    }
+
+    private var homeDiscoverySnapshot: SeriesHomeDiscoverySnapshot {
+        SeriesHomeDiscoverySnapshot(
+            popular: popularPreviews,
+            upcoming: upcomingPreviews,
+            recommended: recommendedPreviews
+        )
+    }
+
+    private var shouldShowHomeDiscoveryFailure: Bool {
+        homeDiscoveryLoadState == .failed && homeDiscoverySnapshot.hasContent == false
+    }
+
+    private func loadHomeDiscoveryIfNeeded() async {
+        if let cachedSnapshot = SeriesHomeDiscoverySessionCache.value() {
+            applyHomeDiscoverySnapshot(cachedSnapshot)
+            homeDiscoveryLoadState = .loaded
+            reconcileMissingArtwork(
+                from: cachedSnapshot.popular + cachedSnapshot.upcoming + cachedSnapshot.recommended
+            )
+            return
+        }
+
+        await refreshHomeDiscovery(force: false)
+    }
+
+    private func refreshHomeDiscovery(force: Bool) async {
+        guard homeDiscoveryLoadState != .loading else {
+            return
+        }
+
+        if force == false, let cachedSnapshot = SeriesHomeDiscoverySessionCache.value() {
+            applyHomeDiscoverySnapshot(cachedSnapshot)
+            homeDiscoveryLoadState = .loaded
+            return
+        }
+
+        homeDiscoveryLoadState = .loading
+
+        if shouldSimulateHomeDiscoveryFailure {
+            uiTestHomeDiscoveryLoadAttempts += 1
+            homeDiscoveryLoadState = homeDiscoverySnapshot.hasContent ? .loaded : .failed
+            return
+        }
+
         let client = SeriesCatalogSearchClient()
         async let popular = try? client.popular(locale: Locale.current.identifier, surface: "home", limit: 18)
         async let upcoming = try? client.popular(locale: Locale.current.identifier, surface: "upcoming", limit: 18)
         async let recommended = try? client.popular(locale: Locale.current.identifier, surface: "avi", limit: 18)
 
-        popularPreviews = (await popular)?.results.map { SeriesHomeDiscoveryPreview(catalogItem: $0) } ?? []
-        upcomingPreviews = (await upcoming)?.results.map { SeriesHomeDiscoveryPreview(catalogItem: $0) } ?? []
-        recommendedPreviews = (await recommended)?.results.map { SeriesHomeDiscoveryPreview(catalogItem: $0) } ?? []
-        reconcileMissingArtwork(from: popularPreviews + upcomingPreviews + recommendedPreviews)
-        isLoadingHomeDiscovery = false
+        let responses = await (popular, upcoming, recommended)
+        var didCompleteRequest = false
+
+        if let response = responses.0 {
+            popularPreviews = response.results.map { SeriesHomeDiscoveryPreview(catalogItem: $0) }
+            didCompleteRequest = true
+        }
+        if let response = responses.1 {
+            upcomingPreviews = response.results.map { SeriesHomeDiscoveryPreview(catalogItem: $0) }
+            didCompleteRequest = true
+        }
+        if let response = responses.2 {
+            recommendedPreviews = response.results.map { SeriesHomeDiscoveryPreview(catalogItem: $0) }
+            didCompleteRequest = true
+        }
+
+        let snapshot = homeDiscoverySnapshot
+        if didCompleteRequest {
+            SeriesHomeDiscoverySessionCache.store(snapshot)
+            homeDiscoveryLoadState = .loaded
+            reconcileMissingArtwork(from: snapshot.popular + snapshot.upcoming + snapshot.recommended)
+        } else {
+            homeDiscoveryLoadState = snapshot.hasContent ? .loaded : .failed
+        }
+    }
+
+    private var shouldSimulateHomeDiscoveryFailure: Bool {
+        switch SeriesUITestEnvironment.current.homeDiscoveryScenario {
+        case "failed":
+            return true
+        case "failed_once":
+            return uiTestHomeDiscoveryLoadAttempts == 0
+        default:
+            return false
+        }
+    }
+
+    private func applyHomeDiscoverySnapshot(_ snapshot: SeriesHomeDiscoverySnapshot) {
+        popularPreviews = snapshot.popular
+        upcomingPreviews = snapshot.upcoming
+        recommendedPreviews = snapshot.recommended
     }
 
     private func reconcileMissingArtwork(from previews: [SeriesHomeDiscoveryPreview]) {
@@ -626,21 +718,91 @@ private struct SeriesWatchingHomeScreen: View {
                     }
                 )
             }
-
-            if homeState.currentEntry == nil {
-                Button(action: openSearch) {
-                    Label(L10n.string("home.add"), systemImage: "magnifyingglass")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-            }
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 12)
         .background(.regularMaterial)
     }
 
+    private var hasPendingHomeUndo: Bool {
+        pendingProgressUndo != nil || pendingUndo != nil
+    }
+
+}
+
+private struct SeriesHomeDiscoveryFailureView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    let retry: () -> Void
+
+    var body: some View {
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                accessibilityContent
+            } else {
+                standardContent
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            Color(.secondarySystemGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+        )
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("home.discovery.failure")
+    }
+
+    private var standardContent: some View {
+        HStack(spacing: 12) {
+            failureIcon(size: 38)
+            failureMessage
+            Spacer(minLength: 8)
+            retryButton(fillsAvailableWidth: false, minHeight: 44)
+        }
+    }
+
+    private var accessibilityContent: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 12) {
+                failureIcon(size: 42)
+                failureMessage
+            }
+
+            retryButton(fillsAvailableWidth: true, minHeight: 52)
+        }
+        .dynamicTypeSize(.xSmall ... .accessibility1)
+    }
+
+    private var failureMessage: some View {
+        Text(L10n.string("home.discovery.failure"))
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func failureIcon(size: CGFloat) -> some View {
+        Image(systemName: "wifi.exclamationmark")
+            .font(.headline.weight(.bold))
+            .foregroundStyle(AVBrandColor.accent)
+            .frame(width: size, height: size)
+            .background(AVBrandColor.accent.opacity(0.14), in: Circle())
+            .accessibilityHidden(true)
+    }
+
+    private func retryButton(fillsAvailableWidth: Bool, minHeight: CGFloat) -> some View {
+        Button(action: retry) {
+            Label(L10n.string("common.retry"), systemImage: "arrow.clockwise")
+                .font(.subheadline.weight(.bold))
+                .frame(maxWidth: fillsAvailableWidth ? .infinity : nil, minHeight: minHeight)
+                .padding(.horizontal, 12)
+        }
+        .buttonStyle(.bordered)
+        .tint(AVBrandColor.accent)
+        .accessibilityIdentifier("home.discovery.retry")
+    }
 }
 
 private struct SeriesHomeAviBrief: View {
@@ -650,35 +812,16 @@ private struct SeriesHomeAviBrief: View {
     let openAvi: () -> Void
 
     @Environment(\.avCommonAppExperience) private var appExperience
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         Button(action: openAvi) {
-            HStack(spacing: 12) {
-                Image("AviOnboardingCTA")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 38, height: 38)
-                    .accessibilityHidden(true)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(appExperience.identity.assistantName)
-                        .font(.system(size: 13, weight: .black, design: .rounded))
-                        .foregroundStyle(AVBrandColor.textPrimary)
-
-                    Text(briefDetail)
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.82)
-                        .fixedSize(horizontal: false, vertical: true)
+            Group {
+                if dynamicTypeSize.isAccessibilitySize {
+                    accessibilityContent
+                } else {
+                    standardContent
                 }
-                .layoutPriority(1)
-
-                Image(systemName: "sparkles")
-                    .font(.system(size: 14, weight: .black))
-                    .foregroundStyle(Color.black.opacity(0.78))
-                    .frame(width: 34, height: 34)
-                    .background(AVBrandColor.accent, in: Circle())
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
@@ -691,7 +834,70 @@ private struct SeriesHomeAviBrief: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(L10n.string("home.aviBrief.action"))
+        .accessibilityValue(briefDetail)
         .accessibilityIdentifier("home.aviBrief.open")
+    }
+
+    private var standardContent: some View {
+        HStack(spacing: 12) {
+            assistantAvatar(size: 38)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(appExperience.identity.assistantName)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(AVBrandColor.textPrimary)
+
+                Text(briefDetail)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.82)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .layoutPriority(1)
+
+            actionIcon(size: 34, font: .caption.weight(.black))
+        }
+    }
+
+    private var accessibilityContent: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 12) {
+                assistantAvatar(size: 40)
+
+                Text(appExperience.identity.assistantName)
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(AVBrandColor.textPrimary)
+
+                Spacer(minLength: 8)
+
+                actionIcon(size: 40, font: .headline.weight(.black))
+            }
+
+            Text(briefDetail)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .lineLimit(4)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .dynamicTypeSize(.xSmall ... .accessibility1)
+    }
+
+    private func assistantAvatar(size: CGFloat) -> some View {
+        Image("AviOnboardingCTA")
+            .resizable()
+            .scaledToFit()
+            .frame(width: size, height: size)
+            .accessibilityHidden(true)
+    }
+
+    private func actionIcon(size: CGFloat, font: Font) -> some View {
+        Image(systemName: "sparkles")
+            .font(font)
+            .foregroundStyle(Color.black.opacity(0.78))
+            .frame(width: size, height: size)
+            .background(AVBrandColor.accent, in: Circle())
+            .accessibilityHidden(true)
     }
 
     private var briefDetail: String {
@@ -770,10 +976,15 @@ struct SeriesUndoBar: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .stroke(Color.primary.opacity(0.08), lineWidth: 1)
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("series.undo.bar")
     }
 }
 
 struct SeriesLibraryRow<MenuContent: View>: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let entry: SeriesLibraryEntry
     let detail: String
     let openDetail: () -> Void
@@ -781,58 +992,139 @@ struct SeriesLibraryRow<MenuContent: View>: View {
     @ViewBuilder let menuContent: () -> MenuContent
 
     var body: some View {
-        HStack(spacing: 12) {
-            Button(action: openDetail) {
-                rowContent
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                accessibilityLayout
+            } else if horizontalSizeClass == .compact {
+                compactLayout
+            } else {
+                regularLayout
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel(entry.title)
-            .accessibilityHint(L10n.string("detail.open"))
+        }
+        .padding(.vertical, horizontalSizeClass == .compact ? 0 : 4)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("series-library-row-\(entry.id)")
+    }
+
+    private var regularLayout: some View {
+        HStack(spacing: 12) {
+            detailButton
 
             Spacer()
 
-            if let markNext {
-                SeriesProgressPillButton(
-                    title: compactProgressActionTitle(for: entry),
-                    systemName: quickProgressFilledSystemImage(for: entry),
-                    style: .accent,
-                    accessibilityLabel: quickProgressAccessibilityLabel,
-                    accessibilityIdentifier: "series-row-\(entry.id)-quick-progress",
-                    minHeight: 36,
-                    isDisabled: !entry.canMarkNextEpisodeFromKnownGuide,
-                    action: markNext
-                )
+            progressButton(minHeight: 36)
+            actionsMenu
+        }
+    }
+
+    private var compactLayout: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            detailButton
+
+            HStack(spacing: 10) {
+                Spacer(minLength: 48)
+                progressButton(minHeight: 44)
+                actionsMenu
+            }
+        }
+    }
+
+    private var accessibilityLayout: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            detailButton
+
+            if markNext != nil {
+                progressButton(minHeight: 52, fillsAvailableWidth: true, titleLineLimit: 2)
             }
 
-            Menu {
-                menuContent()
-            } label: {
-                Image(systemName: "ellipsis")
-                    .frame(width: 34, height: 34)
+            HStack {
+                Spacer()
+                actionsMenu
             }
-            .buttonStyle(.bordered)
-            .accessibilityLabel(L10n.string("home.actions"))
         }
-        .padding(.vertical, 4)
+    }
+
+    private var detailButton: some View {
+        Button(action: openDetail) {
+            rowContent
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(entry.title)
+        .accessibilityHint(L10n.string("detail.open"))
+    }
+
+    @ViewBuilder
+    private func progressButton(
+        minHeight: CGFloat,
+        fillsAvailableWidth: Bool = false,
+        titleLineLimit: Int = 1
+    ) -> some View {
+        if let markNext {
+            SeriesProgressPillButton(
+                title: progressDisplayTitle,
+                systemName: quickProgressFilledSystemImage(for: entry),
+                style: .accent,
+                accessibilityLabel: quickProgressAccessibilityLabel,
+                accessibilityIdentifier: "series-row-\(entry.id)-quick-progress",
+                minHeight: minHeight,
+                fillsAvailableWidth: fillsAvailableWidth,
+                isDisabled: !entry.canMarkNextEpisodeFromKnownGuide,
+                titleFont: dynamicTypeSize.isAccessibilitySize
+                    ? .caption2.weight(.black)
+                    : .caption.weight(.black),
+                titleLineLimit: titleLineLimit,
+                action: markNext
+            )
+        }
+    }
+
+    private var actionsMenu: some View {
+        Menu {
+            menuContent()
+        } label: {
+            Image(systemName: "ellipsis")
+                .frame(width: 34, height: 34)
+        }
+        .buttonStyle(.bordered)
+        .accessibilityLabel(L10n.string("home.actions"))
     }
 
     private var quickProgressAccessibilityLabel: String {
         primaryProgressActionTitle(for: entry)
     }
 
+    private var progressDisplayTitle: String {
+        let title = compactProgressActionTitle(for: entry)
+        guard dynamicTypeSize.isAccessibilitySize else {
+            return title
+        }
+
+        let cursor = cursorLabel(entry.nextEpisodeCursor)
+        guard let cursorRange = title.range(of: cursor) else {
+            return title
+        }
+
+        let prefix = title[..<cursorRange.lowerBound].trimmingCharacters(in: .whitespacesAndNewlines)
+        let suffix = title[cursorRange.upperBound...].trimmingCharacters(in: .whitespacesAndNewlines)
+        return [prefix, cursor, suffix]
+            .filter { !$0.isEmpty }
+            .joined(separator: "\n")
+    }
+
     private var rowContent: some View {
         HStack(spacing: 12) {
-            SeriesEntryArtworkView(entry: entry, size: 36)
+            SeriesEntryArtworkView(entry: entry, size: dynamicTypeSize.isAccessibilitySize ? 48 : 36)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(entry.title)
-                    .font(.system(size: 15, weight: .semibold))
-                    .lineLimit(2)
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 2)
                     .fixedSize(horizontal: false, vertical: true)
                 Text(detail)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.caption.weight(.medium))
                     .foregroundStyle(.secondary)
-                    .lineLimit(2)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 2)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .layoutPriority(1)
@@ -844,6 +1136,7 @@ private struct SeriesCurrentWatchingCard: View {
     @Environment(\.colorScheme) private var colorScheme
 
     let entry: SeriesLibraryEntry
+    let fillsPrimaryActionWidth: Bool
     let markPrevious: () -> Void
     let markNext: () -> Void
     let startWatching: () -> Void
@@ -859,6 +1152,7 @@ private struct SeriesCurrentWatchingCard: View {
 
     init(
         entry: SeriesLibraryEntry,
+        fillsPrimaryActionWidth: Bool,
         markPrevious: @escaping () -> Void,
         markNext: @escaping () -> Void,
         startWatching: @escaping () -> Void,
@@ -871,6 +1165,7 @@ private struct SeriesCurrentWatchingCard: View {
         delete: @escaping () -> Void
     ) {
         self.entry = entry
+        self.fillsPrimaryActionWidth = fillsPrimaryActionWidth
         self.markPrevious = markPrevious
         self.markNext = markNext
         self.startWatching = startWatching
@@ -893,6 +1188,8 @@ private struct SeriesCurrentWatchingCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(heroBackground)
         .contentShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("home-current-card")
         .sheet(isPresented: $isShowingProgressSelector) {
             SeriesProgressEditorSheet(
                 entry: entry,
@@ -983,8 +1280,9 @@ private struct SeriesCurrentWatchingCard: View {
                 systemName: primaryIconName,
                 style: .accent,
                 accessibilityLabel: primaryActionAccessibilityLabel,
+                accessibilityIdentifier: "home-current-primary-action",
                 minHeight: 50,
-                fillsAvailableWidth: true,
+                fillsAvailableWidth: fillsPrimaryActionWidth,
                 isDisabled: !entry.canMarkNextEpisodeFromKnownGuide,
                 action: primaryAction
             )
@@ -1281,6 +1579,8 @@ private struct SeriesHomeDiscoveryRail: View {
     private static let tabletGridSpacing: CGFloat = 14
     private static let tabletMaxDisplayCount = 18
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let title: String
     let previews: [SeriesHomeDiscoveryPreview]
     let isLoading: Bool
@@ -1297,12 +1597,13 @@ private struct SeriesHomeDiscoveryRail: View {
         if isLoading || previews.isEmpty == false {
             VStack(alignment: .leading, spacing: 14) {
                 Text(title)
-                    .font(.system(size: 17, weight: .black, design: .rounded))
+                    .font(.headline.weight(.bold))
                     .foregroundStyle(.primary)
+                    .dynamicTypeSize(.xSmall ... .accessibility1)
 
                 if isTabletLayout {
                     LazyVGrid(
-                        columns: [GridItem(.adaptive(minimum: SeriesHomeDiscoveryCard.itemWidth, maximum: SeriesHomeDiscoveryCard.itemWidth), spacing: Self.tabletGridSpacing, alignment: .top)],
+                        columns: [GridItem(.adaptive(minimum: cardItemWidth, maximum: cardItemWidth), spacing: Self.tabletGridSpacing, alignment: .top)],
                         alignment: .leading,
                         spacing: 18
                     ) {
@@ -1355,8 +1656,12 @@ private struct SeriesHomeDiscoveryRail: View {
             return 4
         }
 
-        let columnStride = SeriesHomeDiscoveryCard.itemWidth + Self.tabletGridSpacing
+        let columnStride = cardItemWidth + Self.tabletGridSpacing
         return max(1, Int((tabletGridWidth + Self.tabletGridSpacing) / columnStride))
+    }
+
+    private var cardItemWidth: CGFloat {
+        SeriesHomeDiscoveryCard.itemWidth(for: dynamicTypeSize)
     }
 
     @ViewBuilder
@@ -1391,24 +1696,48 @@ private struct SeriesHomeDiscoveryRailWidthKey: PreferenceKey {
 private struct SeriesHomeDiscoverySkeletonCard: View {
     let seed: Int
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(Color(.tertiarySystemGroupedBackground))
-                .frame(width: 92, height: 128)
+                .frame(width: artworkWidth, height: artworkHeight)
                 .overlay(alignment: .bottomTrailing) {
                     Circle()
                         .fill(Color(.secondarySystemGroupedBackground))
-                        .frame(width: 34, height: 34)
-                        .padding(7)
+                        .frame(width: actionSize, height: actionSize)
+                        .padding(actionInset)
                 }
 
-            skeletonLine(width: seed.isMultiple(of: 2) ? 82 : 68, height: 14)
-            skeletonLine(width: seed.isMultiple(of: 2) ? 52 : 64, height: 11)
+            skeletonLine(
+                width: seed.isMultiple(of: 2) ? artworkWidth * 0.9 : artworkWidth * 0.72,
+                height: dynamicTypeSize.isAccessibilitySize ? 22 : 14
+            )
+            skeletonLine(
+                width: seed.isMultiple(of: 2) ? artworkWidth * 0.58 : artworkWidth * 0.7,
+                height: dynamicTypeSize.isAccessibilitySize ? 18 : 11
+            )
         }
-        .frame(width: SeriesHomeDiscoveryCard.itemWidth, alignment: .leading)
+        .frame(width: SeriesHomeDiscoveryCard.itemWidth(for: dynamicTypeSize), alignment: .leading)
         .redacted(reason: .placeholder)
         .accessibilityHidden(true)
+    }
+
+    private var artworkWidth: CGFloat {
+        SeriesHomeDiscoveryCard.artworkWidth(for: dynamicTypeSize)
+    }
+
+    private var artworkHeight: CGFloat {
+        SeriesHomeDiscoveryCard.artworkHeight(for: dynamicTypeSize)
+    }
+
+    private var actionSize: CGFloat {
+        SeriesHomeDiscoveryCard.actionSize(for: dynamicTypeSize)
+    }
+
+    private var actionInset: CGFloat {
+        dynamicTypeSize.isAccessibilitySize ? 8 : 7
     }
 }
 
@@ -1419,8 +1748,12 @@ private func skeletonLine(width: CGFloat, height: CGFloat) -> some View {
 }
 
 private struct SeriesHomeDiscoveryCard: View {
-    static let itemWidth: CGFloat = 108
-    private static let artworkWidth: CGFloat = 96
+    private static let standardItemWidth: CGFloat = 108
+    private static let accessibleItemWidth: CGFloat = 152
+    private static let standardArtworkWidth: CGFloat = 96
+    private static let accessibleArtworkWidth: CGFloat = 140
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     let preview: SeriesHomeDiscoveryPreview
     let canAddSeries: Bool
@@ -1436,33 +1769,42 @@ private struct SeriesHomeDiscoveryCard: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(preview.title)
+            .accessibilityValue(preview.metadataText)
             .accessibilityHint(L10n.string("detail.open"))
+            .accessibilityIdentifier("home.discovery.card.\(preview.id)")
 
             actionButton
-                .padding(.leading, Self.artworkWidth - 41)
-                .padding(.top, 91)
+                .padding(.leading, artworkWidth - actionSize - actionInset)
+                .padding(.top, artworkHeight - actionSize - actionInset)
         }
-        .frame(width: Self.itemWidth, alignment: .leading)
+        .frame(width: itemWidth, alignment: .leading)
+        .dynamicTypeSize(.xSmall ... .accessibility1)
     }
 
     private var cardContent: some View {
         VStack(alignment: .leading, spacing: 9) {
-            SeriesHomePreviewArtwork(preview: preview, width: Self.artworkWidth, height: 132)
+            SeriesHomePreviewArtwork(preview: preview, width: artworkWidth, height: artworkHeight)
 
             Text(preview.title)
-                .font(.system(size: preview.titleFontSize, weight: .black, design: .rounded))
+                .font(titleFont)
                 .foregroundStyle(.primary)
-                .lineLimit(2)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 2)
                 .allowsTightening(true)
                 .truncationMode(.tail)
-                .frame(width: Self.artworkWidth, height: 36, alignment: .topLeading)
+                .frame(
+                    width: artworkWidth,
+                    height: dynamicTypeSize.isAccessibilitySize ? nil : 36,
+                    alignment: .topLeading
+                )
+                .fixedSize(horizontal: false, vertical: dynamicTypeSize.isAccessibilitySize)
 
             Text(preview.metadataText)
-                .font(.system(size: 11, weight: .bold))
+                .font(metadataFont)
                 .foregroundStyle(.secondary)
-                .lineLimit(1)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
                 .minimumScaleFactor(0.82)
-                .frame(width: Self.artworkWidth, alignment: .leading)
+                .frame(width: artworkWidth, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: dynamicTypeSize.isAccessibilitySize)
         }
     }
 
@@ -1472,13 +1814,68 @@ private struct SeriesHomeDiscoveryCard: View {
             canAddSeries ? addSeries() : showLimitAction()
         } label: {
             Image(systemName: canAddSeries ? "plus" : "sparkles")
-                .font(.system(size: 15, weight: .black))
+                .font(actionFont)
                 .foregroundStyle(AVBrandColor.accent)
-                .frame(width: 34, height: 34)
+                .frame(width: actionSize, height: actionSize)
                 .background(.regularMaterial, in: Circle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(canAddSeries ? L10n.string("search.follow") : limitActionTitle)
+        .accessibilityIdentifier("home.discovery.action.\(preview.id)")
+    }
+
+    static func itemWidth(for dynamicTypeSize: DynamicTypeSize) -> CGFloat {
+        dynamicTypeSize.isAccessibilitySize ? accessibleItemWidth : standardItemWidth
+    }
+
+    static func artworkWidth(for dynamicTypeSize: DynamicTypeSize) -> CGFloat {
+        dynamicTypeSize.isAccessibilitySize ? accessibleArtworkWidth : standardArtworkWidth
+    }
+
+    static func artworkHeight(for dynamicTypeSize: DynamicTypeSize) -> CGFloat {
+        dynamicTypeSize.isAccessibilitySize ? 193 : 132
+    }
+
+    static func actionSize(for dynamicTypeSize: DynamicTypeSize) -> CGFloat {
+        dynamicTypeSize.isAccessibilitySize ? 44 : 34
+    }
+
+    private var itemWidth: CGFloat {
+        Self.itemWidth(for: dynamicTypeSize)
+    }
+
+    private var artworkWidth: CGFloat {
+        Self.artworkWidth(for: dynamicTypeSize)
+    }
+
+    private var artworkHeight: CGFloat {
+        Self.artworkHeight(for: dynamicTypeSize)
+    }
+
+    private var actionSize: CGFloat {
+        Self.actionSize(for: dynamicTypeSize)
+    }
+
+    private var actionInset: CGFloat {
+        dynamicTypeSize.isAccessibilitySize ? 8 : 7
+    }
+
+    private var titleFont: Font {
+        dynamicTypeSize.isAccessibilitySize
+            ? .subheadline.weight(.bold)
+            : .system(size: preview.titleFontSize, weight: .black, design: .rounded)
+    }
+
+    private var metadataFont: Font {
+        dynamicTypeSize.isAccessibilitySize
+            ? .caption.weight(.semibold)
+            : .system(size: 11, weight: .bold)
+    }
+
+    private var actionFont: Font {
+        dynamicTypeSize.isAccessibilitySize
+            ? .headline.weight(.black)
+            : .system(size: 15, weight: .black)
     }
 }
 
@@ -1662,23 +2059,32 @@ struct SeriesProgressPillButton: View {
     var minHeight: CGFloat = 40
     var fillsAvailableWidth = false
     var isDisabled = false
+    var titleFont: Font = .system(size: 13, weight: .black, design: .rounded)
+    var titleLineLimit = 1
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            Label(title, systemImage: systemName)
-                .font(.system(size: 13, weight: .black, design: .rounded))
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-                .allowsTightening(true)
-                .foregroundStyle(foregroundColor)
-                .frame(maxWidth: fillsAvailableWidth ? .infinity : nil, minHeight: minHeight)
-                .padding(.horizontal, 13)
-                .background(backgroundColor, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .stroke(strokeColor, lineWidth: 1)
-                }
+            HStack(spacing: 8) {
+                Image(systemName: systemName)
+                    .accessibilityHidden(true)
+
+                Text(title)
+                    .lineLimit(titleLineLimit)
+                    .minimumScaleFactor(0.72)
+                    .allowsTightening(true)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+            }
+            .font(titleFont)
+            .foregroundStyle(foregroundColor)
+            .frame(maxWidth: fillsAvailableWidth ? .infinity : nil, minHeight: minHeight)
+            .padding(.horizontal, 13)
+            .background(backgroundColor, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(strokeColor, lineWidth: 1)
+            }
         }
         .buttonStyle(.plain)
         .disabled(isDisabled)
@@ -2542,32 +2948,79 @@ struct SeriesPosterMark: View {
 }
 
 private struct SeriesEmptyWatchingView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let openSearch: () -> Void
 
     var body: some View {
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                accessibilityLayout
+            } else {
+                standardLayout
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(20)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("home.empty-state")
+    }
+
+    private var standardLayout: some View {
         HStack(alignment: .center, spacing: 16) {
             SeriesEmptyPosterPlaceholder(size: 74)
 
             VStack(alignment: .leading, spacing: 10) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(L10n.string("home.empty.title"))
-                        .font(.system(size: 22, weight: .bold))
-                    Text(L10n.string("home.empty.subtitle"))
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+                emptyCopy
 
                 Button(action: openSearch) {
                     Label(L10n.string("home.add"), systemImage: "magnifyingglass")
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.regular)
+                .accessibilityIdentifier("home.empty.search")
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private var accessibilityLayout: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            emptyCopy
+
+            Button(action: openSearch) {
+                HStack(spacing: 10) {
+                    Image(systemName: "magnifyingglass")
+                    Text(L10n.string("home.add"))
+                    Spacer(minLength: 0)
+                }
+                .font(.headline.weight(.bold))
+                .dynamicTypeSize(.xSmall ... .accessibility1)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
+                .foregroundStyle(.white)
+                .background(AVBrandColor.accent, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(L10n.string("home.add"))
+            .accessibilityIdentifier("home.empty.search")
+        }
+    }
+
+    private var emptyCopy: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(L10n.string("home.empty.title"))
+                .font(.title3.weight(.bold))
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(L10n.string("home.empty.subtitle"))
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .dynamicTypeSize(.xSmall ... .accessibility1)
     }
 }
 

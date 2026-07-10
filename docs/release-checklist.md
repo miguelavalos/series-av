@@ -293,10 +293,11 @@ accepted before submit:
 
 ## Native Test Coverage
 
-The iOS project has native XCTest and UI test targets. The latest local run on
-2026-06-17 passed 50 tests on the iPhone 17 simulator. Before submission, keep
-this target green and add or manually sign off the remaining real-account
-flows:
+The iOS project has native XCTest and UI test targets. The latest focused local
+run on 2026-07-10 passed 120 `SeriesAVTests` unit tests, plus targeted iPhone and
+iPad UI smoke tests for the adaptive UI baseline documented in
+`ios-ui-quality-review.md`. Before submission, run the complete native suite,
+keep it green, and add or manually sign off the remaining real-account flows:
 
 1. Signed-in free Series-only account is eligible and can request deletion after typing `DELETE`.
 2. Tune AV linked app blocks deletion.

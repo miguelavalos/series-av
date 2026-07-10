@@ -62,6 +62,8 @@
 "detail.summary.guideCountOnly" = "Sinopsi no disponible. La guia té %d episodis coneguts.";
 "detail.summary.loadingGuide" = "Sinopsi no disponible. S'està carregant la guia d'episodis.";
 "detail.summary.noGuide" = "Sinopsi no disponible. La guia d'episodis encara no està disponible per a aquesta sèrie.";
+"detail.summary.expand" = "Mostra'n més";
+"detail.summary.collapse" = "Mostra'n menys";
 "detail.numbering.providerNote" = "L'episodi total i la temporada poden diferir: les temporades segueixen la guia del proveïdor.";
 "detail.guideCoverage.latest" = "Guia actualitzada fins a %@";
 "detail.guideCoverage.count" = "Guia amb %d episodis coneguts";
@@ -75,6 +77,7 @@
 "detail.guideFeedback.sent.detail" = "Rebut. Ho farem servir per prioritzar l'enriquiment d'aquesta sèrie.";
 "detail.guideFeedback.failed" = "No s'ha pogut enviar. Torna-ho a provar.";
 "detail.tracking.title" = "Seguiment";
+"detail.tracking.adjustCompact" = "Ajustar";
 "detail.tracking.notFollowed" = "Encara no es a la teva biblioteca.";
 "detail.episodes.title" = "Episodis";
 "detail.episodes.unavailable" = "Guia no disponible";
@@ -94,6 +97,8 @@
 "home.editor.guideCoverage.generic" = "Rang manual: la guia encara no marca un límit fiable";
 "home.editor.guideCoverage.unavailable" = "Guia pendent de revisar";
 "detail.sources.title" = "Fonts";
+"detail.options.title" = "Més opcions";
+"detail.sources.open" = "Obrir una font";
 "detail.sources.imdb" = "IMDb";
 "detail.sources.wikipedia" = "Viquipèdia";
 "detail.sources.web" = "Cerca web";
@@ -108,7 +113,9 @@
 "detail.delete.confirm.title" = "Eliminar sèrie";
 "detail.delete.confirm.detail" = "La sèrie sortirà de la biblioteca local. Ho podràs desfer just després.";
 "detail.delete.confirm.action" = "Eliminar sèrie";
+"detail.management.open" = "Gestionar la sèrie";
 "detail.privateNote.title" = "Nota privada";
+"detail.privateNote.add" = "Afegir una nota privada";
 "detail.privateNote.empty" = "Afegeix una nota privada només per a tu.";
 "detail.privateNote.edit" = "Edita la nota privada";
 "detail.privateNote.count" = "%d de %d caràcters";
@@ -119,6 +126,7 @@
 "home.readyToStart.title" = "A punt per començar";
 "home.rail.popular" = "Populars";
 "home.rail.recommended" = "Més per seguir";
+"home.discovery.failure" = "No s'han pogut carregar els suggeriments. Comprova la connexió.";
 "home.editor.season" = "Temporada %d";
 "home.editor.season.short" = "Temporada";
 "home.editor.episode" = "Episodi %d";
@@ -156,6 +164,7 @@
 "library.search.empty.title" = "Sense resultats";
 "library.search.empty.subtitle" = "Prova amb un altre títol.";
 "library.filter.title" = "Filtre";
+"library.filter.selector.label" = "Filtra la biblioteca";
 "library.filter.all" = "Tot";
 "library.filter.wantToWatch" = "Per veure";
 "library.filter.watching" = "Veient";
@@ -271,21 +280,22 @@
 "profile.pro.avi.title" = "Avi a Home";
 "profile.pro.avi.detail" = "Mantingues la guia de seguiment al costat de la sèrie actual.";
 "profile.safety.title" = "Seguretat del compte";
-"profile.safety.subtitle" = "Les accions sensibles usen Account AV sense enviar-te a iniciar sessió de nou al web.";
+"profile.safety.subtitle" = "Gestiona accions sensibles sense tornar a iniciar sessió al web.";
 "profile.safety.delete.title" = "Eliminar el compte d'Apps AV";
-"profile.safety.delete.detail" = "Inicia una sol·licitud protegida dins l'app per al teu compte compartit d'Apps AV.";
+"profile.safety.delete.detail" = "Sol·licita eliminar el teu compte compartit d'Apps AV.";
 "profile.actions.signingOut" = "Tancant sessió…";
 "profile.actions.signOut" = "Tancar sessió";
 "profile.account.connect" = "Iniciar sessió";
 "profile.account.connectUnavailable" = "L'inici de sessió del compte no està disponible ara";
 "profile.account.connected" = "Connectat a %@.";
-"profile.account.identity.guest" = "Mode local en aquest dispositiu";
+"profile.account.identity.guest" = "Sense cap compte connectat";
 "profile.summary.account.detail.signedIn" = "Sessió iniciada";
 "profile.summary.account.detail.guest" = "Estàs usant Series AV en mode local en aquest dispositiu.";
 "profile.summary.plan.detail.guest" = "Mode local";
-"profile.summary.plan.detail.free" = "Compte connectat";
+"profile.summary.plan.detail.free" = "Pla gratuït";
 "profile.summary.plan.detail.pro" = "Pro";
 "profile.pro.subtitle.guest" = "Inicia sessió per veure Series AV Pro.";
+"profile.pro.subtitle.unavailable" = "Podràs consultar Series AV Pro quan l'accés al compte torni a estar disponible.";
 "profile.pro.subtitle.free" = "Millora per seguir més sèries actives i mantenir l'accés Pro vinculat al compte.";
 "profile.pro.subtitle.pro" = "El teu accés Pro està actiu. Gestiona la facturació al teu compte de l'App Store.";
 "profile.pro.signIn" = "Iniciar sessió";
@@ -408,6 +418,14 @@
 
 "accountDeletion.confirm.instructions" = "Escriu DELETE per confirmar que vols eliminar el compte compartit d'Apps AV.";
 
+"accountDeletion.confirm.fieldHint" = "Escriu DELETE per activar el botó Eliminar el compte d'Apps AV.";
+
+"accountDeletion.confirm.fieldLabel" = "Codi de confirmació";
+
+"accountDeletion.confirm.fieldValueEmpty" = "Buit";
+
+"accountDeletion.confirm.title" = "Confirmació final";
+
 "accountDeletion.deleteButton" = "Eliminar el compte d'Apps AV";
 
 "accountDeletion.deleting" = "Eliminant el compte…";
@@ -430,7 +448,15 @@
 
 "accountDeletion.finalizing" = "Finalitzant…";
 
-"accountDeletion.impact.high.detail" = "Eliminar aquest compte és permanent. Pots perdre accés Pro, subscripcions gestionades per un altre proveïdor, crèdits sense usar, crèdits reservats, contingut generat i dades de totes les apps Apps AV. Això no es pot desfer. L'eliminació continua disponible si decideixes continuar.";
+"accountDeletion.impact.high.footer" = "L'eliminació és permanent. Pots continuar, però no es pot desfer.";
+
+"accountDeletion.impact.high.intro" = "Pots perdre:";
+
+"accountDeletion.impact.high.item.access" = "L'accés Pro i les subscripcions gestionades per altres proveïdors.";
+
+"accountDeletion.impact.high.item.credits" = "Els crèdits sense usar o reservats i el contingut generat.";
+
+"accountDeletion.impact.high.item.data" = "Les dades de totes les apps Apps AV.";
 
 "accountDeletion.impact.high.title" = "Pèrdua permanent de Pro, crèdits i dades";
 
@@ -490,6 +516,14 @@
 "search.collection.updating" = "Actualitzant el cataleg";
 "search.results.count.one" = "%d resultat";
 "search.results.count.other" = "%d resultats";
+"search.metadata.status.running" = "En emissió";
+"search.metadata.status.ended" = "Finalitzada";
+"search.metadata.status.upcoming" = "Properament";
+"search.metadata.status.cancelled" = "Cancel·lada";
+"search.metadata.status.hiatus" = "En pausa";
+"search.metadata.throughSeason" = "Fins a T%d";
+"search.metadata.episodes.one" = "%d episodi";
+"search.metadata.episodes.other" = "%d episodis";
 "common.retry" = "Torna-ho a provar";
 "shareInvite.title" = "Invitacio de Series";
 "shareInvite.heading" = "Acceptar serie compartida";

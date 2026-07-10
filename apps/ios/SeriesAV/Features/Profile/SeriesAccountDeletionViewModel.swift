@@ -2,11 +2,19 @@ import Foundation
 
 @MainActor
 final class SeriesAccountDeletionViewModel: ObservableObject {
+    enum ErrorContext: String, Equatable {
+        case load
+        case requestDeletion
+        case finalizeDeletion
+        case unlink
+    }
+
     @Published private(set) var summary: AccountSummary?
     @Published private(set) var resolvedEligibility: AccountDeletionEligibility?
     @Published private(set) var isLoading = false
     @Published private(set) var isSubmitting = false
     @Published private(set) var errorMessage: String?
+    @Published private(set) var errorContext: ErrorContext?
     @Published private(set) var didCompleteDeletion = false
     @Published private(set) var didUnlinkCurrentApp = false
     @Published private(set) var unlinkMessage: String?
@@ -62,7 +70,7 @@ final class SeriesAccountDeletionViewModel: ObservableObject {
     func load() async {
         guard !isLoading else { return }
         isLoading = true
-        errorMessage = nil
+        clearError()
         defer { isLoading = false }
 
         do {
@@ -76,7 +84,7 @@ final class SeriesAccountDeletionViewModel: ObservableObject {
                 try? await completeLocalSignOut()
                 return
             }
-            errorMessage = L10n.string("accountDeletion.error.load")
+            setError(L10n.string("accountDeletion.error.load"), context: .load)
             resolvedEligibility = SeriesAccountDeletionPolicy.unavailableEligibility(copy: Self.deletionCopy)
         }
     }
@@ -84,7 +92,7 @@ final class SeriesAccountDeletionViewModel: ObservableObject {
     func requestDeletion() async {
         guard canRequestDeletion, !isSubmitting else { return }
         isSubmitting = true
-        errorMessage = nil
+        clearError()
         defer { isSubmitting = false }
 
         do {
@@ -99,14 +107,14 @@ final class SeriesAccountDeletionViewModel: ObservableObject {
                 try await completeLocalSignOut()
             }
         } catch {
-            errorMessage = L10n.string("accountDeletion.error.request")
+            setError(L10n.string("accountDeletion.error.request"), context: .requestDeletion)
         }
     }
 
     func finalizeDeletion() async {
         guard canFinalizeDeletion, !isSubmitting else { return }
         isSubmitting = true
-        errorMessage = nil
+        clearError()
         defer { isSubmitting = false }
 
         do {
@@ -121,14 +129,14 @@ final class SeriesAccountDeletionViewModel: ObservableObject {
                 try await completeLocalSignOut()
             }
         } catch {
-            errorMessage = L10n.string("accountDeletion.error.finalize")
+            setError(L10n.string("accountDeletion.error.finalize"), context: .finalizeDeletion)
         }
     }
 
     func unlinkCurrentApp() async {
         guard canUnlinkCurrentApp, !isSubmitting else { return }
         isSubmitting = true
-        errorMessage = nil
+        clearError()
         defer { isSubmitting = false }
 
         do {
@@ -137,8 +145,18 @@ final class SeriesAccountDeletionViewModel: ObservableObject {
             try await signOut()
             didUnlinkCurrentApp = true
         } catch {
-            errorMessage = L10n.string("accountDeletion.error.unlink")
+            setError(L10n.string("accountDeletion.error.unlink"), context: .unlink)
         }
+    }
+
+    private func clearError() {
+        errorMessage = nil
+        errorContext = nil
+    }
+
+    private func setError(_ message: String, context: ErrorContext) {
+        errorMessage = message
+        errorContext = context
     }
 
     private func apply(summary: AccountSummary) {

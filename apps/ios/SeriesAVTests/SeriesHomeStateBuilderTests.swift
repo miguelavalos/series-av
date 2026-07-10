@@ -66,6 +66,33 @@ final class SeriesHomeStateBuilderTests: XCTestCase {
         XCTAssertEqual(preview.titleFontSize, 12.5)
     }
 
+    func testDiscoverySnapshotReportsWhetherAnyRailHasContent() {
+        let emptySnapshot = SeriesHomeDiscoverySnapshot(popular: [], upcoming: [], recommended: [])
+        let populatedSnapshot = SeriesHomeDiscoverySnapshot(
+            popular: [],
+            upcoming: [preview(id: "upcoming", title: "Upcoming")],
+            recommended: []
+        )
+
+        XCTAssertFalse(emptySnapshot.hasContent)
+        XCTAssertTrue(populatedSnapshot.hasContent)
+    }
+
+    @MainActor
+    func testDiscoverySessionCacheKeepsTheLatestSuccessfulSnapshot() {
+        SeriesHomeDiscoverySessionCache.reset()
+        defer { SeriesHomeDiscoverySessionCache.reset() }
+        let snapshot = SeriesHomeDiscoverySnapshot(
+            popular: [preview(id: "popular", title: "Popular")],
+            upcoming: [],
+            recommended: []
+        )
+
+        SeriesHomeDiscoverySessionCache.store(snapshot)
+
+        XCTAssertEqual(SeriesHomeDiscoverySessionCache.value(), snapshot)
+    }
+
     private func entry(
         id: String,
         title: String,

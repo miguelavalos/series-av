@@ -121,6 +121,48 @@ final class SeriesBundleConfigTests: XCTestCase {
 
         XCTAssertTrue(DefaultSeriesAVAccountService.shouldForceGuestForUITests(environment: forceGuestEnvironment))
     }
+
+    @MainActor
+    func testEpisodeGuideScenarioIsOnlyAvailableDuringUITests() {
+        let regularEnvironment = SeriesUITestEnvironment(environment: [
+            "SERIESAV_UI_TESTS_EPISODE_GUIDE": "failed_once"
+        ])
+        let uiTestEnvironment = SeriesUITestEnvironment(environment: [
+            "SERIESAV_UI_TESTS": "1",
+            "SERIESAV_UI_TESTS_EPISODE_GUIDE": "failed_once"
+        ])
+
+        XCTAssertNil(regularEnvironment.episodeGuideScenario)
+        XCTAssertEqual(uiTestEnvironment.episodeGuideScenario, "failed_once")
+    }
+
+    @MainActor
+    func testGuideFeedbackScenarioIsOnlyAvailableDuringUITests() {
+        let regularEnvironment = SeriesUITestEnvironment(environment: [
+            "SERIESAV_UI_TESTS_GUIDE_FEEDBACK": "sent"
+        ])
+        let uiTestEnvironment = SeriesUITestEnvironment(environment: [
+            "SERIESAV_UI_TESTS": "1",
+            "SERIESAV_UI_TESTS_GUIDE_FEEDBACK": "sent"
+        ])
+
+        XCTAssertNil(regularEnvironment.guideFeedbackScenario)
+        XCTAssertEqual(uiTestEnvironment.guideFeedbackScenario, "sent")
+    }
+
+    @MainActor
+    func testHomeDiscoveryScenarioIsOnlyAvailableDuringUITests() {
+        let regularEnvironment = SeriesUITestEnvironment(environment: [
+            "SERIESAV_UI_TESTS_HOME_DISCOVERY": "failed_once"
+        ])
+        let uiTestEnvironment = SeriesUITestEnvironment(environment: [
+            "SERIESAV_UI_TESTS": "1",
+            "SERIESAV_UI_TESTS_HOME_DISCOVERY": "failed_once"
+        ])
+
+        XCTAssertNil(regularEnvironment.homeDiscoveryScenario)
+        XCTAssertEqual(uiTestEnvironment.homeDiscoveryScenario, "failed_once")
+    }
 }
 
 private enum BundleConfigFixture {

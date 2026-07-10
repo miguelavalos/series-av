@@ -3,6 +3,9 @@ import AVBrandFoundation
 import SwiftUI
 
 struct SeriesLibraryTabScreen: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     @Bindable var store: SeriesLibraryStore
     let accessController: SeriesAccessController?
 
@@ -189,11 +192,11 @@ struct SeriesLibraryTabScreen: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
                 Image(systemName: "magnifyingglass")
-                    .font(.system(size: 18, weight: .bold))
+                    .font(.headline.weight(.bold))
                     .foregroundStyle(AVBrandColor.accent)
 
                 TextField(L10n.string("library.search.placeholder"), text: $query)
-                    .font(.system(size: 17, weight: .semibold))
+                    .font(.body.weight(.semibold))
                     .textInputAutocapitalization(.words)
                     .submitLabel(.search)
 
@@ -202,7 +205,7 @@ struct SeriesLibraryTabScreen: View {
                         query = ""
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 18, weight: .bold))
+                            .font(.headline.weight(.bold))
                             .foregroundStyle(.secondary)
                     }
                     .buttonStyle(.plain)
@@ -216,30 +219,92 @@ struct SeriesLibraryTabScreen: View {
                     .stroke(Color.primary.opacity(0.06), lineWidth: 1)
             }
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(SeriesLibraryFilter.allCases, id: \.self) { filter in
-                        Button {
-                            selectedFilter = filter
-                        } label: {
-                            Text(filterShortTitle(filter))
-                                .font(.system(size: 13, weight: .bold))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.78)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 10)
-                        }
-                        .buttonStyle(.plain)
-                        .foregroundStyle(selectedFilter == filter ? Color.white : Color.primary)
-                        .background(selectedFilter == filter ? AVBrandColor.accent : Color(.secondarySystemGroupedBackground), in: Capsule())
-                        .overlay {
-                            Capsule()
-                                .stroke(selectedFilter == filter ? AVBrandColor.accent.opacity(0.8) : Color.primary.opacity(0.08), lineWidth: 1)
-                        }
+            if dynamicTypeSize.isAccessibilitySize {
+                accessibleFilterMenu
+            } else {
+                filterChips
+            }
+        }
+    }
+
+    private var filterChips: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(SeriesLibraryFilter.allCases, id: \.self) { filter in
+                    Button {
+                        selectedFilter = filter
+                    } label: {
+                        Text(filterShortTitle(filter))
+                            .font(.caption.weight(.bold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.78)
+                            .padding(.horizontal, filterHorizontalPadding)
+                            .padding(.vertical, 10)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(selectedFilter == filter ? Color.white : Color.primary)
+                    .background(selectedFilter == filter ? AVBrandColor.accent : Color(.secondarySystemGroupedBackground), in: Capsule())
+                    .overlay {
+                        Capsule()
+                            .stroke(selectedFilter == filter ? AVBrandColor.accent.opacity(0.8) : Color.primary.opacity(0.08), lineWidth: 1)
                     }
                 }
             }
         }
+    }
+
+    private var accessibleFilterMenu: some View {
+        Menu {
+            ForEach(SeriesLibraryFilter.allCases, id: \.self) { filter in
+                Button {
+                    selectedFilter = filter
+                } label: {
+                    if selectedFilter == filter {
+                        Label(filterTitle(filter), systemImage: "checkmark")
+                    } else {
+                        Text(filterTitle(filter))
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "line.3.horizontal.decrease.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(AVBrandColor.accent)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L10n.string("library.filter.title"))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(AVBrandColor.textSecondary)
+
+                    Text(filterTitle(selectedFilter))
+                        .font(.body.weight(.bold))
+                        .foregroundStyle(AVBrandColor.textPrimary)
+                }
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(AVBrandColor.textSecondary)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
+            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(L10n.string("library.filter.selector.label"))
+        .accessibilityValue(filterTitle(selectedFilter))
+        .accessibilityIdentifier("library.filter.selector")
+    }
+
+    private var filterHorizontalPadding: CGFloat {
+        horizontalSizeClass == .compact ? 10 : 14
     }
 
     private var shareInviteClient: SeriesShareInviteClient? {
@@ -250,12 +315,12 @@ struct SeriesLibraryTabScreen: View {
     private func screenTitle(title: String, subtitle: String) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
-                .font(.system(size: 34, weight: .black))
+                .font(.largeTitle.weight(.black))
                 .foregroundStyle(AVBrandColor.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
 
             Text(subtitle)
-                .font(AVBrandTypography.body)
+                .font(.body)
                 .foregroundStyle(AVBrandColor.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -266,10 +331,10 @@ struct SeriesLibraryTabScreen: View {
         AVAppShellCard {
             VStack(alignment: .leading, spacing: 8) {
                 Text(title)
-                    .font(.system(size: 12, weight: .bold))
+                    .font(.caption.weight(.bold))
                     .foregroundStyle(AVBrandColor.textSecondary)
 
-                LazyVGrid(columns: libraryGridColumns, alignment: .leading, spacing: 10) {
+                LazyVGrid(columns: libraryGridColumns, alignment: .leading, spacing: libraryGridSpacing) {
                     ForEach(entries) { entry in
                         SeriesLibraryRow(
                             entry: entry,
@@ -283,7 +348,8 @@ struct SeriesLibraryTabScreen: View {
                                 activeMenu(for: entry)
                             }
                         }
-                        .padding(10)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, libraryRowVerticalPadding)
                         .background(Color(.secondarySystemGroupedBackground).opacity(0.62), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                     }
                 }
@@ -293,6 +359,14 @@ struct SeriesLibraryTabScreen: View {
 
     private var libraryGridColumns: [GridItem] {
         [GridItem(.adaptive(minimum: 360), spacing: 10)]
+    }
+
+    private var libraryGridSpacing: CGFloat {
+        horizontalSizeClass == .compact ? 6 : 10
+    }
+
+    private var libraryRowVerticalPadding: CGFloat {
+        horizontalSizeClass == .compact ? 6 : 10
     }
 
     @ViewBuilder

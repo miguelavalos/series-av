@@ -5,6 +5,7 @@ import SwiftUI
 
 struct SeriesAppShellView: View {
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Binding var selectedTab: SeriesRootTab
     let accessController: SeriesAccessController
     let store: SeriesLibraryStore
@@ -89,7 +90,7 @@ struct SeriesAppShellView: View {
                 NavigationStack {
                     screen(for: selectedTab)
                 }
-                .safeAreaPadding(.bottom, 96)
+                .safeAreaPadding(.bottom, appExperience.footerConfiguration.backdropHeight)
             },
             footerPlayer: {
                 EmptyView()
@@ -110,12 +111,13 @@ struct SeriesAppShellView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .background(AVBrandSurface.shellBackground.ignoresSafeArea())
+            .accessibilityElement(children: .contain)
             .accessibilityIdentifier("series.shell.tablet")
         }
     }
 
     private var tabletSidebar: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: sidebarRowSpacing) {
             tabletSidebarBrandHeader
             .padding(.bottom, 12)
 
@@ -131,6 +133,7 @@ struct SeriesAppShellView: View {
             tabletChromeButton(
                 title: L10n.string("profile.settingsScreen.title"),
                 systemImage: "gearshape.fill",
+                accessibilityIdentifier: "series.sidebar.settings",
                 isSelected: chromeItem == .settings
             ) {
                 chromeItem = .settings
@@ -140,6 +143,7 @@ struct SeriesAppShellView: View {
             tabletChromeButton(
                 title: L10n.string("profile.accountScreen.title"),
                 systemImage: "person.crop.circle.fill",
+                accessibilityIdentifier: "series.sidebar.account",
                 isSelected: chromeItem == .account
             ) {
                 chromeItem = .account
@@ -148,9 +152,10 @@ struct SeriesAppShellView: View {
         }
         .padding(.horizontal, AVAppShellTabletSidebarMetric.horizontalPadding)
         .padding(.vertical, AVAppShellTabletSidebarMetric.verticalPadding)
-        .frame(width: 238, alignment: .topLeading)
+        .frame(width: tabletSidebarWidth, alignment: .topLeading)
         .frame(maxHeight: .infinity, alignment: .topLeading)
         .background(.regularMaterial)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("series.shell.tablet.sidebar")
     }
 
@@ -165,27 +170,89 @@ struct SeriesAppShellView: View {
     }
 
     private func tabletSidebarButton(tab: SeriesRootTab, isSelected: Bool) -> some View {
-        AVAppShellTabletSidebarButton(
+        tabletSidebarNavigationButton(
             title: tab.shellTab.title,
             systemImage: tab.shellTab.systemImage,
-            isSelected: isSelected
-        ) {
-            chromeItem = nil
-            selectedTab = tab
-        }
+            isSelected: isSelected,
+            action: {
+                chromeItem = nil
+                selectedTab = tab
+            }
+        )
         .accessibilityIdentifier("series.sidebar.\(tab.rawValue)")
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(tab.shellTab.title)
     }
 
-    private func tabletChromeButton(title: String, systemImage: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
-        AVAppShellTabletSidebarButton(
+    private func tabletChromeButton(
+        title: String,
+        systemImage: String,
+        accessibilityIdentifier: String,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        tabletSidebarNavigationButton(
             title: title,
             systemImage: systemImage,
             isSelected: isSelected,
-            fontSize: 15,
             action: action
         )
+        .accessibilityIdentifier(accessibilityIdentifier)
+    }
+
+    private func tabletSidebarNavigationButton(
+        title: String,
+        systemImage: String,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 10) {
+                Image(systemName: systemImage)
+                    .frame(width: sidebarIconWidth, alignment: .center)
+
+                Text(title)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Spacer(minLength: 0)
+            }
+            .font(.body.weight(isSelected ? .semibold : .medium))
+            .dynamicTypeSize(.xSmall ... .accessibility1)
+            .frame(maxWidth: .infinity, minHeight: sidebarMinimumRowHeight, alignment: .leading)
+            .padding(.horizontal, AVAppShellTabletSidebarMetric.rowHorizontalInset)
+            .padding(.vertical, sidebarRowVerticalInset)
+            .background(
+                isSelected ? Color.primary.opacity(0.08) : Color.clear,
+                in: RoundedRectangle(
+                    cornerRadius: AVAppShellTabletSidebarMetric.rowCornerRadius,
+                    style: .continuous
+                )
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    private var tabletSidebarWidth: CGFloat {
+        dynamicTypeSize.isAccessibilitySize ? 300 : 238
+    }
+
+    private var sidebarMinimumRowHeight: CGFloat {
+        dynamicTypeSize.isAccessibilitySize ? 56 : 44
+    }
+
+    private var sidebarRowVerticalInset: CGFloat {
+        dynamicTypeSize.isAccessibilitySize ? 8 : AVAppShellTabletSidebarMetric.rowVerticalInset
+    }
+
+    private var sidebarRowSpacing: CGFloat {
+        dynamicTypeSize.isAccessibilitySize ? 8 : 10
+    }
+
+    private var sidebarIconWidth: CGFloat {
+        dynamicTypeSize.isAccessibilitySize ? 32 : 24
     }
 
     private func scheduleSignedInLibrarySync(after delay: Duration? = nil) {
@@ -202,6 +269,7 @@ struct SeriesAppShellView: View {
 
         let syncPolicy = SeriesStartupSyncPolicy(
             canUseCloudSync: accessController.capabilities.canUseCloudSync,
+            shouldRetryAfterFailure: librarySync.shouldRetryAfterFailure,
             lastLibrarySyncRequestedAt: lastAutomaticLibrarySyncRequestedAt,
             now: .now
         )
@@ -326,21 +394,25 @@ struct SeriesStartupSyncPolicy: Equatable {
     static let automaticLibrarySyncInterval: TimeInterval = 300
 
     let canUseCloudSync: Bool
+    let shouldRetryAfterFailure: Bool
     let lastLibrarySyncRequestedAt: Date?
     let now: Date
 
     init(
         canUseCloudSync: Bool,
+        shouldRetryAfterFailure: Bool = false,
         lastLibrarySyncRequestedAt: Date? = nil,
         now: Date = .now
     ) {
         self.canUseCloudSync = canUseCloudSync
+        self.shouldRetryAfterFailure = shouldRetryAfterFailure
         self.lastLibrarySyncRequestedAt = lastLibrarySyncRequestedAt
         self.now = now
     }
 
     var shouldScheduleLibrarySync: Bool {
         guard canUseCloudSync else { return false }
+        guard shouldRetryAfterFailure == false else { return true }
         guard let lastLibrarySyncRequestedAt else { return true }
         return now.timeIntervalSince(lastLibrarySyncRequestedAt) >= Self.automaticLibrarySyncInterval
     }
