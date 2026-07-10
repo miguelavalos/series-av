@@ -7,6 +7,7 @@ struct SeriesDetailScreen: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @EnvironmentObject private var externalLinkPreferences: AppExternalLinkPreferencesController
 
     let catalogItem: SeriesCatalogItem?
@@ -220,47 +221,88 @@ struct SeriesDetailScreen: View {
 
     private var header: some View {
         AVAppShellCard {
-            HStack(alignment: .top, spacing: 16) {
-                artwork
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(title)
-                        .font(.system(size: 28, weight: .black, design: .rounded))
-                        .foregroundStyle(AVBrandColor.textPrimary)
-                        .lineLimit(3)
-                        .minimumScaleFactor(0.72)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    if metadataText.isEmpty == false {
-                        Text(metadataText)
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(.secondary)
-                            .lineLimit(2)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    SeriesExpandableSummaryText(
-                        text: spoilerFreeSummaryText,
-                        collapsedLineLimit: 4
-                    )
-
-                    if shouldShowProviderNumberingNote {
-                        Label(L10n.string("detail.numbering.providerNote"), systemImage: "number")
-                            .font(.system(size: 11, weight: .black))
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    Label(guideCoverageText, systemImage: guideCoverageSystemImage)
-                        .font(.system(size: 11, weight: .black))
-                        .foregroundStyle(AVBrandColor.accent)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.82)
-                        .fixedSize(horizontal: false, vertical: true)
+            Group {
+                if dynamicTypeSize.isAccessibilitySize {
+                    accessibilityHeader
+                } else {
+                    standardHeader
                 }
-                .layoutPriority(1)
+            }
+            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("series-detail-header")
+        }
+    }
+
+    private var standardHeader: some View {
+        HStack(alignment: .top, spacing: 16) {
+            artwork(size: 92)
+
+            VStack(alignment: .leading, spacing: 8) {
+                headerIdentity
+                headerSupportingContent
+            }
+            .layoutPriority(1)
+        }
+    }
+
+    private var accessibilityHeader: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 12) {
+                artwork(size: 76)
+                headerIdentity
+            }
+
+            headerSupportingContent
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private var headerIdentity: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.title.weight(.black))
+                .foregroundStyle(AVBrandColor.textPrimary)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
+                .minimumScaleFactor(dynamicTypeSize.isAccessibilitySize ? 1 : 0.72)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("series-detail-title")
+
+            if metadataText.isEmpty == false {
+                Text(metadataText)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("series-detail-metadata")
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var headerSupportingContent: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SeriesExpandableSummaryText(
+                text: spoilerFreeSummaryText,
+                collapsedLineLimit: 4
+            )
+
+            if shouldShowProviderNumberingNote {
+                Label(L10n.string("detail.numbering.providerNote"), systemImage: "number")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Label(guideCoverageText, systemImage: guideCoverageSystemImage)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(AVBrandColor.accent)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("series-detail-guide-coverage")
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var trackingSection: some View {
@@ -269,16 +311,7 @@ struct SeriesDetailScreen: View {
                 sectionTitle(L10n.string("detail.tracking.title"))
 
                 if let entry {
-                    HStack(alignment: .center, spacing: 12) {
-                        Label(statusTitle(entry.status), systemImage: detailStatusIcon(entry.status))
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(AVBrandColor.accent)
-
-                        Text(trackingDetail(for: entry))
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+                    trackingSummary(for: entry)
 
                     trackingActions(for: entry)
                 } else if let follow {
@@ -368,26 +401,47 @@ struct SeriesDetailScreen: View {
     }
 
     private func secondaryOptionLabel(_ title: String, systemImage: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: systemImage)
-                .font(.body.weight(.semibold))
-                .foregroundStyle(AVBrandColor.accent)
-                .frame(width: 28, height: 44)
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 8) {
+                    secondaryOptionIcon(systemImage)
 
-            Text(title)
-                .font(.subheadline.weight(.bold))
-                .foregroundStyle(AVBrandColor.textPrimary)
-                .fixedSize(horizontal: false, vertical: true)
+                    Text(title)
+                        .font(.headline)
+                        .foregroundStyle(AVBrandColor.textPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .contentShape(Rectangle())
+            } else {
+                HStack(spacing: 12) {
+                    secondaryOptionIcon(systemImage)
 
-            Spacer(minLength: 8)
+                    Text(title)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(AVBrandColor.textPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
 
-            Image(systemName: "chevron.up.chevron.down")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(.tertiary)
-                .accessibilityHidden(true)
+                    Spacer(minLength: 8)
+
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.tertiary)
+                        .accessibilityHidden(true)
+                }
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .contentShape(Rectangle())
+            }
         }
-        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-        .contentShape(Rectangle())
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+    }
+
+    private func secondaryOptionIcon(_ systemImage: String) -> some View {
+        Image(systemName: systemImage)
+            .font(.body.weight(.semibold))
+            .foregroundStyle(AVBrandColor.accent)
+            .frame(width: 28, height: 44, alignment: .leading)
+            .accessibilityHidden(true)
     }
 
     @ViewBuilder
@@ -397,58 +451,90 @@ struct SeriesDetailScreen: View {
                note.isEmpty == false {
                 AVAppShellCard {
                     VStack(alignment: .leading, spacing: 12) {
-                        HStack {
+                        HStack(spacing: 12) {
                             sectionTitle(L10n.string("detail.privateNote.title"))
-                            Spacer()
+                            Spacer(minLength: 8)
                             Button {
                                 isShowingPrivateNoteEditor = true
                             } label: {
                                 Image(systemName: "square.and.pencil")
-                                    .frame(width: 36, height: 36)
+                                    .font(.body.weight(.semibold))
+                                    .foregroundStyle(AVBrandColor.accent)
+                                    .frame(width: 44, height: 44)
+                                    .background(
+                                        Color.secondary.opacity(0.10),
+                                        in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    )
                             }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(.plain)
                             .accessibilityLabel(L10n.string("detail.privateNote.edit"))
                             .accessibilityIdentifier("series-detail-private-note-edit")
                         }
 
                         Text(note)
-                            .font(.system(size: 15, weight: .medium))
+                            .font(.body.weight(.medium))
                             .foregroundStyle(AVBrandColor.textPrimary)
                             .fixedSize(horizontal: false, vertical: true)
+                            .accessibilityIdentifier("series-detail-private-note-body")
                     }
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                 }
             } else {
                 AVAppShellCard {
                     Button {
                         isShowingPrivateNoteEditor = true
                     } label: {
-                        HStack(spacing: 12) {
-                            Image(systemName: "note.text.badge.plus")
-                                .font(.body.weight(.semibold))
-                                .foregroundStyle(AVBrandColor.accent)
-                                .frame(width: 28, height: 44)
-
-                            Text(L10n.string("detail.privateNote.add"))
-                                .font(.subheadline.weight(.bold))
-                                .foregroundStyle(AVBrandColor.textPrimary)
-                                .fixedSize(horizontal: false, vertical: true)
-
-                            Spacer(minLength: 8)
-
-                            Image(systemName: "chevron.right")
-                                .font(.caption.weight(.bold))
-                                .foregroundStyle(.tertiary)
-                                .accessibilityHidden(true)
-                        }
-                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                        .contentShape(Rectangle())
+                        privateNoteAddLabel
                     }
                     .buttonStyle(.plain)
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                     .accessibilityHint(L10n.string("detail.privateNote.empty"))
                     .accessibilityIdentifier("series-detail-private-note-add")
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private var privateNoteAddLabel: some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) {
+                privateNoteAddIcon
+
+                Text(L10n.string("detail.privateNote.add"))
+                    .font(.headline)
+                    .foregroundStyle(AVBrandColor.textPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .contentShape(Rectangle())
+        } else {
+            HStack(spacing: 12) {
+                privateNoteAddIcon
+
+                Text(L10n.string("detail.privateNote.add"))
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(AVBrandColor.textPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
+            }
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+    }
+
+    private var privateNoteAddIcon: some View {
+        Image(systemName: "note.text.badge.plus")
+            .font(.body.weight(.semibold))
+            .foregroundStyle(AVBrandColor.accent)
+            .frame(width: 28, height: 44, alignment: .leading)
+            .accessibilityHidden(true)
     }
 
     private var guideSection: some View {
@@ -479,9 +565,9 @@ struct SeriesDetailScreen: View {
                         }
 
                         if episodes.count > visibleEpisodes.count {
-                            Text(String(format: L10n.string("detail.episodes.more"), episodes.count - visibleEpisodes.count))
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundStyle(.secondary)
+                            episodeGuideRemainderLabel(
+                                remainingCount: episodes.count - visibleEpisodes.count
+                            )
                         }
                     }
                 case .failed:
@@ -510,50 +596,86 @@ struct SeriesDetailScreen: View {
                     await submitGuideFeedback()
                 }
             } label: {
-                HStack(spacing: 12) {
-                    Group {
-                        if feedbackState == .sending {
-                            ProgressView()
-                                .controlSize(.small)
-                        } else {
-                            Image(systemName: feedbackState == .sent ? "checkmark.circle.fill" : "exclamationmark.bubble")
-                                .font(.body.weight(.semibold))
-                        }
-                    }
-                    .foregroundStyle(feedbackState == .sent ? Color.green : AVBrandColor.accent)
-                    .frame(width: 28, height: 44)
-
-                    Text(guideFeedbackActionTitle)
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(AVBrandColor.textPrimary)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Spacer(minLength: 8)
-
-                    if feedbackState == .idle || feedbackState == .failed {
-                        Image(systemName: "chevron.right")
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(.tertiary)
-                            .accessibilityHidden(true)
-                    }
-                }
-                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                .contentShape(Rectangle())
+                guideFeedbackLabel
             }
             .buttonStyle(.plain)
+            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
             .disabled(seriesId.isEmpty || feedbackState == .sending || feedbackState == .sent)
             .accessibilityHint(L10n.string("detail.guideFeedback.detail"))
             .accessibilityIdentifier("series-detail-guide-feedback")
 
             if let message = guideFeedbackStatusMessage {
                 Text(message)
-                    .font(.system(size: 12, weight: .bold))
+                    .font(.footnote.weight(.semibold))
                     .foregroundStyle(feedbackState == .failed ? Color.red : Color.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                    .padding(.leading, 40)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, dynamicTypeSize.isAccessibilitySize ? 0 : 40)
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                     .accessibilityIdentifier("series-detail-guide-feedback-status")
             }
         }
+    }
+
+    @ViewBuilder
+    private var guideFeedbackLabel: some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) {
+                guideFeedbackIcon
+
+                Text(guideFeedbackActionTitle)
+                    .font(.headline)
+                    .foregroundStyle(AVBrandColor.textPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .contentShape(Rectangle())
+        } else {
+            HStack(spacing: 12) {
+                guideFeedbackIcon
+
+                Text(guideFeedbackActionTitle)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(AVBrandColor.textPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Spacer(minLength: 8)
+
+                if feedbackState == .idle || feedbackState == .failed {
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.tertiary)
+                        .accessibilityHidden(true)
+                }
+            }
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+    }
+
+    private var guideFeedbackIcon: some View {
+        Group {
+            if feedbackState == .sending {
+                ProgressView()
+                    .controlSize(.small)
+            } else {
+                Image(systemName: feedbackState == .sent ? "checkmark.circle.fill" : "exclamationmark.bubble")
+                    .font(.body.weight(.semibold))
+            }
+        }
+        .foregroundStyle(feedbackState == .sent ? Color.green : AVBrandColor.accent)
+        .frame(width: 28, height: 44, alignment: .leading)
+        .accessibilityHidden(true)
+    }
+
+    private func episodeGuideRemainderLabel(remainingCount: Int) -> some View {
+        Text(String(format: L10n.string("detail.episodes.more"), remainingCount))
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+            .accessibilityIdentifier("series-detail-episodes-more")
     }
 
     private var presentation: SeriesDetailPresentation {
@@ -580,17 +702,68 @@ struct SeriesDetailScreen: View {
 
     private func sectionTitle(_ title: String) -> some View {
         Text(title)
-            .font(.system(size: 13, weight: .black))
+            .font(.caption.weight(.black))
             .foregroundStyle(AVBrandColor.textSecondary)
             .textCase(.uppercase)
+            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+    }
+
+    private func trackingSummary(for entry: SeriesLibraryEntry) -> some View {
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 6) {
+                    trackingStatusLabel(for: entry)
+                    trackingDetailText(for: entry)
+                }
+            } else {
+                HStack(alignment: .center, spacing: 12) {
+                    trackingStatusLabel(for: entry)
+                    trackingDetailText(for: entry)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("series-detail-tracking-summary")
+    }
+
+    private func trackingStatusLabel(for entry: SeriesLibraryEntry) -> some View {
+        Label(statusTitle(entry.status), systemImage: detailStatusIcon(entry.status))
+            .font(.subheadline.weight(.bold))
+            .foregroundStyle(AVBrandColor.accent)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("series-detail-tracking-status")
+    }
+
+    private func trackingDetailText(for entry: SeriesLibraryEntry) -> some View {
+        Text(trackingDetail(for: entry))
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityIdentifier("series-detail-tracking-detail")
     }
 
     private func trackingActions(for entry: SeriesLibraryEntry) -> some View {
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                accessibilityTrackingActions(for: entry)
+            } else {
+                standardTrackingActions(for: entry)
+            }
+        }
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("series-detail-tracking-actions")
+    }
+
+    private func standardTrackingActions(for entry: SeriesLibraryEntry) -> some View {
         ViewThatFits(in: .horizontal) {
             HStack(spacing: 8) {
                 primaryTrackingAction(for: entry, allowsWrapping: false)
                 adjustTrackingAction(expands: false)
-                pinTrackingAction
+                pinTrackingAction()
             }
 
             VStack(spacing: 8) {
@@ -598,9 +771,17 @@ struct SeriesDetailScreen: View {
 
                 HStack(spacing: 8) {
                     adjustTrackingAction(expands: true)
-                    pinTrackingAction
+                    pinTrackingAction()
                 }
             }
+        }
+    }
+
+    private func accessibilityTrackingActions(for entry: SeriesLibraryEntry) -> some View {
+        VStack(spacing: 8) {
+            primaryTrackingAction(for: entry, allowsWrapping: true)
+            adjustTrackingAction(expands: true, usesFullTitle: true)
+            pinTrackingAction(expands: true, showsLabel: true)
         }
     }
 
@@ -631,13 +812,20 @@ struct SeriesDetailScreen: View {
         .accessibilityIdentifier("series-detail-tracking-primary")
     }
 
-    private func adjustTrackingAction(expands: Bool) -> some View {
+    private func adjustTrackingAction(
+        expands: Bool,
+        usesFullTitle: Bool = false
+    ) -> some View {
         Button {
             isShowingProgressEditor = true
         } label: {
-            Label(L10n.string("detail.tracking.adjustCompact"), systemImage: "scope")
-                .font(.caption.weight(.bold))
-                .lineLimit(1)
+            Label(
+                L10n.string(usesFullTitle ? "home.adjust" : "detail.tracking.adjustCompact"),
+                systemImage: "scope"
+            )
+                .font((usesFullTitle ? Font.subheadline : Font.caption).weight(.bold))
+                .lineLimit(usesFullTitle ? 2 : 1)
+                .multilineTextAlignment(.center)
                 .fixedSize(horizontal: expands == false, vertical: false)
                 .frame(maxWidth: expands ? .infinity : nil, minHeight: 30)
         }
@@ -649,20 +837,31 @@ struct SeriesDetailScreen: View {
     }
 
     @ViewBuilder
-    private var pinTrackingAction: some View {
+    private func pinTrackingAction(
+        expands: Bool = false,
+        showsLabel: Bool = false
+    ) -> some View {
         if let setPinned, let entry {
             Button {
                 let nextPinned = currentIsPinned == false
                 displayedPinnedOverride = nextPinned
                 setPinned(entry, nextPinned)
             } label: {
-                Image(systemName: currentIsPinned ? "pin.slash" : "pin")
-                    .font(.body.weight(.bold))
-                    .frame(width: 20, height: 30)
+                if showsLabel {
+                    Label(pinTitle, systemImage: currentIsPinned ? "pin.slash" : "pin")
+                        .font(.subheadline.weight(.bold))
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity, minHeight: 30)
+                } else {
+                    Image(systemName: currentIsPinned ? "pin.slash" : "pin")
+                        .font(.body.weight(.bold))
+                        .frame(width: 20, height: 30)
+                }
             }
             .buttonStyle(.bordered)
             .controlSize(.regular)
-            .frame(minWidth: 44, minHeight: 44)
+            .frame(minWidth: 44, maxWidth: expands ? .infinity : nil, minHeight: 44)
             .accessibilityLabel(pinTitle)
             .accessibilityIdentifier("series-detail-tracking-pin")
             .help(pinTitle)
@@ -702,9 +901,9 @@ struct SeriesDetailScreen: View {
     }
 
     @ViewBuilder
-    private var artwork: some View {
+    private func artwork(size: CGFloat) -> some View {
         if let detailEntry = presentation.detailEntry {
-            SeriesEntryArtworkView(entry: detailEntry, size: 92)
+            SeriesEntryArtworkView(entry: detailEntry, size: size)
         } else if let url = effectiveCatalogItem?.displayArtwork.url {
             AsyncImage(url: url) { phase in
                 switch phase {
@@ -713,18 +912,18 @@ struct SeriesDetailScreen: View {
                         .resizable()
                         .scaledToFill()
                 default:
-                    SeriesPosterMark(seed: title, size: 92)
+                    SeriesPosterMark(seed: title, size: size)
                 }
             }
-            .frame(width: 92, height: 128)
+            .frame(width: size, height: size * 1.38)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .stroke(Color.white.opacity(0.24), lineWidth: 1)
             }
         } else {
-            SeriesPosterMark(seed: title, size: 92)
-                .frame(width: 92, height: 128)
+            SeriesPosterMark(seed: title, size: size)
+                .frame(width: size, height: size * 1.38)
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
     }
@@ -1030,7 +1229,7 @@ struct SeriesDetailScreen: View {
                 seasonNumber: 1,
                 episodeNumber: episode,
                 title: String(format: L10n.string("home.editor.episode"), episode),
-                airDate: nil,
+                airDate: episode == 2 ? "2026-07-10" : nil,
                 reliability: .partial,
                 relativeState: uiTestRelativeState(for: cursor),
                 supportedActions: []
@@ -1296,16 +1495,23 @@ private struct SeriesDetailGuideUnavailableState: View {
 
     var body: some View {
         Group {
-            if let retryAction,
-               dynamicTypeSize.isAccessibilitySize || horizontalSizeClass == .compact {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 12) {
+                    accessibilityMessage
+
+                    if let retryAction {
+                        accessibilityRetryButton(action: retryAction)
+                    }
+                }
+            } else if let retryAction, horizontalSizeClass == .compact {
                 HStack(alignment: .top, spacing: 8) {
-                    message
+                    standardMessage
                     Spacer(minLength: 4)
                     compactRetryButton(action: retryAction)
                 }
             } else {
                 HStack(alignment: .center, spacing: 10) {
-                    message
+                    standardMessage
 
                     if let retryAction {
                         Spacer(minLength: 6)
@@ -1315,29 +1521,54 @@ private struct SeriesDetailGuideUnavailableState: View {
             }
         }
         .padding(.vertical, 2)
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("series-detail-guide-state")
     }
 
-    private var message: some View {
+    private var standardMessage: some View {
         HStack(alignment: .center, spacing: 10) {
-            Image(systemName: systemImage)
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(AVBrandColor.accent)
-                .frame(width: 28, height: 32)
-                .accessibilityHidden(true)
+            guideIcon
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(L10n.string("detail.episodes.unavailable"))
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(AVBrandColor.textPrimary)
-
-                Text(detail)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                guideTitle(font: .subheadline.weight(.bold))
+                guideDetail(font: .caption)
             }
         }
+    }
+
+    private var accessibilityMessage: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            guideIcon
+            guideTitle(font: .headline)
+            guideDetail(font: .body)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var guideIcon: some View {
+        Image(systemName: systemImage)
+            .font(.title3.weight(.semibold))
+            .foregroundStyle(AVBrandColor.accent)
+            .frame(width: 28, height: 32, alignment: .leading)
+            .accessibilityHidden(true)
+            .accessibilityIdentifier("series-detail-guide-state-icon")
+    }
+
+    private func guideTitle(font: Font) -> some View {
+        Text(L10n.string("detail.episodes.unavailable"))
+            .font(font)
+            .foregroundStyle(AVBrandColor.textPrimary)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityIdentifier("series-detail-guide-state-title")
+    }
+
+    private func guideDetail(font: Font) -> some View {
+        Text(detail)
+            .font(font)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityIdentifier("series-detail-guide-state-detail")
     }
 
     private func retryButton(action: @escaping () -> Void) -> some View {
@@ -1361,6 +1592,18 @@ private struct SeriesDetailGuideUnavailableState: View {
         }
         .buttonStyle(.bordered)
         .accessibilityLabel(L10n.string("common.retry"))
+        .accessibilityIdentifier("series-detail-guide-retry")
+    }
+
+    private func accessibilityRetryButton(action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(L10n.string("common.retry"), systemImage: "arrow.clockwise")
+                .font(.subheadline.weight(.bold))
+                .frame(maxWidth: .infinity, minHeight: 30)
+        }
+        .buttonStyle(.bordered)
+        .controlSize(.regular)
+        .frame(maxWidth: .infinity, minHeight: 44)
         .accessibilityIdentifier("series-detail-guide-retry")
     }
 }
@@ -1451,6 +1694,9 @@ private enum SeriesDetailGuideState {
 }
 
 private struct SeriesDetailEpisodeRow: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @ScaledMetric(relativeTo: .caption) private var scaledStateIconSize: CGFloat = 32
+
     let episode: SeriesEpisodeGuideItem
     let absoluteEpisodeNumber: Int?
     let displayedLastWatchedEpisodeCursor: SeriesEpisodeCursor?
@@ -1463,9 +1709,14 @@ private struct SeriesDetailEpisodeRow: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(actionTitle)
+            .accessibilityValue(accessibilityValue)
             .accessibilityIdentifier(actionIdentifier)
         } else {
             rowContent
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(episodeNumberLabel)
+                .accessibilityValue(accessibilityValue)
+                .accessibilityIdentifier(rowIdentifier)
         }
     }
 
@@ -1485,32 +1736,43 @@ private struct SeriesDetailEpisodeRow: View {
         "series-detail-episode-\(episode.cursor.seasonNumber)-\(episode.cursor.episodeNumber)-set-progress"
     }
 
+    private var rowIdentifier: String {
+        "series-detail-episode-\(episode.cursor.seasonNumber)-\(episode.cursor.episodeNumber)-row"
+    }
+
+    private var accessibilityValue: String {
+        [episodeTitle, episode.airDate, stateTitle]
+            .compactMap { value in
+                guard let value, value.isEmpty == false else { return nil }
+                return value
+            }
+            .joined(separator: ", ")
+    }
+
     private var rowContent: some View {
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                accessibilityRowContent
+            } else {
+                standardRowContent
+            }
+        }
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(rowBackground, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .strokeBorder(rowBorderColor, lineWidth: rowBorderWidth)
+        )
+    }
+
+    private var standardRowContent: some View {
         HStack(alignment: .top, spacing: 10) {
-            Text(episodeNumberLabel)
-                .font(.system(size: 13, weight: .black, design: .rounded))
-                .foregroundStyle(cursorColor)
-                .monospacedDigit()
+            episodeNumberText
                 .frame(width: 108, alignment: .leading)
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text(episodeTitle)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(AVBrandColor.textPrimary)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                if let airDate = episode.airDate, airDate.isEmpty == false {
-                    Text(airDate)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(.secondary)
-                }
-
-                Text(stateTitle)
-                    .font(.system(size: 11, weight: .black))
-                    .foregroundStyle(stateTitleColor)
-                    .textCase(.uppercase)
-            }
+            episodeMetadata
 
             Spacer(minLength: 0)
 
@@ -1518,12 +1780,60 @@ private struct SeriesDetailEpisodeRow: View {
                 stateIconBadge
             }
         }
-        .padding(10)
-        .background(rowBackground, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(rowBorderColor, lineWidth: rowBorderWidth)
-        )
+    }
+
+    private var accessibilityRowContent: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .center, spacing: 10) {
+                episodeNumberText
+
+                Spacer(minLength: 8)
+
+                if markWatchedThrough != nil {
+                    stateIconBadge
+                }
+            }
+
+            episodeMetadata
+        }
+    }
+
+    private var episodeNumberText: some View {
+        Text(displayedEpisodeNumberLabel)
+            .font(dynamicTypeSize.isAccessibilitySize ? .headline.weight(.black) : .subheadline.weight(.black))
+            .foregroundStyle(cursorColor)
+            .monospacedDigit()
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var episodeMetadata: some View {
+        VStack(alignment: .leading, spacing: dynamicTypeSize.isAccessibilitySize ? 6 : 3) {
+            Text(episodeTitle)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(AVBrandColor.textPrimary)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let airDate = episode.airDate, airDate.isEmpty == false {
+                Text(airDate)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Text(stateTitle)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(stateTitleColor)
+                .textCase(.uppercase)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private var displayedEpisodeNumberLabel: String {
+        guard dynamicTypeSize.isAccessibilitySize, let absoluteEpisodeNumber else {
+            return episodeNumberLabel
+        }
+        return "E\(absoluteEpisodeNumber)\n\(cursorLabel(episode.cursor))"
     }
 
     private var episodeNumberLabel: String {
@@ -1535,14 +1845,18 @@ private struct SeriesDetailEpisodeRow: View {
 
     private var stateIconBadge: some View {
         Image(systemName: stateIconName)
-            .font(.system(size: 14, weight: .black))
+            .font(.caption.weight(.black))
             .foregroundStyle(stateIconColor)
-            .frame(width: 32, height: 32)
+            .frame(width: stateIconSize, height: stateIconSize)
             .background(stateIconBackground, in: Circle())
             .overlay {
                 Circle().stroke(stateIconStrokeColor, lineWidth: 1)
             }
             .accessibilityHidden(true)
+    }
+
+    private var stateIconSize: CGFloat {
+        min(scaledStateIconSize, dynamicTypeSize.isAccessibilitySize ? 44 : 36)
     }
 
     private var stateIconName: String {

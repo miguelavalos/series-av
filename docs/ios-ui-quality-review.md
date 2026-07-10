@@ -39,6 +39,9 @@ runtime runbooks and are not replaced by this UI review.
 - The fixed duplicate `Buscar serie` footer was removed. Home now reserves its
   bottom safe-area bar only while a reversible progress or library action is
   pending.
+- The transient undo bar uses semantic Dynamic Type fonts, switches to a
+  two-level layout at accessibility sizes, keeps both actions at least 44 points,
+  and remains entirely above the floating tab navigation.
 
 ### Library and Search
 
@@ -57,12 +60,38 @@ runtime runbooks and are not replaced by this UI review.
 
 - Long summaries can expand and collapse without hiding the rest of the detail
   page.
-- Tracking actions use a compact hierarchy at normal sizes and remain usable at
-  accessibility sizes.
+- The detail header keeps its compact artwork-and-copy column normally, then
+  separates poster/title from a full-width summary and guide metadata at
+  accessibility sizes, with a controlled high text scale.
+- Tracking actions use a compact single-row hierarchy at normal sizes and stack
+  three equal-width, fully labelled controls at accessibility sizes.
+- The tracking summary uses semantic text styles, keeps status and progress on
+  one compact row normally, and stacks them at accessibility sizes so neither
+  becomes undersized beside the actions.
+- Episode rows use semantic text styles, expose title, air date, and state to
+  assistive technologies, and switch to a deliberately stacked layout at
+  accessibility sizes without allowing maximum text settings to turn each row
+  into a full-screen card.
+- The episode-guide footer uses semantic, controlled text styles for the
+  remaining-episode count and feedback result; feedback messages also reclaim
+  the full card width at accessibility sizes.
+- The guide-feedback action keeps a compact icon-title-disclosure row normally
+  and switches to a controlled icon-over-title layout at accessibility sizes,
+  including its sending, sent, and retryable-error states.
 - Episode-guide empty and error states distinguish unavailable data from a
   retryable failure.
+- Episode-guide unavailable states retain a compact horizontal presentation
+  normally, then stack icon and copy at accessibility sizes; retryable failures
+  also expose a full-width labelled retry action.
 - Private notes, guide feedback, source links, and library management actions use
   compact rows or menus instead of large repeated buttons.
+- The empty private-note action keeps its icon, title, and disclosure affordance
+  on one compact row normally, then uses a controlled icon-over-title layout at
+  accessibility sizes.
+- Saved private notes use a semantic, controlled body style and expose a compact
+  44-point edit control instead of a fixed-size label and undersized icon target.
+- Secondary-option menus keep compact icon-title-disclosure rows normally and
+  switch to matched, controlled icon-over-title layouts at accessibility sizes.
 - iPad presents the detail as a wider page with tracking and episode information
   making better use of the available width.
 
@@ -111,6 +140,7 @@ cache after validation.
 
 ## Follow-up review order
 
-Continue the audit one issue at a time. The next known candidate is the transient
-undo bar: its normal layout is compact, but its fixed small text and close icon
-should be made Dynamic Type-aware with a minimum 44-point interaction target.
+Continue the audit one issue at a time. The next known candidate is the
+not-followed tracking card: its explanatory copy still uses a fixed 14-point
+font while the follow action is a large full-width button, so the state should
+be checked for both accessibility scaling and excessive visual weight.

@@ -720,7 +720,8 @@ private struct SeriesWatchingHomeScreen: View {
             }
         }
         .padding(.horizontal, 20)
-        .padding(.vertical, 12)
+        .padding(.top, 12)
+        .padding(.bottom, 88)
         .background(.regularMaterial)
     }
 
@@ -948,29 +949,22 @@ struct PendingProgressUndo: Identifiable, Equatable {
 }
 
 struct SeriesUndoBar: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let title: String
     let undo: () -> Void
     let dismiss: () -> Void
 
     var body: some View {
-        HStack(spacing: 10) {
-            Text(title)
-                .font(.system(size: 13, weight: .semibold))
-                .lineLimit(2)
-
-            Spacer()
-
-            Button(L10n.string("home.undo"), action: undo)
-                .font(.system(size: 13, weight: .bold))
-
-            Button(action: dismiss) {
-                Image(systemName: "xmark")
-                    .frame(width: 28, height: 28)
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                accessibilityLayout
+            } else {
+                standardLayout
             }
-            .accessibilityLabel(L10n.string("common.close"))
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        .padding(.vertical, 8)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -978,6 +972,67 @@ struct SeriesUndoBar: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("series.undo.bar")
+    }
+
+    private var standardLayout: some View {
+        HStack(spacing: 10) {
+            message(lineLimit: 2)
+                .layoutPriority(1)
+
+            Spacer(minLength: 0)
+
+            undoButton
+            dismissButton
+        }
+    }
+
+    private var accessibilityLayout: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            message(lineLimit: nil)
+
+            HStack(spacing: 8) {
+                undoButton
+
+                Spacer(minLength: 8)
+
+                dismissButton
+            }
+        }
+    }
+
+    private func message(lineLimit: Int?) -> some View {
+        Text(title)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(.primary)
+            .lineLimit(lineLimit)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityIdentifier("series.undo.message")
+    }
+
+    private var undoButton: some View {
+        Button(action: undo) {
+            Text(L10n.string("home.undo"))
+                .font(.subheadline.weight(.bold))
+                .frame(minHeight: 44)
+                .padding(.horizontal, 4)
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(Color.accentColor)
+        .contentShape(Rectangle())
+        .accessibilityIdentifier("series.undo.action")
+    }
+
+    private var dismissButton: some View {
+        Button(action: dismiss) {
+            Image(systemName: "xmark")
+                .font(.body.weight(.semibold))
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.secondary)
+        .accessibilityLabel(L10n.string("common.close"))
+        .accessibilityIdentifier("series.undo.dismiss")
     }
 }
 
