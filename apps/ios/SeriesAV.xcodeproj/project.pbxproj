@@ -55,6 +55,10 @@
 		B04B4F18E3187D0804B79BCF /* SeriesDetailPresentationBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE128B612294FB1028077612 /* SeriesDetailPresentationBuilderTests.swift */; };
 		B5255448167E43828252DB71 /* SeriesAuthOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AF87B75A9721D260B4C3E1 /* SeriesAuthOnboardingView.swift */; };
 		BA243CAA0B49EFED0D7B6F21 /* SeriesProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39E85DD4C7D5EBBF8721E3A /* SeriesProfileScreen.swift */; };
+		BA243CAB0B49EFED0D7B6F21 /* SeriesSettingsContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39E85DE4C7D5EBBF8721E3A /* SeriesSettingsContent.swift */; };
+		BA243CAC0B49EFED0D7B6F21 /* SeriesAccountContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39E85DF4C7D5EBBF8721E3A /* SeriesAccountContent.swift */; };
+		BA243CAD0B49EFED0D7B6F21 /* SeriesProCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39E85E04C7D5EBBF8721E3A /* SeriesProCard.swift */; };
+		BA243CAE0B49EFED0D7B6F21 /* SeriesProfileSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39E85E14C7D5EBBF8721E3A /* SeriesProfileSheets.swift */; };
 		BBF07CE22C3C21C2F169EED1 /* SeriesAVSplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54848FD3FA8A4FAE5ABAC868 /* SeriesAVSplashView.swift */; };
 		BC9DA56281027A4AE6B394B0 /* SeriesAccessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEBE0C665DDB4A48FE198C52 /* SeriesAccessController.swift */; };
 		BF63FF65D1650DC0551600DA /* SeriesShareInviteAcceptanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFC876C69C024E647F9617A7 /* SeriesShareInviteAcceptanceView.swift */; };
@@ -142,6 +146,10 @@
 		ACDE5B246EE20134733B58AA /* SeriesAccountDeletionScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccountDeletionScreen.swift; sourceTree = "<group>"; };
 		AE24F5B52463208C5E876228 /* SeriesAVAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAVAPIClient.swift; sourceTree = "<group>"; };
 		B39E85DD4C7D5EBBF8721E3A /* SeriesProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesProfileScreen.swift; sourceTree = "<group>"; };
+		B39E85DE4C7D5EBBF8721E3A /* SeriesSettingsContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesSettingsContent.swift; sourceTree = "<group>"; };
+		B39E85DF4C7D5EBBF8721E3A /* SeriesAccountContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesAccountContent.swift; sourceTree = "<group>"; };
+		B39E85E04C7D5EBBF8721E3A /* SeriesProCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesProCard.swift; sourceTree = "<group>"; };
+		B39E85E14C7D5EBBF8721E3A /* SeriesProfileSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeriesProfileSheets.swift; sourceTree = "<group>"; };
 		B608F239FAA9C18EE697CAC1 /* account-av */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "account-av"; path = "../../../account-av"; sourceTree = SOURCE_ROOT; };
 		B96C17F9BEEC431492047F12 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C538F408F2AE4DD90050AD7A /* SeriesAVTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SeriesAVTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -361,8 +369,12 @@
 			children = (
 				ACDE5B246EE20134733B58AA /* SeriesAccountDeletionScreen.swift */,
 				425BB0E0381300D68D5D8878 /* SeriesAccountDeletionViewModel.swift */,
+				B39E85DF4C7D5EBBF8721E3A /* SeriesAccountContent.swift */,
 				B39E85DD4C7D5EBBF8721E3A /* SeriesProfileScreen.swift */,
+				B39E85E14C7D5EBBF8721E3A /* SeriesProfileSheets.swift */,
 				326ED2E28D2DC33ECDA6917C /* SeriesProPaywallView.swift */,
+				B39E85E04C7D5EBBF8721E3A /* SeriesProCard.swift */,
+				B39E85DE4C7D5EBBF8721E3A /* SeriesSettingsContent.swift */,
 				A181631A36DECD5130422384 /* SeriesUITestAccountDeletionAPI.swift */,
 			);
 			path = Profile;
@@ -554,6 +566,10 @@
 				1FA804E23A049F7041E058C0 /* SeriesOpenURLContext.swift in Sources */,
 				DEE35176392FBAB1DB687472 /* SeriesProPaywallView.swift in Sources */,
 				BA243CAA0B49EFED0D7B6F21 /* SeriesProfileScreen.swift in Sources */,
+				BA243CAB0B49EFED0D7B6F21 /* SeriesSettingsContent.swift in Sources */,
+				BA243CAC0B49EFED0D7B6F21 /* SeriesAccountContent.swift in Sources */,
+				BA243CAD0B49EFED0D7B6F21 /* SeriesProCard.swift in Sources */,
+				BA243CAE0B49EFED0D7B6F21 /* SeriesProfileSheets.swift in Sources */,
 				68E429A2674985B0A0EFBD40 /* SeriesRootTab.swift in Sources */,
 				624F078872F0733DF5C0E7EB /* SeriesSearchScreen.swift in Sources */,
 				BF63FF65D1650DC0551600DA /* SeriesShareInviteAcceptanceView.swift in Sources */,

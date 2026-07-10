@@ -29,6 +29,7 @@ struct SeriesAuthOnboardingView: View {
                 )
             }
         )
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         .alert(L10n.string("access.error.title"), isPresented: isShowingErrorBinding) {
             Button(L10n.string("common.close"), role: .cancel) {}
         } message: {
@@ -139,6 +140,7 @@ private struct SeriesAuthOptionsPanel: View {
     let onSkip: () -> Void
 
     @Environment(\.avCommonAppExperience) private var appExperience
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         AVAuthOptionsPanel(
@@ -158,17 +160,20 @@ private struct SeriesAuthOptionsPanel: View {
             onGoogle: onGoogleTap,
             onSkip: onSkip
         ) {
-            AVAuthConfiguredCompanionArtwork(
-                placement: .authPanel,
-                imageWidth: 126,
-                imageHeight: 126,
-                frameWidth: 140,
-                frameHeight: 110,
-                imageOffset: CGSize(width: 0, height: -5),
-                groundShadowColor: nil
-            )
+            if !dynamicTypeSize.isAccessibilitySize {
+                AVAuthConfiguredCompanionArtwork(
+                    placement: .authPanel,
+                    imageWidth: 126,
+                    imageHeight: 126,
+                    frameWidth: 140,
+                    frameHeight: 110,
+                    imageOffset: CGSize(width: 0, height: -5),
+                    groundShadowColor: nil
+                )
                 .offset(x: -44, y: -91)
                 .allowsHitTesting(false)
+                .accessibilityHidden(true)
+            }
         }
     }
 

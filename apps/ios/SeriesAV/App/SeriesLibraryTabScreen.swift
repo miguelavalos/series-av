@@ -11,8 +11,7 @@ struct SeriesLibraryTabScreen: View {
 
     @State private var query = ""
     @State private var selectedFilter: SeriesLibraryFilter = .all
-    @State private var editorEntry: SeriesLibraryEntry?
-    @State private var detailEntry: SeriesLibraryEntry?
+    @State private var sheetDestination: SeriesLibrarySheetDestination?
     @State private var pendingLibraryUndo: PendingLibraryMutationUndo?
     @State private var pendingProgressUndo: PendingProgressUndo?
     @State private var pendingDeleteConfirmation: PendingLibraryDeleteConfirmation?
@@ -67,7 +66,9 @@ struct SeriesLibraryTabScreen: View {
                 }
             }
         }
-        .sheet(item: $editorEntry) { entry in
+        .sheet(item: $sheetDestination) { destination in
+            switch destination {
+            case .progressEditor(let entry):
             SeriesProgressEditorSheet(
                 entry: entry,
                 markWatchedThrough: { cursor in
@@ -82,8 +83,7 @@ struct SeriesLibraryTabScreen: View {
                 }
             )
             .presentationDetents([.large])
-        }
-        .sheet(item: $detailEntry) { entry in
+            case .detail(let entry):
             SeriesDetailScreen(
                 entry: entry,
                 markNext: { entry in
@@ -130,6 +130,7 @@ struct SeriesLibraryTabScreen: View {
                 shareInviteClient: shareInviteClient
             )
             .presentationDetents([.large])
+            }
         }
         .confirmationDialog(
             L10n.string("detail.delete.confirm.title"),
@@ -339,7 +340,7 @@ struct SeriesLibraryTabScreen: View {
                         SeriesLibraryRow(
                             entry: entry,
                             detail: isArchived ? L10n.string("library.archived.detail") : libraryDetail(for: entry),
-                            openDetail: { detailEntry = entry },
+                            openDetail: { sheetDestination = .detail(entry) },
                             markNext: isArchived ? nil : { markNext(from: entry) }
                         ) {
                             if isArchived {
@@ -372,7 +373,7 @@ struct SeriesLibraryTabScreen: View {
     @ViewBuilder
     private func activeMenu(for entry: SeriesLibraryEntry) -> some View {
         Button {
-            detailEntry = entry
+            sheetDestination = .detail(entry)
         } label: {
             Label(L10n.string("detail.open"), systemImage: "info.circle")
         }
@@ -386,7 +387,7 @@ struct SeriesLibraryTabScreen: View {
         }
 
         Button {
-            editorEntry = entry
+            sheetDestination = .progressEditor(entry)
         } label: {
             Label(L10n.string("home.adjust"), systemImage: "scope")
         }
@@ -435,7 +436,7 @@ struct SeriesLibraryTabScreen: View {
     @ViewBuilder
     private func archivedMenu(for entry: SeriesLibraryEntry) -> some View {
         Button {
-            detailEntry = entry
+            sheetDestination = .detail(entry)
         } label: {
             Label(L10n.string("detail.open"), systemImage: "info.circle")
         }
@@ -619,6 +620,18 @@ struct SeriesLibraryTabScreen: View {
             return L10n.string("library.filter.archived.short")
         default:
             return filterTitle(filter)
+        }
+    }
+}
+
+private enum SeriesLibrarySheetDestination: Identifiable {
+    case progressEditor(SeriesLibraryEntry)
+    case detail(SeriesLibraryEntry)
+
+    var id: String {
+        switch self {
+        case .progressEditor(let entry): "progress:\(entry.id)"
+        case .detail(let entry): "detail:\(entry.id)"
         }
     }
 }

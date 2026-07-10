@@ -50,6 +50,22 @@ struct SeriesUITestEnvironment {
         isEnabled && environment["SERIESAV_UI_TESTS_SHOW_PAYWALL"] == "1"
     }
 
+    var shouldShowRedeemCodeSheet: Bool {
+        isEnabled && environment["SERIESAV_UI_TESTS_SHOW_REDEEM_CODE"] == "1"
+    }
+
+    var shouldShowLocalDataMaintenanceSheet: Bool {
+        isEnabled && environment["SERIESAV_UI_TESTS_SHOW_LOCAL_DATA_MAINTENANCE"] == "1"
+    }
+
+    var initialInAppBrowserURL: URL? {
+        guard isEnabled,
+              let rawValue = environment["SERIESAV_UI_TESTS_IN_APP_BROWSER_URL"] else {
+            return nil
+        }
+        return URL(string: rawValue)
+    }
+
     var subscriptionOfferPrice: String? {
         guard isEnabled else { return nil }
         return environment["SERIESAV_UI_TESTS_SUBSCRIPTION_PRICE"]
@@ -72,6 +88,11 @@ struct SeriesUITestEnvironment {
         return environment["SERIESAV_UI_TESTS_EPISODE_GUIDE"]
     }
 
+    var upcomingEpisodesScenario: String? {
+        guard isEnabled else { return nil }
+        return environment["SERIESAV_UI_TESTS_UPCOMING_EPISODES"]
+    }
+
     var guideFeedbackScenario: String? {
         guard isEnabled else { return nil }
         return environment["SERIESAV_UI_TESTS_GUIDE_FEEDBACK"]
@@ -84,6 +105,24 @@ struct SeriesUITestEnvironment {
 
     var shouldShowProgressEditor: Bool {
         isEnabled && environment["SERIESAV_UI_TESTS_SHOW_PROGRESS_EDITOR"] == "1"
+    }
+
+    var shouldStubShareInviteCreation: Bool {
+        isEnabled && environment["SERIESAV_UI_TESTS_SHARE_INVITE"] == "success"
+    }
+
+    var initialShareInviteDeepLink: SeriesShareInviteDeepLink? {
+        guard isEnabled,
+              environment["SERIESAV_UI_TESTS_SHARE_INVITE_ACCEPTANCE"] != nil,
+              let url = URL(string: "com.avalsys.seriesav://i/r/ui-test-invite-token") else {
+            return nil
+        }
+        return SeriesShareInviteDeepLink(url: url)
+    }
+
+    var shareInviteAcceptanceScenario: String? {
+        guard isEnabled else { return nil }
+        return environment["SERIESAV_UI_TESTS_SHARE_INVITE_ACCEPTANCE"]
     }
 
     var progressEditorEntryId: String? {

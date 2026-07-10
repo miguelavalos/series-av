@@ -5,22 +5,21 @@ import UIKit
 
 struct SeriesSearchScreen: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     @Bindable var store: SeriesLibraryStore
     let accessController: SeriesAccessController
     let startSignInFlow: () -> Void
 
-    @State private var isShowingProPaywall = false
     @State private var addedEntry: SeriesLibraryEntry?
     @State private var query = ""
-    @State private var editorEntry: SeriesLibraryEntry?
+    @State private var sheetDestination: SeriesSearchSheetDestination?
     @State private var selectedCollection: SeriesSearchCollection = .popular
     @State private var remoteCatalogResults: [SeriesCatalogPreview] = []
     @State private var remoteCatalogQuery = ""
     @State private var remoteCollectionResults: [SeriesCatalogPreview] = []
     @State private var remoteCollectionKey = ""
     @State private var catalogLoadState = SeriesCatalogLoadState()
-    @State private var detailSelection: SeriesSearchDetailSelection?
 
     private var isTabletLayout: Bool {
         UIDevice.current.userInterfaceIdiom == .pad && horizontalSizeClass != .compact
@@ -44,13 +43,25 @@ struct SeriesSearchScreen: View {
 
             searchResultsSection
         }
-        .sheet(isPresented: $isShowingProPaywall) {
+        .sheet(item: $sheetDestination) { destination in
+            searchSheet(for: destination)
+        }
+        .task(id: searchRefreshKey) {
+            await refreshCatalog()
+        }
+        .scrollDismissesKeyboard(.interactively)
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+    }
+
+    @ViewBuilder
+    private func searchSheet(for destination: SeriesSearchSheetDestination) -> some View {
+        switch destination {
+        case .proPaywall:
             SeriesProPaywallView(
                 accessController: accessController,
                 startSignInFlow: startSignInFlow
             )
-        }
-        .sheet(item: $editorEntry) { entry in
+        case .progressEditor(let entry):
             SeriesProgressEditorSheet(
                 entry: entry,
                 markWatchedThrough: { cursor in
@@ -61,8 +72,7 @@ struct SeriesSearchScreen: View {
                 }
             )
             .presentationDetents([.large])
-        }
-        .sheet(item: $detailSelection) { selection in
+        case .detail(let selection):
             SeriesDetailScreen(
                 catalogItem: selection.catalogItem,
                 entry: selection.entry,
@@ -70,7 +80,7 @@ struct SeriesSearchScreen: View {
                 follow: selection.entry == nil ? {
                     if let catalogItem = selection.catalogItem {
                         follow(catalogItem)
-                        detailSelection = nil
+                        sheetDestination = nil
                     }
                 } : nil,
                 markNext: { entry in
@@ -91,9 +101,6 @@ struct SeriesSearchScreen: View {
                 shareInviteClient: shareInviteClient
             )
             .presentationDetents([.large])
-        }
-        .task(id: searchRefreshKey) {
-            await refreshCatalog()
         }
     }
 
@@ -163,21 +170,23 @@ struct SeriesSearchScreen: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 12) {
                 Image(systemName: "magnifyingglass")
-                    .font(.system(size: 20, weight: .bold))
+                    .font(.title3.weight(.bold))
                     .foregroundStyle(AVBrandColor.accent)
 
                 TextField(L10n.string("search.placeholder"), text: $query)
-                    .font(.system(size: 20, weight: .bold))
+                    .font(.title3.weight(.bold))
                     .textInputAutocapitalization(.words)
                     .submitLabel(.search)
+                    .accessibilityIdentifier("series-search-field")
 
                 if trimmedQuery.isEmpty == false {
                     Button {
                         query = ""
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 18, weight: .bold))
+                            .font(.title3.weight(.bold))
                             .foregroundStyle(.secondary)
+                            .frame(width: 44, height: 44)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(L10n.string("common.clear"))
@@ -198,9 +207,9 @@ struct SeriesSearchScreen: View {
                             query = ""
                         } label: {
                             Text(collection.title)
-                                .font(.system(size: 13, weight: .bold))
+                                .font(.subheadline.weight(.bold))
                                 .padding(.horizontal, 14)
-                                .padding(.vertical, 10)
+                                .frame(minHeight: dynamicTypeSize.isAccessibilitySize ? 52 : 44)
                         }
                         .buttonStyle(.plain)
                         .foregroundStyle(selectedCollection == collection && trimmedQuery.isEmpty ? Color.white : Color.primary)
@@ -209,14 +218,16 @@ struct SeriesSearchScreen: View {
                             Capsule()
                                 .stroke(selectedCollection == collection && trimmedQuery.isEmpty ? AVBrandColor.accent.opacity(0.8) : Color.primary.opacity(0.08), lineWidth: 1)
                         }
+                        .accessibilityIdentifier("series-search-filter-\(collection.cacheKey)")
                     }
                 }
             }
 
             Text(limitText)
-                .font(.system(size: 13, weight: .medium))
+                .font(.callout.weight(.medium))
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("series-search-limit")
 
             if shouldShowUpgradeAction {
                 Button {
@@ -225,7 +236,7 @@ struct SeriesSearchScreen: View {
                     Label(limitActionTitle, systemImage: limitActionSystemImage)
                 }
                 .buttonStyle(.bordered)
-                .controlSize(.small)
+                .controlSize(dynamicTypeSize.isAccessibilitySize ? .regular : .small)
                 .disabled(accessController.accessMode == .guest && !accessController.accountIsAvailable)
             }
 
@@ -247,14 +258,16 @@ struct SeriesSearchScreen: View {
     private func screenTitle(title: String, subtitle: String) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
-                .font(.system(size: 34, weight: .black))
+                .font(.largeTitle.weight(.black))
                 .foregroundStyle(AVBrandColor.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("series-search-title")
 
             Text(subtitle)
                 .font(AVBrandTypography.body)
                 .foregroundStyle(AVBrandColor.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("series-search-subtitle")
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -305,13 +318,16 @@ struct SeriesSearchScreen: View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
                 Text(resultsTitle)
-                    .font(.system(size: 17, weight: .black, design: .rounded))
+                    .font(.headline.weight(.black))
+                    .fontDesign(.rounded)
                     .foregroundStyle(.primary)
+                    .accessibilityIdentifier("series-search-results-title")
 
                 Text(resultsSubtitle)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("series-search-results-subtitle")
             }
 
             if trimmedQuery.isEmpty == false && localMatches.isEmpty == false {
@@ -319,8 +335,8 @@ struct SeriesSearchScreen: View {
                     ForEach(localMatches) { entry in
                         SeriesLibrarySearchResultCard(
                             entry: entry,
-                            openDetail: { detailSelection = SeriesSearchDetailSelection(entry: entry) },
-                            editProgress: { editorEntry = entry },
+                            openDetail: { sheetDestination = .detail(SeriesSearchDetailSelection(entry: entry)) },
+                            editProgress: { sheetDestination = .progressEditor(entry) },
                             markNext: { store.markNextEpisodeWatched(for: entry.id) }
                         )
                     }
@@ -343,13 +359,13 @@ struct SeriesSearchScreen: View {
                             libraryEntry: libraryEntry(for: preview),
                             canAddSeries: canAddSeries,
                             openDetail: {
-                                detailSelection = SeriesSearchDetailSelection(
+                                sheetDestination = .detail(SeriesSearchDetailSelection(
                                     catalogItem: preview.catalogItem,
                                     entry: libraryEntry(for: preview)
-                                )
+                                ))
                             },
                             follow: { follow(preview) },
-                            editProgress: { entry in editorEntry = entry }
+                            editProgress: { entry in sheetDestination = .progressEditor(entry) }
                         )
                     }
                 }
@@ -358,7 +374,7 @@ struct SeriesSearchScreen: View {
     }
 
     private var searchGridColumns: [GridItem] {
-        [GridItem(.adaptive(minimum: 360), spacing: 10)]
+        [GridItem(.adaptive(minimum: dynamicTypeSize.isAccessibilitySize ? 520 : 360), spacing: 10)]
     }
 
     private var resultsTitle: String {
@@ -418,7 +434,7 @@ struct SeriesSearchScreen: View {
         case .guest:
             startSignInFlow()
         case .signedInFree:
-            isShowingProPaywall = true
+            sheetDestination = .proPaywall
         case .signedInPro:
             break
         }
@@ -555,6 +571,8 @@ private func skeletonLine(width: CGFloat, height: CGFloat) -> some View {
 }
 
 private struct SeriesCatalogResultCard: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let preview: SeriesCatalogPreview
     let libraryEntry: SeriesLibraryEntry?
     let canAddSeries: Bool
@@ -563,40 +581,17 @@ private struct SeriesCatalogResultCard: View {
     let editProgress: (SeriesLibraryEntry) -> Void
 
     var body: some View {
-        HStack(alignment: .center, spacing: 12) {
-            Button(action: openDetail) {
-                resultContent
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(preview.title)
-            .accessibilityValue(accessibilityMetadataText)
-            .accessibilityHint(L10n.string("detail.open"))
-
-            if let libraryEntry {
-                VStack(spacing: 8) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(AVBrandColor.accent)
-
-                    SeriesCompactIconButton(
-                        systemName: "scope",
-                        style: .secondary,
-                        accessibilityLabel: L10n.string("home.adjust"),
-                        accessibilityIdentifier: "series-search-\(libraryEntry.id)-edit-progress"
-                    ) {
-                        editProgress(libraryEntry)
-                    }
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 12) {
+                    resultButton
+                    accessibilityAction
                 }
             } else {
-                Button(action: follow) {
-                    Image(systemName: canAddSeries ? "plus" : "sparkles")
-                        .font(.system(size: 17, weight: .black))
-                        .foregroundStyle(canAddSeries ? Color.black.opacity(0.84) : AVBrandColor.accent)
-                        .frame(width: 42, height: 42)
-                        .background(canAddSeries ? AVBrandColor.accent : Color(.tertiarySystemGroupedBackground), in: Circle())
+                HStack(alignment: .center, spacing: 12) {
+                    resultButton
+                    compactAction
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel(canAddSeries ? L10n.string("search.follow") : L10n.string("add.footer.upgrade"))
             }
         }
         .padding(10)
@@ -607,36 +602,107 @@ private struct SeriesCatalogResultCard: View {
         }
     }
 
+    private var resultButton: some View {
+        Button(action: openDetail) {
+            resultContent
+        }
+        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityLabel(preview.title)
+        .accessibilityValue(accessibilityMetadataText)
+        .accessibilityHint(L10n.string("detail.open"))
+        .accessibilityIdentifier("series-search-catalog-\(preview.id)-open")
+    }
+
+    @ViewBuilder
+    private var compactAction: some View {
+        if let libraryEntry {
+            VStack(spacing: 8) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.body.weight(.bold))
+                    .foregroundStyle(AVBrandColor.accent)
+
+                SeriesCompactIconButton(
+                    systemName: "scope",
+                    style: .secondary,
+                    size: 44,
+                    accessibilityLabel: L10n.string("home.adjust"),
+                    accessibilityIdentifier: "series-search-\(libraryEntry.id)-edit-progress"
+                ) {
+                    editProgress(libraryEntry)
+                }
+            }
+        } else {
+            Button(action: follow) {
+                Image(systemName: canAddSeries ? "plus" : "sparkles")
+                    .font(.body.weight(.black))
+                    .foregroundStyle(canAddSeries ? Color.black.opacity(0.84) : AVBrandColor.accent)
+                    .frame(width: 44, height: 44)
+                    .background(canAddSeries ? AVBrandColor.accent : Color(.tertiarySystemGroupedBackground), in: Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(followActionTitle)
+            .accessibilityIdentifier("series-search-catalog-\(preview.id)-follow")
+        }
+    }
+
+    @ViewBuilder
+    private var accessibilityAction: some View {
+        if let libraryEntry {
+            SeriesSearchWideActionButton(
+                title: L10n.string("home.adjust"),
+                systemImage: "scope",
+                style: .secondary,
+                accessibilityIdentifier: "series-search-\(libraryEntry.id)-edit-progress"
+            ) {
+                editProgress(libraryEntry)
+            }
+        } else {
+            SeriesSearchWideActionButton(
+                title: followActionTitle,
+                systemImage: canAddSeries ? "plus" : "sparkles",
+                style: canAddSeries ? .accent : .secondary,
+                accessibilityIdentifier: "series-search-catalog-\(preview.id)-follow",
+                action: follow
+            )
+        }
+    }
+
     private var resultContent: some View {
         HStack(alignment: .center, spacing: 12) {
             SeriesSearchPosterView(
                 artwork: preview.artwork,
-                width: 64,
-                height: 88
+                width: dynamicTypeSize.isAccessibilitySize ? 72 : 64,
+                height: dynamicTypeSize.isAccessibilitySize ? 100 : 88
             )
 
             VStack(alignment: .leading, spacing: 5) {
                 Text(preview.title)
-                    .font(.system(size: 18, weight: .black, design: .rounded))
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.82)
+                    .font(.headline.weight(.black))
+                    .fontDesign(.rounded)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 2)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Text(metadataText)
-                    .font(.system(size: 11, weight: .bold))
+                    .font(.footnote.weight(.bold))
                     .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.82)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 if let supplementaryMetadataText {
                     Text(supplementaryMetadataText)
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.footnote.weight(.bold))
                         .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.76)
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+    }
+
+    private var followActionTitle: String {
+        canAddSeries ? L10n.string("search.follow") : L10n.string("add.footer.upgrade")
     }
 
     private var metadataText: String {
@@ -746,36 +812,61 @@ struct SeriesSearchSupplementaryMetadata {
 }
 
 private struct SeriesLibrarySearchResultCard: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let entry: SeriesLibraryEntry
     let openDetail: () -> Void
     let editProgress: () -> Void
     let markNext: () -> Void
 
     var body: some View {
-        HStack(alignment: .center, spacing: 12) {
-            Button(action: openDetail) {
-                resultContent
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(entry.title)
-            .accessibilityHint(L10n.string("detail.open"))
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 12) {
+                    resultButton
 
-            VStack(spacing: 8) {
-                SeriesCompactIconButton(
-                    systemName: "scope",
-                    style: .secondary,
-                    accessibilityLabel: L10n.string("home.adjust"),
-                    accessibilityIdentifier: "series-search-\(entry.id)-edit-progress",
-                    action: editProgress
-                )
+                    VStack(spacing: 10) {
+                        SeriesSearchWideActionButton(
+                            title: L10n.string("home.adjust"),
+                            systemImage: "scope",
+                            style: .secondary,
+                            accessibilityIdentifier: "series-search-\(entry.id)-edit-progress",
+                            action: editProgress
+                        )
 
-                SeriesCompactIconButton(
-                    systemName: quickProgressFilledSystemImage(for: entry),
-                    style: .accent,
-                    accessibilityLabel: primaryProgressActionTitle(for: entry),
-                    accessibilityIdentifier: "series-search-\(entry.id)-quick-progress",
-                    action: markNext
-                )
+                        SeriesSearchWideActionButton(
+                            title: primaryProgressActionTitle(for: entry),
+                            systemImage: quickProgressFilledSystemImage(for: entry),
+                            style: .accent,
+                            accessibilityIdentifier: "series-search-\(entry.id)-quick-progress",
+                            action: markNext
+                        )
+                    }
+                }
+            } else {
+                HStack(alignment: .center, spacing: 12) {
+                    resultButton
+
+                    VStack(spacing: 8) {
+                        SeriesCompactIconButton(
+                            systemName: "scope",
+                            style: .secondary,
+                            size: 44,
+                            accessibilityLabel: L10n.string("home.adjust"),
+                            accessibilityIdentifier: "series-search-\(entry.id)-edit-progress",
+                            action: editProgress
+                        )
+
+                        SeriesCompactIconButton(
+                            systemName: quickProgressFilledSystemImage(for: entry),
+                            style: .accent,
+                            size: 44,
+                            accessibilityLabel: primaryProgressActionTitle(for: entry),
+                            accessibilityIdentifier: "series-search-\(entry.id)-quick-progress",
+                            action: markNext
+                        )
+                    }
+                }
             }
         }
         .padding(10)
@@ -786,37 +877,64 @@ private struct SeriesLibrarySearchResultCard: View {
         }
     }
 
+    private var resultButton: some View {
+        Button(action: openDetail) {
+            resultContent
+        }
+        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityLabel(entry.title)
+        .accessibilityHint(L10n.string("detail.open"))
+        .accessibilityIdentifier("series-search-library-\(entry.id)-open")
+    }
+
     private var resultContent: some View {
         HStack(alignment: .center, spacing: 12) {
-            SeriesEntryArtworkView(entry: entry, size: 62)
+            SeriesEntryArtworkView(entry: entry, size: dynamicTypeSize.isAccessibilitySize ? 70 : 62)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(entry.title)
-                    .font(.system(size: 18, weight: .black, design: .rounded))
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.82)
+                    .font(.headline.weight(.black))
+                    .fontDesign(.rounded)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 2)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                HStack(spacing: 7) {
-                    Label(statusTitle(entry.status), systemImage: statusIconName)
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundStyle(AVBrandColor.accent)
-
-                    Text(nextEpisodeText)
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
+                if dynamicTypeSize.isAccessibilitySize {
+                    VStack(alignment: .leading, spacing: 4) {
+                        statusLabel
+                        nextEpisodeLabel
+                    }
+                } else {
+                    HStack(spacing: 7) {
+                        statusLabel
+                        nextEpisodeLabel
+                    }
                 }
 
                 Text(detail)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.footnote.weight(.medium))
                     .foregroundStyle(.secondary)
-                    .lineLimit(2)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 2)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .layoutPriority(1)
         }
+    }
+
+    private var statusLabel: some View {
+        Label(statusTitle(entry.status), systemImage: statusIconName)
+            .font(.caption.weight(.bold))
+            .foregroundStyle(AVBrandColor.accent)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var nextEpisodeLabel: some View {
+        Text(nextEpisodeText)
+            .font(.footnote.weight(.bold))
+            .foregroundStyle(.secondary)
+            .lineLimit(2)
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     private var detail: String {
@@ -838,6 +956,66 @@ private struct SeriesLibrarySearchResultCard: View {
             return "play.circle"
         case .watched:
             return "checkmark.circle"
+        }
+    }
+}
+
+private struct SeriesSearchWideActionButton: View {
+    enum Style {
+        case accent
+        case secondary
+    }
+
+    let title: String
+    let systemImage: String
+    let style: Style
+    let accessibilityIdentifier: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Label(title, systemImage: systemImage)
+                .font(.footnote.weight(.bold))
+                .foregroundStyle(foregroundColor)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, minHeight: 52)
+                .padding(.horizontal, 10)
+                .background(backgroundColor, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(strokeColor, lineWidth: 1)
+                }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityIdentifier(accessibilityIdentifier)
+    }
+
+    private var foregroundColor: Color {
+        style == .accent ? Color.black.opacity(0.84) : AVBrandColor.textPrimary
+    }
+
+    private var backgroundColor: Color {
+        style == .accent ? AVBrandColor.accent : Color(.tertiarySystemGroupedBackground)
+    }
+
+    private var strokeColor: Color {
+        style == .accent ? AVBrandColor.accent.opacity(0.8) : Color.primary.opacity(0.08)
+    }
+}
+
+private enum SeriesSearchSheetDestination: Identifiable {
+    case proPaywall
+    case progressEditor(SeriesLibraryEntry)
+    case detail(SeriesSearchDetailSelection)
+
+    var id: String {
+        switch self {
+        case .proPaywall: "pro-paywall"
+        case .progressEditor(let entry): "progress:\(entry.id)"
+        case .detail(let selection): "detail:\(selection.id)"
         }
     }
 }

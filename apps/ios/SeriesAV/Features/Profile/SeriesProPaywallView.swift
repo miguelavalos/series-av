@@ -6,11 +6,12 @@ import SwiftUI
 struct SeriesProPaywallView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     let accessController: SeriesAccessController
     let startSignInFlow: () -> Void
 
-    @State private var isShowingRedeemCodeSheet = false
+    @State private var isShowingRedeemCodeSheet = SeriesUITestEnvironment.current.shouldShowRedeemCodeSheet
     @State private var redeemCode = ""
     @State private var redeemStatusMessage: String?
     @State private var isRedeemingCode = false
@@ -78,8 +79,11 @@ struct SeriesProPaywallView: View {
         NavigationStack {
             ScrollView {
                 redeemCodeContent
-                    .padding(20)
+                    .frame(maxWidth: 620)
+                    .padding(dynamicTypeSize.isAccessibilitySize ? 20 : 24)
+                    .frame(maxWidth: .infinity)
             }
+            .scrollBounceBehavior(.basedOnSize)
             .background {
                 Rectangle()
                     .fill(AVBrandSurface.shellBackground)
@@ -96,7 +100,9 @@ struct SeriesProPaywallView: View {
                 }
             }
         }
-        .presentationDetents([.medium])
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+        .presentationDetents(dynamicTypeSize.isAccessibilitySize ? [.large] : [.medium])
+        .presentationDragIndicator(.visible)
         .accessibilityIdentifier("paywall.redeemCode.sheet")
     }
 
@@ -104,48 +110,20 @@ struct SeriesProPaywallView: View {
         VStack(alignment: .leading, spacing: AVBrandSpacing.sm) {
             sectionHeader(title: L10n.string("paywall.promo.title"), detail: L10n.string("paywall.promo.detail"))
 
-            HStack(spacing: AVBrandSpacing.sm) {
-                Image(systemName: "gift.fill")
-                    .font(.system(size: 15, weight: .black))
-                    .foregroundStyle(AVBrandColor.accent)
-
-                TextField(L10n.string("paywall.promo.placeholder"), text: $redeemCode)
-                    .keyboardType(.asciiCapable)
-                    .textContentType(.oneTimeCode)
-                    .textInputAutocapitalization(.characters)
-                    .autocorrectionDisabled()
-                    .onChange(of: redeemCode) { _, newValue in
-                        let sanitized = sanitizedRedeemCodeInput(newValue)
-                        if sanitized != newValue {
-                            redeemCode = sanitized
-                        }
-                    }
-                    .font(AVBrandTypography.bodyStrong)
-                    .padding(.horizontal, AVBrandSpacing.md)
-                    .frame(height: 46)
-                    .background(AVBrandColor.cardSurface, in: RoundedRectangle(cornerRadius: AVBrandRadius.control, style: .continuous))
-                    .accessibilityIdentifier("paywall.redeemCode.field")
-
-                Button(action: claimRedeemCode) {
-                    ZStack {
-                        if isRedeemingCode {
-                            ProgressView()
-                                .tint(AVBrandColor.textInverse)
-                        } else {
-                            Image(systemName: "arrow.right")
-                                .font(.system(size: 17, weight: .black))
-                                .foregroundStyle(AVBrandColor.textInverse)
-                        }
-                    }
-                    .frame(width: 46, height: 46)
-                    .background(
-                        redeemButtonIsDisabled ? Color(.tertiarySystemFill) : AVBrandColor.accent,
-                        in: RoundedRectangle(cornerRadius: AVBrandRadius.control, style: .continuous)
-                    )
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(spacing: AVBrandSpacing.sm) {
+                    redeemCodeField
+                    redeemCodeClaimButton(showsLabel: true)
                 }
-                .disabled(redeemButtonIsDisabled)
-                .accessibilityLabel(L10n.string("paywall.promo.claim"))
-                .accessibilityIdentifier("paywall.redeemCode.claim")
+            } else {
+                HStack(spacing: AVBrandSpacing.sm) {
+                    Image(systemName: "gift.fill")
+                        .font(.body.weight(.black))
+                        .foregroundStyle(AVBrandColor.accent)
+
+                    redeemCodeField
+                    redeemCodeClaimButton(showsLabel: false)
+                }
             }
 
             Text(L10n.string("paywall.promo.optional"))
@@ -156,11 +134,11 @@ struct SeriesProPaywallView: View {
             if let redeemStatusMessage {
                 HStack(alignment: .firstTextBaseline, spacing: AVBrandSpacing.xs) {
                     Image(systemName: "info.circle.fill")
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.caption.weight(.bold))
                         .foregroundStyle(AVBrandColor.textSecondary)
 
                     Text(redeemStatusMessage)
-                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .font(.caption.weight(.bold))
                         .foregroundStyle(AVBrandColor.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -175,15 +153,70 @@ struct SeriesProPaywallView: View {
     private func sectionHeader(title: String, detail: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
-                .font(.system(size: 14, weight: .black, design: .rounded))
+                .font(.headline.weight(.black))
                 .foregroundStyle(AVBrandColor.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("paywall.redeemCode.title")
 
             Text(detail)
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .font(.subheadline.weight(.semibold))
                 .foregroundStyle(AVBrandColor.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("paywall.redeemCode.detail")
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var redeemCodeField: some View {
+        TextField(L10n.string("paywall.promo.placeholder"), text: $redeemCode)
+            .keyboardType(.asciiCapable)
+            .textContentType(.oneTimeCode)
+            .textInputAutocapitalization(.characters)
+            .autocorrectionDisabled()
+            .onChange(of: redeemCode) { _, newValue in
+                let sanitized = sanitizedRedeemCodeInput(newValue)
+                if sanitized != newValue {
+                    redeemCode = sanitized
+                }
+            }
+            .font(.body.weight(.semibold))
+            .padding(.horizontal, AVBrandSpacing.md)
+            .frame(minHeight: dynamicTypeSize.isAccessibilitySize ? 56 : 46)
+            .background(AVBrandColor.cardSurface, in: RoundedRectangle(cornerRadius: AVBrandRadius.control, style: .continuous))
+            .accessibilityIdentifier("paywall.redeemCode.field")
+    }
+
+    private func redeemCodeClaimButton(showsLabel: Bool) -> some View {
+        Button(action: claimRedeemCode) {
+            Group {
+                if isRedeemingCode {
+                    ProgressView()
+                        .tint(AVBrandColor.textInverse)
+                        .frame(maxWidth: showsLabel ? .infinity : nil)
+                } else if showsLabel {
+                    Label(L10n.string("paywall.promo.claim"), systemImage: "arrow.right")
+                        .font(.headline.weight(.bold))
+                        .frame(maxWidth: .infinity)
+                } else {
+                    Image(systemName: "arrow.right")
+                        .font(.body.weight(.black))
+                }
+            }
+            .foregroundStyle(AVBrandColor.textInverse)
+            .frame(
+                maxWidth: showsLabel ? .infinity : nil,
+                minHeight: showsLabel ? 56 : 46
+            )
+            .frame(width: showsLabel ? nil : 46)
+            .background(
+                redeemButtonIsDisabled ? Color(.tertiarySystemFill) : AVBrandColor.accent,
+                in: RoundedRectangle(cornerRadius: AVBrandRadius.control, style: .continuous)
+            )
+        }
+        .buttonStyle(.plain)
+        .disabled(redeemButtonIsDisabled)
+        .accessibilityLabel(L10n.string("paywall.promo.claim"))
+        .accessibilityIdentifier("paywall.redeemCode.claim")
     }
 
     private var proAvatar: some View {

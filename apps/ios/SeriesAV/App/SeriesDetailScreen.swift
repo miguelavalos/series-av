@@ -29,16 +29,12 @@ struct SeriesDetailScreen: View {
 
     @State private var guideState: SeriesDetailGuideState = .loading
     @State private var resolvedCatalogItem: SeriesCatalogItem?
-    @State private var isShowingProgressEditor = false
-    @State private var isShowingPrivateNoteEditor = false
+    @State private var sheetDestination: SeriesDetailSheetDestination?
     @State private var displayedPinnedOverride: Bool?
     @State private var hasDisplayedPrivateNoteOverride = false
     @State private var displayedPrivateNote: String?
     @State private var displayedLastWatchedEpisodeCursor: SeriesEpisodeCursor?
-    @State private var isShowingShareComposer = false
     @State private var isConfirmingDelete = false
-    @State private var inAppBrowserDestination: SeriesInAppBrowserDestination?
-    @State private var shareSheetItem: SeriesShareSheetItem?
     @State private var feedbackState: SeriesGuideFeedbackSubmissionState = .idle
     @State private var uiTestGuideLoadAttempts = 0
 
@@ -98,7 +94,7 @@ struct SeriesDetailScreen: View {
                 if shareInviteClient != nil {
                     ToolbarItem(placement: .primaryAction) {
                         Button {
-                            isShowingShareComposer = true
+                            sheetDestination = .shareComposer
                         } label: {
                             Image(systemName: "square.and.arrow.up")
                         }
@@ -112,60 +108,8 @@ struct SeriesDetailScreen: View {
                 async let guideTask: Void = loadEpisodeGuide()
                 _ = await (detailTask, guideTask)
             }
-            .sheet(isPresented: $isShowingProgressEditor) {
-                if let entry,
-                   let markWatchedThrough,
-                   let clearProgress {
-                    SeriesProgressEditorSheet(
-                        entry: entry,
-                        markWatchedThrough: { cursor in
-                            displayedLastWatchedEpisodeCursor = cursor
-                            markWatchedThrough(entry, cursor)
-                        },
-                        clearProgress: {
-                            displayedLastWatchedEpisodeCursor = nil
-                            clearProgress(entry)
-                        }
-                    )
-                    .presentationDetents([.large])
-                }
-            }
-            .sheet(item: $inAppBrowserDestination) { destination in
-                SeriesInAppBrowserView(url: destination.url)
-                    .ignoresSafeArea()
-            }
-            .sheet(isPresented: $isShowingPrivateNoteEditor) {
-                if let entry, let setPrivateNote {
-                    SeriesPrivateNoteEditorSheet(
-                        entry: entry,
-                        save: { note in
-                            hasDisplayedPrivateNoteOverride = true
-                            displayedPrivateNote = Self.normalizedPrivateNote(note)
-                            setPrivateNote(entry, note)
-                        }
-                    )
-                    .presentationDetents([.medium, .large])
-                }
-            }
-            .sheet(isPresented: $isShowingShareComposer) {
-                SeriesShareInviteComposerSheet(
-                    seriesTitle: title,
-                    createInvite: createShareInvite(message:),
-                    onCreated: { item in
-                        shareSheetItem = item
-                    }
-                )
-                .presentationDetents([.medium])
-            }
-            .sheet(item: $shareSheetItem) { item in
-                ShareLink(item: item.url, subject: Text(item.subject), message: Text(item.message)) {
-                    Label(L10n.string("detail.share.open"), systemImage: "square.and.arrow.up")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .padding(24)
-                .presentationDetents([.height(140)])
+            .sheet(item: $sheetDestination) { destination in
+                detailSheet(for: destination)
             }
             .confirmationDialog(
                 L10n.string("detail.delete.confirm.title"),
@@ -185,6 +129,51 @@ struct SeriesDetailScreen: View {
             }
         }
         .presentationSizing(.page)
+    }
+
+    @ViewBuilder
+    private func detailSheet(for destination: SeriesDetailSheetDestination) -> some View {
+        switch destination {
+        case .progressEditor:
+            if let entry, let markWatchedThrough, let clearProgress {
+                SeriesProgressEditorSheet(
+                    entry: entry,
+                    markWatchedThrough: { cursor in
+                        displayedLastWatchedEpisodeCursor = cursor
+                        markWatchedThrough(entry, cursor)
+                    },
+                    clearProgress: {
+                        displayedLastWatchedEpisodeCursor = nil
+                        clearProgress(entry)
+                    }
+                )
+                .presentationDetents([.large])
+            }
+        case .privateNoteEditor:
+            if let entry, let setPrivateNote {
+                SeriesPrivateNoteEditorSheet(
+                    entry: entry,
+                    save: { note in
+                        hasDisplayedPrivateNoteOverride = true
+                        displayedPrivateNote = Self.normalizedPrivateNote(note)
+                        setPrivateNote(entry, note)
+                    }
+                )
+                .presentationDetents([.medium, .large])
+            }
+        case .shareComposer:
+            SeriesShareInviteComposerSheet(
+                seriesTitle: title,
+                createInvite: createShareInvite(message:),
+                onCreated: { item in sheetDestination = .shareResult(item) }
+            )
+            .presentationDetents(dynamicTypeSize.isAccessibilitySize ? [.large] : [.medium])
+        case .shareResult(let item):
+            SeriesShareResultSheet(item: item)
+        case .inAppBrowser(let url):
+            SeriesInAppBrowserView(url: url)
+                .ignoresSafeArea()
+        }
     }
 
     @ViewBuilder
@@ -315,22 +304,52 @@ struct SeriesDetailScreen: View {
 
                     trackingActions(for: entry)
                 } else if let follow {
-                    Text(L10n.string("detail.tracking.notFollowed"))
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Button {
-                        follow()
-                    } label: {
-                        Label(L10n.string("search.follow"), systemImage: canFollow ? "plus" : "sparkles")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
+                    notFollowedTrackingState(follow: follow)
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private func notFollowedTrackingState(follow: @escaping () -> Void) -> some View {
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 12) {
+                    notFollowedTrackingText(font: .body)
+                    followSeriesButton(follow: follow, expands: true)
+                }
+            } else {
+                HStack(alignment: .center, spacing: 12) {
+                    notFollowedTrackingText(font: .subheadline.weight(.medium))
+                    Spacer(minLength: 4)
+                    followSeriesButton(follow: follow, expands: false)
+                }
+            }
+        }
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+    }
+
+    private func notFollowedTrackingText(font: Font) -> some View {
+        Text(L10n.string("detail.tracking.notFollowed"))
+            .font(font)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+            .layoutPriority(1)
+            .accessibilityIdentifier("series-detail-not-followed")
+    }
+
+    private func followSeriesButton(follow: @escaping () -> Void, expands: Bool) -> some View {
+        Button {
+            follow()
+        } label: {
+            Label(L10n.string("search.follow"), systemImage: canFollow ? "plus" : "sparkles")
+                .font(.subheadline.weight(.bold))
+                .frame(maxWidth: expands ? .infinity : nil, minHeight: 44)
+                .fixedSize(horizontal: expands == false, vertical: false)
+        }
+        .buttonStyle(.borderedProminent)
+        .controlSize(expands ? .large : .regular)
+        .accessibilityIdentifier("series-detail-follow")
     }
 
     private var secondaryOptionsSection: some View {
@@ -455,7 +474,7 @@ struct SeriesDetailScreen: View {
                             sectionTitle(L10n.string("detail.privateNote.title"))
                             Spacer(minLength: 8)
                             Button {
-                                isShowingPrivateNoteEditor = true
+                                sheetDestination = .privateNoteEditor
                             } label: {
                                 Image(systemName: "square.and.pencil")
                                     .font(.body.weight(.semibold))
@@ -482,7 +501,7 @@ struct SeriesDetailScreen: View {
             } else {
                 AVAppShellCard {
                     Button {
-                        isShowingPrivateNoteEditor = true
+                        sheetDestination = .privateNoteEditor
                     } label: {
                         privateNoteAddLabel
                     }
@@ -817,7 +836,7 @@ struct SeriesDetailScreen: View {
         usesFullTitle: Bool = false
     ) -> some View {
         Button {
-            isShowingProgressEditor = true
+            sheetDestination = .progressEditor
         } label: {
             Label(
                 L10n.string(usesFullTitle ? "home.adjust" : "detail.tracking.adjustCompact"),
@@ -870,6 +889,18 @@ struct SeriesDetailScreen: View {
 
     @MainActor
     private func createShareInvite(message: String?) async throws -> SeriesShareSheetItem {
+        if SeriesUITestEnvironment.current.shouldStubShareInviteCreation {
+            let url = AppConfig.seriesWebBaseURL
+                .appending(path: "i")
+                .appending(path: "r")
+                .appending(path: "ui-test")
+            return SeriesShareSheetItem(
+                title: title,
+                url: url,
+                message: Self.shareMessage(for: title, url: url)
+            )
+        }
+
         guard let shareInviteClient else {
             throw SeriesShareInviteComposerError.missingClient
         }
@@ -1128,7 +1159,7 @@ struct SeriesDetailScreen: View {
     private func openSource(_ url: URL) {
         switch externalLinkPreferences.webOpenMode {
         case .inApp:
-            inAppBrowserDestination = SeriesInAppBrowserDestination(url: url)
+            sheetDestination = .inAppBrowser(url)
         case .system:
             openURL(url)
         }
@@ -1288,6 +1319,24 @@ struct SeriesDetailScreen: View {
     }
 }
 
+private enum SeriesDetailSheetDestination: Identifiable {
+    case progressEditor
+    case privateNoteEditor
+    case shareComposer
+    case shareResult(SeriesShareSheetItem)
+    case inAppBrowser(URL)
+
+    var id: String {
+        switch self {
+        case .progressEditor: "progress-editor"
+        case .privateNoteEditor: "private-note-editor"
+        case .shareComposer: "share-composer"
+        case .shareResult(let item): "share-result:\(item.id.absoluteString)"
+        case .inAppBrowser(let url): "in-app-browser:\(url.absoluteString)"
+        }
+    }
+}
+
 private struct SeriesShareSheetItem: Identifiable {
     let title: String
     let url: URL
@@ -1295,6 +1344,41 @@ private struct SeriesShareSheetItem: Identifiable {
 
     var id: URL { url }
     var subject: String { title }
+}
+
+private struct SeriesShareResultSheet: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    let item: SeriesShareSheetItem
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text(item.title)
+                .font(.headline.weight(.bold))
+                .foregroundStyle(AVBrandColor.textPrimary)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 2)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("series-share-result-title")
+
+            ShareLink(item: item.url, subject: Text(item.subject), message: Text(item.message)) {
+                Label(L10n.string("detail.share.open"), systemImage: "square.and.arrow.up")
+                    .font(.body.weight(.bold))
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .accessibilityIdentifier("series-share-result-action")
+        }
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+        .padding(24)
+        .frame(maxWidth: 620, alignment: .leading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(AVBrandSurface.shellBackground.ignoresSafeArea())
+        .presentationDragIndicator(.visible)
+        .presentationDetents([.height(dynamicTypeSize.isAccessibilitySize ? 270 : 168)])
+    }
 }
 
 private enum SeriesShareInviteComposerError: Error {
@@ -1376,6 +1460,7 @@ private struct SeriesPrivateNoteEditorSheet: View {
 
 private struct SeriesShareInviteComposerSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     let seriesTitle: String
     let createInvite: (String?) async throws -> SeriesShareSheetItem
@@ -1387,70 +1472,81 @@ private struct SeriesShareInviteComposerSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 16) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(seriesTitle)
-                        .font(.system(size: 22, weight: .black, design: .rounded))
-                        .foregroundStyle(AVBrandColor.textPrimary)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.78)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(seriesTitle)
+                            .font(.title2.weight(.black))
+                            .foregroundStyle(AVBrandColor.textPrimary)
+                            .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .accessibilityIdentifier("series-share-composer-title")
 
-                    Text(L10n.string("detail.share.composer.detail"))
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                TextEditor(text: $message)
-                    .font(.system(size: 16, weight: .medium))
-                    .frame(minHeight: 108)
-                    .padding(8)
-                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                    .overlay(alignment: .topLeading) {
-                        if message.isEmpty {
-                            Text(L10n.string("detail.share.message.placeholder"))
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundStyle(.tertiary)
-                                .padding(.horizontal, 13)
-                                .padding(.vertical, 16)
-                                .allowsHitTesting(false)
-                        }
-                    }
-                    .onChange(of: message) { _, newValue in
-                        if newValue.count > 280 {
-                            message = String(newValue.prefix(280))
-                        }
+                        Text(L10n.string("detail.share.composer.detail"))
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .accessibilityIdentifier("series-share-composer-detail")
                     }
 
-                HStack {
-                    Spacer()
-                    Text("\(message.count)/280")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(.secondary)
-                }
+                    TextEditor(text: $message)
+                        .font(.body.weight(.medium))
+                        .frame(minHeight: dynamicTypeSize.isAccessibilitySize ? 140 : 108)
+                        .padding(8)
+                        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .overlay(alignment: .topLeading) {
+                            if message.isEmpty {
+                                Text(L10n.string("detail.share.message.placeholder"))
+                                    .font(.body.weight(.medium))
+                                    .foregroundStyle(.tertiary)
+                                    .padding(.horizontal, 13)
+                                    .padding(.vertical, 16)
+                                    .allowsHitTesting(false)
+                                    .accessibilityHidden(true)
+                            }
+                        }
+                        .accessibilityLabel(L10n.string("detail.share.message.placeholder"))
+                        .accessibilityIdentifier("series-share-composer-editor")
+                        .onChange(of: message) { _, newValue in
+                            if newValue.count > 280 {
+                                message = String(newValue.prefix(280))
+                            }
+                        }
 
-                if let errorMessage {
-                    Text(errorMessage)
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(.red)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+                    HStack {
+                        Spacer()
+                        Text("\(message.count)/280")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(.secondary)
+                            .accessibilityLabel("\(message.count) de 280")
+                            .accessibilityIdentifier("series-share-composer-count")
+                    }
 
-                Button {
-                    Task { await share() }
-                } label: {
-                    Label(isCreating ? L10n.string("detail.share.creating") : L10n.string("detail.share.create"), systemImage: "square.and.arrow.up")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .disabled(isCreating)
+                    if let errorMessage {
+                        Text(errorMessage)
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(.red)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .accessibilityIdentifier("series-share-composer-error")
+                    }
 
-                Spacer(minLength: 0)
+                    Button {
+                        Task { await share() }
+                    } label: {
+                        Label(isCreating ? L10n.string("detail.share.creating") : L10n.string("detail.share.create"), systemImage: "square.and.arrow.up")
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .disabled(isCreating)
+                    .accessibilityIdentifier("series-share-composer-create")
+                }
+                .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                .padding(20)
+                .frame(maxWidth: 620, alignment: .topLeading)
+                .frame(maxWidth: .infinity, alignment: .top)
             }
-            .padding(20)
-            .frame(maxWidth: 620, alignment: .topLeading)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .accessibilityIdentifier("series-share-composer")
             .background(AVBrandSurface.shellBackground.ignoresSafeArea())
             .navigationTitle(L10n.string("detail.share"))
             .navigationBarTitleDisplayMode(.inline)

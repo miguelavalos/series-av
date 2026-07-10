@@ -22,6 +22,7 @@ struct SeriesAppBootstrapView: View {
 
     init() {
         _selectedTab = State(initialValue: SeriesLaunchContext.current.initialTab)
+        _shareInviteDeepLink = State(initialValue: SeriesUITestEnvironment.current.initialShareInviteDeepLink)
     }
 
     var body: some View {

@@ -48,6 +48,44 @@ final class SeriesAVProfileUITests: XCTestCase {
         XCTAssertFalse(app.descendants(matching: .any)["profile.sync.card"].exists)
     }
 
+    func testSignedInFreeProfileAdaptsAtAccessibilityTextSize() {
+        let app = launchProfileApp(
+            extraEnvironment: [
+                "SERIESAV_UI_TESTS_ACCOUNT_MODE": "free"
+            ],
+            contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL"
+        )
+
+        let screenTitle = app.staticTexts["Mi cuenta"]
+        let signOutButton = app.buttons["profile.account.signOut"]
+        XCTAssertTrue(screenTitle.waitForExistence(timeout: 5))
+        XCTAssertGreaterThan(screenTitle.frame.height, 44)
+        XCTAssertTrue(signOutButton.exists)
+        for _ in 0..<3 where !signOutButton.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(signOutButton.isHittable)
+        XCTAssertGreaterThanOrEqual(signOutButton.frame.height, 55.5)
+
+        let upgradeButton = app.buttons["profile.pro.upgrade"]
+        for _ in 0..<5 where !upgradeButton.exists || !upgradeButton.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(upgradeButton.isHittable)
+        XCTAssertGreaterThanOrEqual(upgradeButton.frame.height, 55.5)
+        XCTAssertTrue(app.staticTexts["Cuenta Pro"].exists)
+        XCTAssertTrue(app.staticTexts["Mantén el acceso Pro vinculado a tu cuenta de Apps AV."].exists)
+
+        let safetyAction = app.buttons["profile.safety.delete"]
+        for _ in 0..<6 where !safetyAction.exists || !safetyAction.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(safetyAction.isHittable)
+        XCTAssertGreaterThan(safetyAction.frame.height, 120)
+        XCTAssertTrue(app.staticTexts["Eliminar cuenta de Apps AV"].exists)
+        XCTAssertTrue(app.staticTexts["Solicita eliminar tu cuenta compartida de Apps AV."].exists)
+    }
+
     func testProProfileShowsLibrarySyncConflictResolution() {
         let app = launchProfileApp(extraEnvironment: [
             "SERIESAV_UI_TESTS_ACCOUNT_MODE": "pro",
@@ -59,6 +97,40 @@ final class SeriesAVProfileUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Tu biblioteca cambió en otro dispositivo. Actualiza desde la nube antes de hacer más cambios."].exists)
         XCTAssertTrue(app.buttons["Actualizar"].exists)
         XCTAssertTrue(app.buttons["Mantener este dispositivo"].exists)
+    }
+
+    func testProProfileSyncConflictRemainsReadableAtAccessibilityTextSize() {
+        let app = launchProfileApp(
+            extraEnvironment: [
+                "SERIESAV_UI_TESTS_ACCOUNT_MODE": "pro",
+                "SERIESAV_UI_TESTS_LIBRARY_SYNC_STATE": "conflict"
+            ],
+            contentSizeCategory: "UICTContentSizeCategoryAccessibilityXXXL"
+        )
+
+        let syncCard = app.descendants(matching: .any)["profile.sync.card"]
+        let syncDetail = app.staticTexts[
+            "Tu biblioteca cambió en otro dispositivo. Actualiza desde la nube antes de hacer más cambios."
+        ]
+        let refreshButton = app.buttons["Actualizar"]
+        let keepDeviceButton = app.buttons["Mantener este dispositivo"]
+        XCTAssertTrue(syncCard.waitForExistence(timeout: 5))
+        XCTAssertTrue(syncDetail.exists)
+        XCTAssertGreaterThan(syncDetail.frame.height, 100)
+
+        for _ in 0..<8 where !refreshButton.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(refreshButton.isHittable)
+        XCTAssertGreaterThanOrEqual(refreshButton.frame.height, 55.5)
+        XCTAssertLessThan(syncDetail.frame.maxY, refreshButton.frame.minY)
+
+        for _ in 0..<4 where !keepDeviceButton.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(keepDeviceButton.isHittable)
+        XCTAssertGreaterThanOrEqual(keepDeviceButton.frame.height, 55.5)
+        XCTAssertFalse(refreshButton.frame.intersects(keepDeviceButton.frame))
     }
 
     func testSignedInFreeCanOpenProPaywallWithRestoreAndLegalLinks() {
@@ -289,7 +361,10 @@ final class SeriesAVProfileUITests: XCTestCase {
         XCTAssertTrue(app.buttons["profile.account.signIn"].waitForExistence(timeout: 5))
     }
 
-    private func launchProfileApp(extraEnvironment: [String: String]) -> XCUIApplication {
+    private func launchProfileApp(
+        extraEnvironment: [String: String],
+        contentSizeCategory: String? = nil
+    ) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment["SERIESAV_UI_TESTS"] = "1"
         app.launchEnvironment["SERIESAV_UI_TESTS_FORCE_GUEST"] = "0"
@@ -301,6 +376,9 @@ final class SeriesAVProfileUITests: XCTestCase {
             app.launchEnvironment[key] = value
         }
         app.launchArguments += ["-AppleLanguages", "(es)", "-AppleLocale", "es_ES"]
+        if let contentSizeCategory {
+            app.launchArguments += ["-UIPreferredContentSizeCategoryName", contentSizeCategory]
+        }
         app.launch()
 
         addTeardownBlock {

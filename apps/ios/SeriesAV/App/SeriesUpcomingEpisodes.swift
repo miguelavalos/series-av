@@ -55,6 +55,11 @@ final class SeriesUpcomingEpisodesModel: ObservableObject {
             return
         }
 
+        if SeriesUITestEnvironment.current.upcomingEpisodesScenario == "sample" {
+            state = .loaded(uiTestUpcomingEpisodes(entries: resolvedEntries))
+            return
+        }
+
         state = .loading
         let today = calendar.startOfDay(for: Date())
         let horizon = calendar.date(byAdding: .day, value: horizonDays, to: today) ?? today
@@ -113,6 +118,31 @@ final class SeriesUpcomingEpisodesModel: ObservableObject {
         )
     }
 
+    private func uiTestUpcomingEpisodes(entries: [SeriesLibraryEntry]) -> [SeriesUpcomingEpisode] {
+        let today = calendar.startOfDay(for: Date())
+        return zip(entries.prefix(3), [1, 3, 8]).compactMap { entry, dayOffset in
+            guard let airDate = calendar.date(byAdding: .day, value: dayOffset, to: today) else {
+                return nil
+            }
+            let cursor = entry.lastWatchedEpisodeCursor?.nextEpisode ?? SeriesEpisodeCursor(seasonNumber: 1, episodeNumber: 1)
+            let item = SeriesEpisodeGuideItem(
+                seasonNumber: cursor.seasonNumber,
+                episodeNumber: cursor.episodeNumber,
+                title: "Episodio de estreno con un título suficientemente largo",
+                airDate: Self.airDateFormatter.string(from: airDate),
+                reliability: .reliable,
+                relativeState: .next,
+                supportedActions: []
+            )
+            return SeriesUpcomingEpisode(
+                entryId: entry.id,
+                seriesTitle: entry.title,
+                item: item,
+                airDate: airDate
+            )
+        }
+    }
+
     private nonisolated static func date(from value: String?) -> Date? {
         guard let value, !value.isEmpty else { return nil }
         return airDateFormatter.date(from: value)
@@ -140,7 +170,7 @@ struct SeriesUpcomingEpisodesSection: View {
             case .idle, .loading:
                 upcomingCard {
                     Label(L10n.string("upcoming.loading"), systemImage: "calendar.badge.clock")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.subheadline.weight(.semibold))
                         .foregroundStyle(AVBrandColor.textSecondary)
                 }
             case .loaded(let episodes):
@@ -175,6 +205,7 @@ struct SeriesUpcomingEpisodesSection: View {
         .task(id: entries.upcomingLoadSignature) {
             await model.load(entries: entries)
         }
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
     }
 
     private func upcomingCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
@@ -186,53 +217,54 @@ struct SeriesUpcomingEpisodesSection: View {
     private func sectionHeader(title: String, subtitle: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.system(size: 12, weight: .bold))
+                .font(.headline)
                 .foregroundStyle(AVBrandColor.textSecondary)
+                .accessibilityIdentifier("series-upcoming-section-title")
 
             Text(subtitle)
-                .font(.system(size: 13, weight: .medium))
+                .font(.callout.weight(.medium))
                 .foregroundStyle(AVBrandColor.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("series-upcoming-section-subtitle")
         }
     }
 }
 
 struct SeriesHomeUpcomingEpisodesSection: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let entries: [SeriesLibraryEntry]
     let openLibrary: () -> Void
 
     @StateObject private var model = SeriesUpcomingEpisodesModel(maxEntries: 3)
 
     var body: some View {
-        Group {
+        VStack(spacing: 0) {
             if case .loaded(let episodes) = model.state, !episodes.isEmpty {
                 AVAppShellCard {
                     VStack(alignment: .leading, spacing: 12) {
-                        HStack(alignment: .firstTextBaseline) {
-                            Text(L10n.string("upcoming.home.title"))
-                                .font(.system(size: 18, weight: .black))
-                                .foregroundStyle(AVBrandColor.textPrimary)
-
-                            Spacer()
-
-                            Button(L10n.string("upcoming.home.openLibrary"), action: openLibrary)
-                                .font(.system(size: 13, weight: .bold))
-                        }
+                        homeHeader
 
                         ForEach(episodes) { episode in
                             HStack(alignment: .top, spacing: 10) {
-                                SeriesUpcomingDateBadge(date: episode.airDate)
+                                SeriesUpcomingDateBadge(
+                                    date: episode.airDate,
+                                    accessibilityIdentifier: "series-home-upcoming-\(episode.entryId)-date"
+                                )
 
                                 VStack(alignment: .leading, spacing: 3) {
                                     Text(episode.seriesTitle)
-                                        .font(.system(size: 14, weight: .bold))
+                                        .font(.headline)
                                         .foregroundStyle(AVBrandColor.textPrimary)
-                                        .lineLimit(1)
+                                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                        .accessibilityIdentifier("series-home-upcoming-\(episode.entryId)-title")
 
                                     Text(upcomingEpisodeDetail(episode))
-                                        .font(.system(size: 12, weight: .medium))
+                                        .font(.footnote.weight(.medium))
                                         .foregroundStyle(AVBrandColor.textSecondary)
-                                        .lineLimit(2)
+                                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                        .accessibilityIdentifier("series-home-upcoming-\(episode.entryId)-detail")
                                 }
 
                                 Spacer(minLength: 0)
@@ -249,50 +281,113 @@ struct SeriesHomeUpcomingEpisodesSection: View {
         .task(id: entries.upcomingLoadSignature) {
             await model.load(entries: entries)
         }
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+    }
+
+    @ViewBuilder
+    private var homeHeader: some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) {
+                homeTitle
+                openLibraryButton
+            }
+        } else {
+            HStack(alignment: .firstTextBaseline) {
+                homeTitle
+                Spacer()
+                openLibraryButton
+            }
+        }
+    }
+
+    private var homeTitle: some View {
+        Text(L10n.string("upcoming.home.title"))
+            .font(.title3.weight(.black))
+            .foregroundStyle(AVBrandColor.textPrimary)
+            .accessibilityIdentifier("series-home-upcoming-title")
+    }
+
+    private var openLibraryButton: some View {
+        Button(action: openLibrary) {
+            Text(L10n.string("upcoming.home.openLibrary"))
+                .font(.subheadline.weight(.bold))
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
+        }
+        .accessibilityIdentifier("series-home-upcoming-open-library")
     }
 }
 
 private struct SeriesUpcomingEpisodeRow: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let episode: SeriesUpcomingEpisode
     let entry: SeriesLibraryEntry?
     let markWatchedThrough: (SeriesLibraryEntry, SeriesEpisodeCursor) -> Void
 
     var body: some View {
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 12) {
+                    episodeSummary
+                    actionButton
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            } else {
+                HStack(alignment: .top, spacing: 12) {
+                    episodeSummary
+                    Spacer(minLength: 0)
+                    actionButton
+                }
+            }
+        }
+    }
+
+    private var episodeSummary: some View {
         HStack(alignment: .top, spacing: 12) {
-            SeriesUpcomingDateBadge(date: episode.airDate)
+            SeriesUpcomingDateBadge(
+                date: episode.airDate,
+                accessibilityIdentifier: "series-upcoming-\(episode.entryId)-date"
+            )
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(episode.seriesTitle)
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.headline)
                     .foregroundStyle(AVBrandColor.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("series-upcoming-\(episode.entryId)-title")
 
                 Text(upcomingEpisodeDetail(episode))
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.callout.weight(.medium))
                     .foregroundStyle(AVBrandColor.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("series-upcoming-\(episode.entryId)-detail")
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
 
-            Spacer(minLength: 0)
-
-            if let entry {
-                Button {
-                    markWatchedThrough(entry, episode.cursor)
-                } label: {
-                    Label(actionBadgeTitle, systemImage: "checkmark")
-                        .font(.system(size: 11, weight: .black))
-                        .foregroundStyle(Color.black.opacity(0.84))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.72)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 6)
-                        .frame(maxWidth: 124, alignment: .trailing)
-                        .background(AVBrandColor.accent, in: Capsule())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(actionTitle)
-                .accessibilityIdentifier(actionIdentifier)
+    @ViewBuilder
+    private var actionButton: some View {
+        if let entry {
+            Button {
+                markWatchedThrough(entry, episode.cursor)
+            } label: {
+                Label(actionBadgeTitle, systemImage: "checkmark")
+                    .font(.footnote.weight(.bold))
+                    .foregroundStyle(Color.black.opacity(0.84))
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 10)
+                    .frame(
+                        maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : 132,
+                        minHeight: 44,
+                        alignment: dynamicTypeSize.isAccessibilitySize ? .center : .trailing
+                    )
+                    .background(AVBrandColor.accent, in: Capsule())
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel(actionTitle)
+            .accessibilityIdentifier(actionIdentifier)
         }
     }
 
@@ -310,25 +405,33 @@ private struct SeriesUpcomingEpisodeRow: View {
 }
 
 private struct SeriesUpcomingDateBadge: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let date: Date
+    let accessibilityIdentifier: String
 
     var body: some View {
         VStack(spacing: 2) {
             Text(month)
-                .font(.system(size: 10, weight: .black))
+                .font(.caption2.weight(.black))
                 .foregroundStyle(AVBrandColor.accent)
                 .textCase(.uppercase)
 
             Text(day)
-                .font(.system(size: 17, weight: .black))
+                .font(.title3.weight(.black))
                 .foregroundStyle(AVBrandColor.textPrimary)
         }
-        .frame(width: 48, height: 48)
+        .frame(
+            width: dynamicTypeSize.isAccessibilitySize ? 64 : 48,
+            height: dynamicTypeSize.isAccessibilitySize ? 64 : 48
+        )
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .stroke(Color.primary.opacity(0.08), lineWidth: 1)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(date.formatted(.dateTime.day().month(.wide).locale(L10n.locale)))
+        .accessibilityIdentifier(accessibilityIdentifier)
     }
 
     private var month: String {

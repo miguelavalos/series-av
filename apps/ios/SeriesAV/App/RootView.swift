@@ -70,6 +70,20 @@ private struct SeriesHomeDetailSelection: Identifiable {
     }
 }
 
+private enum SeriesHomeSheetDestination: Identifiable {
+    case progressEditor(SeriesLibraryEntry)
+    case detail(SeriesHomeDetailSelection)
+    case proPaywall
+
+    var id: String {
+        switch self {
+        case .progressEditor(let entry): "progress:\(entry.id)"
+        case .detail(let selection): "detail:\(selection.id)"
+        case .proPaywall: "pro-paywall"
+        }
+    }
+}
+
 private struct SeriesWatchingHomeScreen: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -83,9 +97,7 @@ private struct SeriesWatchingHomeScreen: View {
     let openAvi: () -> Void
     let startSignInFlow: () -> Void
 
-    @State private var editorEntry: SeriesLibraryEntry?
-    @State private var detailSelection: SeriesHomeDetailSelection?
-    @State private var isShowingProPaywall = false
+    @State private var sheetDestination: SeriesHomeSheetDestination?
     @State private var pendingUndo: PendingLibraryUndo?
     @State private var pendingProgressUndo: PendingProgressUndo?
     @State private var popularPreviews: [SeriesHomeDiscoveryPreview] = []
@@ -151,13 +163,13 @@ private struct SeriesWatchingHomeScreen: View {
                         markWatchedThroughKeepingStartedSeriesOnHome(cursor, for: currentEntry)
                     },
                     editProgress: {
-                        editorEntry = currentEntry
+                        sheetDestination = .progressEditor(currentEntry)
                     },
                     togglePinned: {
                         store.setPinned(currentEntry.isPinnedHomeSeries != true, for: currentEntry.id)
                     },
                     openDetail: {
-                        detailSelection = SeriesHomeDetailSelection(entry: currentEntry)
+                        sheetDestination = .detail(SeriesHomeDetailSelection(entry: currentEntry))
                     },
                     setStatus: { status in
                         pendingProgressUndo = progressUndo(for: currentEntry, messageKey: "home.undo.status")
@@ -204,13 +216,13 @@ private struct SeriesWatchingHomeScreen: View {
                         markNextEpisodeWatchedKeepingStartedSeriesOnHome(entry)
                     },
                     editProgress: { entry in
-                        editorEntry = entry
+                        sheetDestination = .progressEditor(entry)
                     },
                     togglePinned: { entry in
                         store.setPinned(entry.isPinnedHomeSeries != true, for: entry.id)
                     },
                     openDetail: { entry in
-                        detailSelection = SeriesHomeDetailSelection(entry: entry)
+                        sheetDestination = .detail(SeriesHomeDetailSelection(entry: entry))
                     },
                     setStatus: { entry, status in
                         pendingProgressUndo = progressUndo(for: entry, messageKey: "home.undo.status")
@@ -243,13 +255,13 @@ private struct SeriesWatchingHomeScreen: View {
                         markNextEpisodeWatchedKeepingStartedSeriesOnHome(entry)
                     },
                     editProgress: { entry in
-                        editorEntry = entry
+                        sheetDestination = .progressEditor(entry)
                     },
                     togglePinned: { entry in
                         store.setPinned(entry.isPinnedHomeSeries != true, for: entry.id)
                     },
                     openDetail: { entry in
-                        detailSelection = SeriesHomeDetailSelection(entry: entry)
+                        sheetDestination = .detail(SeriesHomeDetailSelection(entry: entry))
                     },
                     setStatus: { entry, status in
                         pendingProgressUndo = progressUndo(for: entry, messageKey: "home.undo.status")
@@ -286,7 +298,7 @@ private struct SeriesWatchingHomeScreen: View {
             limitActionTitle: limitActionTitle,
             addSeries: addDiscoverySeries,
             openDetail: { preview in
-                detailSelection = SeriesHomeDetailSelection(catalogItem: preview.catalogItem, entry: nil)
+                sheetDestination = .detail(SeriesHomeDetailSelection(catalogItem: preview.catalogItem, entry: nil))
             },
             showLimitAction: showLimitAction
             )
@@ -300,7 +312,7 @@ private struct SeriesWatchingHomeScreen: View {
             limitActionTitle: limitActionTitle,
             addSeries: addDiscoverySeries,
             openDetail: { preview in
-                detailSelection = SeriesHomeDetailSelection(catalogItem: preview.catalogItem, entry: nil)
+                sheetDestination = .detail(SeriesHomeDetailSelection(catalogItem: preview.catalogItem, entry: nil))
             },
             showLimitAction: showLimitAction
             )
@@ -314,7 +326,7 @@ private struct SeriesWatchingHomeScreen: View {
             limitActionTitle: limitActionTitle,
             addSeries: addDiscoverySeries,
             openDetail: { preview in
-                detailSelection = SeriesHomeDetailSelection(catalogItem: preview.catalogItem, entry: nil)
+                sheetDestination = .detail(SeriesHomeDetailSelection(catalogItem: preview.catalogItem, entry: nil))
             },
             showLimitAction: showLimitAction
             )
@@ -324,7 +336,35 @@ private struct SeriesWatchingHomeScreen: View {
                 mobileHomeBottomBar
             }
         }
-        .sheet(item: $editorEntry) { entry in
+        .sheet(item: $sheetDestination) { destination in
+            homeSheet(for: destination)
+        }
+        .task {
+            await loadHomeDiscoveryIfNeeded()
+        }
+        .onAppear {
+            if SeriesUITestEnvironment.current.shouldShowProgressEditor,
+               sheetDestination == nil {
+                let entry: SeriesLibraryEntry?
+                if let requestedEntryId = SeriesUITestEnvironment.current.progressEditorEntryId {
+                    entry = store.entries.first(where: { $0.id == requestedEntryId })
+                } else {
+                    entry = homeState.currentEntry ?? store.activeEntries.first
+                }
+                if let entry {
+                    sheetDestination = .progressEditor(entry)
+                }
+            }
+        }
+        .task(id: missingArtworkSignature) {
+            await reconcileMissingArtwork()
+        }
+    }
+
+    @ViewBuilder
+    private func homeSheet(for destination: SeriesHomeSheetDestination) -> some View {
+        switch destination {
+        case .progressEditor(let entry):
             SeriesProgressEditorSheet(
                 entry: entry,
                 markWatchedThrough: { cursor in
@@ -342,8 +382,7 @@ private struct SeriesWatchingHomeScreen: View {
                 }
             )
             .presentationDetents([.large])
-        }
-        .sheet(item: $detailSelection) { selection in
+        case .detail(let selection):
             SeriesDetailScreen(
                 catalogItem: selection.catalogItem,
                 entry: selection.entry,
@@ -351,7 +390,7 @@ private struct SeriesWatchingHomeScreen: View {
                 follow: selection.entry == nil ? {
                     if canAddSeries, let catalogItem = selection.catalogItem {
                         _ = store.addCatalogSeries(catalogItem)
-                        detailSelection = nil
+                        sheetDestination = nil
                     } else {
                         showLimitAction()
                     }
@@ -396,28 +435,11 @@ private struct SeriesWatchingHomeScreen: View {
                 shareInviteClient: shareInviteClient
             )
             .presentationDetents([.large])
-        }
-        .sheet(isPresented: $isShowingProPaywall) {
+        case .proPaywall:
             SeriesProPaywallView(
                 accessController: accessController,
                 startSignInFlow: startSignInFlow
             )
-        }
-        .task {
-            await loadHomeDiscoveryIfNeeded()
-        }
-        .onAppear {
-            if SeriesUITestEnvironment.current.shouldShowProgressEditor, editorEntry == nil {
-                if let requestedEntryId = SeriesUITestEnvironment.current.progressEditorEntryId,
-                   let requestedEntry = store.entries.first(where: { $0.id == requestedEntryId }) {
-                    editorEntry = requestedEntry
-                } else {
-                    editorEntry = homeState.currentEntry ?? store.activeEntries.first
-                }
-            }
-        }
-        .task(id: missingArtworkSignature) {
-            await reconcileMissingArtwork()
         }
     }
 
@@ -500,7 +522,7 @@ private struct SeriesWatchingHomeScreen: View {
 
             pendingProgressUndo = nil
             pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.added")
-            editorEntry = entry
+            sheetDestination = .progressEditor(entry)
         }
     }
 
@@ -646,7 +668,7 @@ private struct SeriesWatchingHomeScreen: View {
         case .guest:
             startSignInFlow()
         case .signedInFree:
-            isShowingProPaywall = true
+            sheetDestination = .proPaywall
         case .signedInPro:
             break
         }
@@ -1189,6 +1211,7 @@ struct SeriesLibraryRow<MenuContent: View>: View {
 
 private struct SeriesCurrentWatchingCard: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     let entry: SeriesLibraryEntry
     let fillsPrimaryActionWidth: Bool
@@ -1234,15 +1257,16 @@ private struct SeriesCurrentWatchingCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: dynamicTypeSize.isAccessibilitySize ? 20 : 16) {
             heroTopBar
             heroMain
             heroControls
         }
-        .padding(18)
+        .padding(dynamicTypeSize.isAccessibilitySize ? 20 : 18)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(heroBackground)
         .contentShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("home-current-card")
         .sheet(isPresented: $isShowingProgressSelector) {
@@ -1258,69 +1282,74 @@ private struct SeriesCurrentWatchingCard: View {
     }
 
     private var heroTopBar: some View {
-        HStack(alignment: .center, spacing: 8) {
-            Text(currentTitle)
-                .font(.system(size: 11, weight: .black))
-                .tracking(0.7)
-                .foregroundStyle(topPillTextColor)
-                .textCase(.uppercase)
-                .padding(.horizontal, 9)
-                .padding(.vertical, 6)
-                .background(topPillFill, in: Capsule())
-                .overlay {
-                    Capsule().stroke(topPillStroke, lineWidth: 1)
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(alignment: .top, spacing: 10) {
+                        currentStatusBadge
+                        Spacer(minLength: 8)
+                        actionsMenu
+                    }
+                    currentProgressBadge
                 }
-
-            Text(currentProgressShort)
-                .font(.system(size: 11, weight: .black))
-                .tracking(0.4)
-                .foregroundStyle(topPillTextColor.opacity(0.84))
-                .lineLimit(1)
-                .minimumScaleFactor(0.78)
-                .padding(.horizontal, 9)
-                .padding(.vertical, 6)
-                .background(topPillFill.opacity(0.72), in: Capsule())
-                .overlay {
-                    Capsule().stroke(topPillStroke.opacity(0.72), lineWidth: 1)
+            } else {
+                HStack(alignment: .center, spacing: 8) {
+                    currentStatusBadge
+                    currentProgressBadge
+                    Spacer(minLength: 0)
+                    actionsMenu
                 }
-
-            Spacer(minLength: 0)
-            actionsMenu
+            }
         }
+    }
+
+    private var currentStatusBadge: some View {
+        Text(currentTitle)
+            .font(.caption.weight(.black))
+            .tracking(0.7)
+            .foregroundStyle(topPillTextColor)
+            .textCase(.uppercase)
+            .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 6)
+            .background(topPillFill, in: Capsule())
+            .overlay {
+                Capsule().stroke(topPillStroke, lineWidth: 1)
+            }
+            .accessibilityIdentifier("home-current-status")
+    }
+
+    private var currentProgressBadge: some View {
+        Text(currentProgressShort)
+            .font(.caption.weight(.black))
+            .tracking(0.4)
+            .foregroundStyle(topPillTextColor.opacity(0.84))
+            .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 6)
+            .background(topPillFill.opacity(0.72), in: Capsule())
+            .overlay {
+                Capsule().stroke(topPillStroke.opacity(0.72), lineWidth: 1)
+            }
+            .accessibilityIdentifier("home-current-progress")
     }
 
     private var heroMain: some View {
         Button(action: openDetail) {
-            HStack(alignment: .bottom, spacing: 14) {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text(entry.title)
-                        .font(.system(size: 28, weight: .black, design: .rounded))
-                        .foregroundStyle(heroTitleColor)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.62)
-                        .fixedSize(horizontal: false, vertical: true)
+            Group {
+                if dynamicTypeSize.isAccessibilitySize {
+                    heroCopy
+                } else {
+                    HStack(alignment: .bottom, spacing: 14) {
+                        heroCopy
+                            .layoutPriority(1)
 
-                    HStack(spacing: 7) {
-                        Image(systemName: "play.circle.fill")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(AVBrandColor.accent)
-                        Text(String(format: L10n.string("home.current.nextEpisode"), cursorLabel(entry.nextEpisodeCursor)))
-                            .font(.system(size: 14, weight: .black, design: .rounded))
-                            .monospacedDigit()
-                            .foregroundStyle(heroTitleColor.opacity(0.82))
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(heroControlSurface, in: Capsule())
-                    .overlay {
-                        Capsule()
-                            .stroke(heroControlStroke, lineWidth: 1)
+                        SeriesEntryArtworkView(entry: entry, size: 70)
+                            .accessibilityHidden(true)
                     }
                 }
-                .layoutPriority(1)
-
-                SeriesEntryArtworkView(entry: entry, size: 70)
-                    .accessibilityHidden(true)
             }
         }
         .buttonStyle(.plain)
@@ -1328,54 +1357,155 @@ private struct SeriesCurrentWatchingCard: View {
         .accessibilityHint(L10n.string("detail.open"))
     }
 
-    private var heroControls: some View {
-        HStack(spacing: 10) {
-            SeriesProgressPillButton(
-                title: primaryActionTitle,
-                systemName: primaryIconName,
-                style: .accent,
-                accessibilityLabel: primaryActionAccessibilityLabel,
-                accessibilityIdentifier: "home-current-primary-action",
-                minHeight: 50,
-                fillsAvailableWidth: fillsPrimaryActionWidth,
-                isDisabled: !entry.canMarkNextEpisodeFromKnownGuide,
-                action: primaryAction
-            )
+    private var heroCopy: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(entry.title)
+                .font(.title.weight(.black))
+                .fontDesign(.rounded)
+                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                .foregroundStyle(heroTitleColor)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? 4 : 2)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("home-current-series-title")
 
-            Button {
-                isShowingProgressSelector = true
-            } label: {
-                Image(systemName: "scope")
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundStyle(heroControlIconColor)
-                    .frame(width: 46, height: 46)
-                    .background(heroControlSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .stroke(heroControlStroke, lineWidth: 1)
-                    }
+            HStack(alignment: .firstTextBaseline, spacing: 7) {
+                Image(systemName: "play.circle.fill")
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(AVBrandColor.accent)
+                Text(String(format: L10n.string("home.current.nextEpisode"), cursorLabel(entry.nextEpisodeCursor)))
+                    .font(.subheadline.weight(.bold))
+                    .fontDesign(.rounded)
+                    .monospacedDigit()
+                    .foregroundStyle(heroTitleColor.opacity(0.82))
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("home-current-next-episode")
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel(progressEditTitle)
-
-            if entry.lastWatchedEpisodeCursor?.canStepBackQuickly == true {
-                Button(action: markPrevious) {
-                    Image(systemName: "arrow.counterclockwise")
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundStyle(heroControlIconColor)
-                        .frame(width: 46, height: 46)
-                        .background(heroControlSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                .stroke(heroControlStroke, lineWidth: 1)
-                        }
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("\(L10n.string("home.previous")), \(previousLabel)")
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(heroControlSurface, in: Capsule())
+            .overlay {
+                Capsule()
+                    .stroke(heroControlStroke, lineWidth: 1)
             }
-
-            Spacer(minLength: 0)
         }
+    }
+
+    private var heroControls: some View {
+        Group {
+            if usesStackedHeroControls {
+                VStack(spacing: 10) {
+                    primaryProgressButton(minHeight: 56, fillsAvailableWidth: true, titleLineLimit: 2)
+                    heroSecondaryAction(
+                        title: progressEditTitle,
+                        systemName: "scope",
+                        accessibilityIdentifier: "home-current-adjust-progress"
+                    ) {
+                        isShowingProgressSelector = true
+                    }
+
+                    if entry.lastWatchedEpisodeCursor?.canStepBackQuickly == true {
+                        heroSecondaryAction(
+                            title: "\(L10n.string("home.previous")) · \(previousLabel)",
+                            systemName: "arrow.counterclockwise",
+                            accessibilityIdentifier: "home-current-previous-action",
+                            action: markPrevious
+                        )
+                    }
+                }
+            } else {
+                HStack(spacing: 10) {
+                    primaryProgressButton(
+                        minHeight: 50,
+                        fillsAvailableWidth: fillsPrimaryActionWidth,
+                        titleLineLimit: 1
+                    )
+                    compactHeroIconButton(
+                        systemName: "scope",
+                        accessibilityLabel: progressEditTitle,
+                        accessibilityIdentifier: "home-current-adjust-progress"
+                    ) {
+                        isShowingProgressSelector = true
+                    }
+
+                    if entry.lastWatchedEpisodeCursor?.canStepBackQuickly == true {
+                        compactHeroIconButton(
+                            systemName: "arrow.counterclockwise",
+                            accessibilityLabel: "\(L10n.string("home.previous")), \(previousLabel)",
+                            accessibilityIdentifier: "home-current-previous-action",
+                            action: markPrevious
+                        )
+                    }
+
+                    Spacer(minLength: 0)
+                }
+            }
+        }
+    }
+
+    private func primaryProgressButton(
+        minHeight: CGFloat,
+        fillsAvailableWidth: Bool,
+        titleLineLimit: Int
+    ) -> some View {
+        SeriesProgressPillButton(
+            title: primaryActionTitle,
+            systemName: primaryIconName,
+            style: .accent,
+            accessibilityLabel: primaryActionAccessibilityLabel,
+            accessibilityIdentifier: "home-current-primary-action",
+            minHeight: minHeight,
+            fillsAvailableWidth: fillsAvailableWidth,
+            isDisabled: !entry.canMarkNextEpisodeFromKnownGuide,
+            titleFont: usesStackedHeroControls ? .headline.weight(.bold) : .system(size: 13, weight: .black, design: .rounded),
+            titleLineLimit: titleLineLimit,
+            action: primaryAction
+        )
+    }
+
+    private func compactHeroIconButton(
+        systemName: String,
+        accessibilityLabel: String,
+        accessibilityIdentifier: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.body.weight(.bold))
+                .foregroundStyle(heroControlIconColor)
+                .frame(width: 46, height: 46)
+                .background(heroControlSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .stroke(heroControlStroke, lineWidth: 1)
+                }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityIdentifier(accessibilityIdentifier)
+    }
+
+    private func heroSecondaryAction(
+        title: String,
+        systemName: String,
+        accessibilityIdentifier: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: systemName)
+                .font(.headline.weight(.bold))
+                .foregroundStyle(heroControlIconColor)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity, minHeight: 56)
+                .padding(.horizontal, 14)
+                .background(heroControlSurface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(heroControlStroke, lineWidth: 1)
+                }
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(accessibilityIdentifier)
     }
 
     private var actionsMenu: some View {
@@ -1387,6 +1517,10 @@ private struct SeriesCurrentWatchingCard: View {
             archive: archive,
             delete: delete
         )
+    }
+
+    private var usesStackedHeroControls: Bool {
+        dynamicTypeSize.isAccessibilitySize && fillsPrimaryActionWidth
     }
 
     private var currentTitle: String {
@@ -1530,6 +1664,9 @@ private struct SeriesCurrentWatchingCard: View {
 }
 
 private struct SeriesWatchingQueueSection: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
     let entries: [SeriesLibraryEntry]
     let title: String
     let markNext: (SeriesLibraryEntry) -> Void
@@ -1543,69 +1680,25 @@ private struct SeriesWatchingQueueSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
-                .font(.system(size: 16, weight: .bold))
+                .font(.headline.weight(.bold))
                 .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
 
             VStack(spacing: 6) {
                 ForEach(entries) { entry in
-                    HStack(spacing: 12) {
-                        Button {
-                            openDetail(entry)
-                        } label: {
-                            HStack(spacing: 12) {
-                                SeriesEntryArtworkView(entry: entry, size: 42)
-                                    .accessibilityHidden(true)
-
-                                VStack(alignment: .leading, spacing: 3) {
-                                    Text(entry.title)
-                                        .font(.system(size: 15, weight: .semibold))
-                                        .lineLimit(2)
-                                        .minimumScaleFactor(0.82)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                    Text(queueProgress(for: entry))
-                                        .font(.system(size: 12, weight: .medium))
-                                        .foregroundStyle(.secondary)
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.76)
-                                        .allowsTightening(true)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                }
-                                .layoutPriority(1)
-
-                                Spacer(minLength: 0)
-                            }
+                    Group {
+                        if dynamicTypeSize.isAccessibilitySize {
+                            accessibilityRow(for: entry)
+                        } else if usesCompactPhoneRows {
+                            compactPhoneRow(for: entry)
+                        } else {
+                            standardRow(for: entry)
                         }
-                        .buttonStyle(.plain)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .contentShape(Rectangle())
-                        .accessibilityLabel(entry.title)
-                        .accessibilityHint(L10n.string("detail.open"))
-
-                        SeriesProgressPillButton(
-                            title: compactProgressActionTitle(for: entry),
-                            systemName: quickProgressFilledSystemImage(for: entry),
-                            style: .accent,
-                            accessibilityLabel: primaryActionTitle(for: entry),
-                            accessibilityIdentifier: "series-queue-\(entry.id)-quick-progress",
-                            minHeight: 36,
-                            isDisabled: !entry.canMarkNextEpisodeFromKnownGuide
-                        ) {
-                            markNext(entry)
-                        }
-
-                        SeriesEntryActionsMenu(
-                            entry: entry,
-                            togglePinned: { togglePinned(entry) },
-                            openDetail: { openDetail(entry) },
-                            editProgress: { editProgress(entry) },
-                            setStatus: { setStatus(entry, $0) },
-                            archive: { archive(entry) },
-                            delete: { delete(entry) }
-                        )
                     }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 12)
-                    .frame(minHeight: 68)
+                    .padding(.horizontal, dynamicTypeSize.isAccessibilitySize ? 14 : 10)
+                    .padding(.vertical, dynamicTypeSize.isAccessibilitySize ? 14 : 12)
+                    .frame(minHeight: dynamicTypeSize.isAccessibilitySize ? nil : 68)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .background(Color(.secondarySystemGroupedBackground).opacity(0.72), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                     .overlay {
                         RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -1614,8 +1707,126 @@ private struct SeriesWatchingQueueSection: View {
                 }
             }
         }
-        .padding(14)
+        .padding(dynamicTypeSize.isAccessibilitySize ? 16 : 14)
         .background(Color(.secondarySystemGroupedBackground).opacity(0.44), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+    }
+
+    private func standardRow(for entry: SeriesLibraryEntry) -> some View {
+        HStack(spacing: 12) {
+            detailButton(for: entry, artworkSize: 42)
+
+            SeriesProgressPillButton(
+                title: compactProgressActionTitle(for: entry),
+                systemName: quickProgressFilledSystemImage(for: entry),
+                style: .accent,
+                accessibilityLabel: primaryActionTitle(for: entry),
+                accessibilityIdentifier: "series-queue-\(entry.id)-quick-progress",
+                minHeight: 36,
+                isDisabled: !entry.canMarkNextEpisodeFromKnownGuide
+            ) {
+                markNext(entry)
+            }
+
+            actionsMenu(for: entry, showsExpandedLabel: false)
+        }
+    }
+
+    private func compactPhoneRow(for entry: SeriesLibraryEntry) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            detailButton(for: entry, artworkSize: 48)
+
+            HStack(spacing: 10) {
+                SeriesProgressPillButton(
+                    title: primaryActionTitle(for: entry),
+                    systemName: quickProgressFilledSystemImage(for: entry),
+                    style: .accent,
+                    accessibilityLabel: primaryActionTitle(for: entry),
+                    accessibilityIdentifier: "series-queue-\(entry.id)-quick-progress",
+                    minHeight: 44,
+                    fillsAvailableWidth: true,
+                    isDisabled: !entry.canMarkNextEpisodeFromKnownGuide,
+                    titleFont: .callout.weight(.bold)
+                ) {
+                    markNext(entry)
+                }
+
+                actionsMenu(for: entry, showsExpandedLabel: false)
+            }
+        }
+    }
+
+    private func accessibilityRow(for entry: SeriesLibraryEntry) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            detailButton(for: entry, artworkSize: 56)
+
+            SeriesProgressPillButton(
+                title: primaryActionTitle(for: entry),
+                systemName: quickProgressFilledSystemImage(for: entry),
+                style: .accent,
+                accessibilityLabel: primaryActionTitle(for: entry),
+                accessibilityIdentifier: "series-queue-\(entry.id)-quick-progress",
+                minHeight: 56,
+                fillsAvailableWidth: true,
+                isDisabled: !entry.canMarkNextEpisodeFromKnownGuide,
+                titleFont: .headline.weight(.bold),
+                titleLineLimit: 2
+            ) {
+                markNext(entry)
+            }
+
+            actionsMenu(for: entry, showsExpandedLabel: true)
+        }
+    }
+
+    private func detailButton(for entry: SeriesLibraryEntry, artworkSize: CGFloat) -> some View {
+        Button {
+            openDetail(entry)
+        } label: {
+            HStack(alignment: .top, spacing: 12) {
+                SeriesEntryArtworkView(entry: entry, size: artworkSize)
+                    .accessibilityHidden(true)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(entry.title)
+                        .font((dynamicTypeSize.isAccessibilitySize ? Font.headline : .subheadline).weight(.semibold))
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 2)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("series-queue-\(entry.id)-title")
+
+                    Text(queueProgress(for: entry))
+                        .font((dynamicTypeSize.isAccessibilitySize ? Font.subheadline : .caption).weight(.medium))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("series-queue-\(entry.id)-progress")
+                }
+                .layoutPriority(1)
+
+                Spacer(minLength: 0)
+            }
+        }
+        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
+        .accessibilityLabel(entry.title)
+        .accessibilityValue(queueProgress(for: entry))
+        .accessibilityHint(L10n.string("detail.open"))
+        .accessibilityIdentifier("series-queue-\(entry.id)-detail")
+    }
+
+    private func actionsMenu(for entry: SeriesLibraryEntry, showsExpandedLabel: Bool) -> some View {
+        SeriesEntryActionsMenu(
+            entry: entry,
+            togglePinned: { togglePinned(entry) },
+            openDetail: { openDetail(entry) },
+            editProgress: { editProgress(entry) },
+            setStatus: { setStatus(entry, $0) },
+            archive: { archive(entry) },
+            delete: { delete(entry) },
+            showsExpandedLabel: showsExpandedLabel,
+            accessibilityIdentifier: "series-queue-\(entry.id)-actions"
+        )
     }
 
     private func queueProgress(for entry: SeriesLibraryEntry) -> String {
@@ -1627,6 +1838,10 @@ private struct SeriesWatchingQueueSection: View {
 
     private func primaryActionTitle(for entry: SeriesLibraryEntry) -> String {
         primaryProgressActionTitle(for: entry)
+    }
+
+    private var usesCompactPhoneRows: Bool {
+        UIDevice.current.userInterfaceIdiom != .pad || horizontalSizeClass == .compact
     }
 }
 
@@ -1978,6 +2193,8 @@ private struct SeriesEntryActionsMenu: View {
     let setStatus: (SeriesLibraryEntryStatus) -> Void
     let archive: () -> Void
     let delete: () -> Void
+    var showsExpandedLabel = false
+    var accessibilityIdentifier: String? = nil
 
     @State private var isConfirmingDelete = false
 
@@ -2017,11 +2234,23 @@ private struct SeriesEntryActionsMenu: View {
                 Label(L10n.string("home.deleteSeries"), systemImage: "trash")
             }
         } label: {
-            Image(systemName: "ellipsis")
-                .frame(width: 34, height: 34)
+            Group {
+                if showsExpandedLabel {
+                    Label(L10n.string("detail.options.title"), systemImage: "ellipsis")
+                        .font(.subheadline.weight(.bold))
+                        .lineLimit(1)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity, minHeight: 56)
+                        .padding(.horizontal, 14)
+                } else {
+                    Image(systemName: "ellipsis")
+                        .frame(width: 34, height: 34)
+                }
+            }
         }
         .buttonStyle(.bordered)
         .accessibilityLabel(L10n.string("home.actions"))
+        .modifier(SeriesOptionalAccessibilityIdentifier(identifier: accessibilityIdentifier))
         .confirmationDialog(
             L10n.string("detail.delete.confirm.title"),
             isPresented: $isConfirmingDelete,
@@ -2126,10 +2355,10 @@ struct SeriesProgressPillButton: View {
 
                 Text(title)
                     .lineLimit(titleLineLimit)
-                    .minimumScaleFactor(0.72)
+                    .minimumScaleFactor(titleLineLimit > 1 ? 1 : 0.72)
                     .allowsTightening(true)
                     .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: fillsAvailableWidth ? .infinity : nil)
             }
             .font(titleFont)
             .foregroundStyle(foregroundColor)
@@ -2239,6 +2468,7 @@ private func statusIcon(_ status: SeriesLibraryEntryStatus, isSelected: Bool) ->
 
 struct SeriesProgressEditorSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let entry: SeriesLibraryEntry
     let markWatchedThrough: (SeriesEpisodeCursor) -> Void
     let clearProgress: () -> Void
@@ -2297,69 +2527,98 @@ struct SeriesProgressEditorSheet: View {
             }
             .safeAreaInset(edge: .bottom) {
                 Text(L10n.string("home.editor.saveHint"))
-                    .font(.system(size: 12, weight: .bold))
+                    .font(.footnote.weight(.semibold))
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
-                .padding(.horizontal, 18)
-                .padding(.vertical, 12)
-                .background(.regularMaterial)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 12)
+                    .background(.regularMaterial)
+                    .accessibilityIdentifier("series-progress-editor-save-hint")
             }
             .task(id: entry.seriesId) {
                 await loadEpisodeGuide()
             }
         }
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
     }
 
     private var progressHero: some View {
         AVAppShellCard {
-            HStack(alignment: .center, spacing: 14) {
-                SeriesEntryArtworkView(entry: entry, size: 74)
-
-                VStack(alignment: .leading, spacing: 7) {
-                    Text(entry.lastWatchedEpisodeCursor == nil ? L10n.string("home.editor.startPrompt") : L10n.string("home.adjust"))
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundStyle(.secondary)
-
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(selectedCursorLabel)
-                            .font(.system(size: 36, weight: .black, design: .rounded))
-                            .monospacedDigit()
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.75)
-
-                        Text(String(format: L10n.string("home.editor.watchedThrough"), selectedCursorLabel))
-                            .font(.system(size: 13, weight: .black))
-                            .foregroundStyle(.primary)
-                            .lineLimit(2)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        Text(nextEpisodeSummaryText)
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(AVBrandColor.accent)
-                            .lineLimit(2)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        Label(editorGuideCoverageText, systemImage: editorGuideCoverageSystemImage)
-                            .font(.system(size: 11, weight: .black))
-                            .foregroundStyle(.secondary)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.82)
-                            .fixedSize(horizontal: false, vertical: true)
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 14) {
+                    HStack(alignment: .center, spacing: 12) {
+                        SeriesEntryArtworkView(entry: entry, size: 66)
+                        progressHeroSummary
                     }
-                }
-                .layoutPriority(1)
 
-                Spacer(minLength: 0)
+                    progressHeroDetails
+                }
+            } else {
+                HStack(alignment: .center, spacing: 14) {
+                    SeriesEntryArtworkView(entry: entry, size: 74)
+
+                    VStack(alignment: .leading, spacing: 7) {
+                        progressHeroSummary
+                        progressHeroDetails
+                    }
+                    .layoutPriority(1)
+
+                    Spacer(minLength: 0)
+                }
             }
+        }
+    }
+
+    private var progressHeroSummary: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(entry.lastWatchedEpisodeCursor == nil ? L10n.string("home.editor.startPrompt") : L10n.string("home.adjust"))
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(.secondary)
+                .accessibilityIdentifier("series-progress-editor-prompt")
+
+            Text(selectedCursorLabel)
+                .font(.largeTitle.weight(.black))
+                .fontDesign(.rounded)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .accessibilityIdentifier("series-progress-editor-cursor")
+        }
+    }
+
+    private var progressHeroDetails: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(String(format: L10n.string("home.editor.watchedThrough"), selectedCursorLabel))
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(.primary)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("series-progress-editor-watched-through")
+
+            Text(nextEpisodeSummaryText)
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(AVBrandColor.accent)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("series-progress-editor-next")
+
+            Label(editorGuideCoverageText, systemImage: editorGuideCoverageSystemImage)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.secondary)
+                .lineLimit(3)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("series-progress-editor-coverage")
         }
     }
 
     private var seasonSelector: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(L10n.string("home.editor.season.short"))
-                .font(.system(size: 13, weight: .bold))
+                .font(.headline)
                 .foregroundStyle(.secondary)
+                .accessibilityIdentifier("series-progress-editor-season-title")
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
@@ -2388,14 +2647,15 @@ struct SeriesProgressEditorSheet: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
                 Text(L10n.string("home.editor.episode.short"))
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.headline)
                     .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("series-progress-editor-episode-title")
 
                 Spacer()
 
                 if isShowingExtendedEpisodes {
                     Text(L10n.string("home.editor.extendedRange"))
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.footnote.weight(.bold))
                         .foregroundStyle(AVBrandColor.accent)
                 }
             }
@@ -2411,7 +2671,7 @@ struct SeriesProgressEditorSheet: View {
 
                 if shouldShowProviderNumberingNote {
                     Label(L10n.string("detail.numbering.providerNote"), systemImage: "number")
-                        .font(.system(size: 11, weight: .black))
+                        .font(.caption.weight(.bold))
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -2443,9 +2703,10 @@ struct SeriesProgressEditorSheet: View {
 
     private var explanation: some View {
         Text(explanationText)
-            .font(.system(size: 13, weight: .medium))
+            .font(.callout.weight(.medium))
             .foregroundStyle(.secondary)
             .fixedSize(horizontal: false, vertical: true)
+            .accessibilityIdentifier("series-progress-editor-explanation")
     }
 
     private var clearProgressAction: some View {
@@ -2459,6 +2720,7 @@ struct SeriesProgressEditorSheet: View {
             .buttonStyle(.bordered)
             .controlSize(.regular)
             .accessibilityLabel(L10n.string("home.notStarted"))
+            .accessibilityIdentifier("series-progress-editor-clear")
 
             Spacer(minLength: 0)
         }
@@ -2505,7 +2767,7 @@ struct SeriesProgressEditorSheet: View {
     }
 
     private var episodeColumns: [GridItem] {
-        [GridItem(.adaptive(minimum: 58), spacing: 8)]
+        [GridItem(.adaptive(minimum: dynamicTypeSize.isAccessibilitySize ? 92 : 58), spacing: 8)]
     }
 
     private var loadedGuide: SeriesProgressEpisodeGuide? {
@@ -2537,11 +2799,11 @@ struct SeriesProgressEditorSheet: View {
     private var guideMismatchNotice: some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 15, weight: .bold))
+                .font(.body.weight(.bold))
                 .foregroundStyle(.orange)
 
             Text(String(format: L10n.string("home.editor.guideMismatch"), selectedCursorLabel, knownEpisodeLabel(cursor: loadedGuide?.latestCursor ?? selectedCursor, absoluteEpisodeNumber: loadedGuide?.latestCursor.flatMap { loadedGuide?.absoluteEpisodeNumber(for: $0) })))
-                .font(.system(size: 12, weight: .bold))
+                .font(.footnote.weight(.bold))
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -2609,31 +2871,37 @@ struct SeriesProgressEditorSheet: View {
                         .fill(isSelected ? AVBrandColor.accent : Color(.tertiarySystemGroupedBackground))
 
                     Text(loadedGuide?.absoluteEpisodeNumber(for: item.cursor).map { "E\($0)" } ?? "E\(item.episodeNumber)")
-                        .font(.system(size: 15, weight: .black, design: .rounded))
+                        .font(.subheadline.weight(.black))
+                        .fontDesign(.rounded)
                         .monospacedDigit()
                         .lineLimit(1)
                         .minimumScaleFactor(0.68)
                         .foregroundStyle(isSelected ? Color.black.opacity(0.84) : Color.primary)
                 }
-                .frame(width: 58, height: 44)
+                .frame(
+                    width: dynamicTypeSize.isAccessibilitySize ? 70 : 58,
+                    height: dynamicTypeSize.isAccessibilitySize ? 52 : 44
+                )
 
                 VStack(alignment: .leading, spacing: 4) {
                     if loadedGuide?.absoluteEpisodeNumber(for: item.cursor) != nil {
                         Text(cursorLabel(item.cursor))
-                            .font(.system(size: 11, weight: .black, design: .rounded))
+                            .font(.caption.weight(.bold))
+                            .fontDesign(.rounded)
                             .foregroundStyle(.secondary)
                             .monospacedDigit()
                     }
 
                     Text(episodeTitle(for: item))
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .font(.body.weight(.bold))
+                        .fontDesign(.rounded)
                         .foregroundStyle(.primary)
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
 
                     if let airDate = item.airDate, !airDate.isEmpty {
                         Text(airDate)
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(.footnote.weight(.semibold))
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                             .minimumScaleFactor(0.82)
@@ -2642,7 +2910,7 @@ struct SeriesProgressEditorSheet: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 Image(systemName: isWatched ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 17, weight: .bold))
+                    .font(.body.weight(.bold))
                     .foregroundStyle(isWatched ? AVBrandColor.accent : Color.secondary.opacity(0.45))
                     .frame(width: 24, height: 24)
             }
@@ -2676,16 +2944,17 @@ struct SeriesProgressEditorSheet: View {
 
         return VStack(spacing: 5) {
             Text("E\(episode)")
-                .font(.system(size: 14, weight: .black, design: .rounded))
+                .font(.subheadline.weight(.black))
+                .fontDesign(.rounded)
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.74)
 
             Image(systemName: isWatched ? "checkmark.circle.fill" : "circle")
-                .font(.system(size: 12, weight: .bold))
+                .font(.caption.weight(.bold))
                 .foregroundStyle(isSelected ? Color.white.opacity(0.88) : (isWatched ? AVBrandColor.accent : Color.secondary.opacity(0.55)))
         }
-        .frame(maxWidth: .infinity, minHeight: 48)
+        .frame(maxWidth: .infinity, minHeight: dynamicTypeSize.isAccessibilitySize ? 60 : 48)
         .padding(.horizontal, 8)
     }
 
@@ -2713,11 +2982,12 @@ struct SeriesProgressEditorSheet: View {
     private func selectorChip(title: String, accessibilityLabel: String? = nil, isSelected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .font(.subheadline.weight(.bold))
+                .fontDesign(.rounded)
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.74)
-                .frame(maxWidth: .infinity, minHeight: 42)
+                .frame(maxWidth: .infinity, minHeight: dynamicTypeSize.isAccessibilitySize ? 52 : 42)
                 .padding(.horizontal, 10)
         }
         .buttonStyle(.plain)
@@ -2733,8 +3003,8 @@ struct SeriesProgressEditorSheet: View {
     private func moreChip(title: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: "plus")
-                .font(.system(size: 15, weight: .black))
-                .frame(maxWidth: .infinity, minHeight: 42)
+                .font(.body.weight(.black))
+                .frame(maxWidth: .infinity, minHeight: dynamicTypeSize.isAccessibilitySize ? 52 : 42)
         }
         .buttonStyle(.plain)
         .foregroundStyle(AVBrandColor.accent)

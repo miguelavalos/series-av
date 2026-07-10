@@ -163,6 +163,21 @@ final class SeriesBundleConfigTests: XCTestCase {
         XCTAssertNil(regularEnvironment.homeDiscoveryScenario)
         XCTAssertEqual(uiTestEnvironment.homeDiscoveryScenario, "failed_once")
     }
+
+    @MainActor
+    func testInitialInAppBrowserURLIsOnlyAvailableDuringUITests() {
+        let url = "https://series-av.avalsys.com/terms"
+        let regularEnvironment = SeriesUITestEnvironment(environment: [
+            "SERIESAV_UI_TESTS_IN_APP_BROWSER_URL": url
+        ])
+        let uiTestEnvironment = SeriesUITestEnvironment(environment: [
+            "SERIESAV_UI_TESTS": "1",
+            "SERIESAV_UI_TESTS_IN_APP_BROWSER_URL": url
+        ])
+
+        XCTAssertNil(regularEnvironment.initialInAppBrowserURL)
+        XCTAssertEqual(uiTestEnvironment.initialInAppBrowserURL?.absoluteString, url)
+    }
 }
 
 private enum BundleConfigFixture {

@@ -155,43 +155,74 @@ private struct SeriesAviQuickActionsCard: View {
     let openSearch: () -> Void
     let openLibrary: () -> Void
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var body: some View {
         AVAviGuidanceCard(
             title: L10n.string("avi.prepare.title"),
             detail: L10n.string("avi.prepare.detail")
         ) {
-            HStack(spacing: 10) {
-                SeriesAviIconActionButton(
-                    systemImage: "magnifyingglass",
-                    accessibilityLabel: L10n.string("search.title"),
-                    action: openSearch
-                )
-
-                SeriesAviIconActionButton(
-                    systemImage: "rectangle.stack.fill",
-                    accessibilityLabel: L10n.string("library.title"),
-                    action: openLibrary
-                )
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(spacing: 10) {
+                    quickActionButtons
+                }
+            } else {
+                HStack(spacing: 10) {
+                    quickActionButtons
+                }
             }
 
-            HStack(spacing: 8) {
-                SeriesAviMetricPill(
-                    title: L10n.string("library.filter.watching"),
-                    value: watchingCount,
-                    systemImage: "play.circle.fill"
-                )
-                SeriesAviMetricPill(
-                    title: L10n.string("library.filter.all"),
-                    value: activeCount,
-                    systemImage: "rectangle.stack.fill"
-                )
-                SeriesAviMetricPill(
-                    title: L10n.string("library.filter.archived.short"),
-                    value: archivedCount,
-                    systemImage: "archivebox"
-                )
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(spacing: 8) {
+                    metricPills
+                }
+            } else {
+                HStack(spacing: 8) {
+                    metricPills
+                }
             }
         }
+    }
+
+    @ViewBuilder
+    private var quickActionButtons: some View {
+        SeriesAviIconActionButton(
+            systemImage: "magnifyingglass",
+            showsLabel: dynamicTypeSize.isAccessibilitySize,
+            accessibilityLabel: L10n.string("search.title"),
+            accessibilityIdentifier: "series.avi.search",
+            action: openSearch
+        )
+
+        SeriesAviIconActionButton(
+            systemImage: "rectangle.stack.fill",
+            showsLabel: dynamicTypeSize.isAccessibilitySize,
+            accessibilityLabel: L10n.string("library.title"),
+            accessibilityIdentifier: "series.avi.library",
+            action: openLibrary
+        )
+    }
+
+    @ViewBuilder
+    private var metricPills: some View {
+        SeriesAviMetricPill(
+            title: L10n.string("library.filter.watching"),
+            value: watchingCount,
+            systemImage: "play.circle.fill",
+            accessibilityIdentifier: "series.avi.metric.watching"
+        )
+        SeriesAviMetricPill(
+            title: L10n.string("library.filter.all"),
+            value: activeCount,
+            systemImage: "rectangle.stack.fill",
+            accessibilityIdentifier: "series.avi.metric.active"
+        )
+        SeriesAviMetricPill(
+            title: L10n.string("library.filter.archived.short"),
+            value: archivedCount,
+            systemImage: "archivebox",
+            accessibilityIdentifier: "series.avi.metric.archived"
+        )
     }
 }
 
@@ -199,24 +230,52 @@ private struct SeriesAviMetricPill: View {
     let title: String
     let value: Int
     let systemImage: String
+    let accessibilityIdentifier: String
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: systemImage)
-                .font(.system(size: 12, weight: .bold))
-                .foregroundStyle(AVBrandColor.accent)
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                HStack(spacing: 10) {
+                    Label(title, systemImage: systemImage)
+                        .font(.subheadline.weight(.semibold))
+                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                        .foregroundStyle(AVBrandColor.textPrimary)
 
-            Text("\(value)")
-                .font(.system(size: 13, weight: .black, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(AVBrandColor.textPrimary)
+                    Spacer(minLength: 8)
+
+                    metricValue
+                        .font(.headline.weight(.black))
+                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                }
+                .padding(.horizontal, 14)
+                .frame(minHeight: 52)
+                .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            } else {
+                HStack(spacing: 6) {
+                    Image(systemName: systemImage)
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(AVBrandColor.accent)
+
+                    metricValue
+                        .font(.subheadline.weight(.black))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 8)
+                .background(Color(.tertiarySystemGroupedBackground), in: Capsule())
+            }
         }
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 8)
-        .background(Color(.tertiarySystemGroupedBackground), in: Capsule())
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(title): \(value)")
+        .accessibilityIdentifier(accessibilityIdentifier)
+    }
+
+    private var metricValue: some View {
+        Text("\(value)")
+            .monospacedDigit()
+            .foregroundStyle(AVBrandColor.textPrimary)
     }
 }
 
@@ -246,6 +305,8 @@ private struct SeriesAviCurrentFocusCard: View {
     let markPrevious: () -> Void
     let togglePinned: () -> Void
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var body: some View {
         AVAviGuidanceCard(
             title: title,
@@ -258,27 +319,14 @@ private struct SeriesAviCurrentFocusCard: View {
                     systemImage: "play.circle.fill"
                 )
 
-                HStack(spacing: 10) {
-                    SeriesAviIconActionButton(
-                        systemImage: currentEntry.status == .wantToWatch ? "play.fill" : "checkmark",
-                        isPrimary: true,
-                        accessibilityLabel: "\(currentEntry.status == .wantToWatch ? L10n.string("avi.action.start") : L10n.string("avi.action.next")) \(cursorLabel(currentEntry.nextEpisodeCursor))",
-                        action: currentEntry.status == .wantToWatch ? startWatching : markNext
-                    )
-
-                    if currentEntry.lastWatchedEpisodeCursor?.canStepBackQuickly == true {
-                        SeriesAviIconActionButton(
-                            systemImage: "arrow.uturn.backward",
-                            accessibilityLabel: L10n.string("avi.action.previous"),
-                            action: markPrevious
-                        )
+                if dynamicTypeSize.isAccessibilitySize {
+                    VStack(spacing: 10) {
+                        focusActions(for: currentEntry)
                     }
-
-                    SeriesAviIconActionButton(
-                        systemImage: currentEntry.isPinnedHomeSeries == true ? "pin.slash" : "pin",
-                        accessibilityLabel: currentEntry.isPinnedHomeSeries == true ? L10n.string("avi.action.unpin") : L10n.string("avi.action.pin"),
-                        action: togglePinned
-                    )
+                } else {
+                    HStack(spacing: 10) {
+                        focusActions(for: currentEntry)
+                    }
                 }
             } else {
                 AVAviInfoRow(
@@ -300,23 +348,70 @@ private struct SeriesAviCurrentFocusCard: View {
         }
         return String(format: L10n.string("avi.current.next.detail"), cursorLabel(currentEntry.nextEpisodeCursor))
     }
+
+    @ViewBuilder
+    private func focusActions(for currentEntry: SeriesLibraryEntry) -> some View {
+        SeriesAviIconActionButton(
+            systemImage: currentEntry.status == .wantToWatch ? "play.fill" : "checkmark",
+            isPrimary: true,
+            showsLabel: dynamicTypeSize.isAccessibilitySize,
+            accessibilityLabel: "\(currentEntry.status == .wantToWatch ? L10n.string("avi.action.start") : L10n.string("avi.action.next")) \(cursorLabel(currentEntry.nextEpisodeCursor))",
+            accessibilityIdentifier: "series.avi.focus.primary",
+            action: currentEntry.status == .wantToWatch ? startWatching : markNext
+        )
+
+        if currentEntry.lastWatchedEpisodeCursor?.canStepBackQuickly == true {
+            SeriesAviIconActionButton(
+                systemImage: "arrow.uturn.backward",
+                showsLabel: dynamicTypeSize.isAccessibilitySize,
+                accessibilityLabel: L10n.string("avi.action.previous"),
+                accessibilityIdentifier: "series.avi.focus.previous",
+                action: markPrevious
+            )
+        }
+
+        SeriesAviIconActionButton(
+            systemImage: currentEntry.isPinnedHomeSeries == true ? "pin.slash" : "pin",
+            showsLabel: dynamicTypeSize.isAccessibilitySize,
+            accessibilityLabel: currentEntry.isPinnedHomeSeries == true ? L10n.string("avi.action.unpin") : L10n.string("avi.action.pin"),
+            accessibilityIdentifier: "series.avi.focus.pin",
+            action: togglePinned
+        )
+    }
 }
 
 private struct SeriesAviIconActionButton: View {
     let systemImage: String
     var isPrimary = false
+    var showsLabel = false
     let accessibilityLabel: String
+    let accessibilityIdentifier: String
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            Image(systemName: systemImage)
-                .font(.system(size: isPrimary ? 18 : 16, weight: .black))
-                .foregroundStyle(isPrimary ? Color.black.opacity(0.84) : AVBrandColor.textPrimary)
-                .frame(width: isPrimary ? 48 : 44, height: isPrimary ? 48 : 44)
-                .background(isPrimary ? AVBrandColor.accent : Color(.tertiarySystemGroupedBackground), in: Circle())
+            if showsLabel {
+                Label(accessibilityLabel, systemImage: systemImage)
+                    .font(.headline.weight(.bold))
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                    .lineLimit(2)
+                    .foregroundStyle(isPrimary ? Color.black.opacity(0.84) : AVBrandColor.textPrimary)
+                    .frame(maxWidth: .infinity, minHeight: 56)
+                    .padding(.horizontal, 14)
+                    .background(
+                        isPrimary ? AVBrandColor.accent : Color(.tertiarySystemGroupedBackground),
+                        in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    )
+            } else {
+                Image(systemName: systemImage)
+                    .font(isPrimary ? .headline.weight(.black) : .body.weight(.black))
+                    .foregroundStyle(isPrimary ? Color.black.opacity(0.84) : AVBrandColor.textPrimary)
+                    .frame(width: isPrimary ? 48 : 44, height: isPrimary ? 48 : 44)
+                    .background(isPrimary ? AVBrandColor.accent : Color(.tertiarySystemGroupedBackground), in: Circle())
+            }
         }
         .buttonStyle(.plain)
         .accessibilityLabel(accessibilityLabel)
+        .accessibilityIdentifier(accessibilityIdentifier)
     }
 }
