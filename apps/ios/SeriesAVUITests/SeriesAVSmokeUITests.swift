@@ -165,10 +165,16 @@ final class SeriesAVSmokeUITests: XCTestCase {
 
         app.buttons["Inicio"].tap()
         XCTAssertTrue(app.staticTexts["Lista para empezar"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Siguiente S1 E1"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["home-current-progress"].label, "S1 E1")
+        XCTAssertFalse(app.staticTexts["home-current-next-episode"].exists)
         XCTAssertTrue(app.buttons["Empezar, S1 E1"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.staticTexts.matching(NSPredicate(format: "label == %@", "The Last of Us")).count, 1)
         XCTAssertFalse(app.staticTexts["Sigue tu primera serie"].exists)
+
+        let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        screenshot.name = "Home ready-to-start hero"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
     }
 
     @MainActor

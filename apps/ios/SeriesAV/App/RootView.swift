@@ -1402,25 +1402,27 @@ private struct SeriesCurrentWatchingCard: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier("home-current-series-title")
 
-            HStack(alignment: .firstTextBaseline, spacing: 7) {
-                Image(systemName: "play.circle.fill")
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(AVBrandColor.accent)
-                Text(String(format: L10n.string("home.current.nextEpisode"), cursorLabel(entry.nextEpisodeCursor)))
-                    .font(.subheadline.weight(.bold))
-                    .fontDesign(.rounded)
-                    .monospacedDigit()
-                    .foregroundStyle(heroTitleColor.opacity(0.82))
-                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .accessibilityIdentifier("home-current-next-episode")
-            }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(heroControlSurface, in: Capsule())
-            .overlay {
-                Capsule()
-                    .stroke(heroControlStroke, lineWidth: 1)
+            if entry.status != .wantToWatch {
+                HStack(alignment: .firstTextBaseline, spacing: 7) {
+                    Image(systemName: "play.circle.fill")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(AVBrandColor.accent)
+                    Text(String(format: L10n.string("home.current.nextEpisode"), cursorLabel(entry.nextEpisodeCursor)))
+                        .font(.subheadline.weight(.bold))
+                        .fontDesign(.rounded)
+                        .monospacedDigit()
+                        .foregroundStyle(heroTitleColor.opacity(0.82))
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("home-current-next-episode")
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(heroControlSurface, in: Capsule())
+                .overlay {
+                    Capsule()
+                        .stroke(heroControlStroke, lineWidth: 1)
+                }
             }
         }
     }
