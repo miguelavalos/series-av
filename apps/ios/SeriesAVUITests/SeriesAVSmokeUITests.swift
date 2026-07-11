@@ -1275,7 +1275,7 @@ final class SeriesAVSmokeUITests: XCTestCase {
     }
 
     @MainActor
-    func testSampleLibraryStacksRowActionsBelowReadableInfoOnIPhone() throws {
+    func testSampleLibraryKeepsCompactRowActionsBesideReadableInfoOnIPhone() throws {
         continueAfterFailure = false
         let app = makeApp(environment: [
             "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
@@ -1289,11 +1289,24 @@ final class SeriesAVSmokeUITests: XCTestCase {
 
         let title = app.staticTexts["Current Series"]
         let primaryAction = app.buttons["Marcar S1 E3 visto"]
+        let managementMenu = app.buttons["series-row-sample-1-actions"]
         XCTAssertTrue(title.waitForExistence(timeout: 10))
         XCTAssertTrue(primaryAction.exists)
+        XCTAssertTrue(managementMenu.exists)
         XCTAssertGreaterThan(title.frame.width, 90)
-        XCTAssertGreaterThanOrEqual(primaryAction.frame.minY, title.frame.maxY)
+        XCTAssertLessThan(primaryAction.frame.minY, title.frame.maxY)
+        XCTAssertLessThan(primaryAction.frame.maxX, managementMenu.frame.minX)
         XCTAssertGreaterThanOrEqual(primaryAction.frame.height, 44)
+        XCTAssertGreaterThanOrEqual(primaryAction.frame.width, 68)
+        XCTAssertLessThanOrEqual(primaryAction.frame.width, 76)
+        XCTAssertGreaterThanOrEqual(managementMenu.frame.width, 44)
+        XCTAssertGreaterThanOrEqual(managementMenu.frame.height, 44)
+        XCTAssertTrue(managementMenu.isHittable)
+
+        let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        screenshot.name = "Library compact active rows"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
     }
 
     @MainActor

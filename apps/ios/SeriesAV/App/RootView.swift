@@ -1095,14 +1095,11 @@ struct SeriesLibraryRow<MenuContent: View>: View {
     }
 
     private var compactLayout: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        HStack(spacing: 10) {
             detailButton
-
-            HStack(spacing: 10) {
-                Spacer(minLength: 48)
-                progressButton(minHeight: 44)
-                actionsMenu
-            }
+                .layoutPriority(1)
+            compactProgressButton
+            actionsMenu
         }
     }
 
@@ -1156,15 +1153,52 @@ struct SeriesLibraryRow<MenuContent: View>: View {
         }
     }
 
+    @ViewBuilder
+    private var compactProgressButton: some View {
+        if let markNext {
+            Button(action: markNext) {
+                HStack(spacing: 5) {
+                    Image(systemName: quickProgressFilledSystemImage(for: entry))
+                        .accessibilityHidden(true)
+
+                    Text(cursorLabel(entry.nextEpisodeCursor))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.82)
+                }
+                .font(.caption2.weight(.black))
+                .foregroundStyle(Color.black.opacity(0.84))
+                .frame(width: 72, height: 44)
+                .background(AVBrandColor.accent, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .stroke(Color.black.opacity(0.08), lineWidth: 1)
+                }
+            }
+            .buttonStyle(.plain)
+            .disabled(!entry.canMarkNextEpisodeFromKnownGuide)
+            .opacity(entry.canMarkNextEpisodeFromKnownGuide ? 1 : 0.42)
+            .accessibilityLabel(quickProgressAccessibilityLabel)
+            .accessibilityIdentifier("series-row-\(entry.id)-quick-progress")
+        }
+    }
+
     private var actionsMenu: some View {
         Menu {
             menuContent()
         } label: {
             Image(systemName: "ellipsis")
-                .frame(width: 34, height: 34)
+                .font(.body.weight(.bold))
+                .foregroundStyle(AVBrandColor.textPrimary)
+                .frame(width: 44, height: 44)
+                .background(Color(.secondarySystemGroupedBackground), in: Circle())
+                .overlay {
+                    Circle()
+                        .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                }
         }
-        .buttonStyle(.bordered)
+        .buttonStyle(.plain)
         .accessibilityLabel(L10n.string("home.actions"))
+        .accessibilityIdentifier("series-row-\(entry.id)-actions")
     }
 
     private var quickProgressAccessibilityLabel: String {
