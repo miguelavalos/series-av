@@ -149,7 +149,10 @@ includes compact redesigns of Library active and Upcoming episode rows. These
 follow-ups are not present in the already uploaded build `15`; build `16` has not
 been archived or uploaded. Do not relabel build `15` as containing this change.
 The Home hero also removes the redundant `Next S1 E1` badge for ready-to-start
-series while retaining the start cursor and primary action.
+series while retaining the start cursor and primary action. Search category
+filters now adapt to the available width: all six remain visible in two rows on
+iPhone, stay in one row on iPad, and become a compact selector at accessibility
+text sizes.
 
 1. Generate production iOS config and run the app:
 

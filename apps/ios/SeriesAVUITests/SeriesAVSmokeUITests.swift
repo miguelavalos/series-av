@@ -1552,6 +1552,48 @@ final class SeriesAVSmokeUITests: XCTestCase {
     }
 
     @MainActor
+    func testSearchFiltersAdaptToAvailableWidthAtDefaultTextSize() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: ["SERIESAV_UI_TESTS_INITIAL_TAB": "search"])
+        app.launch()
+
+        let filterIds = [
+            "series-search-filter-popular",
+            "series-search-filter-anime",
+            "series-search-filter-drama",
+            "series-search-filter-comedy",
+            "series-search-filter-sci-fi",
+            "series-search-filter-animation"
+        ]
+        let filters = filterIds.map { app.buttons[$0] }
+
+        for filter in filters {
+            XCTAssertTrue(filter.waitForExistence(timeout: 10))
+            XCTAssertTrue(filter.isHittable)
+            XCTAssertGreaterThanOrEqual(filter.frame.height, 44)
+            XCTAssertGreaterThanOrEqual(filter.frame.minX, app.frame.minX + 16)
+            XCTAssertLessThanOrEqual(filter.frame.maxX, app.frame.maxX - 16)
+        }
+
+        if app.frame.width <= 600 {
+            XCTAssertEqual(filters[0].frame.midY, filters[1].frame.midY, accuracy: 2)
+            XCTAssertEqual(filters[1].frame.midY, filters[2].frame.midY, accuracy: 2)
+            XCTAssertEqual(filters[3].frame.midY, filters[4].frame.midY, accuracy: 2)
+            XCTAssertEqual(filters[4].frame.midY, filters[5].frame.midY, accuracy: 2)
+            XCTAssertGreaterThan(filters[3].frame.minY, filters[0].frame.maxY)
+        } else {
+            for filter in filters.dropFirst() {
+                XCTAssertEqual(filter.frame.midY, filters[0].frame.midY, accuracy: 2)
+            }
+        }
+
+        let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        screenshot.name = "Search adaptive category filters"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+    }
+
+    @MainActor
     func testSearchCatalogRemainsReadableAtAccessibilityTextSize() throws {
         continueAfterFailure = false
         let app = makeApp(
@@ -1563,21 +1605,34 @@ final class SeriesAVSmokeUITests: XCTestCase {
         let title = app.staticTexts["series-search-title"]
         let subtitle = app.staticTexts["series-search-subtitle"]
         let searchField = app.textFields["series-search-field"]
-        let popularFilter = app.buttons["series-search-filter-popular"]
+        let filterSelector = app.descendants(matching: .any)["series-search-filter-selector"]
         let limit = app.staticTexts["series-search-limit"]
         let resultsTitle = app.staticTexts["series-search-results-title"]
         let resultsSubtitle = app.staticTexts["series-search-results-subtitle"]
         XCTAssertTrue(title.waitForExistence(timeout: 10))
         XCTAssertTrue(subtitle.exists)
         XCTAssertTrue(searchField.exists)
-        XCTAssertTrue(popularFilter.exists)
+        XCTAssertTrue(filterSelector.exists)
         XCTAssertTrue(limit.exists)
         XCTAssertTrue(resultsTitle.exists)
         XCTAssertTrue(resultsSubtitle.exists)
         XCTAssertGreaterThanOrEqual(searchField.frame.height, 44)
-        XCTAssertGreaterThanOrEqual(popularFilter.frame.height, 44)
+        XCTAssertGreaterThanOrEqual(filterSelector.frame.height, 52)
+        XCTAssertEqual(filterSelector.value as? String, "Populares")
         XCTAssertLessThan(title.frame.maxY, subtitle.frame.minY)
         XCTAssertLessThan(subtitle.frame.maxY, searchField.frame.minY)
+
+        filterSelector.tap()
+        let animationFilter = app.buttons["Animación"]
+        XCTAssertTrue(animationFilter.waitForExistence(timeout: 5))
+        animationFilter.tap()
+        XCTAssertTrue(waitForLabel("Animación", on: resultsTitle, timeout: 5))
+
+        filterSelector.tap()
+        let popularFilter = app.buttons["Populares"]
+        XCTAssertTrue(popularFilter.waitForExistence(timeout: 5))
+        popularFilter.tap()
+        XCTAssertTrue(waitForLabel("Populares", on: resultsTitle, timeout: 5))
 
         let firstResult = app.buttons["The Last of Us"].firstMatch
         let firstFollowAction = app.buttons["Seguir serie"].firstMatch

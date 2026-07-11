@@ -199,29 +199,7 @@ struct SeriesSearchScreen: View {
                     .stroke(Color.primary.opacity(0.06), lineWidth: 1)
             }
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(SeriesSearchCollection.allCases, id: \.self) { collection in
-                        Button {
-                            selectedCollection = collection
-                            query = ""
-                        } label: {
-                            Text(collection.title)
-                                .font(.subheadline.weight(.bold))
-                                .padding(.horizontal, 14)
-                                .frame(minHeight: dynamicTypeSize.isAccessibilitySize ? 52 : 44)
-                        }
-                        .buttonStyle(.plain)
-                        .foregroundStyle(selectedCollection == collection && trimmedQuery.isEmpty ? Color.white : Color.primary)
-                        .background(selectedCollection == collection && trimmedQuery.isEmpty ? AVBrandColor.accent : Color(.secondarySystemGroupedBackground), in: Capsule())
-                        .overlay {
-                            Capsule()
-                                .stroke(selectedCollection == collection && trimmedQuery.isEmpty ? AVBrandColor.accent.opacity(0.8) : Color.primary.opacity(0.08), lineWidth: 1)
-                        }
-                        .accessibilityIdentifier("series-search-filter-\(collection.cacheKey)")
-                    }
-                }
-            }
+            collectionFilters
 
             Text(limitText)
                 .font(.callout.weight(.medium))
@@ -253,6 +231,103 @@ struct SeriesSearchScreen: View {
                 )
             }
         }
+    }
+
+    @ViewBuilder
+    private var collectionFilters: some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            collectionFilterMenu
+        } else {
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 8) {
+                    ForEach(SeriesSearchCollection.allCases, id: \.self) { collection in
+                        collectionFilterButton(collection)
+                    }
+                }
+                .fixedSize(horizontal: true, vertical: false)
+
+                LazyVGrid(
+                    columns: [GridItem(.adaptive(minimum: 100), spacing: 8)],
+                    alignment: .leading,
+                    spacing: 8
+                ) {
+                    ForEach(SeriesSearchCollection.allCases, id: \.self) { collection in
+                        collectionFilterButton(collection, fillsAvailableWidth: true)
+                    }
+                }
+            }
+        }
+    }
+
+    private func collectionFilterButton(
+        _ collection: SeriesSearchCollection,
+        fillsAvailableWidth: Bool = false
+    ) -> some View {
+        Button {
+            selectCollection(collection)
+        } label: {
+            Text(collection.title)
+                .font(.subheadline.weight(.bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
+                .padding(.horizontal, fillsAvailableWidth ? 8 : 14)
+                .frame(maxWidth: fillsAvailableWidth ? .infinity : nil, minHeight: 44)
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(isSelected(collection) ? Color.white : Color.primary)
+        .background(isSelected(collection) ? AVBrandColor.accent : Color(.secondarySystemGroupedBackground), in: Capsule())
+        .overlay {
+            Capsule()
+                .stroke(isSelected(collection) ? AVBrandColor.accent.opacity(0.8) : Color.primary.opacity(0.08), lineWidth: 1)
+        }
+        .accessibilityIdentifier("series-search-filter-\(collection.cacheKey)")
+    }
+
+    private var collectionFilterMenu: some View {
+        Menu {
+            ForEach(SeriesSearchCollection.allCases, id: \.self) { collection in
+                Button {
+                    selectCollection(collection)
+                } label: {
+                    if collection == selectedCollection {
+                        Label(collection.title, systemImage: "checkmark")
+                    } else {
+                        Text(collection.title)
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "line.3.horizontal.decrease")
+                    .foregroundStyle(AVBrandColor.accent)
+                Text(selectedCollection.title)
+                    .font(.headline.weight(.bold))
+                Spacer(minLength: 8)
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.secondary)
+            }
+            .foregroundStyle(AVBrandColor.textPrimary)
+            .padding(.horizontal, 16)
+            .frame(maxWidth: .infinity, minHeight: 52)
+            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+            }
+        }
+        .accessibilityLabel(L10n.string("search.filter.selector.label"))
+        .accessibilityValue(selectedCollection.title)
+        .accessibilityIdentifier("series-search-filter-selector")
+    }
+
+    private func selectCollection(_ collection: SeriesSearchCollection) {
+        selectedCollection = collection
+        query = ""
+    }
+
+    private func isSelected(_ collection: SeriesSearchCollection) -> Bool {
+        selectedCollection == collection && trimmedQuery.isEmpty
     }
 
     private func screenTitle(title: String, subtitle: String) -> some View {

@@ -506,6 +506,7 @@
 "search.addTyped" = "Follow \"%@\"";
 "search.collection.anime" = "Anime";
 "search.collection.animation" = "Animation";
+"search.filter.selector.label" = "Browse category";
 "search.collection.comedy" = "Comedy";
 "search.collection.drama" = "Drama";
 "search.collection.popular" = "Popular";
