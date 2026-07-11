@@ -89,6 +89,19 @@ final class SeriesAVSmokeUITests: XCTestCase {
     }
 
     @MainActor
+    private func waitForLabel(
+        _ label: String,
+        on element: XCUIElement,
+        timeout: TimeInterval = 2
+    ) -> Bool {
+        let expectation = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "label == %@", label),
+            object: element
+        )
+        return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
+    }
+
+    @MainActor
     func testFollowCatalogSeriesFromSearchAppearsInLibraryAndHome() throws {
         continueAfterFailure = false
         let app = makeApp(contentSizeCategory: "UICTContentSizeCategoryL")
@@ -132,9 +145,9 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(summaryToggle.waitForExistence(timeout: 5))
         XCTAssertEqual(summaryToggle.label, "Ver más")
         summaryToggle.tap()
-        XCTAssertEqual(summaryToggle.label, "Ver menos")
+        XCTAssertTrue(waitForLabel("Ver menos", on: summaryToggle))
         summaryToggle.tap()
-        XCTAssertEqual(summaryToggle.label, "Ver más")
+        XCTAssertTrue(waitForLabel("Ver más", on: summaryToggle))
         app.buttons["Cerrar"].tap()
 
         let firstFollowButton = app.buttons["Seguir serie"].firstMatch
@@ -464,9 +477,9 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertEqual(summaryToggle.label, "Ver más")
 
         summaryToggle.tap()
-        XCTAssertEqual(summaryToggle.label, "Ver menos")
+        XCTAssertTrue(waitForLabel("Ver menos", on: summaryToggle))
         summaryToggle.tap()
-        XCTAssertEqual(summaryToggle.label, "Ver más")
+        XCTAssertTrue(waitForLabel("Ver más", on: summaryToggle))
     }
 
     @MainActor
