@@ -129,8 +129,9 @@ baseline. Earlier iPad-support version `1.0.1 (12)` was approved on
 2026-06-28. The subscription review screenshot and promotional image were
 attached before the original `1.0 (11)` submission.
 
-Local candidate snapshot, 2026-07-11: iOS/iPadOS version `1.0.3 (15)` is the
-next prepared candidate and has not been uploaded. Public config hygiene,
+Upload snapshot, 2026-07-11: iOS/iPadOS version `1.0.3 (15)` was uploaded
+successfully to App Store Connect and Apple reported that the package is
+processing. Public config hygiene,
 production runtime/API checks, the Release simulator gate, five-locale UI
 coverage, Dynamic Type coverage, localized-copy audit, privacy-manifest lint,
 production subscription readiness, production signed-in Pro smoke, archive
