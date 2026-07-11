@@ -193,6 +193,8 @@ struct SeriesUpcomingEpisodesSection: View {
 
                                 if episode.id != episodes.last?.id {
                                     Divider()
+                                        .padding(.leading, 60)
+                                        .opacity(0.55)
                                 }
                             }
                         }
@@ -217,12 +219,12 @@ struct SeriesUpcomingEpisodesSection: View {
     private func sectionHeader(title: String, subtitle: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.headline)
-                .foregroundStyle(AVBrandColor.textSecondary)
+                .font(.title3.weight(.bold))
+                .foregroundStyle(AVBrandColor.textPrimary)
                 .accessibilityIdentifier("series-upcoming-section-title")
 
             Text(subtitle)
-                .font(.callout.weight(.medium))
+                .font(.subheadline)
                 .foregroundStyle(AVBrandColor.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier("series-upcoming-section-subtitle")
@@ -329,14 +331,15 @@ private struct SeriesUpcomingEpisodeRow: View {
             if dynamicTypeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: 12) {
                     episodeSummary
-                    actionButton
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    HStack {
+                        Spacer(minLength: 0)
+                        actionMenu
+                    }
                 }
             } else {
                 HStack(alignment: .top, spacing: 12) {
                     episodeSummary
-                    Spacer(minLength: 0)
-                    actionButton
+                    actionMenu
                 }
             }
         }
@@ -353,46 +356,62 @@ private struct SeriesUpcomingEpisodeRow: View {
                 Text(episode.seriesTitle)
                     .font(.headline)
                     .foregroundStyle(AVBrandColor.textPrimary)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
                     .fixedSize(horizontal: false, vertical: true)
+                    .layoutPriority(1)
                     .accessibilityIdentifier("series-upcoming-\(episode.entryId)-title")
 
-                Text(upcomingEpisodeDetail(episode))
-                    .font(.callout.weight(.medium))
+                Text(cursorLabel(episode.cursor))
+                    .font(.subheadline.weight(.semibold))
                     .foregroundStyle(AVBrandColor.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier("series-upcoming-\(episode.entryId)-detail")
+
+                if let episodeTitle = upcomingEpisodeTitle(episode) {
+                    Text(episodeTitle)
+                        .font(.subheadline)
+                        .foregroundStyle(AVBrandColor.textSecondary)
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("series-upcoming-\(episode.entryId)-episode-title")
+                }
+
+                Text(relativeDateText(for: episode.airDate))
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(AVBrandColor.accent)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("series-upcoming-\(episode.entryId)-relative-date")
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
     @ViewBuilder
-    private var actionButton: some View {
+    private var actionMenu: some View {
         if let entry {
-            Button {
-                markWatchedThrough(entry, episode.cursor)
+            Menu {
+                Button {
+                    markWatchedThrough(entry, episode.cursor)
+                } label: {
+                    Label(L10n.string("upcoming.adjustProgress"), systemImage: "checkmark.circle")
+                }
             } label: {
-                Label(actionBadgeTitle, systemImage: "checkmark")
-                    .font(.footnote.weight(.bold))
-                    .foregroundStyle(Color.black.opacity(0.84))
-                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.horizontal, 10)
-                    .frame(
-                        maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : 132,
-                        minHeight: 44,
-                        alignment: dynamicTypeSize.isAccessibilitySize ? .center : .trailing
+                Image(systemName: "ellipsis")
+                    .font(.body.weight(.bold))
+                    .foregroundStyle(AVBrandColor.textPrimary)
+                    .frame(width: 44, height: 44)
+                    .background(
+                        Color(.secondarySystemGroupedBackground),
+                        in: Circle()
                     )
-                    .background(AVBrandColor.accent, in: Capsule())
+                    .overlay {
+                        Circle()
+                            .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                    }
             }
-            .buttonStyle(.plain)
             .accessibilityLabel(actionTitle)
             .accessibilityIdentifier(actionIdentifier)
         }
-    }
-
-    private var actionBadgeTitle: String {
-        L10n.string("detail.episodes.action.setPoint")
     }
 
     private var actionTitle: String {
@@ -444,12 +463,42 @@ private struct SeriesUpcomingDateBadge: View {
 }
 
 private func upcomingEpisodeDetail(_ episode: SeriesUpcomingEpisode) -> String {
-    let title = episode.item.title?.trimmingCharacters(in: .whitespacesAndNewlines)
-    let episodeTitle = title?.isEmpty == false ? title! : String(format: L10n.string("home.editor.episode"), episode.item.episodeNumber)
-    return "\(cursorLabel(episode.cursor)) · \(episodeTitle) · \(relativeDateText(for: episode.airDate))"
+    [cursorLabel(episode.cursor), upcomingEpisodeTitle(episode), relativeDateText(for: episode.airDate)]
+        .compactMap { $0 }
+        .joined(separator: " · ")
+}
+
+private func upcomingEpisodeTitle(_ episode: SeriesUpcomingEpisode) -> String? {
+    guard let rawTitle = episode.item.title?.trimmingCharacters(in: .whitespacesAndNewlines), !rawTitle.isEmpty else {
+        return nil
+    }
+
+    let normalizedTitle = rawTitle
+        .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: L10n.locale)
+        .lowercased()
+    let episodeNumber = episode.item.episodeNumber
+    let placeholders = [
+        "tba",
+        "tbd",
+        "to be announced",
+        "episode \(episodeNumber)",
+        "episodio \(episodeNumber)",
+        "episodi \(episodeNumber)",
+        "folge \(episodeNumber)"
+    ]
+
+    return placeholders.contains(normalizedTitle) ? nil : rawTitle
 }
 
 private func relativeDateText(for date: Date) -> String {
+    let calendar = Calendar.current
+    if calendar.isDateInToday(date) {
+        return L10n.string("upcoming.date.today")
+    }
+    if calendar.isDateInTomorrow(date) {
+        return L10n.string("upcoming.date.tomorrow")
+    }
+
     let formatter = RelativeDateTimeFormatter()
     formatter.locale = L10n.locale
     formatter.unitsStyle = .full

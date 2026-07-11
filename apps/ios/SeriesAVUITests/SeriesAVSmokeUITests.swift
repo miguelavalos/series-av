@@ -1360,9 +1360,11 @@ final class SeriesAVSmokeUITests: XCTestCase {
         let dateBadge = app.descendants(matching: .any)["series-upcoming-sample-1-date"]
         let seriesTitle = app.staticTexts["series-upcoming-sample-1-title"]
         let detail = app.staticTexts["series-upcoming-sample-1-detail"]
+        let episodeTitle = app.staticTexts["series-upcoming-sample-1-episode-title"]
+        let relativeDate = app.staticTexts["series-upcoming-sample-1-relative-date"]
         let action = app.buttons["series-upcoming-episode-1-3-set-progress"]
 
-        for _ in 0..<4 where !action.isHittable {
+        for _ in 0..<6 where action.frame.maxY > app.frame.maxY - 120 {
             app.swipeUp()
         }
 
@@ -1370,15 +1372,73 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(dateBadge.exists)
         XCTAssertTrue(seriesTitle.exists)
         XCTAssertTrue(detail.exists)
+        XCTAssertTrue(episodeTitle.exists)
+        XCTAssertTrue(relativeDate.exists)
         XCTAssertTrue(action.exists)
         XCTAssertGreaterThanOrEqual(dateBadge.frame.width, 60)
         XCTAssertGreaterThanOrEqual(dateBadge.frame.height, 60)
         XCTAssertLessThan(seriesTitle.frame.maxY, detail.frame.minY)
         XCTAssertLessThanOrEqual(dateBadge.frame.maxX, seriesTitle.frame.minX)
-        XCTAssertLessThan(detail.frame.maxY, action.frame.minY)
-        XCTAssertGreaterThan(action.frame.width, app.frame.width * 0.70)
+        XCTAssertLessThan(detail.frame.maxY, episodeTitle.frame.minY)
+        XCTAssertLessThan(episodeTitle.frame.maxY, relativeDate.frame.minY)
+        XCTAssertLessThan(relativeDate.frame.maxY, action.frame.minY)
+        XCTAssertGreaterThanOrEqual(action.frame.width, 44)
+        XCTAssertLessThan(action.frame.width, 80)
         XCTAssertGreaterThanOrEqual(action.frame.height, 44)
         XCTAssertTrue(action.isHittable)
+
+        action.tap()
+        XCTAssertTrue(app.buttons["Ajustar progreso"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
+    func testUpcomingLibraryRowsUseCompactActionsAtDefaultTextSize() throws {
+        continueAfterFailure = false
+        let app = makeApp(environment: [
+            "SERIESAV_UI_TESTS_SAMPLE_LIBRARY": "1",
+            "SERIESAV_UI_TESTS_INITIAL_TAB": "library",
+            "SERIESAV_UI_TESTS_UPCOMING_EPISODES": "sample"
+        ])
+        app.launch()
+
+        guard app.frame.width <= 600 else {
+            throw XCTSkip("This compact row check only applies to iPhone.")
+        }
+
+        let sectionTitle = app.staticTexts["series-upcoming-section-title"]
+        for _ in 0..<12 where !sectionTitle.exists {
+            app.swipeUp()
+        }
+        XCTAssertTrue(sectionTitle.waitForExistence(timeout: 10))
+
+        let seriesTitle = app.staticTexts["series-upcoming-sample-1-title"]
+        let detail = app.staticTexts["series-upcoming-sample-1-detail"]
+        let episodeTitle = app.staticTexts["series-upcoming-sample-1-episode-title"]
+        let relativeDate = app.staticTexts["series-upcoming-sample-1-relative-date"]
+        let action = app.buttons["series-upcoming-episode-1-3-set-progress"]
+
+        for _ in 0..<6 where action.frame.maxY > app.frame.maxY - 120 {
+            app.swipeUp()
+        }
+
+        XCTAssertTrue(seriesTitle.exists)
+        XCTAssertTrue(detail.exists)
+        XCTAssertTrue(episodeTitle.exists)
+        XCTAssertTrue(relativeDate.exists)
+        XCTAssertTrue(action.exists)
+        XCTAssertLessThan(seriesTitle.frame.maxY, detail.frame.minY)
+        XCTAssertLessThan(detail.frame.maxY, episodeTitle.frame.minY)
+        XCTAssertLessThan(episodeTitle.frame.maxY, relativeDate.frame.minY)
+        XCTAssertLessThanOrEqual(seriesTitle.frame.maxX, action.frame.minX)
+        XCTAssertGreaterThanOrEqual(action.frame.width, 44)
+        XCTAssertLessThan(action.frame.width, 80)
+        XCTAssertGreaterThanOrEqual(action.frame.height, 44)
+        XCTAssertTrue(action.isHittable)
+
+        let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        screenshot.name = "Upcoming library compact rows"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
     }
 
     @MainActor

@@ -144,6 +144,11 @@ reused or selected as the release candidate.
 TestFlight purchase/restore and physical-device Universal Link handoff remain
 post-upload checks and must not be represented as locally approved.
 
+Post-upload source snapshot, 2026-07-11: the iOS source now uses build `16` and
+includes a compact redesign of Library > Upcoming episodes. This follow-up is
+not present in the already uploaded build `15`; build `16` has not been
+archived or uploaded. Do not relabel build `15` as containing this change.
+
 1. Generate production iOS config and run the app:
 
    ```bash

@@ -180,6 +180,8 @@
 "upcoming.subtitle" = "Los siguientes episodios con fecha de tus series guardadas.";
 "upcoming.loading" = "Buscando próximos episodios";
 "upcoming.adjustProgress" = "Ajustar progreso";
+"upcoming.date.today" = "Hoy";
+"upcoming.date.tomorrow" = "Mañana";
 "upcoming.home.title" = "Próximamente";
 "upcoming.home.openLibrary" = "Ver todo";
 "add.footer.pro" = "Elige una serie y marca el punto exacto por temporada y episodio.";

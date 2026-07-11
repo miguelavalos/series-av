@@ -180,6 +180,8 @@
 "upcoming.subtitle" = "Els següents episodis amb data de les teves sèries desades.";
 "upcoming.loading" = "Cercant pròxims episodis";
 "upcoming.adjustProgress" = "Ajustar progrés";
+"upcoming.date.today" = "Avui";
+"upcoming.date.tomorrow" = "Demà";
 "upcoming.home.title" = "Pròximament";
 "upcoming.home.openLibrary" = "Veure-ho tot";
 "add.footer.pro" = "Tria una sèrie i marca el punt exacte per temporada i episodi.";

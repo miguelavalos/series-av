@@ -180,6 +180,8 @@
 "upcoming.subtitle" = "Next dated episodes from your saved series.";
 "upcoming.loading" = "Checking upcoming episodes";
 "upcoming.adjustProgress" = "Adjust progress";
+"upcoming.date.today" = "Today";
+"upcoming.date.tomorrow" = "Tomorrow";
 "upcoming.home.title" = "Coming soon";
 "upcoming.home.openLibrary" = "View all";
 "add.footer.pro" = "Choose a series and mark the exact season and episode point.";
