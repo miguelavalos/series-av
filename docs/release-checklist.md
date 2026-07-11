@@ -129,7 +129,7 @@ baseline. Earlier iPad-support version `1.0.1 (12)` was approved on
 2026-06-28. The subscription review screenshot and promotional image were
 attached before the original `1.0 (11)` submission.
 
-Upload snapshot, 2026-07-11: iOS/iPadOS version `1.0.3 (15)` was uploaded
+Upload snapshot, 2026-07-11: iOS/iPadOS version `1.0.3 (16)` was uploaded
 successfully to App Store Connect and Apple reported that the package is
 processing. Public config hygiene,
 production runtime/API checks, the Release simulator gate, five-locale UI
@@ -137,22 +137,21 @@ coverage, Dynamic Type coverage, localized-copy audit, privacy-manifest lint,
 production subscription readiness, production signed-in Pro smoke, archive
 entitlements, app/Sentry dSYM matching, and non-interactive Apple Distribution
 codesigning all passed. The verified local archive is
-`.derived-data/release-archives/SeriesAV-1.0.3-15-2026-07-11-095656.xcarchive`.
-It declares `ITSAppUsesNonExemptEncryption = NO`. An earlier build `14` upload
+`.derived-data/release-archives/SeriesAV-1.0.3-16-2026-07-11-111358.xcarchive`.
+It declares `ITSAppUsesNonExemptEncryption = NO`. Its App Store Connect build
+upload id is `bd395be4-ccfa-49c5-be19-be3fff7e7d4c`. An earlier build `14` upload
 was interrupted after Apple had received its files, so build `14` must not be
 reused or selected as the release candidate.
 TestFlight purchase/restore and physical-device Universal Link handoff remain
 post-upload checks and must not be represented as locally approved.
 
-Post-upload source snapshot, 2026-07-11: the iOS source now uses build `16` and
-includes compact redesigns of Library active and Upcoming episode rows. These
-follow-ups are not present in the already uploaded build `15`; build `16` has not
-been archived or uploaded. Do not relabel build `15` as containing this change.
-The Home hero also removes the redundant `Next S1 E1` badge for ready-to-start
-series while retaining the start cursor and primary action. Search category
-filters now adapt to the available width: all six remain visible in two rows on
-iPhone, stay in one row on iPad, and become a compact selector at accessibility
-text sizes.
+Build `16` contains compact redesigns of Library active and Upcoming episode
+rows. The Home hero also removes the redundant `Next S1 E1` badge for
+ready-to-start series while retaining the start cursor and primary action.
+Search category filters adapt to the available width: all six remain visible in
+two rows on iPhone, stay in one row on iPad, and become a compact selector at
+accessibility text sizes. The earlier uploaded build `15` does not contain these
+follow-ups and is superseded by build `16`.
 
 1. Generate production iOS config and run the app:
 
