@@ -129,14 +129,17 @@ baseline. Earlier iPad-support version `1.0.1 (12)` was approved on
 2026-06-28. The subscription review screenshot and promotional image were
 attached before the original `1.0 (11)` submission.
 
-Local candidate snapshot, 2026-07-11: iOS/iPadOS version `1.0.3 (14)` is the
+Local candidate snapshot, 2026-07-11: iOS/iPadOS version `1.0.3 (15)` is the
 next prepared candidate and has not been uploaded. Public config hygiene,
 production runtime/API checks, the Release simulator gate, five-locale UI
 coverage, Dynamic Type coverage, localized-copy audit, privacy-manifest lint,
 production subscription readiness, production signed-in Pro smoke, archive
 entitlements, app/Sentry dSYM matching, and non-interactive Apple Distribution
 codesigning all passed. The verified local archive is
-`.derived-data/release-archives/SeriesAV-1.0.3-14-2026-07-11-094353.xcarchive`.
+`.derived-data/release-archives/SeriesAV-1.0.3-15-2026-07-11-095656.xcarchive`.
+It declares `ITSAppUsesNonExemptEncryption = NO`. An earlier build `14` upload
+was interrupted after Apple had received its files, so build `14` must not be
+reused or selected as the release candidate.
 TestFlight purchase/restore and physical-device Universal Link handoff remain
 post-upload checks and must not be represented as locally approved.
 
