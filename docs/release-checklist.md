@@ -129,7 +129,7 @@ baseline. Earlier iPad-support version `1.0.1 (12)` was approved on
 2026-06-28. The subscription review screenshot and promotional image were
 attached before the original `1.0 (11)` submission.
 
-Upload snapshot, 2026-07-11: iOS/iPadOS version `1.0.3 (16)` was uploaded
+Upload snapshot, 2026-07-13: iOS/iPadOS version `1.0.3 (17)` was uploaded
 successfully to App Store Connect and Apple reported that the package is
 processing. Public config hygiene,
 production runtime/API checks, the Release simulator gate, five-locale UI
@@ -137,14 +137,17 @@ coverage, Dynamic Type coverage, localized-copy audit, privacy-manifest lint,
 production subscription readiness, production signed-in Pro smoke, archive
 entitlements, app/Sentry dSYM matching, and non-interactive Apple Distribution
 codesigning all passed. The verified local archive is
-`.derived-data/release-archives/SeriesAV-1.0.3-16-2026-07-11-111358.xcarchive`.
+`.derived-data/release-archives/SeriesAV-1.0.3-17-2026-07-13-120108.xcarchive`.
 It declares `ITSAppUsesNonExemptEncryption = NO`. Its App Store Connect build
-upload id is `bd395be4-ccfa-49c5-be19-be3fff7e7d4c`. An earlier build `14` upload
+upload id is `a65ddba7-d951-439a-8f75-ce4247cd58c2`. An earlier build `14` upload
 was interrupted after Apple had received its files, so build `14` must not be
 reused or selected as the release candidate.
 TestFlight purchase/restore and physical-device Universal Link handoff remain
 post-upload checks and must not be represented as locally approved.
 
+Build `17` adds a compact floating undo confirmation across Home, Library,
+Search, and Avi. The action remains on one line, removes the competing close
+button, dismisses automatically, and adapts to accessibility text sizes.
 Build `16` contains compact redesigns of Library active and Upcoming episode
 rows. The Home hero also removes the redundant `Next S1 E1` badge for
 ready-to-start series while retaining the start cursor and primary action.
