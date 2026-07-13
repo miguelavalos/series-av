@@ -129,21 +129,30 @@ baseline. Earlier iPad-support version `1.0.1 (12)` was approved on
 2026-06-28. The subscription review screenshot and promotional image were
 attached before the original `1.0 (11)` submission.
 
-Upload snapshot, 2026-07-13: iOS/iPadOS version `1.0.3 (17)` was uploaded
-successfully to App Store Connect and Apple reported that the package is
-processing. Public config hygiene,
+App Review snapshot, 2026-07-13: iOS/iPadOS version `1.0.3 (17)` completed
+App Store Connect processing, was selected as the release build, and was added
+to the App Review submission per operator report. Final submission, approval,
+and publication are not asserted by this checkpoint. The version keeps manual
+release, immediate rollout after release, the existing average rating, and a
+completed `4+` age classification. Public config hygiene,
 production runtime/API checks, the Release simulator gate, five-locale UI
 coverage, Dynamic Type coverage, localized-copy audit, privacy-manifest lint,
 production subscription readiness, production signed-in Pro smoke, archive
 entitlements, app/Sentry dSYM matching, and non-interactive Apple Distribution
 codesigning all passed. The verified local archive is
 `.derived-data/release-archives/SeriesAV-1.0.3-17-2026-07-13-120108.xcarchive`.
-It declares `ITSAppUsesNonExemptEncryption = NO`. Its App Store Connect build
-upload id is `a65ddba7-d951-439a-8f75-ce4247cd58c2`. An earlier build `14` upload
+It declares `ITSAppUsesNonExemptEncryption = NO`. An earlier build `14` upload
 was interrupted after Apple had received its files, so build `14` must not be
 reused or selected as the release candidate.
 TestFlight purchase/restore and physical-device Universal Link handoff remain
 post-upload checks and must not be represented as locally approved.
+
+The localized App Store release notes remain intentionally short:
+
+- English (UK): `Improved layouts, clearer series information and more compact actions.`
+- German: `Verbesserte Layouts, klarere Serieninformationen und kompaktere Aktionen.`
+- Spanish (Spain): `Diseños mejorados, información de series más clara y acciones más compactas.`
+- French (France): `Mise en page améliorée, informations plus claires et actions plus compactes.`
 
 Build `17` adds a compact floating undo confirmation across Home, Library,
 Search, and Avi. The action remains on one line, removes the competing close

@@ -124,15 +124,18 @@ For simulator or physical iPhone installs, follow [docs/install-ios.md](docs/ins
 
 1. Treat iOS/iPadOS version `1.0.2 (13)` as the current public App Store
    baseline for client compatibility work.
-2. Continue purchase, restore, RevenueCat webhook, and Apps AV entitlement
+2. Treat iOS/iPadOS version `1.0.3 (17)` as the current App Review candidate.
+   It was added to the review submission on 2026-07-13, but must not be treated
+   as the public baseline until Apple approves and publishes it.
+3. Continue purchase, restore, RevenueCat webhook, and Apps AV entitlement
    validation for
    `seriesav_pro_monthly`.
-3. Keep the shared RevenueCat project intact. Moments AV and Animate AV
+4. Keep the shared RevenueCat project intact. Moments AV and Animate AV
    offerings may exist beside Series AV; Series AV readiness depends on
    offering `default` containing `$rc_monthly -> seriesav_pro_monthly`.
-4. Finish production QA for backend-backed catalog routes where V1 needs
+5. Finish production QA for backend-backed catalog routes where V1 needs
    account-aware data: Search/resolve, Detail, and compact episode guide.
-5. Keep the reserved Avi limits documented, but do not expose Avi action copy or
+6. Keep the reserved Avi limits documented, but do not expose Avi action copy or
    UI until Series AV has real Avi-assisted flows.
 
 ## Contributing And Security
