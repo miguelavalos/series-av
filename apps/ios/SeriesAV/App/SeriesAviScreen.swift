@@ -11,6 +11,7 @@ struct SeriesAviScreen: View {
     let openLibrary: () -> Void
 
     @Environment(\.avCommonAppExperience) private var appExperience
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var pendingProgressUndo: PendingProgressUndo?
 
     var body: some View {
@@ -53,7 +54,7 @@ struct SeriesAviScreen: View {
                 )
             }
         }
-        .safeAreaInset(edge: .bottom) {
+        .overlay(alignment: .bottom) {
             if let pendingProgressUndo {
                 SeriesUndoBar(
                     title: String(format: L10n.string(pendingProgressUndo.messageKey), pendingProgressUndo.title),
@@ -71,10 +72,11 @@ struct SeriesAviScreen: View {
                     }
                 )
                 .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(.regularMaterial)
+                .padding(.bottom, horizontalSizeClass == .compact ? 88 : 16)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        .animation(.snappy(duration: 0.25), value: pendingProgressUndo != nil)
     }
 
     private var landingContent: AVAviLandingContent {

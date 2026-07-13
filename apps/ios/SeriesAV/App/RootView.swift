@@ -331,11 +331,13 @@ private struct SeriesWatchingHomeScreen: View {
             showLimitAction: showLimitAction
             )
         }
-        .safeAreaInset(edge: .bottom) {
+        .overlay(alignment: .bottom) {
             if !isTabletLayout && hasPendingHomeUndo {
-                mobileHomeBottomBar
+                mobileHomeUndoSnackbar
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        .animation(.snappy(duration: 0.25), value: hasPendingHomeUndo)
         .sheet(item: $sheetDestination) { destination in
             homeSheet(for: destination)
         }
@@ -706,7 +708,7 @@ private struct SeriesWatchingHomeScreen: View {
         }
     }
 
-    private var mobileHomeBottomBar: some View {
+    private var mobileHomeUndoSnackbar: some View {
         VStack(spacing: 10) {
             if let pendingProgressUndo {
                 SeriesUndoBar(
@@ -742,9 +744,7 @@ private struct SeriesWatchingHomeScreen: View {
             }
         }
         .padding(.horizontal, 20)
-        .padding(.top, 12)
         .padding(.bottom, 88)
-        .background(.regularMaterial)
     }
 
     private var hasPendingHomeUndo: Bool {
@@ -985,41 +985,57 @@ struct SeriesUndoBar: View {
                 standardLayout
             }
         }
-        .padding(.horizontal, 12)
+        .padding(.horizontal, 14)
         .padding(.vertical, 8)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(Color.primary.opacity(0.08), lineWidth: 1)
         }
+        .shadow(color: Color.black.opacity(0.12), radius: 12, y: 4)
+        .frame(maxWidth: 520)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("series.undo.bar")
+        .task(id: title) {
+            try? await Task.sleep(for: .seconds(5))
+            guard Task.isCancelled == false else {
+                return
+            }
+            dismiss()
+        }
     }
 
     private var standardLayout: some View {
         HStack(spacing: 10) {
-            message(lineLimit: 2)
+            confirmationIcon
+
+            message(lineLimit: 1)
                 .layoutPriority(1)
 
-            Spacer(minLength: 0)
+            Spacer(minLength: 4)
 
             undoButton
-            dismissButton
         }
     }
 
     private var accessibilityLayout: some View {
         VStack(alignment: .leading, spacing: 8) {
-            message(lineLimit: nil)
-
-            HStack(spacing: 8) {
-                undoButton
-
-                Spacer(minLength: 8)
-
-                dismissButton
+            HStack(alignment: .top, spacing: 10) {
+                confirmationIcon
+                    .padding(.top, 2)
+                message(lineLimit: nil)
             }
+
+            undoButton
+                .frame(maxWidth: .infinity, alignment: .trailing)
         }
+    }
+
+    private var confirmationIcon: some View {
+        Image(systemName: "checkmark.circle.fill")
+            .font(.body.weight(.semibold))
+            .foregroundStyle(AVBrandColor.accent)
+            .accessibilityHidden(true)
     }
 
     private func message(lineLimit: Int?) -> some View {
@@ -1035,26 +1051,15 @@ struct SeriesUndoBar: View {
         Button(action: undo) {
             Text(L10n.string("home.undo"))
                 .font(.subheadline.weight(.bold))
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
                 .frame(minHeight: 44)
-                .padding(.horizontal, 4)
+                .padding(.horizontal, 8)
         }
         .buttonStyle(.plain)
         .foregroundStyle(Color.accentColor)
         .contentShape(Rectangle())
         .accessibilityIdentifier("series.undo.action")
-    }
-
-    private var dismissButton: some View {
-        Button(action: dismiss) {
-            Image(systemName: "xmark")
-                .font(.body.weight(.semibold))
-                .frame(width: 44, height: 44)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .foregroundStyle(.secondary)
-        .accessibilityLabel(L10n.string("common.close"))
-        .accessibilityIdentifier("series.undo.dismiss")
     }
 }
 

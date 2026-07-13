@@ -229,8 +229,10 @@ struct SeriesSearchScreen: View {
                         self.addedEntry = nil
                     }
                 )
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        .animation(.snappy(duration: 0.25), value: addedEntry != nil)
     }
 
     @ViewBuilder

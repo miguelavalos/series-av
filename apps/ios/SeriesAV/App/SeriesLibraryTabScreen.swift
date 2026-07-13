@@ -147,7 +147,7 @@ struct SeriesLibraryTabScreen: View {
         } message: {
             Text(L10n.string("detail.delete.confirm.detail"))
         }
-        .safeAreaInset(edge: .bottom) {
+        .overlay(alignment: .bottom) {
             if let pendingLibraryUndo {
                 SeriesUndoBar(
                     title: String(format: L10n.string(pendingLibraryUndo.messageKey), pendingLibraryUndo.title),
@@ -160,10 +160,9 @@ struct SeriesLibraryTabScreen: View {
                     }
                 )
                 .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .frame(maxWidth: 680)
+                .padding(.bottom, horizontalSizeClass == .compact ? 88 : 16)
                 .frame(maxWidth: .infinity)
-                .background(.regularMaterial)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             } else if let pendingProgressUndo {
                 SeriesUndoBar(
                     title: String(format: L10n.string(pendingProgressUndo.messageKey), pendingProgressUndo.title),
@@ -181,12 +180,12 @@ struct SeriesLibraryTabScreen: View {
                     }
                 )
                 .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .frame(maxWidth: 680)
+                .padding(.bottom, horizontalSizeClass == .compact ? 88 : 16)
                 .frame(maxWidth: .infinity)
-                .background(.regularMaterial)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        .animation(.snappy(duration: 0.25), value: pendingLibraryUndo != nil || pendingProgressUndo != nil)
     }
 
     private var libraryControls: some View {

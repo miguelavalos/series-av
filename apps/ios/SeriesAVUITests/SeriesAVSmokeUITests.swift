@@ -2082,20 +2082,21 @@ final class SeriesAVSmokeUITests: XCTestCase {
         primaryAction.tap()
 
         XCTAssertTrue(undoBar.waitForExistence(timeout: 5))
+        let message = app.staticTexts["series.undo.message"]
         let undoButton = app.buttons["series.undo.action"]
         let dismissButton = app.buttons["series.undo.dismiss"]
+        XCTAssertTrue(message.exists)
         XCTAssertTrue(undoButton.exists)
-        XCTAssertTrue(dismissButton.exists)
+        XCTAssertFalse(dismissButton.exists)
         XCTAssertTrue(undoButton.isHittable)
-        XCTAssertTrue(dismissButton.isHittable)
         XCTAssertGreaterThanOrEqual(undoBar.frame.height, 44)
         XCTAssertLessThan(undoBar.frame.height, 90)
         XCTAssertGreaterThanOrEqual(undoButton.frame.height, 44)
-        XCTAssertGreaterThanOrEqual(dismissButton.frame.width, 44)
-        XCTAssertGreaterThanOrEqual(dismissButton.frame.height, 44)
-        XCTAssertLessThan(abs(undoButton.frame.midY - dismissButton.frame.midY), 4)
+        XCTAssertGreaterThanOrEqual(undoButton.frame.width, 70)
+        XCTAssertLessThanOrEqual(message.frame.maxX, undoButton.frame.minX)
+        XCTAssertLessThan(message.frame.height, 30)
         XCTAssertLessThanOrEqual(undoBar.frame.maxY, homeTab.frame.minY)
-        dismissButton.tap()
+        undoButton.tap()
         XCTAssertFalse(undoBar.waitForExistence(timeout: 1))
     }
 
@@ -2123,19 +2124,15 @@ final class SeriesAVSmokeUITests: XCTestCase {
         XCTAssertTrue(undoBar.waitForExistence(timeout: 5))
         XCTAssertTrue(message.exists)
         XCTAssertTrue(undoButton.exists)
-        XCTAssertTrue(dismissButton.exists)
+        XCTAssertFalse(dismissButton.exists)
         XCTAssertTrue(undoButton.isHittable)
-        XCTAssertTrue(dismissButton.isHittable)
         XCTAssertGreaterThan(message.frame.height, 30)
         XCTAssertGreaterThanOrEqual(undoButton.frame.height, 44)
-        XCTAssertGreaterThanOrEqual(dismissButton.frame.width, 44)
-        XCTAssertGreaterThanOrEqual(dismissButton.frame.height, 44)
         XCTAssertGreaterThanOrEqual(undoButton.frame.minY, message.frame.maxY)
         XCTAssertGreaterThan(undoBar.frame.height, 90)
         XCTAssertTrue(undoBar.frame.contains(undoButton.frame))
-        XCTAssertTrue(undoBar.frame.contains(dismissButton.frame))
         XCTAssertLessThanOrEqual(undoBar.frame.maxY, homeTab.frame.minY)
-        dismissButton.tap()
+        undoButton.tap()
         XCTAssertFalse(undoBar.waitForExistence(timeout: 1))
     }
 
