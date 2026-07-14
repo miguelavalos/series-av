@@ -166,6 +166,26 @@ struct SeriesUITestEnvironment {
         return environment["SERIESAV_UI_TEST_ACCOUNT_DELETION"]
     }
 
+    var accountUserId: String {
+        guard isEnabled else { return Self.accountUserId }
+        return environment["SERIESAV_UI_TEST_ACCOUNT_USER_ID"] ?? Self.accountUserId
+    }
+
+    var accountUserDisplayName: String {
+        guard isEnabled else { return Self.accountUserDisplayName }
+        return environment["SERIESAV_UI_TEST_ACCOUNT_DISPLAY_NAME"] ?? Self.accountUserDisplayName
+    }
+
+    var accountUserEmailAddress: String? {
+        guard isEnabled else { return Self.accountUserEmailAddress }
+        return environment["SERIESAV_UI_TEST_ACCOUNT_EMAIL"] ?? Self.accountUserEmailAddress
+    }
+
+    var accountToken: String {
+        guard isEnabled else { return Self.accountToken }
+        return environment["SERIESAV_UI_TEST_ACCOUNT_TOKEN"] ?? Self.accountToken
+    }
+
     var forcedLibrarySyncState: SeriesLibrarySyncCoordinator.State? {
         guard isEnabled else { return nil }
         switch environment["SERIESAV_UI_TESTS_LIBRARY_SYNC_STATE"] {

@@ -79,7 +79,7 @@ struct DefaultSeriesAVAccountService: SeriesAVAccountServicing {
             return nil
         }
         if Self.uiTestAccountUser != nil {
-            return SeriesUITestEnvironment.accountToken
+            return SeriesUITestEnvironment.current.accountToken
         }
         return try await accountService.getToken()
     }
@@ -126,10 +126,11 @@ struct DefaultSeriesAVAccountService: SeriesAVAccountServicing {
 
     private static var uiTestAccountUser: SeriesAccountUser? {
         guard SeriesUITestEnvironment.current.hasAccountOverride else { return nil }
+        let environment = SeriesUITestEnvironment.current
         return SeriesAccountUser(
-            id: SeriesUITestEnvironment.accountUserId,
-            displayName: SeriesUITestEnvironment.accountUserDisplayName,
-            emailAddress: SeriesUITestEnvironment.accountUserEmailAddress
+            id: environment.accountUserId,
+            displayName: environment.accountUserDisplayName,
+            emailAddress: environment.accountUserEmailAddress
         )
     }
 

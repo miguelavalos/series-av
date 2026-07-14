@@ -112,6 +112,23 @@ final class SeriesBundleConfigTests: XCTestCase {
         XCTAssertTrue(DefaultSeriesAVAccountService.shouldUseGuestTokenForUITests(environment: guestAvailableEnvironment))
     }
 
+    func testUITestAccountRuntimeOverridesRemainTestOnly() {
+        let regularEnvironment = SeriesUITestEnvironment(environment: [
+            "SERIESAV_UI_TEST_ACCOUNT_USER_ID": "runtime-user",
+            "SERIESAV_UI_TEST_ACCOUNT_TOKEN": "runtime-token"
+        ])
+        let uiTestEnvironment = SeriesUITestEnvironment(environment: [
+            "SERIESAV_UI_TESTS": "1",
+            "SERIESAV_UI_TEST_ACCOUNT_USER_ID": "runtime-user",
+            "SERIESAV_UI_TEST_ACCOUNT_TOKEN": "runtime-token"
+        ])
+
+        XCTAssertEqual(regularEnvironment.accountUserId, SeriesUITestEnvironment.accountUserId)
+        XCTAssertEqual(regularEnvironment.accountToken, SeriesUITestEnvironment.accountToken)
+        XCTAssertEqual(uiTestEnvironment.accountUserId, "runtime-user")
+        XCTAssertEqual(uiTestEnvironment.accountToken, "runtime-token")
+    }
+
     @MainActor
     func testAccountServiceUITestForceGuestDisablesAccountAvailability() {
         let forceGuestEnvironment = SeriesUITestEnvironment(environment: [

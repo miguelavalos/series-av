@@ -361,6 +361,35 @@ final class SeriesAVProfileUITests: XCTestCase {
         XCTAssertTrue(app.buttons["profile.account.signIn"].waitForExistence(timeout: 5))
     }
 
+    func testLivePreviewDeletionSignsOutAndReturnsToGuest() throws {
+        let processEnvironment = ProcessInfo.processInfo.environment
+        guard let token = processEnvironment["SERIESAV_LIVE_PREVIEW_ACCOUNT_TOKEN"],
+              let userId = processEnvironment["SERIESAV_LIVE_PREVIEW_ACCOUNT_USER_ID"] else {
+            throw XCTSkip("Live preview account deletion requires an ephemeral disposable account token and internal user id.")
+        }
+
+        let app = launchProfileApp(extraEnvironment: [
+            "SERIESAV_UI_TESTS_ACCOUNT_MODE": "free",
+            "SERIESAV_UI_TEST_ACCOUNT_TOKEN": token,
+            "SERIESAV_UI_TEST_ACCOUNT_USER_ID": userId,
+            "SERIESAV_UI_TEST_ACCOUNT_DISPLAY_NAME": "Disposable deletion smoke",
+            "SERIESAV_UI_TEST_ACCOUNT_EMAIL": ""
+        ])
+
+        openAccountDeletion(in: app)
+        XCTAssertTrue(app.descendants(matching: .any)["accountDeletion.status.eligible"].waitForExistence(timeout: 10))
+
+        let confirmation = app.textFields["accountDeletion.confirmation"]
+        XCTAssertTrue(confirmation.waitForExistence(timeout: 5))
+        confirmation.tap()
+        confirmation.typeText("DELETE")
+        app.buttons["accountDeletion.deleteButton"].tap()
+
+        XCTAssertTrue(app.buttons["profile.account.signIn"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.descendants(matching: .any)["profile.account.localMode"].exists)
+        XCTAssertFalse(app.buttons["profile.account.signOut"].exists)
+    }
+
     private func launchProfileApp(
         extraEnvironment: [String: String],
         contentSizeCategory: String? = nil
