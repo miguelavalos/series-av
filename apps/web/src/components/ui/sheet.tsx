@@ -4,6 +4,22 @@ import * as SheetPrimitive from "@radix-ui/react-dialog"
 
 import { cn } from "@/lib/utils"
 
+type DialogDomPrimitiveProps<TElement extends HTMLElement> =
+  React.HTMLAttributes<TElement> & React.RefAttributes<TElement>
+
+const DialogOverlay = SheetPrimitive.Overlay as React.ForwardRefExoticComponent<
+  DialogDomPrimitiveProps<HTMLDivElement> & { forceMount?: true }
+>
+const DialogClose = SheetPrimitive.Close as React.ForwardRefExoticComponent<
+  React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement>
+>
+const DialogTitle = SheetPrimitive.Title as React.ForwardRefExoticComponent<
+  DialogDomPrimitiveProps<HTMLHeadingElement>
+>
+const DialogDescription = SheetPrimitive.Description as React.ForwardRefExoticComponent<
+  DialogDomPrimitiveProps<HTMLParagraphElement>
+>
+
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />
 }
@@ -29,9 +45,9 @@ function SheetPortal({
 function SheetOverlay({
   className,
   ...props
-}: React.ComponentProps<typeof SheetPrimitive.Overlay>) {
+}: React.ComponentProps<typeof DialogOverlay>) {
   return (
-    <SheetPrimitive.Overlay
+    <DialogOverlay
       data-slot="sheet-overlay"
       className={cn(
         "fixed inset-0 z-50 bg-black/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0",
@@ -73,10 +89,10 @@ function SheetContent({
       >
         {children}
         {showCloseButton && (
-          <SheetPrimitive.Close className="absolute top-4 right-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-secondary">
+          <DialogClose className="absolute top-4 right-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-secondary">
             <XIcon className="size-4" />
             <span className="sr-only">Close</span>
-          </SheetPrimitive.Close>
+          </DialogClose>
         )}
       </SheetPrimitive.Content>
     </SheetPortal>
@@ -106,9 +122,9 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
 function SheetTitle({
   className,
   ...props
-}: React.ComponentProps<typeof SheetPrimitive.Title>) {
+}: React.ComponentProps<typeof DialogTitle>) {
   return (
-    <SheetPrimitive.Title
+    <DialogTitle
       data-slot="sheet-title"
       className={cn("font-semibold text-foreground", className)}
       {...props}
@@ -119,9 +135,9 @@ function SheetTitle({
 function SheetDescription({
   className,
   ...props
-}: React.ComponentProps<typeof SheetPrimitive.Description>) {
+}: React.ComponentProps<typeof DialogDescription>) {
   return (
-    <SheetPrimitive.Description
+    <DialogDescription
       data-slot="sheet-description"
       className={cn("text-sm text-muted-foreground", className)}
       {...props}
