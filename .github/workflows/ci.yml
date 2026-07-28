@@ -54,7 +54,10 @@ jobs:
         run: vp run config:hygiene
 
       - name: Run canonical checks
-        run: vp run check
+        run: |
+          vp run copy:audit
+          vp run ios:build ARCHS=arm64 ONLY_ACTIVE_ARCH=YES
+          vp run web:typecheck
 
       - name: Verify generated files are current
         run: git diff --exit-code
