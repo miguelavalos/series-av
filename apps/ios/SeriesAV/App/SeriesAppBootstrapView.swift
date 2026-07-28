@@ -5,7 +5,7 @@ import SwiftUI
 struct SeriesAppBootstrapView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.seriesPendingOpenURL) private var pendingOpenURL
-    @State private var accessController = SeriesAccessController()
+    @State private var accessController: SeriesAccessController
     @State private var selectedTab: SeriesRootTab
     @State private var authPresentationState: AVProductAccountAuthPresentationState = .hidden
     @State private var authenticationWasSkipped = false
@@ -21,6 +21,7 @@ struct SeriesAppBootstrapView: View {
     }
 
     init() {
+        _accessController = State(initialValue: SeriesAccessController())
         _selectedTab = State(initialValue: SeriesLaunchContext.current.initialTab)
         _shareInviteDeepLink = State(initialValue: SeriesUITestEnvironment.current.initialShareInviteDeepLink)
     }
