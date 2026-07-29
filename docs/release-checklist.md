@@ -147,6 +147,18 @@ reused or selected as the release candidate.
 TestFlight purchase/restore and physical-device Universal Link handoff remain
 post-upload checks and must not be represented as locally approved.
 
+TestFlight rebuild checkpoint, 2026-07-29: the unchanged Series AV release
+candidate was installed and accepted by the operator on a physical iPhone 14
+and iPad Air (4th generation) as build `18`. Apple rejected the first upload
+attempt because the already-approved `1.0.3` train was closed, so the marketing
+version was advanced to `1.0.4` without changing the candidate code. The exact
+`1.0.4 (18)` archive then passed production runtime checks, bundle/team and
+Account AV keychain-contract validation, code-signature checks, and app/Sentry
+dSYM matching before App Store Connect accepted it. Apple completed processing;
+the build is `Lista para enviar` in the internal `Series AV Test` group. No
+purchase or App Review submission was performed. The verified archive is
+`.derived-data/release-archives/SeriesAV-1.0.4-18-2026-07-29-144014.xcarchive`.
+
 The localized App Store release notes remain intentionally short:
 
 - English (UK): `Improved layouts, clearer series information and more compact actions.`
