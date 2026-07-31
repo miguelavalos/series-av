@@ -1,5 +1,6 @@
 import Foundation
 import AVExternalLinkFoundation
+import AVSettingsFoundation
 import SwiftUI
 
 enum AppLanguage: String, CaseIterable, Identifiable {
@@ -36,17 +37,19 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     }
 
     static func resolved(from rawValue: String?) -> AppLanguage {
-        guard let rawValue else { return .english }
-        if let exactMatch = AppLanguage(rawValue: rawValue) {
-            return exactMatch
-        }
+        resolvedInitial(storedLanguageCode: rawValue, preferredLanguages: [])
+    }
 
-        let normalized = rawValue.lowercased()
-        if normalized.hasPrefix("es") { return .spanish }
-        if normalized.hasPrefix("ca") { return .catalan }
-        if normalized.hasPrefix("fr") { return .french }
-        if normalized.hasPrefix("de") { return .german }
-        return .english
+    static func resolvedInitial(
+        storedLanguageCode: String?,
+        preferredLanguages: [String]
+    ) -> AppLanguage {
+        let languageCode = AVInitialAppLanguage.resolve(
+            storedLanguageCode: storedLanguageCode,
+            preferredLanguages: preferredLanguages,
+            supportedLanguageCodes: Set(allCases.map(\.rawValue))
+        )
+        return AppLanguage(rawValue: languageCode) ?? .english
     }
 }
 
@@ -69,9 +72,15 @@ final class AppLanguageController: ObservableObject {
             return
         }
 
-        currentLanguage = AppLanguage.resolved(
-            from: userDefaults.string(forKey: userDefaultsKey) ?? Locale.preferredLanguages.first
+        let storedLanguage = userDefaults.string(forKey: userDefaultsKey)
+        let resolvedLanguage = AppLanguage.resolvedInitial(
+            storedLanguageCode: storedLanguage,
+            preferredLanguages: Locale.preferredLanguages
         )
+        currentLanguage = resolvedLanguage
+        if storedLanguage != resolvedLanguage.rawValue {
+            userDefaults.set(resolvedLanguage.rawValue, forKey: userDefaultsKey)
+        }
     }
 
     func select(_ language: AppLanguage) {

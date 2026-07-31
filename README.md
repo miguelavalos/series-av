@@ -9,6 +9,11 @@ or deletion workflows, read [AGENTS.md](AGENTS.md). Those workflows are governed
 by private AVALSYS runbooks and must not be replaced with an invented local
 backend flow.
 
+On a fresh install, the iOS client persists the device's primary supported
+EN/ES/CA/FR/DE language, with English fallback, following the shared
+[Apps AV contract](https://github.com/miguelavalos/apps-av/blob/main/docs/initial-app-language.md).
+An explicit in-app choice always wins afterward.
+
 ## License
 
 This repository is released under the MIT license. See [LICENSE](LICENSE).
