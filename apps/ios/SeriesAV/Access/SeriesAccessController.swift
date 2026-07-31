@@ -392,11 +392,33 @@ final class SeriesAccessController {
                 return
             }
         }
+
+        guard isWaitingForSubscriptionReconciliation else { return }
+        guard accountUser == reconciliationAccountUser else { return }
+        finishSubscriptionReconciliationAsDelayed()
     }
 
     private func clearSubscriptionReconciliationState() {
         isWaitingForSubscriptionReconciliation = false
         subscriptionReconciliationSource = nil
+        subscriptionError = nil
+    }
+
+    private func finishSubscriptionReconciliationAsDelayed() {
+        let source = subscriptionReconciliationSource
+        isWaitingForSubscriptionReconciliation = false
+        subscriptionReconciliationSource = nil
+
+        switch source {
+        case .purchase:
+            subscriptionError = .purchaseReconciliationDelayed
+        case .restore:
+            subscriptionError = .restoreReconciliationDelayed
+        case .redeemCode:
+            subscriptionError = .redemptionReconciliationDelayed
+        case nil:
+            break
+        }
     }
 
     private func clearSubscriptionState() {

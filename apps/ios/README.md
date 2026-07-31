@@ -36,8 +36,9 @@ Current scaffold:
   `/v1/apps/seriesav/data/seriesLibrary`, enabled only when Apps AV access
   exposes `canUseCloudSync`.
 - RevenueCat-backed Series AV Pro purchase/restore boundary and custom paywall
-  shell, guarded by public xcconfig/Info.plist config and backend access
-  reconciliation.
+  shell, guarded by public xcconfig/Info.plist config, exact active `pro`
+  entitlement acceptance, and bounded backend access reconciliation. See
+  `../../docs/subscription-access-contract.md`.
 - Runtime config preflight for Account AV, Convex URL, RevenueCat, keychain
   access group, support/legal URLs, and release archive checks.
 - Home, Library, Search, and Avi product tabs using the shared Apps AV shell.

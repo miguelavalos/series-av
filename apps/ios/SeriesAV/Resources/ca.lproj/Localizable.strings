@@ -344,6 +344,11 @@
 "subscription.error.offerUnavailable" = "L'oferta Pro no està disponible ara mateix.";
 "subscription.error.productUnavailable" = "La subscripció mensual Pro no està disponible ara mateix.";
 "subscription.error.cancelled" = "Compra cancel·lada.";
+"subscription.error.purchaseNotEntitled" = "Apple no ha confirmat l'accés actiu a Series AV Pro. No tornis a comprar. Comprova el teu compte de l'App Store i després prem Restaura les compres.";
+"subscription.error.restoreNotEntitled" = "No s'ha trobat cap subscripció activa a Series AV Pro per a aquest compte de l'App Store. Subscriu-t'hi per activar Pro.";
+"subscription.error.purchaseReconciliationDelayed" = "La compra està confirmada, però Pro encara s'està sincronitzant. No tornis a comprar. Prova Restaura les compres d'aquí a poc.";
+"subscription.error.restoreReconciliationDelayed" = "Apple ha confirmat una subscripció activa, però Pro encara s'està sincronitzant. Prova Restaura les compres de nou d'aquí a poc.";
+"subscription.error.redemptionReconciliationDelayed" = "El codi s'ha acceptat, però Pro encara s'està sincronitzant. Torna-ho a provar d'aquí a poc.";
 "subscription.error.redemptionUnavailable" = "El bescanvi de codis no està disponible ara mateix.";
 "subscription.error.unknown" = "No s'ha pogut completar la subscripció.";
 "tab.home" = "Inici";

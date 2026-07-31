@@ -344,6 +344,11 @@
 "subscription.error.offerUnavailable" = "L'offre Pro n'est pas disponible pour le moment.";
 "subscription.error.productUnavailable" = "L'abonnement mensuel Pro n'est pas disponible pour le moment.";
 "subscription.error.cancelled" = "Achat annulé.";
+"subscription.error.purchaseNotEntitled" = "Apple n'a pas confirmé l'accès actif à Series AV Pro. Ne rachète pas l'abonnement. Vérifie ton compte App Store, puis essaie Restaurer les achats.";
+"subscription.error.restoreNotEntitled" = "Aucun abonnement Series AV Pro actif n'a été trouvé pour ce compte App Store. Abonne-toi pour activer Pro.";
+"subscription.error.purchaseReconciliationDelayed" = "Ton achat est confirmé, mais Pro est toujours en cours de synchronisation. Ne rachète pas l'abonnement. Réessaie bientôt avec Restaurer les achats.";
+"subscription.error.restoreReconciliationDelayed" = "Apple a confirmé un abonnement actif, mais Pro est toujours en cours de synchronisation. Réessaie bientôt avec Restaurer les achats.";
+"subscription.error.redemptionReconciliationDelayed" = "Ton code a été accepté, mais Pro est toujours en cours de synchronisation. Réessaie bientôt.";
 "subscription.error.redemptionUnavailable" = "L'utilisation des codes n'est pas disponible pour le moment.";
 "subscription.error.unknown" = "L'abonnement n'a pas pu être finalisé.";
 "tab.home" = "Accueil";

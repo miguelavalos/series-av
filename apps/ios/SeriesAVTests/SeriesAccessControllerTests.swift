@@ -360,6 +360,81 @@ final class SeriesAccessControllerTests: XCTestCase {
         XCTAssertNil(controller.subscriptionError)
     }
 
+    func testSubscriptionEntitlementPolicyRequiresExactActiveProIdentifier() {
+        XCTAssertTrue(SeriesSubscriptionEntitlementPolicy.hasActiveProEntitlement(["pro"]))
+        XCTAssertFalse(SeriesSubscriptionEntitlementPolicy.hasActiveProEntitlement([]))
+        XCTAssertFalse(SeriesSubscriptionEntitlementPolicy.hasActiveProEntitlement(["series_pro"]))
+        XCTAssertFalse(SeriesSubscriptionEntitlementPolicy.hasActiveProEntitlement(["PRO"]))
+    }
+
+    func testInactivePurchaseAndRestoreStopWithoutStartingBackendReconciliation() async {
+        let subscriptionPurchasing = StubSeriesSubscriptionPurchasing()
+        subscriptionPurchasing.purchaseError = .purchaseNotEntitled
+        subscriptionPurchasing.restoreError = .restoreNotEntitled
+        let controller = makeSignedInFreeController(subscriptionPurchasing: subscriptionPurchasing)
+
+        await controller.syncFromAccountProvider()
+        await controller.purchaseMonthlyPro()
+
+        XCTAssertEqual(controller.subscriptionError, .purchaseNotEntitled)
+        XCTAssertFalse(controller.isWaitingForSubscriptionReconciliation)
+        XCTAssertNil(controller.subscriptionReconciliationSource)
+
+        await controller.restorePurchases()
+
+        XCTAssertEqual(controller.subscriptionError, .restoreNotEntitled)
+        XCTAssertFalse(controller.isWaitingForSubscriptionReconciliation)
+        XCTAssertNil(controller.subscriptionReconciliationSource)
+    }
+
+    func testProviderFailureRemainsDistinctAndDoesNotStartBackendReconciliation() async {
+        let subscriptionPurchasing = StubSeriesSubscriptionPurchasing()
+        subscriptionPurchasing.purchaseError = .underlying("Provider unavailable")
+        let controller = makeSignedInFreeController(subscriptionPurchasing: subscriptionPurchasing)
+
+        await controller.syncFromAccountProvider()
+        await controller.purchaseMonthlyPro()
+
+        XCTAssertEqual(controller.subscriptionError, .underlying("Provider unavailable"))
+        XCTAssertFalse(controller.isWaitingForSubscriptionReconciliation)
+        XCTAssertNil(controller.subscriptionReconciliationSource)
+    }
+
+    func testPurchaseAndRestoreEndWithActionableErrorWhenBackendReconciliationTimesOut() async {
+        let subscriptionPurchasing = StubSeriesSubscriptionPurchasing()
+        let controller = makeSignedInFreeController(
+            subscriptionPurchasing: subscriptionPurchasing,
+            subscriptionReconciliationRetryDelaysNanoseconds: []
+        )
+
+        await controller.syncFromAccountProvider()
+        await controller.purchaseMonthlyPro()
+
+        XCTAssertEqual(controller.subscriptionError, .purchaseReconciliationDelayed)
+        XCTAssertFalse(controller.isWaitingForSubscriptionReconciliation)
+        XCTAssertNil(controller.subscriptionReconciliationSource)
+
+        await controller.restorePurchases()
+
+        XCTAssertEqual(controller.subscriptionError, .restoreReconciliationDelayed)
+        XCTAssertFalse(controller.isWaitingForSubscriptionReconciliation)
+        XCTAssertNil(controller.subscriptionReconciliationSource)
+    }
+
+    func testPromotionCodeEndsWithActionableErrorWhenBackendReconciliationTimesOut() async throws {
+        let controller = makeSignedInFreeController(
+            promotionCodeRedeemer: StubSeriesPromotionCodeRedeemer(),
+            subscriptionReconciliationRetryDelaysNanoseconds: []
+        )
+
+        await controller.syncFromAccountProvider()
+        try await controller.claimPromotionCode("series-pro-2026")
+
+        XCTAssertEqual(controller.subscriptionError, .redemptionReconciliationDelayed)
+        XCTAssertFalse(controller.isWaitingForSubscriptionReconciliation)
+        XCTAssertNil(controller.subscriptionReconciliationSource)
+    }
+
     func testPurchaseRetriesAccountSyncUntilBackendEntitlementIsVisible() async {
         let entitlementService = SequenceSeriesEntitlementService(accesses: [
             SeriesResolvedAccess(
@@ -549,6 +624,40 @@ final class SeriesAccessControllerTests: XCTestCase {
         return defaults
     }
 
+    private func makeSignedInFreeController(
+        subscriptionPurchasing: SeriesSubscriptionPurchasing = StubSeriesSubscriptionPurchasing(),
+        promotionCodeRedeemer: SeriesPromotionCodeRedeeming = StubSeriesPromotionCodeRedeemer(),
+        subscriptionReconciliationRetryDelaysNanoseconds: [UInt64] = []
+    ) -> SeriesAccessController {
+        SeriesAccessController(
+            accountService: StubSeriesAVAccountService(
+                restoreResult: .active(SeriesAccountUser(
+                    id: "provider-user-1",
+                    displayName: "Provider User",
+                    emailAddress: "provider@example.com"
+                )),
+                token: "provider-token"
+            ),
+            profileResolver: StubSeriesAccountProfileResolver(user: SeriesAccountUser(
+                id: "apps-av-user-1",
+                displayName: "Apps AV User",
+                emailAddress: "apps@example.com"
+            )),
+            entitlementService: StubSeriesEntitlementService(access: SeriesResolvedAccess(
+                platformUserId: "apps-av-user-1",
+                planTier: .free,
+                accessMode: .signedInFree,
+                capabilities: .forMode(.signedInFree),
+                limits: .forMode(.signedInFree)
+            )),
+            subscriptionPurchasing: subscriptionPurchasing,
+            promotionCodeRedeemer: promotionCodeRedeemer,
+            userDefaults: isolatedUserDefaults(),
+            subscriptionReconciliationRetryDelaysNanoseconds: subscriptionReconciliationRetryDelaysNanoseconds,
+            sleepNanoseconds: { _ in }
+        )
+    }
+
     private var lastKnownAccountUserKey: String {
         "seriesav.account.lastKnownUser"
     }
@@ -692,6 +801,8 @@ private final class StubSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasi
     private(set) var lastLoadedOfferUser: SeriesAccountUser?
     private(set) var lastPurchasedUser: SeriesAccountUser?
     private(set) var lastRestoredUser: SeriesAccountUser?
+    var purchaseError: SeriesSubscriptionPurchaseError?
+    var restoreError: SeriesSubscriptionPurchaseError?
     var offer = SeriesSubscriptionOffer(
         identifier: "$rc_monthly",
         productIdentifier: "com.avalsys.seriesav.pro.monthly",
@@ -715,6 +826,9 @@ private final class StubSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasi
         try await prepare(for: user)
         purchaseCount += 1
         lastPurchasedUser = user
+        if let purchaseError {
+            throw purchaseError
+        }
         return SeriesPurchaseOutcome(shouldRefreshAccess: true, customerUserID: user?.id ?? "")
     }
 
@@ -722,6 +836,9 @@ private final class StubSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasi
         try await prepare(for: user)
         restoreCount += 1
         lastRestoredUser = user
+        if let restoreError {
+            throw restoreError
+        }
         return SeriesPurchaseOutcome(shouldRefreshAccess: true, customerUserID: user?.id ?? "")
     }
 }
