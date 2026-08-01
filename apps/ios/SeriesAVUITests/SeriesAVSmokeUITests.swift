@@ -73,6 +73,7 @@ final class SeriesAVSmokeUITests: XCTestCase {
         app.launchEnvironment["SERIESAV_UI_TESTS_RESET_STATE"] = "1"
         app.launchEnvironment["SERIESAV_DISABLE_SPLASH"] = "1"
         app.launchEnvironment["SERIESAV_DISABLE_ONBOARDING"] = "1"
+        app.launchEnvironment["SERIESAV_APP_LANGUAGE"] = language
         for (key, value) in environment {
             app.launchEnvironment[key] = value
         }

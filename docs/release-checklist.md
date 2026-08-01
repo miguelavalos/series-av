@@ -159,6 +159,21 @@ the build is `Lista para enviar` in the internal `Series AV Test` group. No
 purchase or App Review submission was performed. The verified archive is
 `.derived-data/release-archives/SeriesAV-1.0.4-18-2026-07-29-144014.xcarchive`.
 
+Subscription-reconciliation preparation checkpoint, 2026-08-01: current
+source contains the bounded purchase/restore reconciliation repair from
+`de9d00c` and prepares iOS/iPadOS `1.0.4 (19)` in `4af29ef`. The client now
+requires the exact active RevenueCat `pro` entitlement before asking Apps AV
+to refresh access, distinguishes inactive purchase/restore outcomes from
+provider failures, stops after bounded retries, and cancels stale work when
+the Account AV identity changes. The production-config simulator gate passed
+its public-config check, read-only production API smokes, 8 focused unit tests,
+3 UI tests, Release build, and Spanish Search evidence capture. The localized
+UI harness and evidence launch explicitly set `SERIESAV_APP_LANGUAGE`, because
+the real app correctly persists the first supported device language and later
+in-app choices. Build 19 has not been archived or uploaded at this checkpoint;
+it is not in TestFlight or App Review, and real StoreKit purchase/restore proof
+remains a physical-device gate.
+
 The localized App Store release notes remain intentionally short:
 
 - English (UK): `Improved layouts, clearer series information and more compact actions.`

@@ -127,14 +127,14 @@ For simulator or physical iPhone installs, follow [docs/install-ios.md](docs/ins
 
 ## Open product work
 
-1. Treat iOS/iPadOS version `1.0.2 (13)` as the current public App Store
-   baseline for client compatibility work.
-2. Treat iOS/iPadOS version `1.0.3 (17)` as the current App Review candidate.
-   It was added to the review submission on 2026-07-13, but must not be treated
-   as the public baseline until Apple approves and publishes it.
-3. Continue purchase, restore, RevenueCat webhook, and Apps AV entitlement
-   validation for
-   `seriesav_pro_monthly`.
+1. Treat iOS/iPadOS `1.0.2 (13)` as the latest confirmed public App Store
+   baseline for client compatibility work. `1.0.3 (17)` was submitted on
+   2026-07-13, but approval/publication has not been confirmed in this repo.
+2. Treat `1.0.4 (18)` as the latest confirmed internal TestFlight baseline.
+   Current source prepares `1.0.4 (19)` with bounded subscription
+   reconciliation, but build 19 is not archived or uploaded yet.
+3. Complete physical-device purchase, restore, RevenueCat webhook, and Apps AV
+   entitlement validation for `seriesav_pro_monthly` on build 19 or later.
 4. Keep the shared RevenueCat project intact. Moments AV and Animate AV
    offerings may exist beside Series AV; Series AV readiness depends on
    offering `default` containing `$rc_monthly -> seriesav_pro_monthly`.
