@@ -32,7 +32,6 @@ final class SeriesEntitlementServiceTests: XCTestCase {
         XCTAssertEqual(access.capabilities.canUseBackend, true)
         XCTAssertEqual(access.capabilities.canUseCloudSync, false)
         XCTAssertEqual(access.limits.activeLibrarySeries, 25)
-        XCTAssertEqual(access.limits.aviActionsPerDay, 5)
     }
 
     func testSignedInFreeUsesBackendButDoesNotUseCloudSync() {
@@ -44,7 +43,6 @@ final class SeriesEntitlementServiceTests: XCTestCase {
         XCTAssertEqual(access.capabilities.canUseBackend, true)
         XCTAssertEqual(access.capabilities.canUseCloudSync, false)
         XCTAssertEqual(access.limits.activeLibrarySeries, 75)
-        XCTAssertEqual(access.limits.aviActionsPerDay, 15)
     }
 
     func testRefreshUsesSeriesAVEntryAndAppsAVUserId() async {
@@ -79,10 +77,8 @@ final class SeriesEntitlementServiceTests: XCTestCase {
         XCTAssertEqual(access.platformUserId, "apps-av-user-1")
         XCTAssertEqual(access.accessMode, .signedInPro)
         XCTAssertEqual(access.planTier, .pro)
-        XCTAssertEqual(access.capabilities.canUsePremiumFeatures, true)
         XCTAssertEqual(access.capabilities.canUseCloudSync, true)
         XCTAssertEqual(access.limits.activeLibrarySeries, 1_000)
-        XCTAssertNil(access.limits.aviActionsPerDay)
     }
 
     func testRefreshFallsBackToSignedInFreeWhenSeriesEntryIsMissing() async {
@@ -145,10 +141,10 @@ private struct AccessPolicyModeContract: Decodable {
     let limits: AccessLimitsContract
 }
 
+/// The shared contract still lists `canUsePremiumFeatures`; the app no longer models it.
 private struct AccessCapabilitiesContract: Decodable {
     let isSignedIn: Bool
     let canUseBackend: Bool
-    let canUsePremiumFeatures: Bool
     let canUseCloudSync: Bool
     let canManagePlan: Bool
 
@@ -156,22 +152,18 @@ private struct AccessCapabilitiesContract: Decodable {
         SeriesAccessCapabilities(
             isSignedIn: isSignedIn,
             canUseBackend: canUseBackend,
-            canUsePremiumFeatures: canUsePremiumFeatures,
             canUseCloudSync: canUseCloudSync,
             canManagePlan: canManagePlan
         )
     }
 }
 
+/// The shared contract still lists `aviActionsPerDay`; the app only enforces the active-library limit.
 private struct AccessLimitsContract: Decodable {
     let activeLibrarySeries: Int?
-    let aviActionsPerDay: Int?
 
     var seriesValue: SeriesAccessLimits {
-        SeriesAccessLimits(
-            activeLibrarySeries: activeLibrarySeries,
-            aviActionsPerDay: aviActionsPerDay
-        )
+        SeriesAccessLimits(activeLibrarySeries: activeLibrarySeries)
     }
 }
 

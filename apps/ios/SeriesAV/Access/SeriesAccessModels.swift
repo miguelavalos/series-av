@@ -44,19 +44,16 @@ struct SeriesAccountSession: Equatable {
     let access: SeriesResolvedAccess
 }
 
+/// What the current access mode can do. Cloud sync of the library is the only Pro-exclusive capability;
+/// the backend contract may carry more fields, which are ignored here.
 struct SeriesAccessCapabilities: Codable, Equatable {
     let isSignedIn: Bool
     let canUseBackend: Bool
-    let canUsePremiumFeatures: Bool
     let canUseCloudSync: Bool
     let canManagePlan: Bool
 
     var isLocalOnly: Bool {
         !canUseCloudSync
-    }
-
-    var canUpgradeToPro: Bool {
-        isSignedIn && !canUsePremiumFeatures
     }
 
     static func forMode(_ accessMode: SeriesAccessMode) -> SeriesAccessCapabilities {
@@ -65,7 +62,6 @@ struct SeriesAccessCapabilities: Codable, Equatable {
             SeriesAccessCapabilities(
                 isSignedIn: false,
                 canUseBackend: true,
-                canUsePremiumFeatures: false,
                 canUseCloudSync: false,
                 canManagePlan: false
             )
@@ -73,7 +69,6 @@ struct SeriesAccessCapabilities: Codable, Equatable {
             SeriesAccessCapabilities(
                 isSignedIn: true,
                 canUseBackend: true,
-                canUsePremiumFeatures: false,
                 canUseCloudSync: false,
                 canManagePlan: true
             )
@@ -81,7 +76,6 @@ struct SeriesAccessCapabilities: Codable, Equatable {
             SeriesAccessCapabilities(
                 isSignedIn: true,
                 canUseBackend: true,
-                canUsePremiumFeatures: true,
                 canUseCloudSync: true,
                 canManagePlan: true
             )
@@ -89,18 +83,18 @@ struct SeriesAccessCapabilities: Codable, Equatable {
     }
 }
 
+/// Plan limits the app enforces. Guest 25, Free 75, Pro 1000 active series; `nil` is unlimited.
 struct SeriesAccessLimits: Codable, Equatable {
     let activeLibrarySeries: Int?
-    let aviActionsPerDay: Int?
 
     static func forMode(_ accessMode: SeriesAccessMode) -> SeriesAccessLimits {
         switch accessMode {
         case .guest:
-            SeriesAccessLimits(activeLibrarySeries: 25, aviActionsPerDay: 5)
+            SeriesAccessLimits(activeLibrarySeries: 25)
         case .signedInFree:
-            SeriesAccessLimits(activeLibrarySeries: 75, aviActionsPerDay: 15)
+            SeriesAccessLimits(activeLibrarySeries: 75)
         case .signedInPro:
-            SeriesAccessLimits(activeLibrarySeries: 1_000, aviActionsPerDay: nil)
+            SeriesAccessLimits(activeLibrarySeries: 1_000)
         }
     }
 }
