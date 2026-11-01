@@ -528,7 +528,7 @@ struct SeriesGuideFeedbackClient: Sendable {
             method: "POST",
             body: body,
             headers: ["Content-Type": "application/json"],
-            requiresAuth: false
+            requiresAuth: true
         )
         return try decoder.decode(SeriesGuideFeedbackResponse.self, from: data)
     }

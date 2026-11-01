@@ -25,7 +25,8 @@ struct SeriesDetailScreen: View {
     private let episodeGuideClient: SeriesEpisodeGuideClient
     private let detailClient: SeriesDetailClient
     private let shareInviteClient: SeriesShareInviteClient?
-    private let guideFeedbackClient: SeriesGuideFeedbackClient
+    /// Authenticated client; `nil` for guests, who see a sign-in message instead of the report action.
+    private let guideFeedbackClient: SeriesGuideFeedbackClient?
 
     @State private var guideState: SeriesDetailGuideState = .loading
     @State private var resolvedCatalogItem: SeriesCatalogItem?
@@ -53,7 +54,7 @@ struct SeriesDetailScreen: View {
         episodeGuideClient: SeriesEpisodeGuideClient = SeriesEpisodeGuideClient(apiClient: SeriesAVAPIClient()),
         detailClient: SeriesDetailClient = SeriesDetailClient(),
         shareInviteClient: SeriesShareInviteClient? = nil,
-        guideFeedbackClient: SeriesGuideFeedbackClient = SeriesGuideFeedbackClient()
+        guideFeedbackClient: SeriesGuideFeedbackClient? = nil
     ) {
         self.catalogItem = catalogItem
         self.entry = entry
@@ -608,7 +609,27 @@ struct SeriesDetailScreen: View {
         }
     }
 
+    @ViewBuilder
     private var guideFeedbackContent: some View {
+        if canSendGuideFeedback {
+            guideFeedbackAction
+        } else {
+            Text(L10n.string("detail.guideFeedback.signInRequired"))
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                .accessibilityIdentifier("series-detail-guide-feedback-sign-in")
+        }
+    }
+
+    /// Guide feedback needs a signed-in account on the backend. UI-test scenarios keep the action.
+    private var canSendGuideFeedback: Bool {
+        guideFeedbackClient != nil || SeriesUITestEnvironment.current.guideFeedbackScenario != nil
+    }
+
+    private var guideFeedbackAction: some View {
         VStack(alignment: .leading, spacing: 8) {
             Button {
                 Task {
@@ -1173,6 +1194,11 @@ struct SeriesDetailScreen: View {
         if let scenario = SeriesUITestEnvironment.current.guideFeedbackScenario {
             await Task.yield()
             feedbackState = scenario == "sent" ? .sent : .failed
+            return
+        }
+
+        guard let guideFeedbackClient else {
+            feedbackState = .failed
             return
         }
 
