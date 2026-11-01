@@ -18,7 +18,6 @@ struct RootView: View {
     var body: some View {
         SeriesWatchingHomeScreen(
             store: store,
-            activeSeriesLimit: accessController.limits.activeLibrarySeries,
             accessController: accessController,
             openSettings: openSettings,
             openAccount: openAccount,
@@ -88,7 +87,6 @@ private struct SeriesWatchingHomeScreen: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     @Bindable var store: SeriesLibraryStore
-    let activeSeriesLimit: Int?
     let accessController: SeriesAccessController
     let openSettings: () -> Void
     let openAccount: () -> Void
@@ -390,11 +388,11 @@ private struct SeriesWatchingHomeScreen: View {
                 entry: selection.entry,
                 canFollow: canAddSeries,
                 follow: selection.entry == nil ? {
-                    if canAddSeries, let catalogItem = selection.catalogItem {
-                        _ = store.addCatalogSeries(catalogItem)
-                        sheetDestination = nil
-                    } else {
+                    guard let catalogItem = selection.catalogItem else { return }
+                    if store.addCatalogSeries(catalogItem).isLimitReached {
                         showLimitAction()
+                    } else {
+                        sheetDestination = nil
                     }
                 } : nil,
                 markNext: { entry in
@@ -434,7 +432,8 @@ private struct SeriesWatchingHomeScreen: View {
                     pendingProgressUndo = nil
                     pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.deleted")
                 },
-                shareInviteClient: shareInviteClient
+                shareInviteClient: shareInviteClient,
+                guideFeedbackClient: guideFeedbackClient
             )
             .presentationDetents([.large])
         case .proPaywall:
@@ -445,24 +444,18 @@ private struct SeriesWatchingHomeScreen: View {
         }
     }
 
-    private var activeLibraryLimitPolicy: SeriesActiveLibraryLimitPolicy {
-        SeriesActiveLibraryLimitPolicy(
-            activeCount: store.activeEntries.count,
-            activeLimit: activeSeriesLimit
-        )
-    }
-
     private var canAddSeries: Bool {
-        activeLibraryLimitPolicy.canAddSeries
-    }
-
-    private var remainingSeriesCount: Int? {
-        activeLibraryLimitPolicy.remainingSeriesCount
+        store.canAddActiveSeries
     }
 
     private var shareInviteClient: SeriesShareInviteClient? {
         guard accessController.isSignedIn else { return nil }
         return SeriesShareInviteClient(apiClient: accessController.authenticatedAPIClient())
+    }
+
+    private var guideFeedbackClient: SeriesGuideFeedbackClient? {
+        guard accessController.isSignedIn else { return nil }
+        return SeriesGuideFeedbackClient(apiClient: accessController.authenticatedAPIClient())
     }
 
     private var entriesNeedingCatalogMetadata: [SeriesLibraryEntry] {
@@ -512,19 +505,15 @@ private struct SeriesWatchingHomeScreen: View {
     }
 
     private func addDiscoverySeries(_ preview: SeriesHomeDiscoveryPreview) {
-        guard canAddSeries else {
-            showLimitAction()
-            return
-        }
-
-        Task {
-            guard let entry = store.addCatalogSeries(preview.catalogItem) else {
-                return
-            }
-
+        switch store.addCatalogSeries(preview.catalogItem) {
+        case .activated(let entry):
             pendingProgressUndo = nil
             pendingUndo = PendingLibraryUndo(entryId: entry.id, title: entry.title, messageKey: "home.undo.added")
             sheetDestination = .progressEditor(entry)
+        case .limitReached:
+            showLimitAction()
+        case .rejected:
+            break
         }
     }
 
@@ -665,24 +654,14 @@ private struct SeriesWatchingHomeScreen: View {
         }
     }
 
+    /// Full library: guests and Free accounts see the Pro paywall (a guest signs in when subscribing).
     private func showLimitAction() {
-        switch accessController.accessMode {
-        case .guest:
-            startSignInFlow()
-        case .signedInFree:
-            sheetDestination = .proPaywall
-        case .signedInPro:
-            break
-        }
+        guard accessController.accessMode != .signedInPro else { return }
+        sheetDestination = .proPaywall
     }
 
     private var limitActionTitle: String {
-        switch accessController.accessMode {
-        case .guest:
-            accessController.accountIsAvailable ? L10n.string("add.footer.connectAccount") : L10n.string("profile.account.connectUnavailable")
-        case .signedInFree, .signedInPro:
-            L10n.string("add.footer.upgrade")
-        }
+        SeriesActiveLibraryLimitCopy.actionTitle
     }
 
     @ViewBuilder
@@ -732,8 +711,8 @@ private struct SeriesWatchingHomeScreen: View {
                     undo: {
                         if pendingUndo.messageKey == "home.undo.added" {
                             store.delete(pendingUndo.entryId)
-                        } else {
-                            store.restore(pendingUndo.entryId)
+                        } else if store.restore(pendingUndo.entryId).isLimitReached {
+                            showLimitAction()
                         }
                         self.pendingUndo = nil
                     },

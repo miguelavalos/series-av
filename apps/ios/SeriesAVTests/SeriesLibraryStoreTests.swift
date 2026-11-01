@@ -385,8 +385,8 @@ final class SeriesLibraryStoreTests: XCTestCase {
         let date = Date(timeIntervalSince1970: 1_800_000_000)
         let store = SeriesLibraryStore()
 
-        let first = store.addCatalogSeries(catalogItem(id: "series-example", title: "  Example Show  "), at: date)
-        let second = store.addCatalogSeries(catalogItem(id: "series-example", title: "Example Show"), at: date.addingTimeInterval(10))
+        let first = store.addCatalogSeries(catalogItem(id: "series-example", title: "  Example Show  "), at: date).entry
+        let second = store.addCatalogSeries(catalogItem(id: "series-example", title: "Example Show"), at: date.addingTimeInterval(10)).entry
 
         XCTAssertEqual(first?.title, "Example Show")
         XCTAssertEqual(second?.seriesId, "series-example")
@@ -414,6 +414,65 @@ final class SeriesLibraryStoreTests: XCTestCase {
 
         XCTAssertTrue(policy.canAddSeries)
         XCTAssertNil(policy.remainingSeriesCount)
+    }
+
+    func testStoreRefusesNewActiveSeriesOnceTheLimitIsFull() {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = SeriesLibraryStore(
+            entries: [entry(id: "one", title: "One", pinned: false, interactedAt: date)],
+            activeLibraryLimit: 1
+        )
+
+        XCTAssertFalse(store.canAddActiveSeries)
+        XCTAssertEqual(
+            store.addCatalogSeries(catalogItem(id: "two", title: "Two"), at: date),
+            .limitReached(SeriesActiveLibraryLimitPolicy(activeCount: 1, activeLimit: 1))
+        )
+        XCTAssertEqual(store.entries.map(\.entryId), ["one"])
+
+        store.activeLibraryLimit = 2
+        XCTAssertEqual(store.addCatalogSeries(catalogItem(id: "two", title: "Two"), at: date).entry?.entryId, "two")
+        XCTAssertEqual(store.activeEntries.count, 2)
+    }
+
+    func testStoreLetsAnAlreadyActiveSeriesBeReaddedAtTheLimit() {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = SeriesLibraryStore(
+            entries: [entry(id: "one", title: "One", pinned: false, interactedAt: date)],
+            activeLibraryLimit: 1
+        )
+
+        let outcome = store.add(entry(id: "one", title: "One again", pinned: false, interactedAt: date))
+
+        XCTAssertEqual(outcome.entry?.title, "One again")
+        XCTAssertEqual(store.activeEntries.count, 1)
+    }
+
+    func testStoreRefusesUnarchiveAndUndeleteOnceTheLimitIsFull() {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = SeriesLibraryStore(
+            entries: [
+                entry(id: "active", title: "Active", pinned: false, interactedAt: date),
+                entry(id: "archived", title: "Archived", pinned: false, interactedAt: date),
+                entry(id: "deleted", title: "Deleted", pinned: false, interactedAt: date)
+            ],
+            activeLibraryLimit: 1
+        )
+        store.archive("archived", at: date)
+        store.delete("deleted", at: date)
+
+        XCTAssertTrue(store.restore("archived", at: date).isLimitReached)
+        XCTAssertTrue(store.restore("deleted", at: date).isLimitReached)
+        XCTAssertEqual(store.activeEntries.map(\.entryId), ["active"])
+        XCTAssertEqual(store.archivedEntries.map(\.entryId), ["archived"])
+        XCTAssertEqual(store.deletedEntries.map(\.entryId), ["deleted"])
+
+        store.restoreToArchive("deleted", at: date)
+        XCTAssertEqual(Set(store.archivedEntries.map(\.entryId)), ["archived", "deleted"])
+        XCTAssertEqual(store.activeEntries.map(\.entryId), ["active"])
+
+        XCTAssertEqual(store.restore("missing", at: date), .rejected)
+        XCTAssertEqual(store.restore("active", at: date).entry?.entryId, "active")
     }
 
     func testSearchEntriesMatchesTitlesCaseInsensitively() {
@@ -456,7 +515,7 @@ final class SeriesLibraryStoreTests: XCTestCase {
     func testPersistedStoreSavesProgressChanges() {
         let defaults = isolatedUserDefaults()
         let store = SeriesLibraryStore.persisted(userDefaults: defaults)
-        let entry = store.addCatalogSeries(catalogItem(id: "series-progress", title: "Progress Show"), at: Date(timeIntervalSince1970: 1_800_000_000))
+        let entry = store.addCatalogSeries(catalogItem(id: "series-progress", title: "Progress Show"), at: Date(timeIntervalSince1970: 1_800_000_000)).entry
 
         store.markWatchedThrough(SeriesEpisodeCursor(seasonNumber: 2, episodeNumber: 8), for: entry?.id ?? "")
 

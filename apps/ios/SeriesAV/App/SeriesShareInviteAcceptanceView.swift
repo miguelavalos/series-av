@@ -10,6 +10,9 @@ struct SeriesShareInviteAcceptanceView: View {
     let onDismiss: () -> Void
 
     @State private var state: InviteAcceptanceState = .idle
+    /// Set when the invite was accepted but the plan's active-library limit kept the series out.
+    @State private var libraryLimitReached: SeriesActiveLibraryLimitPolicy?
+    @State private var isShowingProPaywall = false
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -71,6 +74,12 @@ struct SeriesShareInviteAcceptanceView: View {
             }
         }
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+        .sheet(isPresented: $isShowingProPaywall) {
+            SeriesProPaywallView(
+                accessController: accessController,
+                startSignInFlow: startSignInFlow
+            )
+        }
         .onAppear {
             if let forcedInitialState = Self.forcedInitialState {
                 state = forcedInitialState
@@ -148,10 +157,33 @@ struct SeriesShareInviteAcceptanceView: View {
                     .font(.title3.bold())
                     .fixedSize(horizontal: false, vertical: true)
             }
-            Text(L10n.string("shareInvite.acceptedDetail"))
+            if let libraryLimitReached {
+                Text(SeriesActiveLibraryLimitCopy.limitReachedMessage(
+                    limit: libraryLimitReached.activeLimit ?? 0,
+                    accessMode: accessController.accessMode
+                ))
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("series-share-invite-limit")
+                if accessController.accessMode != .signedInPro {
+                    Button {
+                        isShowingProPaywall = true
+                    } label: {
+                        Label(SeriesActiveLibraryLimitCopy.actionTitle, systemImage: "sparkles")
+                            .frame(maxWidth: .infinity, minHeight: 50)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .accessibilityIdentifier("series-share-invite-see-pro")
+                }
+            } else {
+                Text(L10n.string("shareInvite.acceptedDetail"))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             Button(L10n.string("common.done"), action: onDismiss)
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
@@ -235,8 +267,14 @@ struct SeriesShareInviteAcceptanceView: View {
             updatedAt: now,
             lastInteractedAt: now
         )
-        store.upsert(entry)
-        librarySync.localEntriesDidChange(store.entries, accessController: accessController)
+        switch store.add(entry) {
+        case .activated:
+            librarySync.localEntriesDidChange(store.entries, accessController: accessController)
+        case .limitReached(let policy):
+            libraryLimitReached = policy
+        case .rejected:
+            break
+        }
     }
 
     private enum InviteAcceptanceState: Equatable {

@@ -98,22 +98,25 @@ struct SeriesSearchScreen: View {
                 setPrivateNote: { entry, note in
                     store.setPrivateNote(note, for: entry.id)
                 },
-                shareInviteClient: shareInviteClient
+                shareInviteClient: shareInviteClient,
+                guideFeedbackClient: guideFeedbackClient
             )
             .presentationDetents([.large])
         }
     }
 
     private var activeLibraryLimitPolicy: SeriesActiveLibraryLimitPolicy {
-        SeriesActiveLibraryLimitPolicy(
-            activeCount: store.activeEntries.count,
-            activeLimit: accessController.limits.activeLibrarySeries
-        )
+        store.activeLibraryLimitPolicy
     }
 
     private var shareInviteClient: SeriesShareInviteClient? {
         guard accessController.isSignedIn else { return nil }
         return SeriesShareInviteClient(apiClient: accessController.authenticatedAPIClient())
+    }
+
+    private var guideFeedbackClient: SeriesGuideFeedbackClient? {
+        guard accessController.isSignedIn else { return nil }
+        return SeriesGuideFeedbackClient(apiClient: accessController.authenticatedAPIClient())
     }
 
     private var canAddSeries: Bool {
@@ -215,7 +218,7 @@ struct SeriesSearchScreen: View {
                 }
                 .buttonStyle(.bordered)
                 .controlSize(dynamicTypeSize.isAccessibilitySize ? .regular : .small)
-                .disabled(accessController.accessMode == .guest && !accessController.accountIsAvailable)
+                .accessibilityIdentifier("series-search-limit-action")
             }
 
             if let addedEntry {
@@ -364,18 +367,11 @@ struct SeriesSearchScreen: View {
     }
 
     private var limitActionTitle: String {
-        switch accessController.accessMode {
-        case .guest:
-            accessController.accountIsAvailable ? L10n.string("add.footer.connectAccount") : L10n.string("profile.account.connectUnavailable")
-        case .signedInFree:
-            L10n.string("add.footer.upgrade")
-        case .signedInPro:
-            L10n.string("add.footer.upgrade")
-        }
+        SeriesActiveLibraryLimitCopy.actionTitle
     }
 
     private var limitActionSystemImage: String {
-        accessController.accessMode == .guest ? "person.crop.circle.badge.plus" : "sparkles"
+        "sparkles"
     }
 
     private var limitText: String {
@@ -388,7 +384,10 @@ struct SeriesSearchScreen: View {
         if canAddSeries {
             return String(format: L10n.string("add.footer.remaining"), remainingSeriesCount)
         }
-        return L10n.string("add.footer.limitReached")
+        return SeriesActiveLibraryLimitCopy.limitReachedMessage(
+            limit: activeLibraryLimitPolicy.activeLimit ?? 0,
+            accessMode: accessController.accessMode
+        )
     }
 
     private var searchResultsSection: some View {
@@ -494,27 +493,20 @@ struct SeriesSearchScreen: View {
     }
 
     private func follow(_ catalogItem: SeriesCatalogItem) {
-        guard canAddSeries else {
-            runLimitAction()
-            return
-        }
-        Task {
-            guard let entry = store.addCatalogSeries(catalogItem) else {
-                return
-            }
+        switch store.addCatalogSeries(catalogItem) {
+        case .activated(let entry):
             addedEntry = entry
+        case .limitReached:
+            runLimitAction()
+        case .rejected:
+            break
         }
     }
 
+    /// Full library: guests and Free accounts see the Pro paywall (a guest signs in when subscribing).
     private func runLimitAction() {
-        switch accessController.accessMode {
-        case .guest:
-            startSignInFlow()
-        case .signedInFree:
-            sheetDestination = .proPaywall
-        case .signedInPro:
-            break
-        }
+        guard accessController.accessMode != .signedInPro else { return }
+        sheetDestination = .proPaywall
     }
 
     private func refreshCatalog() async {

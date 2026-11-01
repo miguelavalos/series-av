@@ -104,14 +104,8 @@ struct SeriesLibraryEntry: Codable, Identifiable, Equatable, Sendable {
     }
 }
 
-struct SeriesLimitState: Codable, Equatable, Sendable {
-    var plan: String
-    var activeCount: Int
-    var activeLimit: Int
-    var canAddActive: Bool
-    var reasonCode: String?
-}
-
+/// Active-library limit of the current plan (Guest 25, Free 75, Pro 1000; `nil` is unlimited).
+/// `SeriesLibraryStore` enforces it on every path that makes a series active.
 struct SeriesActiveLibraryLimitPolicy: Equatable, Sendable {
     var activeCount: Int
     var activeLimit: Int?
@@ -128,6 +122,44 @@ struct SeriesActiveLibraryLimitPolicy: Equatable, Sendable {
             return nil
         }
         return max(0, activeLimit - activeCount)
+    }
+}
+
+/// Result of asking the store to make a series active (add, accept a share invite, un-archive, undo).
+enum SeriesLibraryActivationOutcome: Equatable, Sendable {
+    case activated(SeriesLibraryEntry)
+    /// The plan's active-library limit is full; the entry was not changed.
+    case limitReached(SeriesActiveLibraryLimitPolicy)
+    /// Nothing to do: empty input or unknown entry.
+    case rejected
+
+    var entry: SeriesLibraryEntry? {
+        if case .activated(let entry) = self { return entry }
+        return nil
+    }
+
+    var isLimitReached: Bool {
+        if case .limitReached = self { return true }
+        return false
+    }
+}
+
+/// Shared copy for the full-library moment. Every tier below Pro is offered the paywall.
+enum SeriesActiveLibraryLimitCopy {
+    static var actionTitle: String {
+        L10n.string("add.footer.upgrade")
+    }
+
+    /// "You are at N active series…" with the concrete numbers of the next tiers.
+    static func limitReachedMessage(limit: Int, accessMode: SeriesAccessMode) -> String {
+        let proLimit = SeriesAccessLimits.forMode(.signedInPro).activeLibrarySeries ?? 1_000
+        switch accessMode {
+        case .guest:
+            let freeLimit = SeriesAccessLimits.forMode(.signedInFree).activeLibrarySeries ?? 75
+            return String(format: L10n.string("add.footer.limitReached.guest"), limit, freeLimit, proLimit)
+        case .signedInFree, .signedInPro:
+            return String(format: L10n.string("add.footer.limitReached.free"), limit, proLimit)
+        }
     }
 }
 

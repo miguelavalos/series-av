@@ -6,11 +6,26 @@ final class SeriesLibraryStore {
     private static let storageKey = "seriesav.library.v1"
 
     private(set) var entries: [SeriesLibraryEntry]
+    /// Active-series limit of the current plan; `nil` is unlimited. The shell keeps it in step with access.
+    var activeLibraryLimit: Int?
     private let persistence: SeriesLibraryPersisting?
 
-    init(entries: [SeriesLibraryEntry] = [], persistence: SeriesLibraryPersisting? = nil) {
+    init(
+        entries: [SeriesLibraryEntry] = [],
+        activeLibraryLimit: Int? = nil,
+        persistence: SeriesLibraryPersisting? = nil
+    ) {
         self.entries = entries
+        self.activeLibraryLimit = activeLibraryLimit
         self.persistence = persistence
+    }
+
+    var activeLibraryLimitPolicy: SeriesActiveLibraryLimitPolicy {
+        SeriesActiveLibraryLimitPolicy(activeCount: activeEntries.count, activeLimit: activeLibraryLimit)
+    }
+
+    var canAddActiveSeries: Bool {
+        activeLibraryLimitPolicy.canAddSeries
     }
 
     var activeEntries: [SeriesLibraryEntry] {
@@ -64,6 +79,7 @@ final class SeriesLibraryStore {
         }
     }
 
+    /// Raw write with no limit check. Sync and tests use it; user-facing adds go through `add(_:)`.
     func upsert(_ entry: SeriesLibraryEntry) {
         if let index = entries.firstIndex(where: { SeriesLibraryIdentity.sameSeries($0, entry) }) {
             entries[index] = entry
@@ -73,18 +89,31 @@ final class SeriesLibraryStore {
         persist()
     }
 
+    /// Adds or replaces `entry`. When the entry is active and the series is not already active,
+    /// it takes one active slot and is refused once the plan's limit is full.
+    @discardableResult
+    func add(_ entry: SeriesLibraryEntry) -> SeriesLibraryActivationOutcome {
+        let entryIsActive = entry.archivedAt == nil && entry.deletedAt == nil
+        let seriesIsAlreadyActive = activeEntries.contains { SeriesLibraryIdentity.sameSeries($0, entry) }
+        if entryIsActive, seriesIsAlreadyActive == false, canAddActiveSeries == false {
+            return .limitReached(activeLibraryLimitPolicy)
+        }
+        upsert(entry)
+        return .activated(entry)
+    }
+
     @discardableResult
     func addCatalogSeries(
         _ catalogItem: SeriesCatalogItem,
         at date: Date = Date()
-    ) -> SeriesLibraryEntry? {
+    ) -> SeriesLibraryActivationOutcome {
         let title = catalogItem.title.trimmingCharacters(in: .whitespacesAndNewlines)
         let seriesId = catalogItem.seriesId.trimmingCharacters(in: .whitespacesAndNewlines)
         guard title.isEmpty == false else {
-            return nil
+            return .rejected
         }
         guard seriesId.isEmpty == false else {
-            return nil
+            return .rejected
         }
 
         let entry = SeriesLibraryEntry(
@@ -101,8 +130,7 @@ final class SeriesLibraryStore {
             updatedAt: date,
             lastInteractedAt: date
         )
-        upsert(entry)
-        return entry
+        return add(entry)
     }
 
     func markWatchedThrough(
@@ -319,13 +347,34 @@ final class SeriesLibraryStore {
         persist()
     }
 
-    func restore(_ entryId: String, at date: Date = Date()) {
+    /// Makes an archived or deleted entry active again. Refused once the plan's limit is full.
+    @discardableResult
+    func restore(_ entryId: String, at date: Date = Date()) -> SeriesLibraryActivationOutcome {
         guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
-            return
+            return .rejected
+        }
+        let isAlreadyActive = entries[index].archivedAt == nil && entries[index].deletedAt == nil
+        if isAlreadyActive == false, canAddActiveSeries == false {
+            return .limitReached(activeLibraryLimitPolicy)
         }
 
         entries[index].archivedAt = nil
         entries[index].deletedAt = nil
+        entries[index].updatedAt = date
+        entries[index].lastInteractedAt = date
+        persist()
+        return .activated(entries[index])
+    }
+
+    /// Brings a deleted entry back as archived. It takes no active slot, so the limit does not apply.
+    func restoreToArchive(_ entryId: String, at date: Date = Date()) {
+        guard let index = entries.firstIndex(where: { $0.entryId == entryId }) else {
+            return
+        }
+
+        entries[index].deletedAt = nil
+        entries[index].archivedAt = date
+        entries[index].isPinnedHomeSeries = false
         entries[index].updatedAt = date
         entries[index].lastInteractedAt = date
         persist()

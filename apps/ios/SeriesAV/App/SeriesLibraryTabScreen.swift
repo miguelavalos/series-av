@@ -8,6 +8,7 @@ struct SeriesLibraryTabScreen: View {
 
     @Bindable var store: SeriesLibraryStore
     let accessController: SeriesAccessController?
+    let startSignInFlow: () -> Void
 
     @State private var query = ""
     @State private var selectedFilter: SeriesLibraryFilter = .all
@@ -17,9 +18,14 @@ struct SeriesLibraryTabScreen: View {
     @State private var pendingDeleteConfirmation: PendingLibraryDeleteConfirmation?
     @State private var isConfirmingDelete = false
 
-    init(store: SeriesLibraryStore, accessController: SeriesAccessController? = nil) {
+    init(
+        store: SeriesLibraryStore,
+        accessController: SeriesAccessController? = nil,
+        startSignInFlow: @escaping () -> Void = {}
+    ) {
         self.store = store
         self.accessController = accessController
+        self.startSignInFlow = startSignInFlow
     }
 
     var body: some View {
@@ -68,6 +74,13 @@ struct SeriesLibraryTabScreen: View {
         }
         .sheet(item: $sheetDestination) { destination in
             switch destination {
+            case .proPaywall:
+                if let accessController {
+                    SeriesProPaywallView(
+                        accessController: accessController,
+                        startSignInFlow: startSignInFlow
+                    )
+                }
             case .progressEditor(let entry):
             SeriesProgressEditorSheet(
                 entry: entry,
@@ -127,7 +140,8 @@ struct SeriesLibraryTabScreen: View {
                     pendingProgressUndo = nil
                     store.delete(entry.id)
                 },
-                shareInviteClient: shareInviteClient
+                shareInviteClient: shareInviteClient,
+                guideFeedbackClient: guideFeedbackClient
             )
             .presentationDetents([.large])
             }
@@ -312,6 +326,11 @@ struct SeriesLibraryTabScreen: View {
         return SeriesShareInviteClient(apiClient: accessController.authenticatedAPIClient())
     }
 
+    private var guideFeedbackClient: SeriesGuideFeedbackClient? {
+        guard let accessController, accessController.isSignedIn else { return nil }
+        return SeriesGuideFeedbackClient(apiClient: accessController.authenticatedAPIClient())
+    }
+
     private func screenTitle(title: String, subtitle: String) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
@@ -450,7 +469,7 @@ struct SeriesLibraryTabScreen: View {
                 action: .archive
             )
             pendingProgressUndo = nil
-            store.restore(entry.id)
+            restoreToActiveLibrary(entry.id)
         } label: {
             Label(L10n.string("library.restoreSeries"), systemImage: "arrow.uturn.backward")
         }
@@ -480,13 +499,21 @@ struct SeriesLibraryTabScreen: View {
     private func applyLibraryUndo(_ undo: PendingLibraryMutationUndo) {
         switch undo.action {
         case .restoreActive:
-            store.restore(undo.entryId)
+            restoreToActiveLibrary(undo.entryId)
         case .restoreArchived:
-            store.restore(undo.entryId)
-            store.archive(undo.entryId)
+            // Back to the archive: the entry never takes an active slot, so the limit does not apply.
+            store.restoreToArchive(undo.entryId)
         case .archive:
             store.archive(undo.entryId)
         }
+    }
+
+    /// Un-archive or undo respects the plan's active-library limit; when full, the Pro paywall opens.
+    private func restoreToActiveLibrary(_ entryId: String) {
+        guard store.restore(entryId).isLimitReached else { return }
+        pendingLibraryUndo = nil
+        guard let accessController, accessController.accessMode != .signedInPro else { return }
+        sheetDestination = .proPaywall
     }
 
     private var filteredActiveEntries: [SeriesLibraryEntry] {
@@ -626,11 +653,13 @@ struct SeriesLibraryTabScreen: View {
 private enum SeriesLibrarySheetDestination: Identifiable {
     case progressEditor(SeriesLibraryEntry)
     case detail(SeriesLibraryEntry)
+    case proPaywall
 
     var id: String {
         switch self {
         case .progressEditor(let entry): "progress:\(entry.id)"
         case .detail(let entry): "detail:\(entry.id)"
+        case .proPaywall: "proPaywall"
         }
     }
 }
