@@ -58,20 +58,27 @@ enum SeriesSubscriptionPurchaseError: LocalizedError, Equatable {
     }
 }
 
+/// Store access for Series AV Pro. The monthly offer and its StoreKit price load anonymously (no account
+/// needed); a purchase or restore still needs the Apps AV account user so the `pro` entitlement is
+/// reconciled through the backend (see docs/subscription-access-contract.md).
 @MainActor
 protocol SeriesSubscriptionPurchasing {
+    /// Configures the store SDK anonymously at launch when the public key exists. Never throws or blocks.
+    func configureAtLaunchIfPossible()
+    /// Prepares the SDK for `user`; `nil` prepares an anonymous session that can show the price.
     func prepare(for user: SeriesAccountUser?) async throws
     func loadMonthlyOffer(for user: SeriesAccountUser?) async throws -> SeriesSubscriptionOffer
     func purchaseMonthlyPro(for user: SeriesAccountUser?) async throws -> SeriesPurchaseOutcome
     func restorePurchases(for user: SeriesAccountUser?) async throws -> SeriesPurchaseOutcome
 }
 
+extension SeriesSubscriptionPurchasing {
+    func configureAtLaunchIfPossible() {}
+}
+
 @MainActor
 final class NoopSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasing {
     func prepare(for user: SeriesAccountUser?) async throws {
-        guard user != nil else {
-            throw SeriesSubscriptionPurchaseError.missingAccountUser
-        }
         throw SeriesSubscriptionPurchaseError.missingConfiguration
     }
 
@@ -105,24 +112,25 @@ final class UITestSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasing {
         )
     }
 
-    func prepare(for user: SeriesAccountUser?) async throws {
+    func prepare(for user: SeriesAccountUser?) async throws {}
+
+    private func requireUser(_ user: SeriesAccountUser?) throws {
         guard user != nil else {
             throw SeriesSubscriptionPurchaseError.missingAccountUser
         }
     }
 
     func loadMonthlyOffer(for user: SeriesAccountUser?) async throws -> SeriesSubscriptionOffer {
-        try await prepare(for: user)
-        return offer
+        offer
     }
 
     func purchaseMonthlyPro(for user: SeriesAccountUser?) async throws -> SeriesPurchaseOutcome {
-        try await prepare(for: user)
+        try requireUser(user)
         return SeriesPurchaseOutcome(shouldRefreshAccess: false, customerUserID: user?.id ?? "")
     }
 
     func restorePurchases(for user: SeriesAccountUser?) async throws -> SeriesPurchaseOutcome {
-        try await prepare(for: user)
+        try requireUser(user)
         return SeriesPurchaseOutcome(shouldRefreshAccess: false, customerUserID: user?.id ?? "")
     }
 
@@ -147,10 +155,23 @@ final class RevenueCatSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasing
         self.monthlyPackageIDProvider = monthlyPackageIDProvider
     }
 
+    func configureAtLaunchIfPossible() {
+        guard !Purchases.isConfigured, let apiKey = apiKeyProvider(), !apiKey.isEmpty else { return }
+        Purchases.configure(withAPIKey: apiKey)
+        purchaseLogger.info("Configured RevenueCat anonymously at launch")
+    }
+
     func prepare(for user: SeriesAccountUser?) async throws {
-        let userID = try requireUserID(user)
         guard let apiKey = apiKeyProvider(), !apiKey.isEmpty else {
             throw SeriesSubscriptionPurchaseError.missingConfiguration
+        }
+
+        guard let userID = user?.id, !userID.isEmpty else {
+            // Anonymous session: enough to load the offering and show the StoreKit price.
+            if !Purchases.isConfigured {
+                Purchases.configure(withAPIKey: apiKey)
+            }
+            return
         }
 
         if configuredUserID == userID, Purchases.isConfigured {

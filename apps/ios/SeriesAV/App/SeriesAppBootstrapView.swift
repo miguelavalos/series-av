@@ -127,6 +127,7 @@ struct SeriesAppBootstrapView: View {
     }
 
     private func skipAuthentication() {
+        accessController.cancelPendingPurchase()
         authPresentationState = .hidden
         automaticGuestOnboardingIsPresented = false
         postAuthenticationSplashIsPresented = true
@@ -155,6 +156,7 @@ struct SeriesAppBootstrapView: View {
         authenticationWasSkipped = false
         automaticGuestOnboardingIsPresented = false
         authPresentationState = .hidden
+        await accessController.resumePendingPurchaseIfNeeded()
     }
 
     private func startGoogleSignIn() async throws {
@@ -162,6 +164,7 @@ struct SeriesAppBootstrapView: View {
         authenticationWasSkipped = false
         automaticGuestOnboardingIsPresented = false
         authPresentationState = .hidden
+        await accessController.resumePendingPurchaseIfNeeded()
     }
 
     private func handlePendingOpenURL(_ url: URL?) {

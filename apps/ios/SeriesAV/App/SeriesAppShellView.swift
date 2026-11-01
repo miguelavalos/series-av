@@ -16,7 +16,8 @@ struct SeriesAppShellView: View {
     @State private var librarySyncTask: Task<Void, Never>?
     @State private var lastAutomaticLibrarySyncRequestedAt: Date?
     @State private var chromeItem: AVAppShellChromeItem?
-    @State private var isShowingUITestPaywall = SeriesUITestEnvironment.current.shouldShowPaywall
+    /// Shown for the UI-test paywall scenario and when a guest signs in from the paywall to subscribe.
+    @State private var isShowingShellPaywall = SeriesUITestEnvironment.current.shouldShowPaywall
 
     init(
         selectedTab: Binding<SeriesRootTab>,
@@ -35,6 +36,9 @@ struct SeriesAppShellView: View {
 
     var body: some View {
         adaptiveShell
+            .onChange(of: accessController.limits.activeLibrarySeries, initial: true) { _, limit in
+                store.activeLibraryLimit = limit
+            }
             .task(id: accessController.accessMode) {
                 scheduleSignedInLibrarySync(after: .milliseconds(150))
             }
@@ -51,7 +55,12 @@ struct SeriesAppShellView: View {
             .onChange(of: store.entries) { _, entries in
                 librarySync.localEntriesDidChange(entries, accessController: accessController)
             }
-            .sheet(isPresented: $isShowingUITestPaywall) {
+            .onChange(of: accessController.isSignedIn, initial: true) { _, isSignedIn in
+                if isSignedIn, accessController.hasPendingPurchase {
+                    isShowingShellPaywall = true
+                }
+            }
+            .sheet(isPresented: $isShowingShellPaywall) {
                 SeriesProPaywallView(
                     accessController: accessController,
                     startSignInFlow: startSignInFlow
@@ -367,7 +376,8 @@ struct SeriesAppShellView: View {
             case .library:
                 SeriesLibraryTabScreen(
                     store: store,
-                    accessController: accessController
+                    accessController: accessController,
+                    startSignInFlow: startSignInFlow
                 )
             case .search:
                 SeriesSearchScreen(

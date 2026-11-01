@@ -84,6 +84,8 @@ final class SeriesAccessController {
     private(set) var isSubscriptionOperationInProgress: Bool
     private(set) var isWaitingForSubscriptionReconciliation: Bool
     private(set) var subscriptionReconciliationSource: SubscriptionReconciliationSource?
+    /// Monthly purchase a guest asked for before signing in; completed by `resumePendingPurchaseIfNeeded()`.
+    private(set) var hasPendingPurchase = false
 
     init(
         accountService: SeriesAVAccountServicing = DefaultSeriesAVAccountService(),
@@ -141,6 +143,7 @@ final class SeriesAccessController {
         self.isWaitingForSubscriptionReconciliation = false
         self.subscriptionReconciliationSource = nil
         resolveAccessState()
+        self.subscriptionPurchasing.configureAtLaunchIfPossible()
     }
 
     var isSignedIn: Bool {
@@ -282,12 +285,9 @@ final class SeriesAccessController {
         userDefaults.set(now(), forKey: guestOnboardingLastPromptAtKey)
     }
 
+    /// Loads the monthly offer and its StoreKit price. Works for guests: the store session is anonymous
+    /// until an Apps AV account user appears.
     func loadMonthlySubscriptionOffer() async {
-        guard accountUser != nil else {
-            subscriptionError = .missingAccountUser
-            return
-        }
-
         do {
             subscriptionOffer = try await subscriptionPurchasing.loadMonthlyOffer(for: subscriptionAccountUser)
             subscriptionError = nil
@@ -299,9 +299,34 @@ final class SeriesAccessController {
     }
 
     func purchaseMonthlyPro() async {
+        hasPendingPurchase = false
         await runSubscriptionOperation(source: .purchase) {
             try await subscriptionPurchasing.purchaseMonthlyPro(for: subscriptionAccountUser)
         }
+    }
+
+    /// Guest tap on "Subscribe": remembers the intent so the purchase continues right after sign-in.
+    /// Returns `false` when the caller must present sign-in first.
+    func requestMonthlyPurchase() -> Bool {
+        guard isSignedIn else {
+            hasPendingPurchase = true
+            return false
+        }
+        return true
+    }
+
+    /// Continues a purchase requested before sign-in. The `pro` entitlement still resolves through Apps AV.
+    func resumePendingPurchaseIfNeeded() async {
+        guard hasPendingPurchase, isSignedIn else { return }
+        guard accessMode != .signedInPro else {
+            hasPendingPurchase = false
+            return
+        }
+        await purchaseMonthlyPro()
+    }
+
+    func cancelPendingPurchase() {
+        hasPendingPurchase = false
     }
 
     func restorePurchases() async {
@@ -421,9 +446,10 @@ final class SeriesAccessController {
         }
     }
 
+    /// Keeps `subscriptionOffer`: the price is the same anonymous StoreKit value for every account state.
     private func clearSubscriptionState() {
-        subscriptionOffer = nil
         subscriptionError = nil
+        hasPendingPurchase = false
         isSubscriptionOperationInProgress = false
         clearSubscriptionReconciliationState()
     }

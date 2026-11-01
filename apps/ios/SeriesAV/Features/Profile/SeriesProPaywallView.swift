@@ -51,6 +51,7 @@ struct SeriesProPaywallView: View {
                 }
             }
 
+            guestHintRow
             subscriptionTermsRow
 
             if accessController.isWaitingForSubscriptionReconciliation {
@@ -230,9 +231,10 @@ struct SeriesProPaywallView: View {
         )
     }
 
+    /// Terms are visible to everyone, guests included, as soon as the StoreKit price is known.
     @ViewBuilder
     private var subscriptionTermsRow: some View {
-        if accessController.isSignedIn, let offer = accessController.subscriptionOffer {
+        if let offer = accessController.subscriptionOffer {
             AVPaywallStatusRow(
                 systemImage: "calendar.badge.clock",
                 message: L10n.string("paywall.subscriptionTerms", offer.localizedPrice)
@@ -241,19 +243,28 @@ struct SeriesProPaywallView: View {
         }
     }
 
-    private func primaryAction() {
-        if accessController.isSignedIn {
-            Task { await accessController.purchaseMonthlyPro() }
-        } else {
-            dismiss()
-            startSignInFlow()
+    @ViewBuilder
+    private var guestHintRow: some View {
+        if !accessController.isSignedIn {
+            AVPaywallStatusRow(
+                systemImage: "person.crop.circle.badge.checkmark",
+                message: L10n.string("paywall.guest.hint")
+            )
+            .accessibilityIdentifier("paywall.guest.hint")
         }
     }
 
-    private var primaryButtonTitle: String {
-        guard accessController.isSignedIn else {
-            return L10n.string("profile.pro.signIn")
+    private func primaryAction() {
+        guard accessController.requestMonthlyPurchase() else {
+            // Guest: sign in first; the purchase continues automatically once the account exists.
+            dismiss()
+            startSignInFlow()
+            return
         }
+        Task { await accessController.purchaseMonthlyPro() }
+    }
+
+    private var primaryButtonTitle: String {
         if accessController.isSubscriptionOperationInProgress {
             return L10n.string("paywall.purchase.loading")
         }
@@ -268,7 +279,7 @@ struct SeriesProPaywallView: View {
 
     private var primaryButtonIsDisabled: Bool {
         if !accessController.isSignedIn {
-            return !accessController.accountIsAvailable
+            return !accessController.accountIsAvailable || accessController.subscriptionOffer == nil
         }
         return accessController.isWaitingForSubscriptionReconciliation ||
             accessController.isSubscriptionOperationInProgress ||
@@ -327,13 +338,15 @@ struct SeriesProPaywallView: View {
         }
     }
 
+    /// Only real Pro value: cloud sync (the one exclusive feature), the 1000-series library, and the
+    /// account-managed subscription.
     private var benefitItems: [AVPaywallBenefitItem] {
         [
             AVPaywallBenefitItem(
-                id: "avi",
-                systemImage: "sparkles",
-                title: L10n.string("paywall.benefit.avi.title"),
-                detail: L10n.string("paywall.benefit.avi")
+                id: "sync",
+                systemImage: "icloud",
+                title: L10n.string("paywall.benefit.sync.title"),
+                detail: L10n.string("paywall.benefit.sync")
             ),
             AVPaywallBenefitItem(
                 id: "library",
@@ -342,10 +355,10 @@ struct SeriesProPaywallView: View {
                 detail: L10n.string("paywall.benefit.library")
             ),
             AVPaywallBenefitItem(
-                id: "sync",
-                systemImage: "icloud",
-                title: L10n.string("paywall.benefit.sync.title"),
-                detail: L10n.string("paywall.benefit.sync")
+                id: "account",
+                systemImage: "checkmark.seal.fill",
+                title: L10n.string("paywall.benefit.account.title"),
+                detail: L10n.string("paywall.benefit.account")
             )
         ]
     }

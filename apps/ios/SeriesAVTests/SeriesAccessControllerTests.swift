@@ -585,18 +585,93 @@ final class SeriesAccessControllerTests: XCTestCase {
         XCTAssertEqual(subscriptionPurchasing.lastPurchasedUser?.displayName, "Profile User")
     }
 
-    func testLoadMonthlySubscriptionOfferRequiresSignedInUser() async {
+    func testGuestCanSeeMonthlyOfferAndPriceWithoutAnAccount() async {
+        let subscriptionPurchasing = StubSeriesSubscriptionPurchasing()
         let controller = SeriesAccessController(
             accountService: StubSeriesAVAccountService(restoreResult: .signedOut),
             profileResolver: StubSeriesAccountProfileResolver(user: nil),
             entitlementService: StubSeriesEntitlementService(access: .guest),
-            subscriptionPurchasing: StubSeriesSubscriptionPurchasing(),
+            subscriptionPurchasing: subscriptionPurchasing,
             userDefaults: isolatedUserDefaults()
         )
 
+        await controller.syncFromAccountProvider()
         await controller.loadMonthlySubscriptionOffer()
 
-        XCTAssertEqual(controller.subscriptionError, .missingAccountUser)
+        XCTAssertEqual(controller.accessMode, .guest)
+        XCTAssertEqual(subscriptionPurchasing.configureAtLaunchCount, 1)
+        XCTAssertNil(subscriptionPurchasing.lastLoadedOfferUser)
+        XCTAssertEqual(controller.subscriptionOffer?.localizedPrice, "$2.99")
+        XCTAssertNil(controller.subscriptionError)
+    }
+
+    func testGuestSubscribeTapWaitsForSignInAndThenPurchasesOnce() async {
+        let subscriptionPurchasing = StubSeriesSubscriptionPurchasing()
+        let controller = SeriesAccessController(
+            accountService: StubSeriesAVAccountService(
+                restoreResult: .active(SeriesAccountUser(
+                    id: "provider-user-1",
+                    displayName: "Provider User",
+                    emailAddress: "provider@example.com"
+                )),
+                token: "provider-token"
+            ),
+            profileResolver: StubSeriesAccountProfileResolver(user: SeriesAccountUser(
+                id: "profile-user-1",
+                displayName: "Profile User",
+                emailAddress: "profile@example.com"
+            )),
+            entitlementService: StubSeriesEntitlementService(access: SeriesResolvedAccess(
+                platformUserId: "apps-av-user-1",
+                planTier: .free,
+                accessMode: .signedInFree,
+                capabilities: .forMode(.signedInFree),
+                limits: .forMode(.signedInFree)
+            )),
+            subscriptionPurchasing: subscriptionPurchasing,
+            userDefaults: isolatedUserDefaults(),
+            subscriptionReconciliationRetryDelaysNanoseconds: [],
+            sleepNanoseconds: { _ in }
+        )
+
+        // Fresh install: still a guest until the account provider is synced.
+        XCTAssertFalse(controller.isSignedIn)
+        XCTAssertFalse(controller.requestMonthlyPurchase())
+        XCTAssertTrue(controller.hasPendingPurchase)
+
+        // Not signed in yet: nothing happens.
+        await controller.resumePendingPurchaseIfNeeded()
+        XCTAssertEqual(subscriptionPurchasing.purchaseCount, 0)
+
+        await controller.syncFromAccountProvider()
+        XCTAssertTrue(controller.isSignedIn)
+        XCTAssertTrue(controller.requestMonthlyPurchase())
+
+        await controller.resumePendingPurchaseIfNeeded()
+        XCTAssertEqual(subscriptionPurchasing.purchaseCount, 1)
+        XCTAssertEqual(subscriptionPurchasing.lastPurchasedUser?.id, "apps-av-user-1")
+        XCTAssertFalse(controller.hasPendingPurchase)
+
+        await controller.resumePendingPurchaseIfNeeded()
+        XCTAssertEqual(subscriptionPurchasing.purchaseCount, 1)
+    }
+
+    func testCancellingPendingPurchaseOrSkippingSignInClearsTheIntent() async {
+        let subscriptionPurchasing = StubSeriesSubscriptionPurchasing()
+        let controller = SeriesAccessController(
+            accountService: StubSeriesAVAccountService(restoreResult: .signedOut),
+            profileResolver: StubSeriesAccountProfileResolver(user: nil),
+            entitlementService: StubSeriesEntitlementService(access: .guest),
+            subscriptionPurchasing: subscriptionPurchasing,
+            userDefaults: isolatedUserDefaults()
+        )
+
+        XCTAssertFalse(controller.requestMonthlyPurchase())
+        controller.cancelPendingPurchase()
+        XCTAssertFalse(controller.hasPendingPurchase)
+
+        await controller.resumePendingPurchaseIfNeeded()
+        XCTAssertEqual(subscriptionPurchasing.purchaseCount, 0)
     }
 
     func testGuestCannotStartSubscriptionPurchaseOrRestore() async {
@@ -810,6 +885,12 @@ private final class StubSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasi
         localizedPrice: "$2.99"
     )
 
+    private(set) var configureAtLaunchCount = 0
+
+    func configureAtLaunchIfPossible() {
+        configureAtLaunchCount += 1
+    }
+
     func prepare(for user: SeriesAccountUser?) async throws {
         guard user != nil else {
             throw SeriesSubscriptionPurchaseError.missingAccountUser
@@ -817,7 +898,6 @@ private final class StubSeriesSubscriptionPurchasing: SeriesSubscriptionPurchasi
     }
 
     func loadMonthlyOffer(for user: SeriesAccountUser?) async throws -> SeriesSubscriptionOffer {
-        try await prepare(for: user)
         lastLoadedOfferUser = user
         return offer
     }

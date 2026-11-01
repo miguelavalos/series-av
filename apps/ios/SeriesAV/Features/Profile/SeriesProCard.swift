@@ -34,9 +34,9 @@ struct SeriesProCard: View {
                 benefitInfoRows
             } else {
                 compactBenefitRow(
-                    systemImage: "checkmark.seal.fill",
-                    title: L10n.string("profile.pro.account.title"),
-                    detail: L10n.string("profile.pro.account.detail")
+                    systemImage: "icloud",
+                    title: L10n.string("profile.pro.sync.title"),
+                    detail: L10n.string("profile.pro.sync.detail")
                 )
                 compactBenefitRow(
                     systemImage: "rectangle.stack.badge.person.crop",
@@ -44,9 +44,9 @@ struct SeriesProCard: View {
                     detail: L10n.string("profile.pro.library.detail")
                 )
                 compactBenefitRow(
-                    systemImage: "sparkles",
-                    title: L10n.string("profile.pro.avi.title"),
-                    detail: L10n.string("profile.pro.avi.detail")
+                    systemImage: "checkmark.seal.fill",
+                    title: L10n.string("profile.pro.account.title"),
+                    detail: L10n.string("profile.pro.account.detail")
                 )
             }
         }
@@ -57,9 +57,9 @@ struct SeriesProCard: View {
     @ViewBuilder
     private var benefitInfoRows: some View {
         AVSettingsInfoRow(
-            systemImage: "checkmark.seal.fill",
-            title: L10n.string("profile.pro.account.title"),
-            detail: L10n.string("profile.pro.account.detail")
+            systemImage: "icloud",
+            title: L10n.string("profile.pro.sync.title"),
+            detail: L10n.string("profile.pro.sync.detail")
         )
         AVSettingsInfoRow(
             systemImage: "rectangle.stack.badge.person.crop",
@@ -67,9 +67,9 @@ struct SeriesProCard: View {
             detail: L10n.string("profile.pro.library.detail")
         )
         AVSettingsInfoRow(
-            systemImage: "sparkles",
-            title: L10n.string("profile.pro.avi.title"),
-            detail: L10n.string("profile.pro.avi.detail")
+            systemImage: "checkmark.seal.fill",
+            title: L10n.string("profile.pro.account.title"),
+            detail: L10n.string("profile.pro.account.detail")
         )
     }
 
@@ -111,7 +111,15 @@ struct SeriesProCard: View {
     private var actionButton: some View {
         switch accessController.accessMode {
         case .guest:
-            EmptyView()
+            // Guests can see the price and the paywall; sign-in happens when they subscribe.
+            tabletAlignedContent {
+                AVSettingsButton(
+                    title: L10n.string("profile.pro.viewOffer"),
+                    style: .primary,
+                    action: showProPaywall
+                )
+            }
+            .accessibilityIdentifier("profile.pro.viewOffer")
         case .signedInFree:
             tabletAlignedContent {
                 AVSettingsButton(
