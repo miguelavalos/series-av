@@ -23,7 +23,7 @@ final class SeriesAVSmokeUITests: XCTestCase {
             libraryTab: "Biblioteca",
             libraryTitle: "Biblioteca",
             accountTitle: "Cuenta",
-            paywallTitle: "Sigue más series"
+            paywallTitle: "Tu biblioteca en todos tus dispositivos"
         ),
         LocaleSmokeConfiguration(
             language: "ca",
@@ -497,7 +497,7 @@ final class SeriesAVSmokeUITests: XCTestCase {
         ])
         app.launch()
 
-        XCTAssertTrue(app.staticTexts["Sigue más series"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Tu biblioteca en todos tus dispositivos"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["Iniciar sesión"].exists)
         XCTAssertFalse(app.buttons["Restaurar compras"].exists)
         let redeemButton = app.buttons["paywall.redeemCode"].firstMatch
@@ -968,8 +968,8 @@ final class SeriesAVSmokeUITests: XCTestCase {
         ])
         app.launch()
 
-        XCTAssertTrue(app.staticTexts["Sigue más series"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.buttons["Continuar por 4,99 €"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Tu biblioteca en todos tus dispositivos"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["Suscribirse · 4,99 € / mes"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["Restaurar compras"].exists)
         XCTAssertTrue(
             staticText(
