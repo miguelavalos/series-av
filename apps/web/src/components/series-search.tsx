@@ -12,6 +12,7 @@ import { useSeriesLibrary } from "@/lib/series-library-provider";
 import { normalizeSearchText } from "@/lib/series-library";
 import { localizedSeriesPath, useSeriesApiLocale, useSeriesText } from "@/lib/series-i18n";
 import { useAppsAvLocale } from "@avalsys/apps-av-web";
+import { useAccountSession, useAccountToken } from "@avalsys/account-av-web";
 
 export function SeriesSearch() {
   const apiLocale = useSeriesApiLocale();
@@ -21,11 +22,16 @@ export function SeriesSearch() {
   const library = useSeriesLibrary();
   const [query, setQuery] = useState("");
   const client = useMemo(() => new SeriesApiClient(getSeriesApiBaseUrl()), []);
+  const accountSession = useAccountSession();
+  const getToken = useAccountToken();
   const trimmedQuery = query.trim();
   const catalog = useQuery({
-    enabled: trimmedQuery.length > 1,
-    queryFn: () => client.searchSeries({ query: trimmedQuery, locale: apiLocale, limit: 12 }),
-    queryKey: ["series-av", "search", apiLocale, trimmedQuery]
+    enabled: trimmedQuery.length > 1 && accountSession.isLoaded,
+    queryFn: async () => {
+      const token = accountSession.isSignedIn ? await getToken() : null;
+      return client.searchSeries({ query: trimmedQuery, locale: apiLocale, limit: 12, token });
+    },
+    queryKey: ["series-av", "search", apiLocale, trimmedQuery, accountSession.userId ?? null]
   });
   const popular = useQuery({
     enabled: trimmedQuery.length === 0,

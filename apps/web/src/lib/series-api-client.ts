@@ -85,6 +85,7 @@ export interface SearchSeriesInput {
   limit?: number;
   locale?: string;
   query: string;
+  token?: string | null;
 }
 
 export interface SeriesEpisodesResponse {
@@ -142,13 +143,16 @@ export interface SeriesLibrarySyncDocument {
 export class SeriesApiClient {
   constructor(private readonly baseUrl: string) {}
 
-  async searchSeries({ limit = 10, locale = "en-US", query }: SearchSeriesInput): Promise<SeriesSearchResponse> {
+  async searchSeries({ limit = 10, locale = "en-US", query, token }: SearchSeriesInput): Promise<SeriesSearchResponse> {
     const url = new URL(`${this.baseUrl}/v1/series/search`);
     url.searchParams.set("q", query);
     url.searchParams.set("locale", locale);
     url.searchParams.set("limit", String(Math.min(Math.max(limit, 1), 25)));
 
-    const response = await fetch(url);
+    // Anonymous search is catalog-only on the API; a signed-in miss may reach the provider.
+    const response = await fetch(url, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined
+    });
     if (!response.ok) {
       throw new Error(`Series search failed with ${response.status}.`);
     }
