@@ -42,6 +42,10 @@ Mandatory rules:
 - do not use `wrangler dev` or another local Worker as product app backend;
 - do not invent alternate runtime/testing flows when the private guide already
   defines one;
+- Infisical is the owner's and read-only for agents: never create, change
+  or delete a value there by any means; tell the owner the name,
+  environment and reason and the owner does it by hand ("Infisical" in
+  `project-bootstrap/docs/WORKING_RULES.md`);
 - use Infisical/Varlock-backed private tooling for config, deploy keys, and
   secret resolution;
 - Account AV iOS login must match Tune AV's keychain pattern:
