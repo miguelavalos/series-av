@@ -34,7 +34,7 @@ final class SeriesAVSmokeUITests: XCTestCase {
             libraryTab: "Biblioteca",
             libraryTitle: "Biblioteca",
             accountTitle: "Compte",
-            paywallTitle: "Segueix més sèries"
+            paywallTitle: "La teva biblioteca a tots els teus dispositius"
         ),
         LocaleSmokeConfiguration(
             language: "fr",
@@ -45,7 +45,7 @@ final class SeriesAVSmokeUITests: XCTestCase {
             libraryTab: "Bibliothèque",
             libraryTitle: "Bibliothèque",
             accountTitle: "Compte",
-            paywallTitle: "Suivez plus de séries"
+            paywallTitle: "Votre bibliothèque sur tous vos appareils"
         ),
         LocaleSmokeConfiguration(
             language: "de",
@@ -56,7 +56,7 @@ final class SeriesAVSmokeUITests: XCTestCase {
             libraryTab: "Bibliothek",
             libraryTitle: "Bibliothek",
             accountTitle: "Konto",
-            paywallTitle: "Verfolge mehr Serien"
+            paywallTitle: "Deine Bibliothek auf allen deinen Geräten"
         )
     ]
 
