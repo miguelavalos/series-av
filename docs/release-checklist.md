@@ -366,3 +366,34 @@ keep it green, and add or manually sign off the remaining real-account flows:
 2. Tune AV linked app blocks deletion.
 3. Active Pro access blocks deletion.
 4. Completed deletion signs out locally and returns Series AV to guest mode.
+
+## 1.0.4 (20) TestFlight delivery checkpoint, 2026-11-02
+
+iOS/iPadOS `1.0.4 (20)` was produced on `openspace` from public source
+`3d23d56` plus the build-number bump: the Pro offer (active-library limit
+enforced in the store at Guest 25 / Free 75 / Pro 1000, the monthly paywall
+priced for guests, Pro copy naming cloud sync and the limits in five
+languages, guide feedback only for signed-in accounts) and the web app sending
+the account token on catalog search. Build `19` was never uploaded and is not
+used.
+
+- Verification before archiving: production simulator release gate passed
+  (public config hygiene, production runtime config, production Search API
+  smoke, 8 focused unit tests, 3 localized UI tests at
+  AccessibilityXXXL, Release simulator build, Search screenshot). The first
+  gate run failed only because the localized paywall titles in the UI test
+  still held the old ca/fr/de copy; fixed in `3d23d56`. Web typecheck, 18 web
+  tests and the localized copy audit passed. The 132 iOS unit tests passed on
+  `home` for the same branch.
+- Archive
+  `.derived-data/release-archives/SeriesAV-1.0.4-20-2026-11-02-113052.xcarchive`,
+  bundle `com.avalsys.seriesav`, team `935PM55U6R`, app UUID
+  `2D9E980F-1242-3DE0-96E0-0CC4ECCD0855`, Sentry UUID
+  `9DF00CB7-052C-3CD8-8B5E-A0C80EED8402`; final archive verification passed.
+- Toolchain: Xcode 27.2. The Xcode Apple ID session on `openspace` is still
+  expired (`exportArchive Failed to Use Accounts`); the upload used the App
+  Store Connect API key path from the private release machine setup. Upload
+  accepted at 11:34 CET (`Upload succeeded`, `EXPORT SUCCEEDED`).
+- No App Review attachment or submission, no external testing, no backend or
+  production-data change from this delivery. Processing and group status: see
+  the private Series AV status checkpoint.

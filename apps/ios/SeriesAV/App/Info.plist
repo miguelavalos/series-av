@@ -44,7 +44,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>19</string>
+	<string>20</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
@@ -59,6 +59,8 @@
 	<string>$(SERIESAV_DEBUG_FORCE_PRO_MODE)</string>
 	<key>SERIESAV_DELETE_ACCOUNT_URL</key>
 	<string>$(SERIESAV_DELETE_ACCOUNT_URL)</string>
+	<key>SERIESAV_IOS_SENTRY_DSN</key>
+	<string>$(SERIESAV_IOS_SENTRY_DSN)</string>
 	<key>SERIESAV_OPEN_SOURCE_URL</key>
 	<string>$(SERIESAV_OPEN_SOURCE_URL)</string>
 	<key>SERIESAV_PRIVACY_URL</key>
@@ -69,8 +71,6 @@
 	<string>$(SERIESAV_REVENUECAT_OFFERING_ID)</string>
 	<key>SERIESAV_REVENUECAT_PUBLIC_API_KEY</key>
 	<string>$(SERIESAV_REVENUECAT_PUBLIC_API_KEY)</string>
-	<key>SERIESAV_IOS_SENTRY_DSN</key>
-	<string>$(SERIESAV_IOS_SENTRY_DSN)</string>
 	<key>SERIESAV_SUPPORT_EMAIL</key>
 	<string>$(SERIESAV_SUPPORT_EMAIL)</string>
 	<key>SERIESAV_SUPPORT_URL</key>
@@ -84,10 +84,10 @@
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<false/>
 	</dict>
-	<key>UIRequiresFullScreen</key>
-	<true/>
 	<key>UILaunchScreen</key>
 	<dict/>
+	<key>UIRequiresFullScreen</key>
+	<true/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
