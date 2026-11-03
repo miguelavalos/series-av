@@ -78,3 +78,24 @@ Mandatory rules:
 
 If the private repo is unavailable, stop and say that the authoritative runbook
 cannot be checked. Do not substitute a guessed local workflow.
+
+## Pull requests
+
+Run `vp run check` once before opening a pull request. It runs the
+localized-copy audit, the simulator iOS build and the web typecheck, after
+`pnpm install`. The full suite, release builds, archives and device runs
+belong to CI and to the required checks; do not repeat them locally unless
+the change needs it or the owner asks.
+
+A fresh worktree runs `scripts/setup-worktree.sh` through `t3.json`: it links
+`account-av` and `apps-av` beside the worktree from the main checkout and
+installs the pnpm dependencies. Wait for it before installing anything by
+hand.
+
+## Review
+
+The independent review that sets `agent-review` follows
+[`project-bootstrap/docs/REVIEW.md`](https://github.com/miguelavalos/project-bootstrap/blob/main/docs/REVIEW.md),
+at `~/github/project-bootstrap/docs/REVIEW.md` on agent machines. The reviewer
+is a fresh agent that did not write the change. Its review comment starts with
+`PASS` or `BLOCK`.
